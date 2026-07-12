@@ -106,7 +106,7 @@ function isResultsComplete(results) {
 }
 
 export default function App() {
-  const [phase, setPhase] = useState("idle"); // idle | drawing | done
+  const [phase, setPhase] = useState("idle"); 
   const [speed, setSpeed] = useState("normal");
   const [results, setResults] = useState(createEmptyResults());
   const [drawnTeamIds, setDrawnTeamIds] = useState(new Set());
