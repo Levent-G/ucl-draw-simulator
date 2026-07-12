@@ -1,15 +1,21 @@
-import React from 'react'
-import { getTeamsByPot, POT_COLORS } from '../data/teams.js'
-import Crest from './Crest.jsx'
+import React from "react";
+import { getTeamsByPot, POT_COLORS } from "../data/teams.js";
+import Crest from "./Crest.jsx";
 
 const VENUES = [
-  { key: 'home', label: 'İÇ SAHA' },
-  { key: 'away', label: 'DEPLASMAN' },
-]
+  { key: "home", label: "İÇ SAHA" },
+  { key: "away", label: "DEPLASMAN" },
+];
 
-export default function PotTable({ pot, results, drawnTeamIds, activeTeamId, pendingCells }) {
-  const teams = getTeamsByPot(pot)
-  const color = POT_COLORS[pot]
+export default function PotTable({
+  pot,
+  results,
+  drawnTeamIds,
+  activeTeamId,
+  pendingCells,
+}) {
+  const teams = getTeamsByPot(pot);
+  const color = POT_COLORS[pot];
 
   return (
     <div className="pot-table-card">
@@ -43,44 +49,51 @@ export default function PotTable({ pot, results, drawnTeamIds, activeTeamId, pen
           </thead>
           <tbody>
             {teams.map((team) => {
-              const drawn = drawnTeamIds.has(team.id)
-              const fixtures = results[team.id]
+              const drawn = drawnTeamIds.has(team.id);
+              const fixtures = results[team.id];
               return (
                 <tr
                   key={team.id}
-                  className={`draw-row ${activeTeamId === team.id ? 'active-row' : ''} ${!drawn ? 'not-drawn' : ''}`}
+                  className={`draw-row ${
+                    activeTeamId === team.id ? "active-row" : ""
+                  } ${!drawn ? "not-drawn" : ""}`}
                 >
                   <td className="team-name-cell">
-                    <Crest team={team} size={52} />
+                    <Crest team={team} size={22} />
                     <span>{team.name}</span>
                   </td>
                   {[1, 2, 3, 4].flatMap((p) =>
                     VENUES.map((v) => {
-                      const opp = fixtures[p][v.key]
-                      const cellKey = `${team.id}:${p}:${v.key}`
-                      const isPending = pendingCells.has(cellKey)
+                      const opp = fixtures[p][v.key];
+                      const cellKey = `${team.id}:${p}:${v.key}`;
+                      // Bu hücre başka bir takımın çekilişiyle (ayna eşleşme
+                      // olarak) daha önceden zaten dolmuş olabilir -- o
+                      // durumda üzerine loading barı binmesin.
+                      const isLoading = pendingCells.has(cellKey) && !opp;
                       return (
                         <td
                           key={cellKey}
-                          className={`fixture-cell ${opp ? 'filled' : ''} ${isPending ? 'loading' : ''}`}
+                          className={`fixture-cell ${opp ? "filled" : ""} ${
+                            isLoading ? "loading" : ""
+                          }`}
                         >
                           {opp && (
                             <span className="fixture-cell-inner">
-                              <Crest team={opp} size={36} />
+                              <Crest team={opp} size={16} />
                               <span>{opp.short}</span>
                             </span>
                           )}
-                          {isPending && <span className="cell-shimmer" />}
+                          {isLoading && <span className="cell-shimmer" />}
                         </td>
-                      )
+                      );
                     })
                   )}
                 </tr>
-              )
+              );
             })}
           </tbody>
         </table>
       </div>
     </div>
-  )
+  );
 }
