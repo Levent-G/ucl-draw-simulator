@@ -1063,18 +1063,29 @@ button {
 }
 
 /* ==========================================================================
-     START ORB -- büyük, yuvarlak, özgün tasarımlı başlat düğmesi
-     (gerçek UEFA amblemi DEĞİL; orijinal bir "top" motifi)
+     START ORB -- üstte özgün "top" amblemi, altında ayrı yazı bloğu
+     (gerçek UEFA amblemi DEĞİL; orijinal bir tasarım)
      ========================================================================== */
 .start-orb {
-  position: relative;
-  width: 168px;
-  height: 168px;
-  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
   border: none;
   cursor: pointer;
   background: none;
-  padding: 0;
+  padding: 10;
+}
+.start-orb:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.start-orb-ball-wrap {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  flex-shrink: 0;
 }
 .start-orb-ring {
   position: absolute;
@@ -1096,7 +1107,7 @@ button {
     opacity: 0;
   }
 }
-.start-orb-core {
+.start-orb-ball {
   position: absolute;
   inset: 0;
   border-radius: 50%;
@@ -1109,18 +1120,15 @@ button {
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06),
     0 20px 45px -14px rgba(84, 104, 255, 0.85),
     inset 0 2px 10px rgba(255, 255, 255, 0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.start-orb:hover .start-orb-core {
+.start-orb:hover .start-orb-ball {
   transform: scale(1.045);
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1),
     0 24px 55px -14px rgba(232, 121, 201, 0.7),
     inset 0 2px 10px rgba(255, 255, 255, 0.2);
 }
-.start-orb:active .start-orb-core {
+.start-orb:active .start-orb-ball {
   transform: scale(0.99);
 }
 .start-orb-pattern {
@@ -1129,27 +1137,41 @@ button {
   width: 100%;
   height: 100%;
 }
+.start-orb-custom-img {
+  position: absolute;
+  left: 50%;
+  top: 92%; /* biraz yukarı taşı */
+  width: 175%;
+  height: auto;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+  clip-path: inset(0 0 48% 0); /* alttaki yazıyı kes */
+  filter: brightness(0) invert(1);
+}
+
 .start-orb-label {
-  position: relative;
-  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  line-height: 1.15;
+  line-height: 1.2;
 }
 .start-orb-title {
   font-family: var(--font-display);
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 600;
-  letter-spacing: 0.03em;
-  color: #fff;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
 }
 .start-orb-sub {
   font-family: var(--font-display);
-  font-size: 21px;
+  font-size: 26px;
   font-weight: 700;
-  letter-spacing: 0.05em;
-  color: var(--ucl-blue-3);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  margin-top: 2px;
+  text-shadow: 0 2px 12px rgba(91, 157, 255, 0.5);
 }
 
 .control-bar-hint {
@@ -1629,14 +1651,17 @@ button {
   }
 
   .start-orb {
-    width: 128px;
-    height: 128px;
+    gap: 10px;
+  }
+  .start-orb-ball-wrap {
+    width: 118px;
+    height: 118px;
   }
   .start-orb-title {
-    font-size: 13px;
+    font-size: 12px;
   }
   .start-orb-sub {
-    font-size: 16px;
+    font-size: 19px;
   }
 
   .sphere-panel {
