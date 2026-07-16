@@ -1,5 +1,21 @@
 // Tarayıcının yerleşik SpeechSynthesis API'sini kullanır -- ekstra ses
 // dosyası ya da telifli içerik gerektirmez, tamamen ücretsiz ve yereldir.
+// Mobil tarayıcılar sesli okumayı yalnızca bir kullanıcı tıklamasıyla TAM O
+// ANDA (senkron) başlatılırsa çalıştırıyor. Bu yüzden, asıl anonslardan önce
+// tıklama anında sessiz/boş bir cümleyle motoru "ısındırıp" kilidini açıyoruz
+// -- bundan sonra aynı sayfa oturumunda gecikmeli speak() çağrıları da çalışır.
+export function unlockSpeech() {
+  if (typeof window === "undefined" || !window.speechSynthesis) return;
+  try {
+    const utter = new SpeechSynthesisUtterance(" ");
+    utter.volume = 0;
+    utter.lang = "tr-TR";
+    window.speechSynthesis.speak(utter);
+  } catch (e) {
+    // yok say
+  }
+}
+
 export function speak(text, enabled, { cancelFirst = false } = {}) {
   if (!enabled) return;
   if (typeof window === "undefined" || !window.speechSynthesis) return;

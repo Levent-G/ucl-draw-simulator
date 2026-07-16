@@ -9,7 +9,7 @@ import { TEAMS, POT_COLORS, COUNTRY_NAMES } from "./data/teams.js";
 import { generateFullDraw, buildAnnouncementPlan } from "./utils/drawEngine.js";
 import { createEmptyResults } from "./utils/resultsHelpers.js";
 import { findDerby } from "./utils/derbies.js";
-import { speak, cancelSpeech } from "./utils/speech.js";
+import { speak, cancelSpeech, unlockSpeech } from "./utils/speech.js";
 import ControlBar from "./components/ControlBar.jsx";
 import DrumSphere from "./components/DrumSphere.jsx";
 import AnnouncerPanel from "./components/AnnouncerPanel.jsx";
@@ -20,6 +20,7 @@ import PaperReveal from "./components/PaperReveal.jsx";
 import CurrentDrawPanel from "./components/CurrentDrawPanel.jsx";
 import DerbyBanner from "./components/DerbyBanner.jsx";
 import FavoriteTeamPicker from "./components/FavoriteTeamPicker.jsx";
+import StartOrb from "./components/StartOrb.jsx";
 import Confetti from "./components/Confetti.jsx";
 
 const DRAW_COUNT_KEY = "uclDrawCount";
@@ -179,6 +180,18 @@ export default function App() {
     []
   );
 
+  // Bazı mobil tarayıcılar, sayfa yeniden açıldığında önceki oturumdaki
+  // scroll konumunu hatırlayıp otomatik oraya kaydırıyor (örn. çekiliş
+  // başladığında tabloya kaymıştık, sayfa yenilenince oraya geri dönüyor).
+  // Bu yüzden sayfa her yüklendiğinde en başa sarıyoruz ki kurulum paneli
+  // (favori takım seçimi) her zaman ilk görülen şey olsun.
+  useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+    window.scrollTo(0, 0);
+  }, []);
+
   const activeTeam = useMemo(
     () => TEAMS.find((t) => t.id === activeTeamId) || null,
     [activeTeamId]
@@ -207,6 +220,7 @@ export default function App() {
     setProgress(0);
     setError(null);
     setDerbyVisible(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   const handleToggleFavorite = useCallback((teamId) => {
@@ -385,6 +399,12 @@ export default function App() {
   }, []);
 
   const handleStart = useCallback(() => {
+    // Mobil tarayıcılar (özellikle iOS Safari) sesli okumaya (TTS) sadece
+    // kullanıcı tıklamasıyla TAM O ANDA başlarsa izin veriyor. Bu yüzden
+    // asıl konuşmalar birkaç saniye sonra (animasyon gecikmelerinin içinde)
+    // gelse bile, motoru burada -- tıklamayla senkron -- "kilidini açarak"
+    // hazırlıyoruz.
+    unlockSpeech();
     resetAll();
     try {
       const matches = generateFullDraw(TEAMS);
@@ -529,6 +549,12 @@ export default function App() {
           onToggleTts={setTtsEnabled}
           drawCount={drawCount}
         />
+      )}
+
+      {phase === "idle" && (
+        <div className="mobile-start-cta">
+          <StartOrb onClick={handleStart} label="ÇEKİLİŞİ" sublabel="BAŞLAT" />
+        </div>
       )}
 
       <div className="main-layout" ref={tableSectionRef}>

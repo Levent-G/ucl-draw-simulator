@@ -832,14 +832,13 @@ button {
     opacity: 1;
   }
 }
-/* Mobilde tablolar alt alta dizilip alan çok uzayabiliyor; düğmeye
-     ulaşmak için scroll etmek zorunda kalınmasın diye ekranda sabitliyoruz. */
+/* Mobilde bu overlay tüm ekranı kaplayıp altındaki kurulum panelini
+     tıklanamaz hale getiriyordu -- bu yüzden mobilde tamamen gizliyoruz ve
+     yerine sayfanın normal akışında, her zaman görünen bir başlat butonu
+     kullanıyoruz (bkz. .mobile-start-cta). */
 @media (max-width: 700px) {
   .table-start-overlay {
-    position: fixed;
-    inset: 0;
-    border-radius: 0;
-    z-index: 30;
+    display: none;
   }
 }
 
@@ -1178,6 +1177,19 @@ button {
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--text-faint);
+}
+
+/* Mobilde tablolar alt alta dizilince çok uzayabiliyor; bu buton, sayfanın
+     normal akışında (overlay değil) her zaman görünür ve hiçbir şeyi bloklamaz. */
+.mobile-start-cta {
+  display: none;
+  justify-content: center;
+  margin: 4px 0 18px;
+}
+@media (max-width: 700px) {
+  .mobile-start-cta {
+    display: flex;
+  }
 }
 
 /* ==========================================================================
