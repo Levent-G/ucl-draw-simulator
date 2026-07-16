@@ -8,14 +8,21 @@ import React, {
 import { TEAMS, POT_COLORS, COUNTRY_NAMES } from "./data/teams.js";
 import { generateFullDraw, buildAnnouncementPlan } from "./utils/drawEngine.js";
 import { createEmptyResults } from "./utils/resultsHelpers.js";
+import { findDerby } from "./utils/derbies.js";
+import { speak, cancelSpeech } from "./utils/speech.js";
 import ControlBar from "./components/ControlBar.jsx";
 import DrumSphere from "./components/DrumSphere.jsx";
 import AnnouncerPanel from "./components/AnnouncerPanel.jsx";
 import PotTablesPanel from "./components/PotTablesPanel.jsx";
 import FinalResultsGrid from "./components/FinalResultsGrid.jsx";
+import FinalFavoriteSummary from "./components/FinalFavoriteSummary.jsx";
 import PaperReveal from "./components/PaperReveal.jsx";
 import CurrentDrawPanel from "./components/CurrentDrawPanel.jsx";
+import DerbyBanner from "./components/DerbyBanner.jsx";
+import FavoriteTeamPicker from "./components/FavoriteTeamPicker.jsx";
 import Confetti from "./components/Confetti.jsx";
+
+const DRAW_COUNT_KEY = "uclDrawCount";
 
 // mix: sıradaki takım çekilmeden önce topların karışma süresi
 // eject: topun küreden fırlayıp ekrana gelme süresi
@@ -106,7 +113,7 @@ function isResultsComplete(results) {
 }
 
 export default function App() {
-  const [phase, setPhase] = useState("idle"); 
+  const [phase, setPhase] = useState("idle"); // idle | drawing | done
   const [speed, setSpeed] = useState("normal");
   const [results, setResults] = useState(createEmptyResults());
   const [drawnTeamIds, setDrawnTeamIds] = useState(new Set());
@@ -125,18 +132,52 @@ export default function App() {
   const [error, setError] = useState(null);
   const [uclLogoFailed, setUclLogoFailed] = useState(false);
 
+  // Favori takım / tahmin oyunu / sesli anlatım / yerel çekiliş sayacı
+  const [favoriteTeamId, setFavoriteTeamId] = useState(null);
+  const [predictions, setPredictions] = useState([]);
+  const [ttsEnabled, setTtsEnabled] = useState(true);
+  const [drawCount, setDrawCount] = useState(0);
+  const [derbyLabel, setDerbyLabel] = useState(null);
+  const [derbyVisible, setDerbyVisible] = useState(false);
+  const [derbyKey, setDerbyKey] = useState(0);
+
   const eventsRef = useRef([]);
   const timeoutRef = useRef(null);
   const speedRef = useRef(speed);
   const tableSectionRef = useRef(null);
   const audioRef = useRef(null);
   const resultsRef = useRef(createEmptyResults());
+  const favoriteTeamIdRef = useRef(null);
+  const ttsEnabledRef = useRef(true);
 
   useEffect(() => {
     speedRef.current = speed;
   }, [speed]);
 
-  useEffect(() => () => clearTimeout(timeoutRef.current), []);
+  useEffect(() => {
+    favoriteTeamIdRef.current = favoriteTeamId;
+  }, [favoriteTeamId]);
+
+  useEffect(() => {
+    ttsEnabledRef.current = ttsEnabled;
+  }, [ttsEnabled]);
+
+  useEffect(() => {
+    try {
+      const stored = Number(window.localStorage.getItem(DRAW_COUNT_KEY) || "0");
+      setDrawCount(Number.isFinite(stored) ? stored : 0);
+    } catch (e) {
+      // localStorage kapalı olabilir (gizli sekme vb.); sessizce yok say.
+    }
+  }, []);
+
+  useEffect(
+    () => () => {
+      clearTimeout(timeoutRef.current);
+      cancelSpeech();
+    },
+    []
+  );
 
   const activeTeam = useMemo(
     () => TEAMS.find((t) => t.id === activeTeamId) || null,
@@ -145,6 +186,7 @@ export default function App() {
 
   const resetAll = useCallback(() => {
     clearTimeout(timeoutRef.current);
+    cancelSpeech();
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
@@ -164,6 +206,20 @@ export default function App() {
     setShowConfetti(false);
     setProgress(0);
     setError(null);
+    setDerbyVisible(false);
+  }, []);
+
+  const handleToggleFavorite = useCallback((teamId) => {
+    setFavoriteTeamId(teamId);
+    setPredictions([]);
+  }, []);
+
+  const handleTogglePrediction = useCallback((teamId) => {
+    setPredictions((prev) => {
+      if (prev.includes(teamId)) return prev.filter((id) => id !== teamId);
+      if (prev.length >= 3) return prev;
+      return [...prev, teamId];
+    });
   }, []);
 
   const processEvent = useCallback((idx) => {
@@ -200,6 +256,13 @@ export default function App() {
           setRevealTeam(ev.team);
           setRevealKey((k) => k + 1);
           setPaperVisible(true);
+          speak(ev.team.name, ttsEnabledRef.current, { cancelFirst: true });
+
+          // Kullanıcının favori takımı çekildiyse küçük bir kutlama.
+          if (favoriteTeamIdRef.current === ev.team.id) {
+            setShowConfetti(true);
+            setTimeout(() => setShowConfetti(false), 3000);
+          }
 
           // Takım belli olur olmaz, bu takımın 8 maçına ait TÜM hücreler
           // (kendi tarafı + rakiplerin ayna hücreleri) aynı anda "yükleniyor"
@@ -234,6 +297,15 @@ export default function App() {
           ev.opp.team.name
         }</b> ile eşleşti — ${venue.toLowerCase()} oynayacak.`,
       ]);
+
+      // Klasik bir rekabet (derbi) çekildiyse kısa bir banner göster.
+      const derby = findDerby(ev.team.short, ev.opp.team.short);
+      if (derby) {
+        setDerbyLabel(derby.label);
+        setDerbyKey((k) => k + 1);
+        setDerbyVisible(true);
+        setTimeout(() => setDerbyVisible(false), 2000);
+      }
 
       setProgress((idx + 1) / events.length);
       const nextIsFill = events[idx + 1]?.type === "fill";
@@ -277,6 +349,7 @@ export default function App() {
         setRevealTeam(null);
         setPaperVisible(false);
         if (audioRef.current) audioRef.current.pause();
+        cancelSpeech();
         setLogs((prev) => [
           ...prev,
           `<b>Kura çekimi tamamlandı.</b> Tüm 36 takımın lig fazı fikstürü belli oldu.`,
@@ -300,6 +373,7 @@ export default function App() {
       setRevealTeam(null);
       setPaperVisible(false);
       if (audioRef.current) audioRef.current.pause();
+      cancelSpeech();
       setLogs((prev) => [
         ...prev,
         `<b>Kura çekimi tamamlandı.</b> Tüm 36 takımın lig fazı fikstürü belli oldu.`,
@@ -318,8 +392,18 @@ export default function App() {
       eventsRef.current = buildEvents(plan);
       setPhase("drawing");
       setLogs(["Kura çekimi başlıyor..."]);
+
+      try {
+        const nextCount = drawCount + 1;
+        window.localStorage.setItem(DRAW_COUNT_KEY, String(nextCount));
+        setDrawCount(nextCount);
+      } catch (e) {
+        // localStorage kapalıysa sessizce yok say.
+      }
+
       if (audioRef.current) {
         audioRef.current.currentTime = 0;
+        audioRef.current.volume = 0.28;
         audioRef.current.play().catch(() => {
           // Ses dosyası eklenmemiş olabilir; sessizce yok say.
         });
@@ -334,10 +418,11 @@ export default function App() {
     } catch (e) {
       setError(e.message);
     }
-  }, [processEvent, resetAll]);
+  }, [processEvent, resetAll, drawCount]);
 
   const handleSkip = useCallback(() => {
     clearTimeout(timeoutRef.current);
+    cancelSpeech();
     if (audioRef.current) audioRef.current.pause();
     const events = eventsRef.current;
     let liveResults = createEmptyResults();
@@ -394,6 +479,11 @@ export default function App() {
         team={phase === "drawing" ? activeTeam : null}
         revealedOpponents={currentTeamOpponents}
       />
+      <DerbyBanner
+        label={derbyLabel}
+        visible={derbyVisible}
+        derbyKey={derbyKey}
+      />
 
       <header className="top-header">
         <div className="brand-row">
@@ -429,6 +519,18 @@ export default function App() {
 
       {error && <p style={{ color: "#f87171" }}>{error}</p>}
 
+      {phase === "idle" && (
+        <FavoriteTeamPicker
+          favoriteTeamId={favoriteTeamId}
+          onSelectFavorite={handleToggleFavorite}
+          predictions={predictions}
+          onTogglePrediction={handleTogglePrediction}
+          ttsEnabled={ttsEnabled}
+          onToggleTts={setTtsEnabled}
+          drawCount={drawCount}
+        />
+      )}
+
       <div className="main-layout" ref={tableSectionRef}>
         <div className="main-left">
           <PotTablesPanel
@@ -446,7 +548,16 @@ export default function App() {
         </div>
       </div>
 
-      {phase === "done" && <FinalResultsGrid results={results} />}
+      {phase === "done" && (
+        <>
+          <FinalFavoriteSummary
+            results={results}
+            favoriteTeamId={favoriteTeamId}
+            predictions={predictions}
+          />
+          <FinalResultsGrid results={results} />
+        </>
+      )}
 
       {phase === "idle" && (
         <p className="footnote">
