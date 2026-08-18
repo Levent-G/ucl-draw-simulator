@@ -2,7 +2,7 @@ import React from 'react'
 import PotTable from './PotTable.jsx'
 import StartOrb from './StartOrb.jsx'
 
-export default function PotTablesPanel({ results, drawnTeamIds, activeTeamId, pendingCells, phase, onStart }) {
+export default function PotTablesPanel({ teams, results, drawnTeamIds, activeTeamId, pendingCells, phase, onStart }) {
   const showFullOverlay = phase === 'idle'
 
   return (
@@ -10,7 +10,7 @@ export default function PotTablesPanel({ results, drawnTeamIds, activeTeamId, pe
       <div className="draw-table-title">
         <h2>Lig Fazı Kura Tablosu</h2>
         <div className="draw-table-title-right">
-          <span className="draw-table-count">{drawnTeamIds.size}/36 takım çekildi</span>
+          <span className="draw-table-count">{drawnTeamIds.size}/{teams.length} takım çekildi</span>
           {phase === 'done' && (
             <button className="btn btn-ghost btn-small" onClick={onStart}>
               Yeniden Çek
@@ -25,6 +25,7 @@ export default function PotTablesPanel({ results, drawnTeamIds, activeTeamId, pe
             <PotTable
               key={pot}
               pot={pot}
+              allTeams={teams}
               results={results}
               drawnTeamIds={drawnTeamIds}
               activeTeamId={activeTeamId}

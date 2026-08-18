@@ -1,16 +1,17 @@
 import React from "react";
-import { TEAMS, POT_COLORS } from "../data/teams.js";
+import { POT_COLORS } from "../data/teams.js";
 import Crest from "./Crest.jsx";
 import { computeToughestGroup } from "../utils/deathGroup.js";
 import { downloadShareCard } from "../utils/shareCard.js";
 
 export default function FinalFavoriteSummary({
+  teams,
   results,
   favoriteTeamId,
   predictions,
 }) {
-  const toughest = computeToughestGroup(results, TEAMS);
-  const favoriteTeam = TEAMS.find((t) => t.id === favoriteTeamId);
+  const toughest = computeToughestGroup(results, teams);
+  const favoriteTeam = teams.find((t) => t.id === favoriteTeamId);
 
   let opponents = [];
   let predictionScore = null;

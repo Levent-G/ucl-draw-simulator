@@ -6,7 +6,9 @@ import { POT_COLORS } from '../data/teams.js'
 // telifsiz özgün SVG rozete geri döner -- bkz. /public/logos/README.md
 export default function Crest({ team, size = 266 }) {
   const [imgFailed, setImgFailed] = useState(false)
-  const color = POT_COLORS[team.pot].main
+  // team.pot yoksa (ör. Süper Lig gibi torbasız/lig formatı takımları) nötr
+  // bir vurgu rengine düşer.
+  const color = team.pot ? POT_COLORS[team.pot]?.main || '#5468ff' : '#5468ff'
 
   if (team.logo && !imgFailed) {
     return (

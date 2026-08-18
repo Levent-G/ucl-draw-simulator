@@ -1,0 +1,94 @@
+import React, { useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { getCompetition } from "../data/competitions.js";
+import { useCompetition } from "../state/CompetitionContext.jsx";
+import CompetitionSubNav from "../components/CompetitionSubNav.jsx";
+import TeamsTab from "../components/stats/TeamsTab.jsx";
+import PlayersTab from "../components/stats/PlayersTab.jsx";
+import CountriesTab from "../components/stats/CountriesTab.jsx";
+import TeamFilterSelect from "../components/stats/TeamFilterSelect.jsx";
+
+const TABS = [
+  { key: "teams", label: "Takımlar" },
+  { key: "players", label: "Oyuncular" },
+  { key: "countries", label: "Ülkeler" },
+];
+
+export default function StatsPage() {
+  const { competitionKey } = useParams();
+  const competition = getCompetition(competitionKey);
+  const { simulation, hasFixture } = useCompetition(competitionKey);
+  const [tab, setTab] = useState("teams");
+  const [selectedTeamId, setSelectedTeamId] = useState("");
+
+  const selectedTeam = selectedTeamId
+    ? competition.teams.find((t) => t.id === selectedTeamId)
+    : null;
+
+  return (
+    <div className="page-shell">
+      <CompetitionSubNav competitionKey={competitionKey} />
+      <header className="page-header">
+        <div>
+          <div className="page-eyebrow">Takımlar · Oyuncular · Ülkeler</div>
+          <h1>{competition.shortName} — İstatistikler</h1>
+          <p>
+            Katsayı, kadro ve ülke bazlı gelişmiş grafikler. Gol/asist/kart ve
+            simüle edilmiş puan durumu gibi bölümler için önce Fikstür &amp;
+            Tahmin sayfasından bir model tahmini üretilmesi gerekir.
+          </p>
+        </div>
+      </header>
+
+      {!hasFixture && (
+        <div className="stats-callout">
+          Henüz bir fikstür/tahmin oluşturulmadı — simüle puan ve gol/kart
+          istatistikleri şimdilik gösterilemiyor, katsayı/ülke/kadro
+          grafikleri zaten görüntülenebilir.{" "}
+          <Link to={`/${competitionKey}/fikstur`}>Fikstür &amp; Tahmin sayfasına git →</Link>
+        </div>
+      )}
+
+      <div className="stats-toolbar">
+        <div className="stats-tabs">
+          {TABS.map((t) => (
+            <button key={t.key} className={tab === t.key ? "active" : ""} onClick={() => setTab(t.key)}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {tab !== "countries" && (
+          <div className="team-filter">
+            <label htmlFor="stats-team-filter">Takım filtresi</label>
+            <TeamFilterSelect
+              teams={competition.teams}
+              value={selectedTeamId}
+              onChange={setSelectedTeamId}
+            />
+            {selectedTeam && (
+              <button className="btn-ghost team-filter-clear" onClick={() => setSelectedTeamId("")}>
+                Filtreyi Temizle
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
+      {tab === "teams" && (
+        <TeamsTab competition={competition} simulation={simulation} selectedTeam={selectedTeam} />
+      )}
+      {tab === "players" && (
+        <PlayersTab competition={competition} simulation={simulation} selectedTeam={selectedTeam} />
+      )}
+      {tab === "countries" && <CountriesTab competition={competition} />}
+
+      <p className="footnote">
+        Oyuncu kadroları gerçek kulüplere yakın (best-effort) seçilmiştir; tam
+        ve güncel kadro değildir, transferler burada anlık yansımayabilir.
+        Gol/asist/kart gibi istatistikler gerçek sezon verisi DEĞİLDİR — bu
+        simülatördeki kura/fikstür/tahmin motoruna göre üretilir.
+      </p>
+    </div>
+  );
+}

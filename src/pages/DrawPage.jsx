@@ -5,25 +5,27 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { TEAMS, POT_COLORS, COUNTRY_NAMES } from "./data/teams.js";
-import { generateFullDraw, buildAnnouncementPlan } from "./utils/drawEngine.js";
-import { createEmptyResults } from "./utils/resultsHelpers.js";
-import { findDerby } from "./utils/derbies.js";
-import { speak, cancelSpeech, unlockSpeech } from "./utils/speech.js";
-import ControlBar from "./components/ControlBar.jsx";
-import DrumSphere from "./components/DrumSphere.jsx";
-import AnnouncerPanel from "./components/AnnouncerPanel.jsx";
-import PotTablesPanel from "./components/PotTablesPanel.jsx";
-import FinalResultsGrid from "./components/FinalResultsGrid.jsx";
-import FinalFavoriteSummary from "./components/FinalFavoriteSummary.jsx";
-import PaperReveal from "./components/PaperReveal.jsx";
-import CurrentDrawPanel from "./components/CurrentDrawPanel.jsx";
-import DerbyBanner from "./components/DerbyBanner.jsx";
-import FavoriteTeamPicker from "./components/FavoriteTeamPicker.jsx";
-import StartOrb from "./components/StartOrb.jsx";
-import Confetti from "./components/Confetti.jsx";
-
-const DRAW_COUNT_KEY = "uclDrawCount";
+import { useParams } from "react-router-dom";
+import { getCompetition } from "../data/competitions.js";
+import { useCompetition } from "../state/CompetitionContext.jsx";
+import { generateFullDraw, buildAnnouncementPlan } from "../utils/drawEngine.js";
+import { createEmptyResults } from "../utils/resultsHelpers.js";
+import { findDerby } from "../utils/derbies.js";
+import { speak, cancelSpeech, unlockSpeech } from "../utils/speech.js";
+import ControlBar from "../components/ControlBar.jsx";
+import DrumSphere from "../components/DrumSphere.jsx";
+import AnnouncerPanel from "../components/AnnouncerPanel.jsx";
+import PotTablesPanel from "../components/PotTablesPanel.jsx";
+import FinalResultsGrid from "../components/FinalResultsGrid.jsx";
+import FinalFavoriteSummary from "../components/FinalFavoriteSummary.jsx";
+import PaperReveal from "../components/PaperReveal.jsx";
+import CurrentDrawPanel from "../components/CurrentDrawPanel.jsx";
+import DerbyBanner from "../components/DerbyBanner.jsx";
+import FavoriteTeamPicker from "../components/FavoriteTeamPicker.jsx";
+import StartOrb from "../components/StartOrb.jsx";
+import Confetti from "../components/Confetti.jsx";
+import FixtureCta from "../components/fixture/FixtureCta.jsx";
+import CompetitionSubNav from "../components/CompetitionSubNav.jsx";
 
 // mix: sıradaki takım çekilmeden önce topların karışma süresi
 // eject: topun küreden fırlayıp ekrana gelme süresi
@@ -32,42 +34,18 @@ const DRAW_COUNT_KEY = "uclDrawCount";
 // fill: tablo hücrelerinin tık tık dolma aralığı (faz 2)
 // phaseGap: faz 1 bitip faz 2 başlarken aradaki kısa duraklama
 const SPEED_DELAYS = {
-  slow: {
-    mix: 3200,
-    eject: 950,
-    paper: 2800,
-    reveal: 780,
-    fill: 680,
-    phaseGap: 500,
-  },
-  normal: {
-    mix: 2400,
-    eject: 880,
-    paper: 2300,
-    reveal: 620,
-    fill: 540,
-    phaseGap: 420,
-  },
-  fast: {
-    mix: 1500,
-    eject: 720,
-    paper: 1500,
-    reveal: 380,
-    fill: 340,
-    phaseGap: 260,
-  },
+  slow: { mix: 3200, eject: 950, paper: 2800, reveal: 780, fill: 680, phaseGap: 500 },
+  normal: { mix: 2400, eject: 880, paper: 2300, reveal: 620, fill: 540, phaseGap: 420 },
+  fast: { mix: 1500, eject: 720, paper: 1500, reveal: 380, fill: 340, phaseGap: 260 },
 };
 
 function buildEvents(plan) {
   const events = [];
   for (const group of plan) {
     events.push({ type: "pick", team: group.team, opponents: group.opponents });
-    // Faz 1: rakipler önce sol alttaki panelde tık tık belirir, tabloda
-    // ilgili yerler "yükleniyor" barına döner.
     for (const opp of group.opponents) {
       events.push({ type: "reveal", team: group.team, opp });
     }
-    // Faz 2: panel tamamlanınca, tablo hücreleri tık tık gerçek veriyle dolar.
     for (const opp of group.opponents) {
       events.push({ type: "fill", team: group.team, opp });
     }
@@ -101,10 +79,10 @@ function cellKeysFor(team, opp) {
   return { teamKey, oppKey };
 }
 
-// Tablodaki 36 takımın 8'er hücresi de (toplam 288) dolmuş mu diye bakar.
-// Doluysa artık çekilecek/gösterilecek yeni bir şey kalmamış demektir.
-function isResultsComplete(results) {
-  for (const team of TEAMS) {
+// Tablodaki N takımın 8'er hücresi de dolmuş mu diye bakar. Doluysa artık
+// çekilecek/gösterilecek yeni bir şey kalmamış demektir.
+function isResultsComplete(results, teams) {
+  for (const team of teams) {
     const fixtures = results[team.id];
     for (const pot of [1, 2, 3, 4]) {
       if (!fixtures[pot].home || !fixtures[pot].away) return false;
@@ -113,10 +91,15 @@ function isResultsComplete(results) {
   return true;
 }
 
-export default function App() {
+export default function DrawPage() {
+  const { competitionKey } = useParams();
+  const competition = getCompetition(competitionKey);
+  const { teams: TEAMS, potColors: POT_COLORS, countryNames: COUNTRY_NAMES } = competition;
+
+  const { setDrawResults, clearCompetition } = useCompetition(competitionKey);
   const [phase, setPhase] = useState("idle"); // idle | drawing | done
   const [speed, setSpeed] = useState("normal");
-  const [results, setResults] = useState(createEmptyResults());
+  const [results, setResults] = useState(() => createEmptyResults(TEAMS));
   const [drawnTeamIds, setDrawnTeamIds] = useState(new Set());
   const [activeTeamId, setActiveTeamId] = useState(null);
   const [activePot, setActivePot] = useState(1);
@@ -147,9 +130,21 @@ export default function App() {
   const speedRef = useRef(speed);
   const tableSectionRef = useRef(null);
   const audioRef = useRef(null);
-  const resultsRef = useRef(createEmptyResults());
+  const resultsRef = useRef(createEmptyResults(TEAMS));
   const favoriteTeamIdRef = useRef(null);
   const ttsEnabledRef = useRef(true);
+
+  // Yarışma değişirse (rota /ucl'den /europa'ya geçerse) tüm seremoni
+  // durumunu bu takımlarla sıfırdan başlat.
+  useEffect(() => {
+    resultsRef.current = createEmptyResults(TEAMS);
+    setPhase("idle");
+    setResults(createEmptyResults(TEAMS));
+    setDrawnTeamIds(new Set());
+    setFavoriteTeamId(null);
+    setPredictions([]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [competitionKey]);
 
   useEffect(() => {
     speedRef.current = speed;
@@ -163,14 +158,11 @@ export default function App() {
     ttsEnabledRef.current = ttsEnabled;
   }, [ttsEnabled]);
 
+  // Çekiliş sayacı bilinçli olarak kalıcı DEĞİL -- sayfa yenilenince (F5)
+  // tüm yarışma verileri gibi bu da sıfırdan başlar.
   useEffect(() => {
-    try {
-      const stored = Number(window.localStorage.getItem(DRAW_COUNT_KEY) || "0");
-      setDrawCount(Number.isFinite(stored) ? stored : 0);
-    } catch (e) {
-      // localStorage kapalı olabilir (gizli sekme vb.); sessizce yok say.
-    }
-  }, []);
+    setDrawCount(0);
+  }, [competitionKey]);
 
   useEffect(
     () => () => {
@@ -181,10 +173,8 @@ export default function App() {
   );
 
   // Bazı mobil tarayıcılar, sayfa yeniden açıldığında önceki oturumdaki
-  // scroll konumunu hatırlayıp otomatik oraya kaydırıyor (örn. çekiliş
-  // başladığında tabloya kaymıştık, sayfa yenilenince oraya geri dönüyor).
-  // Bu yüzden sayfa her yüklendiğinde en başa sarıyoruz ki kurulum paneli
-  // (favori takım seçimi) her zaman ilk görülen şey olsun.
+  // scroll konumunu hatırlayıp otomatik oraya kaydırıyor. Bu yüzden sayfa
+  // her yüklendiğinde en başa sarıyoruz.
   useEffect(() => {
     if ("scrollRestoration" in window.history) {
       window.history.scrollRestoration = "manual";
@@ -192,9 +182,19 @@ export default function App() {
     window.scrollTo(0, 0);
   }, []);
 
+  // Çekiliş tamamlandığında (törenle ya da "atla" ile) sonucu paylaşılan
+  // competition context'ine yazıyoruz -- Fikstür & İstatistik sayfaları
+  // buradan okuyor.
+  useEffect(() => {
+    if (phase === "done") {
+      setDrawResults(results);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, results]);
+
   const activeTeam = useMemo(
     () => TEAMS.find((t) => t.id === activeTeamId) || null,
-    [activeTeamId]
+    [activeTeamId, TEAMS]
   );
 
   const resetAll = useCallback(() => {
@@ -204,9 +204,13 @@ export default function App() {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
-    resultsRef.current = createEmptyResults();
+    resultsRef.current = createEmptyResults(TEAMS);
+    // Çekiliş sıfırlanınca, ona bağlı eski fikstür/tahmin/istatistik de
+    // paylaşılan context'ten temizlenir -- yeni çekiliş tamamlanana kadar
+    // Fikstür & İstatistik sayfaları "önce kura çek" boş durumunu gösterir.
+    clearCompetition();
     setPhase("idle");
-    setResults(createEmptyResults());
+    setResults(createEmptyResults(TEAMS));
     setDrawnTeamIds(new Set());
     setActiveTeamId(null);
     setCurrentTeamOpponents([]);
@@ -221,7 +225,7 @@ export default function App() {
     setError(null);
     setDerbyVisible(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+  }, [clearCompetition, TEAMS]);
 
   const handleToggleFavorite = useCallback((teamId) => {
     setFavoriteTeamId(teamId);
@@ -243,18 +247,13 @@ export default function App() {
     const delays = SPEED_DELAYS[speedRef.current];
 
     if (ev.type === "pick") {
-      // 1) Toplar sadece şimdi, sıradaki takım çekilmeden hemen önce ortaya
-      // çıkıp karışmaya başlar.
       setActivePot(ev.team.pot);
       setSphereVisible(true);
 
       timeoutRef.current = setTimeout(() => {
-        // 2) Top küreden fırlayıp ekrana geliyor (eject animasyonu).
         setPickSignal((s) => s + 1);
 
         timeoutRef.current = setTimeout(() => {
-          // 3) Top ekranda "açılıyor" (flaş efekti), kağıt açılma efektiyle
-          // takım adı beliriyor. Küre kayboluyor.
           setSphereVisible(false);
           setCurrentTeamOpponents([]);
           setActiveTeamId(ev.team.id);
@@ -262,9 +261,9 @@ export default function App() {
           setLogs((prev) => [
             ...prev,
             `<b>${
-              POT_COLORS[ev.team.pot].label
+              POT_COLORS[ev.team.pot]?.label
             }</b> — kutudan çıkan takım: <b>${ev.team.name}</b> (${
-              COUNTRY_NAMES[ev.team.country]
+              COUNTRY_NAMES[ev.team.country] || ev.team.country
             })`,
           ]);
           setRevealTeam(ev.team);
@@ -272,15 +271,11 @@ export default function App() {
           setPaperVisible(true);
           speak(ev.team.name, ttsEnabledRef.current, { cancelFirst: true });
 
-          // Kullanıcının favori takımı çekildiyse küçük bir kutlama.
           if (favoriteTeamIdRef.current === ev.team.id) {
             setShowConfetti(true);
             setTimeout(() => setShowConfetti(false), 3000);
           }
 
-          // Takım belli olur olmaz, bu takımın 8 maçına ait TÜM hücreler
-          // (kendi tarafı + rakiplerin ayna hücreleri) aynı anda "yükleniyor"
-          // durumuna geçer -- panelde henüz hiçbiri görünmese bile.
           const allKeys = new Set();
           for (const opp of ev.opponents) {
             const { teamKey, oppKey } = cellKeysFor(ev.team, opp);
@@ -301,18 +296,15 @@ export default function App() {
     }
 
     if (ev.type === "reveal") {
-      // Faz 1: rakip sol alttaki panelde görünür. Tablodaki ilgili hücreler
-      // zaten 'pick' anında topluca "yükleniyor" durumuna geçmişti.
       setCurrentTeamOpponents((prev) => [...prev, ev.opp]);
       const venue = ev.opp.home ? "İç sahada" : "Deplasmanda";
       setLogs((prev) => [
         ...prev,
-        `${ev.team.name}, ${POT_COLORS[ev.opp.viaPot].label} takımı <b>${
+        `${ev.team.name}, ${POT_COLORS[ev.opp.viaPot]?.label} takımı <b>${
           ev.opp.team.name
         }</b> ile eşleşti — ${venue.toLowerCase()} oynayacak.`,
       ]);
 
-      // Klasik bir rekabet (derbi) çekildiyse kısa bir banner göster.
       const derby = findDerby(ev.team.short, ev.opp.team.short);
       if (derby) {
         setDerbyLabel(derby.label);
@@ -329,10 +321,6 @@ export default function App() {
     }
 
     if (ev.type === "fill") {
-      // Faz 2: panel tamamlandıktan sonra, tablo hücreleri tık tık gerçek
-      // veriyle dolar (yükleniyor barı kalkar). Bu maç, rakip takımın
-      // kendi sırasında zaten yerleştirilmiş olabilir -- o zaman tekrar
-      // yerleştirmeye çalışmıyoruz.
       const { teamKey, oppKey } = cellKeysFor(ev.team, ev.opp);
       const alreadyFilled =
         resultsRef.current[ev.team.id][ev.opp.viaPot][
@@ -353,10 +341,7 @@ export default function App() {
         return next;
       });
 
-      // Tablodaki 288 hücrenin hepsi dolduysa, kürede çekilecek hiçbir şey
-      // kalmamış demektir -- geri kalan tüm seremoni adımlarını atlayıp
-      // çekilişi burada bitiriyoruz.
-      if (isResultsComplete(resultsRef.current)) {
+      if (isResultsComplete(resultsRef.current, TEAMS)) {
         setDrawnTeamIds(new Set(TEAMS.map((t) => t.id)));
         setActiveTeamId(null);
         setSphereVisible(false);
@@ -366,7 +351,7 @@ export default function App() {
         cancelSpeech();
         setLogs((prev) => [
           ...prev,
-          `<b>Kura çekimi tamamlandı.</b> Tüm 36 takımın lig fazı fikstürü belli oldu.`,
+          `<b>Kura çekimi tamamlandı.</b> Tüm ${TEAMS.length} takımın lig fazı fikstürü belli oldu.`,
         ]);
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 4200);
@@ -390,20 +375,16 @@ export default function App() {
       cancelSpeech();
       setLogs((prev) => [
         ...prev,
-        `<b>Kura çekimi tamamlandı.</b> Tüm 36 takımın lig fazı fikstürü belli oldu.`,
+        `<b>Kura çekimi tamamlandı.</b> Tüm ${TEAMS.length} takımın lig fazı fikstürü belli oldu.`,
       ]);
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 4200);
       setProgress(1);
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [TEAMS, POT_COLORS, COUNTRY_NAMES]);
 
   const handleStart = useCallback(() => {
-    // Mobil tarayıcılar (özellikle iOS Safari) sesli okumaya (TTS) sadece
-    // kullanıcı tıklamasıyla TAM O ANDA başlarsa izin veriyor. Bu yüzden
-    // asıl konuşmalar birkaç saniye sonra (animasyon gecikmelerinin içinde)
-    // gelse bile, motoru burada -- tıklamayla senkron -- "kilidini açarak"
-    // hazırlıyoruz.
     unlockSpeech();
     resetAll();
     try {
@@ -413,15 +394,9 @@ export default function App() {
       setPhase("drawing");
       setLogs(["Kura çekimi başlıyor..."]);
 
-      try {
-        const nextCount = drawCount + 1;
-        window.localStorage.setItem(DRAW_COUNT_KEY, String(nextCount));
-        setDrawCount(nextCount);
-      } catch (e) {
-        // localStorage kapalıysa sessizce yok say.
-      }
+      setDrawCount((c) => c + 1);
 
-      if (audioRef.current) {
+      if (audioRef.current && competitionKey === "ucl") {
         audioRef.current.currentTime = 0;
         audioRef.current.volume = 0.28;
         audioRef.current.play().catch(() => {
@@ -430,29 +405,26 @@ export default function App() {
       }
       timeoutRef.current = setTimeout(() => processEvent(0), 300);
       if (tableSectionRef.current) {
-        tableSectionRef.current.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
+        tableSectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     } catch (e) {
       setError(e.message);
     }
-  }, [processEvent, resetAll, drawCount]);
+  }, [processEvent, resetAll, drawCount, TEAMS, competitionKey]);
 
   const handleSkip = useCallback(() => {
     clearTimeout(timeoutRef.current);
     cancelSpeech();
     if (audioRef.current) audioRef.current.pause();
     const events = eventsRef.current;
-    let liveResults = createEmptyResults();
+    let liveResults = createEmptyResults(TEAMS);
     const liveDrawn = new Set();
     const liveLogs = [];
     for (const ev of events) {
       if (ev.type === "pick") {
         liveDrawn.add(ev.team.id);
         liveLogs.push(
-          `<b>${POT_COLORS[ev.team.pot].label}</b> — kutudan çıkan takım: <b>${
+          `<b>${POT_COLORS[ev.team.pot]?.label}</b> — kutudan çıkan takım: <b>${
             ev.team.name
           }</b>`
         );
@@ -461,7 +433,7 @@ export default function App() {
       }
     }
     liveLogs.push(
-      "<b>Kura çekimi tamamlandı.</b> Tüm 36 takımın lig fazı fikstürü belli oldu."
+      `<b>Kura çekimi tamamlandı.</b> Tüm ${TEAMS.length} takımın lig fazı fikstürü belli oldu.`
     );
     resultsRef.current = liveResults;
     setResults(liveResults);
@@ -477,55 +449,46 @@ export default function App() {
     setPhase("done");
     setShowConfetti(true);
     setTimeout(() => setShowConfetti(false), 4200);
-  }, []);
+  }, [TEAMS, POT_COLORS]);
 
   const isTumbling = phase === "drawing";
 
   return (
-    <div className="app-shell">
+    <div className="app-shell page-shell">
+      <CompetitionSubNav competitionKey={competitionKey} />
       {showConfetti && <Confetti />}
-      <audio ref={audioRef} src="/audio/anthem.mp3" loop preload="none" />
-      <DrumSphere
-        visible={sphereVisible}
-        activePot={activePot}
-        pickSignal={pickSignal}
-      />
-      <PaperReveal
-        team={revealTeam}
-        visible={paperVisible}
-        revealKey={revealKey}
-      />
+      {competitionKey === "ucl" && (
+        <audio ref={audioRef} src="/audio/anthem.mp3" loop preload="none" />
+      )}
+      <DrumSphere visible={sphereVisible} activePot={activePot} pickSignal={pickSignal} />
+      <PaperReveal team={revealTeam} visible={paperVisible} revealKey={revealKey} countryNames={COUNTRY_NAMES} />
       <CurrentDrawPanel
         team={phase === "drawing" ? activeTeam : null}
         revealedOpponents={currentTeamOpponents}
       />
-      <DerbyBanner
-        label={derbyLabel}
-        visible={derbyVisible}
-        derbyKey={derbyKey}
-      />
+      <DerbyBanner label={derbyLabel} visible={derbyVisible} derbyKey={derbyKey} />
 
       <header className="top-header">
         <div className="brand-row">
-          {!uclLogoFailed && (
+          {competitionKey === "ucl" && !uclLogoFailed && (
             <img
               src="/logos/ucl-logo.png"
-              alt="UCL logosu"
+              alt="Yarışma logosu"
               className="ucl-logo-img"
               onError={() => setUclLogoFailed(true)}
             />
           )}
           <div>
-            <div className="brand-eyebrow">İsviçre Modeli · Lig Fazı</div>
-            <h1 className="brand-title">UCL Kura Çekimi Simülatörü</h1>
+            <div className="brand-eyebrow">{competition.tagline}</div>
+            <h1 className="brand-title">{competition.name} Kura Çekimi Simülatörü</h1>
             <p className="brand-sub">
-              36 takım, 4 torba, takım başına 8 maç. Gerçek UEFA lig fazı
+              {TEAMS.length} takım, 4 torba, takım başına 8 maç. Gerçek UEFA lig fazı
               kurallarına (federasyon kısıtı, torba başına ev/deplasman dengesi)
               sadık bir algoritma ile gerçek zamanlı simülasyon.
             </p>
           </div>
         </div>
-        <div className="season-badge">36 TAKIM · 4 TORBA · 8 MAÇ</div>
+        <div className="season-badge">{TEAMS.length} TAKIM · 4 TORBA · 8 MAÇ</div>
       </header>
 
       <ControlBar
@@ -541,6 +504,7 @@ export default function App() {
 
       {phase === "idle" && (
         <FavoriteTeamPicker
+          teams={TEAMS}
           favoriteTeamId={favoriteTeamId}
           onSelectFavorite={handleToggleFavorite}
           predictions={predictions}
@@ -560,6 +524,7 @@ export default function App() {
       <div className="main-layout" ref={tableSectionRef}>
         <div className="main-left">
           <PotTablesPanel
+            teams={TEAMS}
             results={results}
             drawnTeamIds={drawnTeamIds}
             activeTeamId={activeTeamId}
@@ -577,11 +542,13 @@ export default function App() {
       {phase === "done" && (
         <>
           <FinalFavoriteSummary
+            teams={TEAMS}
             results={results}
             favoriteTeamId={favoriteTeamId}
             predictions={predictions}
           />
-          <FinalResultsGrid results={results} />
+          <FixtureCta competitionKey={competitionKey} />
+          <FinalResultsGrid teams={TEAMS} results={results} />
         </>
       )}
 

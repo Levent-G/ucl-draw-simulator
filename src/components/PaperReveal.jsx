@@ -1,8 +1,8 @@
 import React from "react";
 import Crest from "./Crest.jsx";
-import { POT_COLORS, COUNTRY_NAMES } from "../data/teams.js";
+import { POT_COLORS } from "../data/teams.js";
 
-export default function PaperReveal({ team, visible, revealKey }) {
+export default function PaperReveal({ team, visible, revealKey, countryNames }) {
   return (
     <div className={`paper-reveal-backdrop ${visible ? "show" : ""}`}>
       {team && (
@@ -24,7 +24,7 @@ export default function PaperReveal({ team, visible, revealKey }) {
               </span>
               <span className="paper-reveal-name">{team.name}</span>
               <span className="paper-reveal-country">
-                {COUNTRY_NAMES[team.country]}
+                {countryNames?.[team.country] || team.country}
               </span>
             </div>
           </div>

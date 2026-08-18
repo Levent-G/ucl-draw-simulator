@@ -1,17 +1,17 @@
 import React from 'react'
-import { TEAMS, POT_COLORS } from '../data/teams.js'
+import { POT_COLORS } from '../data/teams.js'
 import Crest from './Crest.jsx'
 
-export default function FinalResultsGrid({ results }) {
+export default function FinalResultsGrid({ teams, results }) {
   return (
     <section className="final-grid-section">
       <div className="final-grid-title">
         <h2>Tüm Takımların Lig Fazı Fikstürü</h2>
-        <span>36 takım · takım başına 8 maç</span>
+        <span>{teams.length} takım · takım başına 8 maç</span>
       </div>
 
       <div className="final-grid">
-        {TEAMS.map((team) => {
+        {teams.map((team) => {
           const fixtures = results[team.id]
           const rows = [1, 2, 3, 4].flatMap((pot) =>
             ['home', 'away'].map((venue) => ({ pot, venue, opp: fixtures[pot][venue] }))
@@ -21,7 +21,7 @@ export default function FinalResultsGrid({ results }) {
               <div className="final-card-header">
                 <Crest team={team} size={30} />
                 <span className="final-card-name">{team.name}</span>
-                <span className="final-card-pot">{POT_COLORS[team.pot].label}</span>
+                <span className="final-card-pot">{POT_COLORS[team.pot]?.label}</span>
               </div>
               <div className="final-card-rows">
                 {rows.map(({ pot, venue, opp }) => (

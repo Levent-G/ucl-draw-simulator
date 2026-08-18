@@ -1,5 +1,5 @@
 import React from "react";
-import { getTeamsByPot, POT_COLORS } from "../data/teams.js";
+import { POT_COLORS } from "../data/teams.js";
 import Crest from "./Crest.jsx";
 
 const VENUES = [
@@ -9,12 +9,13 @@ const VENUES = [
 
 export default function PotTable({
   pot,
+  allTeams,
   results,
   drawnTeamIds,
   activeTeamId,
   pendingCells,
 }) {
-  const teams = getTeamsByPot(pot);
+  const teams = allTeams.filter((t) => t.pot === pot);
   const color = POT_COLORS[pot];
 
   return (

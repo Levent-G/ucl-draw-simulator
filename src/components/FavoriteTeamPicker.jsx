@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { TEAMS } from '../data/teams.js'
 import Crest from './Crest.jsx'
 
 export default function FavoriteTeamPicker({
+  teams,
   favoriteTeamId,
   onSelectFavorite,
   predictions,
@@ -12,8 +12,8 @@ export default function FavoriteTeamPicker({
   drawCount,
 }) {
   const [query, setQuery] = useState('')
-  const favoriteTeam = TEAMS.find((t) => t.id === favoriteTeamId)
-  const otherTeams = TEAMS.filter((t) => t.id !== favoriteTeamId)
+  const favoriteTeam = teams.find((t) => t.id === favoriteTeamId)
+  const otherTeams = teams.filter((t) => t.id !== favoriteTeamId)
   const filtered = query
     ? otherTeams.filter((t) => t.name.toLowerCase().includes(query.toLowerCase()))
     : otherTeams
@@ -29,7 +29,7 @@ export default function FavoriteTeamPicker({
             onChange={(e) => onSelectFavorite(e.target.value || null)}
           >
             <option value="">Seçmedim</option>
-            {TEAMS.map((t) => (
+            {teams.map((t) => (
               <option key={t.id} value={t.id}>
                 {t.name}
               </option>
