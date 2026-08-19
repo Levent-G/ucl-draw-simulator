@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useCompetition } from "../state/CompetitionContext.jsx";
 import { useTransferMarket } from "../state/TransferContext.jsx";
+import { useTeamTactics } from "../state/TacticsContext.jsx";
 import { standingsFromOrder } from "../utils/predictionEngine.js";
 import { teamsByCoeffDesc } from "../utils/statsSelectors.js";
 import CompetitionSubNav from "../components/CompetitionSubNav.jsx";
@@ -9,6 +10,7 @@ import MatchdayTabs from "../components/fixture/MatchdayTabs.jsx";
 import MatchRow from "../components/fixture/MatchRow.jsx";
 import StandingsTable from "../components/fixture/StandingsTable.jsx";
 import DragStandings from "../components/fixture/DragStandings.jsx";
+import TacticsPanel from "../components/fixture/TacticsPanel.jsx";
 
 export default function FixturePage() {
   const { competitionKey } = useParams();
@@ -28,6 +30,7 @@ export default function FixturePage() {
     startLeagueSeason,
   } = useCompetition(competitionKey);
   const { effectiveAllPlayers, hasTransfers } = useTransferMarket(competitionKey);
+  const { teamTactics, setTeamTactic } = useTeamTactics(competitionKey);
 
   const [activeMatchday, setActiveMatchday] = useState(1);
   const [standingsView, setStandingsView] = useState("model");
@@ -161,6 +164,13 @@ export default function FixturePage() {
         </div>
       </header>
 
+      <TacticsPanel
+        teams={competition.teams}
+        teamTactics={teamTactics}
+        setTeamTactic={setTeamTactic}
+        onChanged={(nextTactics) => runSimulation(fixture, effectiveAllPlayers, nextTactics)}
+      />
+
       <section className="fixture-standings-section">
         <div className="standings-toggle">
           <button
@@ -205,6 +215,7 @@ export default function FixturePage() {
             <MatchRow
               key={m.id}
               match={m}
+              competitionKey={competitionKey}
               userScore={userScores[m.id]}
               onUserScoreChange={(field, value) => updateUserScore(m.id, field, value)}
             />

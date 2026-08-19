@@ -1,7 +1,8 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import Crest from "../Crest.jsx";
 
-export default function MatchRow({ match, userScore, onUserScoreChange }) {
+export default function MatchRow({ match, userScore, onUserScoreChange, competitionKey }) {
   const { homeTeam, awayTeam } = match;
   const hasSim = match.homeGoals != null && match.awayGoals != null;
   const homePct = Math.round((match.homeWinProb ?? 0) * 100);
@@ -28,6 +29,12 @@ export default function MatchRow({ match, userScore, onUserScoreChange }) {
         <div className="match-row-score">
           {hasSim ? `${match.homeGoals} : ${match.awayGoals}` : "– : –"}
         </div>
+
+        {hasSim && match.events && (
+          <Link to={`/${competitionKey}/mac/${match.id}`} className="match-row-details-link">
+            Maç Merkezi →
+          </Link>
+        )}
 
         {hasSim && (
           <>

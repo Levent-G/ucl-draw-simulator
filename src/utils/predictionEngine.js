@@ -28,23 +28,47 @@ function attackStrength(coeff) {
   return Math.max(6, coeff || 6);
 }
 
-// coeff farkından ev/deplasman beklenen gol sayısını (λ) türetir.
-export function expectedGoals(homeTeam, awayTeam) {
+// "Antrenör Modu": kullanıcının bir takıma atadığı oyun tarzı, o takımın
+// hücum/defans λ (beklenen gol) çarpanlarını değiştirir. Hücumcu tarz kendi
+// golünü artırır ama rakibe karşı savunmasını zayıflatır (ve tam tersi) --
+// gerçekçi bir risk/ödül dengesi. Atanmamış takımlar "dengeli" (nötr) kabul
+// edilir.
+export const TACTICS = {
+  balanced: { key: "balanced", label: "Dengeli", icon: "⚖️", attackMult: 1, defenseMult: 1 },
+  attack: { key: "attack", label: "Hücum Ağırlıklı", icon: "⚔️", attackMult: 1.18, defenseMult: 1.12 },
+  defensive: { key: "defensive", label: "Defansif", icon: "🛡️", attackMult: 0.85, defenseMult: 0.78 },
+};
+
+function resolveTactic(teamId, tacticsById) {
+  const key = tacticsById?.[teamId];
+  return TACTICS[key] || TACTICS.balanced;
+}
+
+// coeff farkından ev/deplasman beklenen gol sayısını (λ) türetir. tacticsById
+// verilirse (ör. { teamId: "attack" }) ilgili takımların λ'sı buna göre
+// ayarlanır.
+export function expectedGoals(homeTeam, awayTeam, tacticsById) {
   const hs = attackStrength(homeTeam.coeff);
   const as = attackStrength(awayTeam.coeff);
   const total = hs + as;
   const hShare = hs / total;
   const aShare = as / total;
-  const lambdaHome = clamp(
+  let lambdaHome = clamp(
     BASE_GOALS_TOTAL * hShare + HOME_ADVANTAGE_GOALS,
     MIN_LAMBDA,
     MAX_LAMBDA
   );
-  const lambdaAway = clamp(
+  let lambdaAway = clamp(
     BASE_GOALS_TOTAL * aShare - HOME_ADVANTAGE_GOALS * 0.5,
     MIN_LAMBDA,
     MAX_LAMBDA
   );
+
+  const homeTactic = resolveTactic(homeTeam.id, tacticsById);
+  const awayTactic = resolveTactic(awayTeam.id, tacticsById);
+  lambdaHome = clamp(lambdaHome * homeTactic.attackMult * awayTactic.defenseMult, MIN_LAMBDA, MAX_LAMBDA);
+  lambdaAway = clamp(lambdaAway * awayTactic.attackMult * homeTactic.defenseMult, MIN_LAMBDA, MAX_LAMBDA);
+
   return { lambdaHome, lambdaAway };
 }
 
@@ -93,8 +117,8 @@ export function matchProbabilities(lambdaHome, lambdaAway, maxGoals = 8) {
 }
 
 // Tek bir maçın tahmini skorunu ve olasılıklarını üretir.
-export function simulateMatch(homeTeam, awayTeam) {
-  const { lambdaHome, lambdaAway } = expectedGoals(homeTeam, awayTeam);
+export function simulateMatch(homeTeam, awayTeam, tacticsById) {
+  const { lambdaHome, lambdaAway } = expectedGoals(homeTeam, awayTeam, tacticsById);
   const homeGoals = samplePoisson(lambdaHome);
   const awayGoals = samplePoisson(lambdaAway);
   const probs = matchProbabilities(lambdaHome, lambdaAway);
@@ -119,36 +143,137 @@ function weightedPick(players, weightFn, excludeId) {
   return pool[pool.length - 1];
 }
 
+// Gol dağıtımını yapar VE hangi oyuncunun attığı/asist yaptığı bilgisini
+// (matchResults'taki dakika dakika olay akışı -- "Maç Merkezi" -- için)
+// döner, böylece sezon toplamları (playerStats) ile tek maçlık olay akışı
+// HER ZAMAN tutarlı kalır (aynı seçim, iki yerde de kullanılır).
 function distributeGoals(players, goals, playerStats) {
-  if (!players.length || goals <= 0) return;
+  const events = [];
+  if (!players.length || goals <= 0) return events;
   for (let i = 0; i < goals; i++) {
     const scorer = weightedPick(players, (p) => GOAL_WEIGHT[p.position] ?? 1);
     if (!scorer) continue;
     playerStats[scorer.id].goals++;
+    let assisterId = null;
     if (players.length > 1 && Math.random() < 0.72) {
       const assister = weightedPick(
         players,
         (p) => ASSIST_WEIGHT[p.position] ?? 1,
         scorer.id
       );
-      if (assister) playerStats[assister.id].assists++;
+      if (assister) {
+        playerStats[assister.id].assists++;
+        assisterId = assister.id;
+      }
     }
+    events.push({ scorerId: scorer.id, assisterId });
   }
+  return events;
 }
 
 // Takım başına ort. ~1.6 sarı kart + nadiren kırmızı kart üretir, mevkiye
 // göre ağırlıklandırır (defans/orta saha > forvet > kaleci).
 function distributeCards(players, playerStats) {
-  if (!players.length) return;
+  const events = [];
+  if (!players.length) return events;
   const yellowCount = Math.min(3, samplePoisson(1.6));
   for (let i = 0; i < yellowCount; i++) {
     const p = weightedPick(players, (pl) => CARD_WEIGHT[pl.position] ?? 1);
-    if (p) playerStats[p.id].yellows++;
+    if (p) {
+      playerStats[p.id].yellows++;
+      events.push({ playerId: p.id, type: "yellow" });
+    }
   }
   if (Math.random() < 0.05) {
     const p = weightedPick(players, (pl) => CARD_WEIGHT[pl.position] ?? 1);
-    if (p) playerStats[p.id].reds++;
+    if (p) {
+      playerStats[p.id].reds++;
+      events.push({ playerId: p.id, type: "red" });
+    }
   }
+  return events;
+}
+
+function randomMinute() {
+  return Math.min(90, Math.floor(Math.random() * 90) + 1);
+}
+
+// Süs amaçlı bir oyuncu değişikliği (istatistiklere etki etmez -- sadece
+// "Maç Merkezi" akışını daha gerçekçi hissettirir).
+function pickSubPair(players, excludeIds) {
+  const pool = players.filter((p) => !excludeIds.has(p.id));
+  if (pool.length < 2) return null;
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  return { outPlayer: shuffled[0], inPlayer: shuffled[1] };
+}
+
+// Tek bir maçın gol/kart/değişiklik olaylarını dakikalara yayıp kronolojik
+// sıraya dizer -- "Maç Merkezi" sayfasındaki dakika dakika akış budur.
+function buildMatchTimeline({
+  homeTeam,
+  awayTeam,
+  homeGoalEvents,
+  awayGoalEvents,
+  homeCardEvents,
+  awayCardEvents,
+  homePlayers,
+  awayPlayers,
+}) {
+  const events = [];
+  const findPlayer = (players, id) => players.find((p) => p.id === id) || null;
+
+  for (const g of homeGoalEvents) {
+    events.push({
+      minute: randomMinute(),
+      type: "goal",
+      teamId: homeTeam.id,
+      player: findPlayer(homePlayers, g.scorerId),
+      assist: g.assisterId ? findPlayer(homePlayers, g.assisterId) : null,
+    });
+  }
+  for (const g of awayGoalEvents) {
+    events.push({
+      minute: randomMinute(),
+      type: "goal",
+      teamId: awayTeam.id,
+      player: findPlayer(awayPlayers, g.scorerId),
+      assist: g.assisterId ? findPlayer(awayPlayers, g.assisterId) : null,
+    });
+  }
+
+  const redPlayerIds = new Set();
+  for (const c of homeCardEvents) {
+    events.push({ minute: randomMinute(), type: c.type, teamId: homeTeam.id, player: findPlayer(homePlayers, c.playerId) });
+    if (c.type === "red") redPlayerIds.add(c.playerId);
+  }
+  for (const c of awayCardEvents) {
+    events.push({ minute: randomMinute(), type: c.type, teamId: awayTeam.id, player: findPlayer(awayPlayers, c.playerId) });
+    if (c.type === "red") redPlayerIds.add(c.playerId);
+  }
+
+  const homeSub = pickSubPair(homePlayers, redPlayerIds);
+  if (homeSub) {
+    events.push({
+      minute: 55 + Math.floor(Math.random() * 30),
+      type: "sub",
+      teamId: homeTeam.id,
+      outPlayer: homeSub.outPlayer,
+      inPlayer: homeSub.inPlayer,
+    });
+  }
+  const awaySub = pickSubPair(awayPlayers, redPlayerIds);
+  if (awaySub) {
+    events.push({
+      minute: 55 + Math.floor(Math.random() * 30),
+      type: "sub",
+      teamId: awayTeam.id,
+      outPlayer: awaySub.outPlayer,
+      inPlayer: awaySub.inPlayer,
+    });
+  }
+
+  events.sort((a, b) => a.minute - b.minute);
+  return events;
 }
 
 // --- Kalifikasyon bölgeleri (zones) ---------------------------------------
@@ -210,9 +335,9 @@ function finalizeStandings(standingsMap, zones) {
 // çağrıda Poisson örneklemesi yeniden yapıldığı için sonuç her seferinde
 // biraz farklı olur ("tahminleri yenile" ile yeni bir simülasyon alınır).
 //
-// options: { teams, allPlayers, zones }
+// options: { teams, allPlayers, zones, tacticsById }
 export function simulateSeason(matchdays, options) {
-  const { teams, allPlayers = [], zones } = options;
+  const { teams, allPlayers = [], zones, tacticsById } = options;
   const resolvedZones = zones || buildSwissZones(teams.length);
 
   const standings = {};
@@ -233,7 +358,7 @@ export function simulateSeason(matchdays, options) {
 
   for (const md of matchdays) {
     for (const m of md.matches) {
-      const sim = simulateMatch(m.homeTeam, m.awayTeam);
+      const sim = simulateMatch(m.homeTeam, m.awayTeam, tacticsById);
       const hs = standings[m.homeTeam.id];
       const as_ = standings[m.awayTeam.id];
       if (!hs || !as_) continue;
@@ -260,10 +385,20 @@ export function simulateSeason(matchdays, options) {
 
       const homePlayers = playersByTeam[m.homeTeam.id] || [];
       const awayPlayers = playersByTeam[m.awayTeam.id] || [];
-      distributeGoals(homePlayers, sim.homeGoals, playerStats);
-      distributeGoals(awayPlayers, sim.awayGoals, playerStats);
-      distributeCards(homePlayers, playerStats);
-      distributeCards(awayPlayers, playerStats);
+      const homeGoalEvents = distributeGoals(homePlayers, sim.homeGoals, playerStats);
+      const awayGoalEvents = distributeGoals(awayPlayers, sim.awayGoals, playerStats);
+      const homeCardEvents = distributeCards(homePlayers, playerStats);
+      const awayCardEvents = distributeCards(awayPlayers, playerStats);
+      const events = buildMatchTimeline({
+        homeTeam: m.homeTeam,
+        awayTeam: m.awayTeam,
+        homeGoalEvents,
+        awayGoalEvents,
+        homeCardEvents,
+        awayCardEvents,
+        homePlayers,
+        awayPlayers,
+      });
 
       matchResults.push({
         matchdayNumber: md.number,
@@ -276,6 +411,7 @@ export function simulateSeason(matchdays, options) {
         homeWinProb: sim.homeWinProb,
         drawProb: sim.drawProb,
         awayWinProb: sim.awayWinProb,
+        events,
       });
     }
   }

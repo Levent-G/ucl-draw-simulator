@@ -5,6 +5,7 @@ import { generateRoundRobinFixture } from "../utils/roundRobinEngine.js";
 import { simulateSeason } from "../utils/predictionEngine.js";
 import { generateKnockoutBracket } from "../utils/knockoutEngine.js";
 import { useTeamInjection, applyInjection } from "./TeamInjectionContext.jsx";
+import { useTacticsContext } from "./TacticsContext.jsx";
 
 // NOT: Bu context BİLİNÇLİ OLARAK localStorage kullanmaz -- her sayfa
 // yenilemesinde (F5) TÜM yarışma verileri (çekiliş, fikstür, tahminler)
@@ -33,6 +34,12 @@ function emptyCompetitionState() {
     userScores: {},
     standingsOrder: null,
     knockout: null,
+    // "Karşılıklı Geçmiş" (Head-to-Head) için: her simülasyon çalıştırması
+    // (ilk otomatik simülasyon + her "tahminleri yenile") BİRİKTİRİLEREK
+    // tutulur -- böylece iki takım arasındaki önceki simülasyon
+    // sonuçlarını karşılaştırabiliyoruz. Sadece bu oturuma özeldir (kalıcı
+    // değil); kura/sezon sıfırlanınca (clearCompetition) bu da temizlenir.
+    matchHistory: [],
   };
 }
 
@@ -50,6 +57,7 @@ export function CompetitionProvider({ children }) {
   // fikstür, simülasyon, eleme turu) enjeksiyon uygulanmış haliyle kullanılır.
   const { injections } = useTeamInjection();
   const getComp = useCallback((key) => applyInjection(COMPETITIONS[key], injections[key]), [injections]);
+  const { tactics } = useTacticsContext();
 
   const patch = useCallback((key, partial) => {
     setState((prev) => ({ ...prev, [key]: { ...prev[key], ...partial } }));
@@ -127,7 +135,7 @@ export function CompetitionProvider({ children }) {
   );
 
   const runSimulation = useCallback(
-    (key, fx, allPlayersOverride) => {
+    (key, fx, allPlayersOverride, tacticsOverride) => {
       const comp = getComp(key);
       const slot = state[key];
       const targetFixture = fx || slot?.fixture;
@@ -136,11 +144,14 @@ export function CompetitionProvider({ children }) {
         teams: comp.teams,
         allPlayers: allPlayersOverride || comp.getAllPlayers(),
         zones: comp.zones,
+        tacticsById: tacticsOverride || tactics[key],
       });
-      patch(key, { simulation: sim, knockout: null });
+      const prevHistory = state[key]?.matchHistory || [];
+      const historyEntry = { runId: Date.now(), matches: sim.matchResults };
+      patch(key, { simulation: sim, knockout: null, matchHistory: [...prevHistory, historyEntry] });
       return sim;
     },
-    [state, patch, getComp]
+    [state, patch, getComp, tactics]
   );
 
   const generateKnockout = useCallback(
@@ -225,7 +236,8 @@ export function useCompetition(key) {
     startLeagueSeason: () => ctx.startLeagueSeason(key),
     ensureFixture: () => ctx.ensureFixture(key),
     regenerateFixture: () => ctx.regenerateFixture(key),
-    runSimulation: (fx, allPlayersOverride) => ctx.runSimulation(key, fx, allPlayersOverride),
+    runSimulation: (fx, allPlayersOverride, tacticsOverride) =>
+      ctx.runSimulation(key, fx, allPlayersOverride, tacticsOverride),
     generateKnockout: () => ctx.generateKnockout(key),
     updateUserScore: (matchId, field, value) => ctx.updateUserScore(key, matchId, field, value),
     clearUserScores: () => ctx.clearUserScores(key),

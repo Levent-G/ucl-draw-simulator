@@ -9,6 +9,7 @@ export default function CompetitionSubNav({ competitionKey }) {
     { to: base, label: comp.format === "swiss" ? "Kura Çekimi" : "Sezon", end: true },
     { to: `${base}/fikstur`, label: "Fikstür & Tahmin" },
     { to: `${base}/istatistik`, label: "İstatistikler" },
+    { to: `${base}/karsilikli`, label: "Karşılıklı Geçmiş" },
   ];
   if (comp.hasKnockout) links.push({ to: `${base}/eleme-turu`, label: "Eleme Turu" });
 
