@@ -6,7 +6,6 @@ import React, {
   useState,
 } from "react";
 import { useParams } from "react-router-dom";
-import { getCompetition } from "../data/competitions.js";
 import { useCompetition } from "../state/CompetitionContext.jsx";
 import { generateFullDraw, buildAnnouncementPlan } from "../utils/drawEngine.js";
 import { createEmptyResults } from "../utils/resultsHelpers.js";
@@ -93,10 +92,8 @@ function isResultsComplete(results, teams) {
 
 export default function DrawPage() {
   const { competitionKey } = useParams();
-  const competition = getCompetition(competitionKey);
+  const { competition, setDrawResults, clearCompetition } = useCompetition(competitionKey);
   const { teams: TEAMS, potColors: POT_COLORS, countryNames: COUNTRY_NAMES } = competition;
-
-  const { setDrawResults, clearCompetition } = useCompetition(competitionKey);
   const [phase, setPhase] = useState("idle"); // idle | drawing | done
   const [speed, setSpeed] = useState("normal");
   const [results, setResults] = useState(() => createEmptyResults(TEAMS));

@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getCompetition } from "../data/competitions.js";
 import { useCompetition } from "../state/CompetitionContext.jsx";
 import CompetitionSubNav from "../components/CompetitionSubNav.jsx";
 import Crest from "../components/Crest.jsx";
@@ -14,8 +13,7 @@ import { teamsByCoeffDesc } from "../utils/statsSelectors.js";
 // tamamlanıp şampiyon belli olunca da benzer bir kutlama animasyonu var.
 export default function LeagueHomePage() {
   const { competitionKey } = useParams();
-  const competition = getCompetition(competitionKey);
-  const { hasDraw, simulation, startLeagueSeason, runSimulation, clearCompetition } =
+  const { competition, hasDraw, simulation, startLeagueSeason, runSimulation, clearCompetition } =
     useCompetition(competitionKey);
   const sortedTeams = teamsByCoeffDesc(competition.teams);
 

@@ -18,10 +18,22 @@ export default function NavBar() {
             </NavLink>
           ))}
           <NavLink
+            to="/canli"
+            className={({ isActive }) => `site-nav-link site-nav-link-transfer${isActive ? " active" : ""}`}
+          >
+            📡 Canlı Skorlar
+          </NavLink>
+          <NavLink
             to="/transferler"
             className={({ isActive }) => `site-nav-link site-nav-link-transfer${isActive ? " active" : ""}`}
           >
             🔁 Transfer Merkezi
+          </NavLink>
+          <NavLink
+            to="/ruya-takim"
+            className={({ isActive }) => `site-nav-link site-nav-link-transfer${isActive ? " active" : ""}`}
+          >
+            ⭐ Rüya Takım
           </NavLink>
         </div>
       </div>

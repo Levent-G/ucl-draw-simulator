@@ -18,7 +18,8 @@
 import { POSITION_LABELS } from "./players.js";
 
 const RAW_SUPER_LIG_ROSTERS = {
-  s1: [ // Galatasaray
+  s1: [
+    // Galatasaray
     ["Uğurcan Çakır", "GK", "TUR", 84],
     ["Günay Güvenç", "GK", "TUR", 68],
     ["Jankat Yılmaz", "GK", "TUR", 64],
@@ -40,9 +41,10 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Barış Alper Yılmaz", "MF", "TUR", 78],
     ["Yunus Akgün", "MF", "TUR", 76],
     ["Victor Osimhen", "FW", "NGA", 89],
-    ["Ahmed Kutucu", "FW", "TUR", 72],
+
   ],
-  s2: [ // Fenerbahçe
+  s2: [
+    // Fenerbahçe
     ["Ederson", "GK", "BRA", 85],
     ["Mert Günok", "GK", "TUR", 80],
     ["Tarık Çetin", "GK", "TUR", 70],
@@ -63,7 +65,8 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Vedat Muriqi", "FW", "KVX", 78],
     ["Kerem Aktürkoğlu", "FW", "TUR", 79],
   ],
-  s3: [ // Beşiktaş
+  s3: [
+    // Beşiktaş
     ["Alexander Nübel", "GK", "GER", 80],
     ["Doğan Alemdar", "GK", "TUR", 68],
     ["Emir Yaşar", "GK", "TUR", 62],
@@ -86,7 +89,8 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Semih Kılıçsoy", "FW", "TUR", 77],
     ["Mustafa Hekimoğlu", "FW", "TUR", 68],
   ],
-  s4: [ // Trabzonspor
+  s4: [
+    // Trabzonspor
     ["André Onana", "GK", "CMR", 82],
     ["Ahmet Doğan Yıldırım", "GK", "TUR", 65],
     ["Onuralp Çevikkan", "GK", "TUR", 62],
@@ -106,7 +110,8 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Paul Onuachu", "FW", "NGA", 78],
     ["Umut Nayir", "FW", "TUR", 71],
   ],
-  s5: [ // İstanbul Başakşehir
+  s5: [
+    // İstanbul Başakşehir
     ["Volkan Babacan", "GK", "TUR", 73],
     ["Muhammed Şengezer", "GK", "TUR", 66],
     ["Léo Duarte", "DF", "BRA", 71],
@@ -123,7 +128,8 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Umut Bozok", "FW", "TUR", 70],
     ["Andreas Skov Olsen", "FW", "DEN", 73],
   ],
-  s6: [ // Samsunspor
+  s6: [
+    // Samsunspor
     ["Okan Kocuk", "GK", "TUR", 74],
     ["Joe Mendes", "DF", "SWE", 68],
     ["Ali Badra Diabaté", "DF", "CIV", 70],
@@ -145,7 +151,8 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Fatih Kaya", "FW", "TUR", 68],
     ["Richie Omorowa", "FW", "SWE", 68],
   ],
-  s7: [ // Göztepe
+  s7: [
+    // Göztepe
     ["Mateusz Lis", "GK", "POL", 71],
     ["Nevzat Üzel", "GK", "TUR", 64],
     ["Allan Godói", "DF", "BRA", 68],
@@ -165,7 +172,8 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Jeh", "FW", "BRA", 68],
     ["Janderson", "FW", "BRA", 71],
   ],
-  s8: [ // Kasımpaşa
+  s8: [
+    // Kasımpaşa
     ["Andreas Gianniotis", "GK", "GRE", 69],
     ["Ege Albayrak", "GK", "TUR", 62],
     ["Adem Arous", "DF", "TUN", 65],
@@ -183,7 +191,8 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Mamadou Fall", "FW", "SEN", 64],
     ["Thiemoko Diarra", "FW", "MLI", 64],
   ],
-  s9: [ // Konyaspor
+  s9: [
+    // Konyaspor
     ["Deniz Ertaş", "GK", "TUR", 70],
     ["Bahadır Güngördü", "GK", "TUR", 65],
     ["Arif Boşluk", "DF", "TUR", 62],
@@ -205,7 +214,8 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Enis Destan", "FW", "TUR", 67],
     ["Blaž Kramer", "FW", "SVN", 69],
   ],
-  s10: [ // Alanyaspor
+  s10: [
+    // Alanyaspor
     ["Ertuğrul Taşkıran", "GK", "TUR", 65],
     ["Paulo Victor", "GK", "BRA", 64],
     ["Nuno Lima", "DF", "POR", 65],
@@ -223,26 +233,22 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Meschak Elia", "FW", "COD", 68],
     ["Hwang Ui-jo", "FW", "KOR", 69],
   ],
-  s11: [ // Antalyaspor
-    ["Julián Cuesta", "GK", "ESP", 66],
-    ["Abdullah Yiğiter", "GK", "TUR", 62],
-    ["Veysel Sarı", "DF", "TUR", 65],
-    ["Kenneth Paal", "DF", "SUR", 66],
-    ["Samet Karakoç", "DF", "TUR", 63],
-    ["Bünyamin Balcı", "DF", "TUR", 62],
-    ["Ege İzmirli", "DF", "TUR", 61],
-    ["Jesper Ceesay", "MF", "GAM", 64],
-    ["Dario Sarić", "MF", "BIH", 65],
-    ["Ismail Taïeb Chehaima", "MF", "ALG", 63],
-    ["Ramzi Safuri", "MF", "ISR", 64],
-    ["Sander van de Streek", "MF", "NED", 68],
-    ["Nikola Storm", "MF", "BEL", 67],
-    ["Yohan Boli", "FW", "CIV", 68],
-    ["Bachir Gueye", "FW", "SEN", 64],
-    ["Mevlüt Şimşek", "FW", "TUR", 62],
-    ["Doğukan Sinik", "FW", "TUR", 63],
+  s11: [
+    // Amed SFK
+    ["Alban Lafont", "GK", "FRA", 72],
+    ["Mustafa Burak Bozan", "GK", "TUR", 62],
+    ["Gift Orban", "FW", "NGA", 74],
+    ["Ermal Krasniqi", "FW", "ALB", 66],
+    ["Yira Sor", "FW", "TUR", 64],
+    ["Dia Saba", "FW", "TUR", 63],
+    ["Samuel Ballet", "MF", "FRA", 64],
+    ["Mohamed Khalil", "MF", "TUN", 63],
+    ["Rayan Lutin", "FW", "FRA", 65],
+    ["Berk Kızıldemir", "MF", "TUR", 62],
+    ["Gökhan Gül", "MF", "TUR", 63],
   ],
-  s12: [ // Çaykur Rizespor
+  s12: [
+    // Çaykur Rizespor
     ["Yahia Fofana", "GK", "CIV", 67],
     ["Erdem Canpolat", "GK", "TUR", 63],
     ["Efe Doğan", "GK", "TUR", 60],
@@ -262,46 +268,32 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Jesurun Rak-Sakyi", "FW", "ENG", 65],
     ["Ali Sowe", "FW", "GAM", 66],
     ["Václav Jurečka", "FW", "CZE", 66],
-    ["Halil Dervişoğlu", "FW", "TUR", 68],
+    ["Ahmed Kutucu", "FW", "TUR", 72],
   ],
-  s13: [ // Kayserispor
-    ["Deniz Dönmezer", "GK", "TUR", 62],
-    ["Gökhan Değirmenci", "GK", "TUR", 60],
-    ["Cemal Tabidze", "DF", "GEO", 62],
-    ["Semih Güler", "DF", "TUR", 61],
-    ["Joshua Brenet", "DF", "NED", 66],
-    ["Denis Radu", "DF", "ROU", 61],
-    ["Fethi Özer", "DF", "TUR", 60],
-    ["Sinan Kurt", "MF", "TUR", 63],
-    ["Benhur Keser", "MF", "TUR", 62],
-    ["Sam Mather", "MF", "ENG", 63],
-    ["Mamadi Camará", "MF", "GNB", 61],
-    ["Marco Dulca", "MF", "ROU", 62],
-    ["Youssef Aït Bennasser", "MF", "MAR", 65],
-    ["Daniel Moreno", "FW", "COL", 64],
-    ["Taulant Seferi", "FW", "ALB", 63],
-    ["Miguel Cardoso", "FW", "POR", 66],
-    ["Talha Sarıarslan", "FW", "TUR", 60],
+  s13: [
+    // Çorum FK
+    ["Ahmet Kıvanç", "GK", "TUR", 63],
+    ["Ibrahim Šehić", "GK", "BIH", 64],
+    ["Hasan Akinay", "GK", "TUR", 60],
+    ["Joseph Attamah", "DF", "GHA", 65],
+    ["Sinan Osmanoğlu", "DF", "TUR", 61],
+    ["Ferhat Yazgan", "MF", "TUR", 65],
+    ["Atakan Akkaynak", "MF", "TUR", 62],
+    ["Pedrinho", "MF", "POR", 66],
+    ["Ahmed Ildız", "MF", "TUR", 61],
+    ["Mohammed Diomande", "MF", "CIV", 68],
+    ["Danijel Aleksić", "FW", "SRB", 65],
+    ["Yusuf Erdoğan", "FW", "TUR", 63],
+    ["Mame Thiam", "FW", "SEN", 64],
   ],
-  s14: [ // Sivasspor
-    ["Göktuğ Bakırbaş", "GK", "TUR", 61],
-    ["Ali Şaşal Vural", "GK", "TUR", 63],
-    ["Aaron Appindangoyé", "DF", "GAB", 63],
-    ["Okan Erdoğan", "DF", "TUR", 60],
-    ["Mehmet Albayrak", "DF", "TUR", 60],
-    ["Uğur Çiftçi", "DF", "TUR", 62],
-    ["Feyzi Yıldırım", "DF", "TUR", 60],
-    ["Haris Harisis", "MF", "GRE", 62],
-    ["Luan Campos", "MF", "BRA", 63],
-    ["Alex Pritchard", "MF", "ENG", 65],
-    ["Aly Mallé", "MF", "SEN", 61],
-    ["Valon Ethemi", "MF", "MKD", 62],
-    ["Daniel Avramovski", "MF", "MKD", 64],
-    ["Aliou Badji", "FW", "SEN", 63],
-    ["Bekir Turaç Böke", "FW", "TUR", 60],
-    ["Benjamin Mbunga Kimpioka", "FW", "SWE", 63],
+  s14: [
+    // Erzurumspor FK
+    ["Erkan Anapa", "GK", "TUR", 62],
+    ["Ali Ülgen", "DF", "TUR", 61],
+    ["Hüsamettin Yener", "FW", "TUR", 62],
   ],
-  s15: [ // Gaziantep FK
+  s15: [
+    // Gaziantep FK
     ["Zafer Görgen", "GK", "TUR", 60],
     ["Mustafa Burak Bozan", "GK", "TUR", 58],
     ["Luis Pérez", "DF", "ESP", 62],
@@ -317,8 +309,10 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Enver Kulašin", "MF", "BIH", 61],
     ["Mohamed Bayo", "FW", "GUI", 65],
     ["Emmanuel Boateng", "FW", "GHA", 63],
+    ["Halil Dervişoğlu", "FW", "TUR", 68],
   ],
-  s16: [ // Eyüpspor
+  s16: [
+    // Eyüpspor
     ["Marcos Felipe", "GK", "BRA", 63],
     ["Alp Köseer", "GK", "TUR", 58],
     ["Lucas Calegari", "DF", "BRA", 62],
@@ -338,7 +332,8 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Denis Drăguș", "FW", "ROU", 66],
     ["Metehan Altunbaş", "FW", "TUR", 59],
   ],
-  s17: [ // Kocaelispor
+  s17: [
+    // Kocaelispor
     ["Aleksandar Jovanović", "GK", "SRB", 66],
     ["Serhat Öztaşdelen", "GK", "TUR", 58],
     ["Anfernee Dijksteel", "DF", "SUR", 62],
@@ -361,7 +356,8 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Darko Çurlinov", "FW", "MKD", 60],
     ["Serdar Dursun", "FW", "TUR", 64],
   ],
-  s18: [ // Gençlerbirliği
+  s18: [
+    // Gençlerbirliği
     ["İrfan Can Eğribayat", "GK", "TUR", 68],
     ["Gökhan Akkan", "GK", "TUR", 58],
     ["Dimitrios Goutas", "DF", "GRE", 61],
@@ -393,7 +389,7 @@ export const SUPER_LIG_PLAYERS_BY_TEAM = Object.fromEntries(
       nationality,
       rating,
     })),
-  ])
+  ]),
 );
 
 export function getSuperLigPlayersByTeam(teamId) {

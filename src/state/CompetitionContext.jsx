@@ -4,6 +4,7 @@ import { generateFixture } from "../utils/fixtureEngine.js";
 import { generateRoundRobinFixture } from "../utils/roundRobinEngine.js";
 import { simulateSeason } from "../utils/predictionEngine.js";
 import { generateKnockoutBracket } from "../utils/knockoutEngine.js";
+import { useTeamInjection, applyInjection } from "./TeamInjectionContext.jsx";
 
 // NOT: Bu context BİLİNÇLİ OLARAK localStorage kullanmaz -- her sayfa
 // yenilemesinde (F5) TÜM yarışma verileri (çekiliş, fikstür, tahminler)
@@ -44,6 +45,12 @@ export function CompetitionProvider({ children }) {
     return init;
   });
 
+  // Rüya Takım bir yarışmaya "gönderilmişse" (bkz. TeamInjectionContext), o
+  // yarışmanın takım/oyuncu listesi buradan itibaren HER YERDE (kura,
+  // fikstür, simülasyon, eleme turu) enjeksiyon uygulanmış haliyle kullanılır.
+  const { injections } = useTeamInjection();
+  const getComp = useCallback((key) => applyInjection(COMPETITIONS[key], injections[key]), [injections]);
+
   const patch = useCallback((key, partial) => {
     setState((prev) => ({ ...prev, [key]: { ...prev[key], ...partial } }));
   }, []);
@@ -51,7 +58,7 @@ export function CompetitionProvider({ children }) {
   // ---- Swiss (UCL / Avrupa Ligi) ----
   const setDrawResults = useCallback(
     (key, newResults) => {
-      const comp = COMPETITIONS[key];
+      const comp = getComp(key);
       if (!isCompleteResults(newResults, comp.teams)) return;
       patch(key, {
         started: true,
@@ -63,13 +70,13 @@ export function CompetitionProvider({ children }) {
         knockout: null,
       });
     },
-    [patch]
+    [patch, getComp]
   );
 
   // ---- League (Trendyol Süper Lig) ----
   const startLeagueSeason = useCallback(
     (key) => {
-      const comp = COMPETITIONS[key];
+      const comp = getComp(key);
       const generated = generateRoundRobinFixture(comp.teams);
       patch(key, {
         started: true,
@@ -80,13 +87,13 @@ export function CompetitionProvider({ children }) {
         knockout: null,
       });
     },
-    [patch]
+    [patch, getComp]
   );
 
   // ---- Ortak: fikstür üret / yeniden dağıt ----
   const ensureFixture = useCallback(
     (key) => {
-      const comp = COMPETITIONS[key];
+      const comp = getComp(key);
       const slot = state[key];
       if (!slot || slot.fixture) return slot?.fixture || null;
       if (comp.format === "swiss") {
@@ -98,12 +105,12 @@ export function CompetitionProvider({ children }) {
       // league formatında fikstür zaten startLeagueSeason ile üretilir.
       return null;
     },
-    [state, patch]
+    [state, patch, getComp]
   );
 
   const regenerateFixture = useCallback(
     (key) => {
-      const comp = COMPETITIONS[key];
+      const comp = getComp(key);
       const slot = state[key];
       if (!slot) return null;
       if (comp.format === "swiss") {
@@ -116,12 +123,12 @@ export function CompetitionProvider({ children }) {
       patch(key, { fixture: generated, simulation: null });
       return generated;
     },
-    [state, patch]
+    [state, patch, getComp]
   );
 
   const runSimulation = useCallback(
     (key, fx, allPlayersOverride) => {
-      const comp = COMPETITIONS[key];
+      const comp = getComp(key);
       const slot = state[key];
       const targetFixture = fx || slot?.fixture;
       if (!targetFixture) return null;
@@ -133,12 +140,12 @@ export function CompetitionProvider({ children }) {
       patch(key, { simulation: sim, knockout: null });
       return sim;
     },
-    [state, patch]
+    [state, patch, getComp]
   );
 
   const generateKnockout = useCallback(
     (key) => {
-      const comp = COMPETITIONS[key];
+      const comp = getComp(key);
       const slot = state[key];
       if (!comp.hasKnockout || !slot?.simulation) return null;
       const teamById = Object.fromEntries(comp.teams.map((t) => [t.id, t]));
@@ -146,7 +153,7 @@ export function CompetitionProvider({ children }) {
       patch(key, { knockout: bracket });
       return bracket;
     },
-    [state, patch]
+    [state, patch, getComp]
   );
 
   const updateUserScore = useCallback((key, matchId, field, value) => {
@@ -204,7 +211,8 @@ export function CompetitionProvider({ children }) {
 export function useCompetition(key) {
   const ctx = useContext(CompetitionContext);
   if (!ctx) throw new Error("useCompetition, bir <CompetitionProvider> içinde kullanılmalıdır.");
-  const comp = COMPETITIONS[key];
+  const { injections } = useTeamInjection();
+  const comp = applyInjection(COMPETITIONS[key], injections[key]);
   const slot = ctx.state[key] || emptyCompetitionState();
   return {
     competition: comp,

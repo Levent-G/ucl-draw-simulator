@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { getCompetition } from "../data/competitions.js";
 import { useCompetition } from "../state/CompetitionContext.jsx";
 import CompetitionSubNav from "../components/CompetitionSubNav.jsx";
 import Crest from "../components/Crest.jsx";
@@ -38,8 +37,7 @@ function TieCard({ tie }) {
 
 export default function KnockoutPage() {
   const { competitionKey } = useParams();
-  const competition = getCompetition(competitionKey);
-  const { hasFixture, simulation, knockout, generateKnockout } = useCompetition(competitionKey);
+  const { competition, hasFixture, simulation, knockout, generateKnockout } = useCompetition(competitionKey);
 
   useEffect(() => {
     if (simulation && !knockout) generateKnockout();

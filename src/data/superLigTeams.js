@@ -3,13 +3,17 @@
 // NOT: UEFA Şampiyonlar Ligi / Avrupa Ligi'nin aksine bu, "İsviçre modeli" bir
 // kura değil, standart çift devreli lig (herkes herkesle iki kez oynar) formatlı
 // bir yapıdır. Bu yüzden torba (pot) kavramı yoktur; her takım için sadece görece
-// bir güç puanı (coeff) tutulur. Liste best-effort güncel kulüp/gücü tahminidir,
-// gerçek sezon sıralamasıyla birebir aynı olmak zorunda değildir.
+// bir güç puanı (coeff) tutulur.
+//
+// Takım listesi, 2026-27 sezonu Trendyol Süper Lig'in gerçek 18 takımını
+// yansıtacak şekilde Ağustos 2026'da web araştırmasıyla güncellendi (Antalyaspor,
+// Kayserispor ve Sivasspor küme düştü; yerlerine yükselen Amed SFK, Çorum FK ve
+// Erzurumspor FK eklendi). Coeff değerleri yine kurgusal/gösterim amaçlıdır.
 //
 // logo: projede zaten bulunan (kullanıcının sağladığı) amblem dosyalarından
-// eşleşenler içe aktarılır. Eşleşme bulunamayan takımlar (ör. Sivasspor) için
-// alan atlanır -- Crest.jsx bu durumda otomatik olarak kendi oluşturduğu SVG
-// rozete geri döner.
+// eşleşenler içe aktarılır. Eşleşme bulunamayan takımlar (ör. yeni yükselen
+// kulüpler) için alan atlanır -- Crest.jsx bu durumda otomatik olarak kendi
+// oluşturduğu SVG rozete geri döner.
 import GalatasarayLogo from "../assets/logos/Türkiye - Süper Lig/Galatasaray.png";
 import FenerbahceLogo from "../assets/logos/Türkiye - Süper Lig/Fenerbahce.png";
 import BesiktasLogo from "../assets/logos/Türkiye - Süper Lig/Besiktas JK.png";
@@ -20,9 +24,7 @@ import GoztepeLogo from "../assets/logos/Türkiye - Süper Lig/Göztepe.png";
 import KasimpasaLogo from "../assets/logos/Türkiye - Süper Lig/Kasimpasa.png";
 import KonyasporLogo from "../assets/logos/Türkiye - Süper Lig/Konyaspor.png";
 import AlanyasporLogo from "../assets/logos/Türkiye - Süper Lig/Alanyaspor.png";
-import AntalyasporLogo from "../assets/logos/Türkiye - Süper Lig/Antalyaspor.png";
 import CaykurRizesporLogo from "../assets/logos/Türkiye - Süper Lig/Caykur Rizespor.png";
-import KayserisporLogo from "../assets/logos/Türkiye - Süper Lig/Kayserispor.png";
 import GaziantepFKLogo from "../assets/logos/Türkiye - Süper Lig/Gaziantep FK.png";
 import EyupsporLogo from "../assets/logos/Türkiye - Süper Lig/Eyüpspor.png";
 import KocaelisporLogo from "../assets/logos/Türkiye - Süper Lig/Kocaelispor.png";
@@ -44,10 +46,10 @@ const RAW_SUPER_LIG_TEAMS = [
   { name: "Kasımpaşa", short: "KAS", country: "TUR", pot: null, coeff: 55.0, logo: KasimpasaLogo },
   { name: "Konyaspor", short: "KON", country: "TUR", pot: null, coeff: 54.0, logo: KonyasporLogo },
   { name: "Alanyaspor", short: "ALN", country: "TUR", pot: null, coeff: 53.0, logo: AlanyasporLogo },
-  { name: "Antalyaspor", short: "ANT", country: "TUR", pot: null, coeff: 52.0, logo: AntalyasporLogo },
+  { name: "Amed SFK", short: "AMD", country: "TUR", pot: null, coeff: 52.0 },
   { name: "Çaykur Rizespor", short: "RIZ", country: "TUR", pot: null, coeff: 50.0, logo: CaykurRizesporLogo },
-  { name: "Kayserispor", short: "KAY", country: "TUR", pot: null, coeff: 49.0, logo: KayserisporLogo },
-  { name: "Sivasspor", short: "SIV", country: "TUR", pot: null, coeff: 47.0 },
+  { name: "Çorum FK", short: "COR", country: "TUR", pot: null, coeff: 44.0 },
+  { name: "Erzurumspor FK", short: "ERZ", country: "TUR", pot: null, coeff: 43.0 },
   { name: "Gaziantep FK", short: "GAZ", country: "TUR", pot: null, coeff: 46.0, logo: GaziantepFKLogo },
   { name: "Eyüpspor", short: "EYU", country: "TUR", pot: null, coeff: 45.0, logo: EyupsporLogo },
   { name: "Kocaelispor", short: "KOC", country: "TUR", pot: null, coeff: 40.0, logo: KocaelisporLogo },

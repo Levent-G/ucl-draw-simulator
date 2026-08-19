@@ -2,8 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useCompetition } from "../state/CompetitionContext.jsx";
 import { useTransferMarket } from "../state/TransferContext.jsx";
-import { getCompetition } from "../data/competitions.js";
-import { computeStandingsFromUserScores, standingsFromOrder } from "../utils/predictionEngine.js";
+import { standingsFromOrder } from "../utils/predictionEngine.js";
 import { teamsByCoeffDesc } from "../utils/statsSelectors.js";
 import CompetitionSubNav from "../components/CompetitionSubNav.jsx";
 import MatchdayTabs from "../components/fixture/MatchdayTabs.jsx";
@@ -13,8 +12,8 @@ import DragStandings from "../components/fixture/DragStandings.jsx";
 
 export default function FixturePage() {
   const { competitionKey } = useParams();
-  const competition = getCompetition(competitionKey);
   const {
+    competition,
     hasDraw,
     fixture,
     ensureFixture,
@@ -58,19 +57,6 @@ export default function FixturePage() {
     if (!md) return [];
     return md.matches.map((m) => ({ ...m, ...(simMatchById[m.id] || {}) }));
   }, [fixture, activeMatchday, simMatchById]);
-
-  const userStandings = useMemo(() => {
-    if (!fixture) return [];
-    return computeStandingsFromUserScores(fixture, userScores, {
-      teams: competition.teams,
-      zones: competition.zones,
-    });
-  }, [fixture, userScores, competition]);
-
-  const filledUserMatches = useMemo(
-    () => Object.values(userScores).filter((s) => s.home !== "" && s.away !== "").length,
-    [userScores]
-  );
 
   const totalMatchCount = useMemo(
     () => (fixture ? fixture.reduce((sum, md) => sum + md.matches.length, 0) : 0),
@@ -184,28 +170,16 @@ export default function FixturePage() {
             Model Tahmini Puan Durumu
           </button>
           <button
-            className={standingsView === "user" ? "active" : ""}
-            onClick={() => setStandingsView("user")}
-          >
-            Skor Tahminim ({filledUserMatches}/{totalMatchCount})
-          </button>
-          <button
             className={standingsView === "drag" ? "active" : ""}
             onClick={() => setStandingsView("drag")}
           >
             Sıralama Tahminim (Sürükle)
           </button>
-          {standingsView === "user" && filledUserMatches > 0 && (
-            <button className="btn-ghost" onClick={clearUserScores}>
-              Tahminlerimi Temizle
-            </button>
-          )}
         </div>
 
         {standingsView === "model" && (
           <StandingsTable standings={simulation?.standings} teams={competition.teams} />
         )}
-        {standingsView === "user" && <StandingsTable standings={userStandings} teams={competition.teams} />}
         {standingsView === "drag" && (
           <div className="standings-card">
             <p className="drag-standings-hint">

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getCompetition } from "../data/competitions.js";
 import { useCompetition } from "../state/CompetitionContext.jsx";
 import CompetitionSubNav from "../components/CompetitionSubNav.jsx";
 import TeamsTab from "../components/stats/TeamsTab.jsx";
@@ -16,8 +15,7 @@ const TABS = [
 
 export default function StatsPage() {
   const { competitionKey } = useParams();
-  const competition = getCompetition(competitionKey);
-  const { simulation, hasFixture } = useCompetition(competitionKey);
+  const { competition, simulation, hasFixture } = useCompetition(competitionKey);
   const [tab, setTab] = useState("teams");
   const [selectedTeamId, setSelectedTeamId] = useState("");
 

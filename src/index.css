@@ -58,6 +58,7 @@ body,
 
 body {
   margin: 0;
+  overflow-x: hidden;
   font-family: var(--font-body);
   color: var(--text-primary);
   background: linear-gradient(

@@ -19,6 +19,7 @@ import {
 } from "recharts";
 import SortableTable from "./SortableTable.jsx";
 import ChartTooltip from "./ChartTooltip.jsx";
+import PlayerHeatmap from "./PlayerHeatmap.jsx";
 import PlayerAvatar from "../PlayerAvatar.jsx";
 import { CHART_SERIES, POSITION_COLORS, CHART_GRID, CHART_AXIS } from "../../utils/chartTheme.js";
 import { topScorers, topCarded, allPlayersWithStats, positionCounts } from "../../utils/statsSelectors.js";
@@ -190,6 +191,8 @@ export default function PlayersTab({ competition, simulation, selectedTeam }) {
           </RadarChart>
         </ResponsiveContainer>
       </div>
+
+      <PlayerHeatmap rows={rows} positionLabels={positionLabels} />
 
       <div className="chart-card chart-card-wide">
         <h3>Tüm Oyuncular ({rows.length})</h3>
