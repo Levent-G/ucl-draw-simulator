@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import html2canvas from "html2canvas";
 import { useCompetition } from "../../state/CompetitionContext.jsx";
 import { useTeamTactics } from "../../state/TacticsContext.jsx";
 import { useAchievements } from "../../state/AchievementsContext.jsx";
@@ -170,6 +169,7 @@ export default function InteractivePrediction({ competitionKey, dataSource }) {
     if (!captureRef.current) return;
     setCapturing(true);
     try {
+      const { default: html2canvas } = await import("html2canvas");
       const canvas = await html2canvas(captureRef.current, {
         backgroundColor: "#0e1d4a",
         scale: 2,

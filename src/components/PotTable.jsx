@@ -25,7 +25,7 @@ export default function PotTable({
         POT {pot}
       </div>
 
-      <div className="pot-table-scroll">
+      <div className="pot-table-scroll" tabIndex={0} role="region" aria-label={`Torba ${pot} kura tablosu`}>
         <table className="draw-table">
           <thead>
             <tr>

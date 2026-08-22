@@ -26,7 +26,7 @@ export default function StandingsTable({ standings, title, teams, defaultVisible
   return (
     <div className="standings-card">
       {title && <h3 className="standings-title">{title}</h3>}
-      <div className="standings-scroll">
+      <div className="standings-scroll" tabIndex={0} role="region" aria-label={title || "Puan durumu tablosu"}>
         <table className="standings-table">
           <thead>
             <tr>

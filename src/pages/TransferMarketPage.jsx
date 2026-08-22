@@ -49,35 +49,29 @@ function TransferTeamCard({
         if (playerId) onDropPlayer(playerId, team.id);
       }}
     >
-      <div
-        className="transfer-team-card-header"
-        role="button"
-        tabIndex={0}
-        onClick={() => onToggle(team.id)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onToggle(team.id);
-          }
-        }}
-        aria-expanded={open}
-      >
-        <span className="transfer-team-card-name-link">
-          <Crest team={team} size={24} />
-          <span className="transfer-team-card-name">{team.name}</span>
-        </span>
-        <span className="transfer-team-card-count">{players.length}</span>
+      <div className="transfer-team-card-header">
+        <button
+          type="button"
+          className="transfer-team-card-toggle"
+          onClick={() => onToggle(team.id)}
+          aria-expanded={open}
+        >
+          <span className="transfer-team-card-name-link">
+            <Crest team={team} size={24} />
+            <span className="transfer-team-card-name">{team.name}</span>
+          </span>
+          <span className="transfer-team-card-count">{players.length}</span>
+          <span className="transfer-team-card-chevron" aria-hidden="true">
+            {open ? "▲" : "▼"}
+          </span>
+        </button>
         <Link
           to={`/${competitionKey}/takim/${team.id}`}
           className="transfer-team-card-profile-link"
-          onClick={(e) => e.stopPropagation()}
           title="Takım profilini gör"
         >
           ↗
         </Link>
-        <span className="transfer-team-card-chevron" aria-hidden="true">
-          {open ? "▲" : "▼"}
-        </span>
       </div>
       {open && (
         <div className="transfer-roster-scroll">

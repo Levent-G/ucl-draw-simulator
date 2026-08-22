@@ -1,6 +1,5 @@
 import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import html2canvas from "html2canvas";
 import { useSeasonArchive } from "../state/SeasonArchiveContext.jsx";
 import Crest from "../components/Crest.jsx";
 
@@ -26,6 +25,10 @@ function ArchiveCard({ entry, onRemove }) {
     if (!captureRef.current) return;
     setCapturing(true);
     try {
+      // html2canvas oldukça büyük bir kütüphane -- sadece kullanıcı gerçekten
+      // indirmeye tıkladığında (dinamik import ile) yüklenir, sayfanın ilk
+      // açılış paketini şişirmez.
+      const { default: html2canvas } = await import("html2canvas");
       const canvas = await html2canvas(captureRef.current, {
         backgroundColor: "#0e1d4a",
         scale: 2,

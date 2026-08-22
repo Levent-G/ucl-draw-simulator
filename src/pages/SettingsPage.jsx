@@ -45,12 +45,13 @@ export default function SettingsPage() {
         {Object.entries(MODEL_SETTING_RANGES).map(([key, range]) => (
           <div className="settings-slider-row" key={key}>
             <div className="settings-slider-head">
-              <span>{range.label}</span>
+              <label htmlFor={`setting-${key}`}>{range.label}</label>
               <span className="settings-slider-value">
                 {settings[key].toFixed(2)} {range.unit}
               </span>
             </div>
             <input
+              id={`setting-${key}`}
               type="range"
               min={range.min}
               max={range.max}
@@ -58,6 +59,7 @@ export default function SettingsPage() {
               value={settings[key]}
               onChange={(e) => updateSetting(key, Number(e.target.value))}
               className="settings-slider"
+              aria-valuetext={`${settings[key].toFixed(2)} ${range.unit}`}
             />
             <div className="settings-slider-default">
               Varsayılan: {DEFAULT_MODEL_SETTINGS[key].toFixed(2)} {range.unit}

@@ -36,20 +36,22 @@ export default function SortableTable({ columns, rows, defaultSortKey, defaultDi
   };
 
   return (
-    <div className="sortable-table-scroll">
+    <div className="sortable-table-scroll" tabIndex={0} role="region" aria-label="Sıralanabilir tablo">
       <table className="sortable-table">
         <thead>
           <tr>
             {columns.map((c) => (
               <th
                 key={c.key}
-                onClick={() => handleSort(c.key)}
+                aria-sort={sortKey === c.key ? (dir === "asc" ? "ascending" : "descending") : "none"}
                 className={sortKey === c.key ? "sorted" : ""}
               >
-                {c.label}
-                {sortKey === c.key && (
-                  <span className="sort-arrow">{dir === "asc" ? " ▲" : " ▼"}</span>
-                )}
+                <button type="button" className="sortable-th-btn" onClick={() => handleSort(c.key)}>
+                  {c.label}
+                  {sortKey === c.key && (
+                    <span className="sort-arrow">{dir === "asc" ? " ▲" : " ▼"}</span>
+                  )}
+                </button>
               </th>
             ))}
           </tr>

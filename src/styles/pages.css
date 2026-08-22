@@ -35,6 +35,12 @@
   gap: 6px;
   flex-wrap: wrap;
 }
+.site-nav-burger {
+  display: none;
+}
+.site-nav-icon-label {
+  display: none;
+}
 .site-nav-link {
   font-family: var(--font-display);
   font-size: 12px;
@@ -59,6 +65,63 @@
 .site-nav-link-icon {
   padding: 8px 10px;
   font-size: 15px;
+}
+button.site-nav-link-icon {
+  background: transparent;
+  cursor: pointer;
+}
+
+/* Mobilde 10+ nav linki alt alta sarılıp sayfanın büyük bir kısmını
+   kaplıyordu (bkz. kullanıcı geri bildirimi: "her sayfada çok karmaşık
+   geliyor"). Bu yüzden mobilde linkler bir hamburger menüsünün ARDINA
+   gizlenir; masaüstünde davranış tamamen aynı kalır. */
+@media (max-width: 700px) {
+  .site-nav-inner {
+    padding: 10px 14px;
+    gap: 10px;
+  }
+  .nav-search {
+    order: 3;
+    flex: 1 1 100%;
+    max-width: none;
+  }
+  .site-nav-burger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    margin-left: auto;
+    background: var(--bg-panel);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 16px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .site-nav-links {
+    display: none;
+    width: 100%;
+    order: 4;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 10px;
+    margin-top: 4px;
+    border-top: 1px solid var(--line);
+  }
+  .site-nav-links.is-open {
+    display: flex;
+  }
+  .site-nav-link {
+    width: 100%;
+    padding: 11px 14px;
+  }
+  .site-nav-icon-label {
+    display: inline;
+    margin-left: 6px;
+    text-transform: uppercase;
+  }
 }
 
 .nav-search {
@@ -175,6 +238,28 @@
   text-transform: uppercase;
   color: var(--ucl-blue-3);
   margin-bottom: 6px;
+}
+.route-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 80px 0;
+  color: var(--text-faint);
+  font-size: 13px;
+}
+.route-loading-spinner {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--line-strong);
+  border-top-color: var(--accent);
+  animation: route-loading-spin 0.7s linear infinite;
+}
+@keyframes route-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 .career-season-badge {
   display: inline-block;
@@ -2067,17 +2152,31 @@ a.team-profile-match-row:hover {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-faint);
-  padding: 9px 12px;
+  padding: 0;
   border-bottom: 1px solid var(--line-strong);
-  cursor: pointer;
   white-space: nowrap;
   user-select: none;
 }
 .sortable-table thead th.sorted {
   color: var(--ucl-blue-2);
 }
-.sortable-table thead th:hover {
+.sortable-th-btn {
+  display: block;
+  width: 100%;
+  padding: 9px 12px;
+  background: transparent;
+  border: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.sortable-th-btn:hover {
   color: var(--text-primary);
+}
+.sortable-th-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 .sort-arrow {
   font-size: 9px;
@@ -3745,21 +3844,31 @@ a.team-profile-match-row:hover {
   display: flex;
   width: 100%;
   align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
+  gap: 4px;
+  padding: 4px;
   background: var(--bg-panel-alt);
-  border: none;
   border-bottom: 1px solid transparent;
+  transition: background 0.12s ease;
+}
+.transfer-team-card-toggle {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm, 8px);
   cursor: pointer;
   font: inherit;
   color: inherit;
   text-align: left;
-  transition: background 0.12s ease;
 }
-.transfer-team-card-header:hover {
+.transfer-team-card-toggle:hover {
   background: var(--bg-panel);
 }
-.transfer-team-card-header:focus-visible {
+.transfer-team-card-toggle:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: -2px;
 }
@@ -3785,6 +3894,7 @@ a.team-profile-match-row:hover {
   text-decoration: none;
   font-size: 12px;
   flex-shrink: 0;
+  margin-right: 6px;
 }
 .transfer-team-card-profile-link:hover {
   background: var(--bg-panel);
@@ -4585,6 +4695,20 @@ a.team-profile-match-row:hover {
   flex-direction: column;
   gap: 10px;
 }
+@media (max-width: 700px) {
+  /* Mobilde navbar (hamburger menü açıkken de) yüksekliği değişken --
+     sabit bir "top" değeri kullanmak yerine, içeriği hiç örtmeyen alt
+     köşeye taşıyoruz (yaygın mobil bildirim deseni). */
+  .achievement-toast-stack {
+    top: auto;
+    bottom: 16px;
+    left: 14px;
+    right: 14px;
+  }
+  .achievement-toast {
+    min-width: 0;
+  }
+}
 .achievement-toast {
   display: flex;
   align-items: center;
@@ -4727,4 +4851,106 @@ a.team-profile-match-row:hover {
 .settings-slider-default {
   font-size: 10.5px;
   color: var(--text-faint);
+}
+
+/* ==========================================================================
+   "YENİLİKLER" TANITIM TURU
+   ========================================================================== */
+.whatsnew-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(5, 11, 34, 0.78);
+  backdrop-filter: blur(4px);
+}
+.whatsnew-modal {
+  width: min(680px, 100%);
+  max-height: 85vh;
+  overflow-y: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.8);
+  animation: whatsnew-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes whatsnew-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.whatsnew-head {
+  margin-bottom: 18px;
+}
+.whatsnew-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #facc15;
+}
+.whatsnew-head h2 {
+  font-family: var(--font-display);
+  font-size: 24px;
+  text-transform: uppercase;
+  margin: 6px 0 4px;
+  color: var(--text-primary);
+}
+.whatsnew-head p {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.whatsnew-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.whatsnew-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  cursor: default;
+}
+.whatsnew-item.is-clickable {
+  cursor: pointer;
+}
+.whatsnew-item.is-clickable:hover {
+  border-color: var(--accent);
+  background: var(--bg-panel-alt);
+}
+.whatsnew-item-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.whatsnew-item-title {
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+.whatsnew-item-desc {
+  font-size: 11.5px;
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+.whatsnew-close-btn {
+  width: 100%;
 }
