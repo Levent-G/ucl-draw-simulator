@@ -1,16 +1,18 @@
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useCompetition } from "../state/CompetitionContext.jsx";
-import CompetitionSubNav from "../components/CompetitionSubNav.jsx";
+import CompetitionStepper from "../components/CompetitionStepper.jsx";
 import TeamsTab from "../components/stats/TeamsTab.jsx";
 import PlayersTab from "../components/stats/PlayersTab.jsx";
 import CountriesTab from "../components/stats/CountriesTab.jsx";
+import TeamOfSeasonTab from "../components/stats/TeamOfSeasonTab.jsx";
 import TeamFilterSelect from "../components/stats/TeamFilterSelect.jsx";
 
 const TABS = [
   { key: "teams", label: "Takımlar" },
   { key: "players", label: "Oyuncular" },
   { key: "countries", label: "Ülkeler" },
+  { key: "season-xi", label: "Sezonun 11'i" },
 ];
 
 export default function StatsPage() {
@@ -25,7 +27,7 @@ export default function StatsPage() {
 
   return (
     <div className="page-shell">
-      <CompetitionSubNav competitionKey={competitionKey} />
+      <CompetitionStepper competitionKey={competitionKey} />
       <header className="page-header">
         <div>
           <div className="page-eyebrow">Takımlar · Oyuncular · Ülkeler</div>
@@ -56,7 +58,7 @@ export default function StatsPage() {
           ))}
         </div>
 
-        {tab !== "countries" && (
+        {tab !== "countries" && tab !== "season-xi" && (
           <div className="team-filter">
             <label htmlFor="stats-team-filter">Takım filtresi</label>
             <TeamFilterSelect
@@ -74,12 +76,15 @@ export default function StatsPage() {
       </div>
 
       {tab === "teams" && (
-        <TeamsTab competition={competition} simulation={simulation} selectedTeam={selectedTeam} />
+        <TeamsTab competition={competition} simulation={simulation} selectedTeam={selectedTeam} competitionKey={competitionKey} />
       )}
       {tab === "players" && (
-        <PlayersTab competition={competition} simulation={simulation} selectedTeam={selectedTeam} />
+        <PlayersTab competition={competition} simulation={simulation} selectedTeam={selectedTeam} competitionKey={competitionKey} />
       )}
       {tab === "countries" && <CountriesTab competition={competition} />}
+      {tab === "season-xi" && (
+        <TeamOfSeasonTab competition={competition} simulation={simulation} competitionKey={competitionKey} />
+      )}
 
       <p className="footnote">
         Oyuncu kadroları gerçek kulüplere yakın (best-effort) seçilmiştir; tam

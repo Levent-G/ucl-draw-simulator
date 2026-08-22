@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   ResponsiveContainer,
   RadarChart,
@@ -9,34 +9,50 @@ import {
   Radar,
   Legend,
 } from "recharts";
-import { useDreamTeam, FORMATION_SLOTS } from "../state/DreamTeamContext.jsx";
+import { useDreamTeam, FORMATIONS, ZONES, zoneForY } from "../state/DreamTeamContext.jsx";
 import { useTeamInjection } from "../state/TeamInjectionContext.jsx";
+import { useTacticsContext } from "../state/TacticsContext.jsx";
+import { useAchievements } from "../state/AchievementsContext.jsx";
 import { COMPETITION_LIST } from "../data/competitions.js";
 import { findPlayerByGlobalId } from "../utils/crossCompetitionPlayers.js";
 import PlayerPickerModal from "../components/dreamteam/PlayerPickerModal.jsx";
 import PlayerAvatar from "../components/PlayerAvatar.jsx";
 import Crest from "../components/Crest.jsx";
 import { CHART_SERIES, CHART_GRID, CHART_AXIS } from "../utils/chartTheme.js";
+import { TACTICS } from "../utils/predictionEngine.js";
+import { encodeShareData, decodeShareData, copyToClipboard } from "../utils/shareLink.js";
 
 const DREAM_TEAM_ID = "dream-team";
-const SQUAD_SIZE = FORMATION_SLOTS.length;
+const SQUAD_SIZE = 11;
 
 const TABS = [
   { key: "squad", label: "Kadro Kur" },
   { key: "compare", label: "Karşılaştır" },
 ];
 
-function PitchSlot({ slot, player, onPick, onClear }) {
+function PitchSlot({ slot, coords, player, isDragging, onPick, onClear, onDragStart, onDragEnd, onTouchStart }) {
+  const zone = zoneForY(coords.y);
+  const style = { left: `${coords.x}%`, top: `${coords.y}%` };
+
   return (
-    <div className="pitch-slot">
+    <div className={`pitch-slot ${isDragging ? "is-dragging" : ""}`} style={style}>
       {player ? (
-        <button className="pitch-slot-filled" onClick={() => onPick(slot)} title="Değiştirmek için tıkla">
+        <button
+          className="pitch-slot-filled"
+          draggable
+          onDragStart={(e) => onDragStart(e, slot.id)}
+          onDragEnd={onDragEnd}
+          onTouchStart={() => onTouchStart(slot.id)}
+          onClick={() => onPick(slot)}
+          title="Sahada taşımak için sürükle, değiştirmek için tıkla"
+        >
           <PlayerAvatar player={player} size={40} />
           <span className="pitch-slot-name">{player.name}</span>
           <span className="pitch-slot-meta">
             {player.team && <Crest team={player.team} size={14} />}
             {player.rating}
           </span>
+          <span className="pitch-slot-zone-tag">{zone.short}</span>
           <span
             className="pitch-slot-remove"
             role="button"
@@ -66,6 +82,8 @@ function PitchSlot({ slot, player, onPick, onClear }) {
 function SendToCompetition({ filledPlayers, isFull }) {
   const navigate = useNavigate();
   const { injections, sendDreamTeam, clearInjection } = useTeamInjection();
+  const { setTeamTactic } = useTacticsContext();
+  const [selectedTactic, setSelectedTactic] = useState("balanced");
 
   const handleSend = (compKey) => {
     if (!isFull) return;
@@ -88,6 +106,7 @@ function SendToCompetition({ filledPlayers, isFull }) {
       teamId: team.id,
     }));
     sendDreamTeam(compKey, team, players);
+    setTeamTactic(compKey, DREAM_TEAM_ID, selectedTactic);
     navigate(`/${compKey}`);
   };
 
@@ -101,6 +120,21 @@ function SendToCompetition({ filledPlayers, isFull }) {
           </span>
         )}
       </div>
+
+      <div className="dreamteam-tactic-picker">
+        <span className="dreamteam-tactic-label">Oyun tarzı:</span>
+        {Object.values(TACTICS).map((t) => (
+          <button
+            key={t.key}
+            type="button"
+            className={selectedTactic === t.key ? "active" : ""}
+            onClick={() => setSelectedTactic(t.key)}
+          >
+            {t.icon} {t.label}
+          </button>
+        ))}
+      </div>
+
       <div className="dreamteam-send-buttons">
         {COMPETITION_LIST.map((c) => {
           const injection = injections[c.key];
@@ -131,19 +165,129 @@ function SendToCompetition({ filledPlayers, isFull }) {
 }
 
 function SquadBuilder() {
-  const { squad, setSlotPlayer, clearSlot, clearSquad } = useDreamTeam();
+  const {
+    formation,
+    formationSlots,
+    setFormation,
+    squad,
+    setSlotPlayer,
+    clearSlot,
+    clearSquad,
+    loadSquad,
+    customPositions,
+    setSlotCoords,
+    resetPositions,
+  } = useDreamTeam();
   const [pickerSlot, setPickerSlot] = useState(null);
+  const [draggingSlotId, setDraggingSlotId] = useState(null);
+  const [hoverY, setHoverY] = useState(null);
+  const [shareStatus, setShareStatus] = useState("idle");
+  const pitchRef = useRef(null);
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const rows = useMemo(() => {
-    const byRow = {};
-    for (const slot of FORMATION_SLOTS) {
-      if (!byRow[slot.row]) byRow[slot.row] = [];
-      byRow[slot.row].push(slot);
+  // Paylaşılan bir link (?d=...) ile açıldıysa kadroyu bir kerede yükler,
+  // sonra parametreyi URL'den temizler (böylece sonraki değişiklikler eski
+  // linke geri sarmaz).
+  useEffect(() => {
+    const shared = searchParams.get("d");
+    if (!shared) return;
+    const data = decodeShareData(shared);
+    if (data?.formation && data?.squad) {
+      loadSquad(data.formation, data.squad);
     }
-    return Object.entries(byRow)
-      .sort(([a], [b]) => Number(b) - Number(a)) // forvet üstte, kaleci altta
-      .map(([, slots]) => slots);
+    setSearchParams({}, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleShare = async () => {
+    const url = `${window.location.origin}${window.location.pathname}#/ruya-takim?d=${encodeShareData({ formation, squad })}`;
+    const copied = await copyToClipboard(url);
+    setShareStatus(copied ? "copied" : "manual");
+    window.setTimeout(() => setShareStatus("idle"), 3000);
+    if (!copied) window.prompt("Linki kopyala:", url);
+  };
+
+  const coordsOf = useCallback(
+    (slot) => customPositions[slot.id] || { x: slot.x, y: slot.y },
+    [customPositions]
+  );
+
+  const handleDragStart = useCallback((e, slotId) => {
+    e.dataTransfer.setData("text/plain", slotId);
+    e.dataTransfer.effectAllowed = "move";
+    setDraggingSlotId(slotId);
+  }, []);
+
+  const handleDragEnd = useCallback(() => {
+    setDraggingSlotId(null);
+    setHoverY(null);
+  }, []);
+
+  const handlePitchDragOver = useCallback(
+    (e) => {
+      if (!draggingSlotId) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      const rect = pitchRef.current.getBoundingClientRect();
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      setHoverY(Math.max(0, Math.min(100, y)));
+    },
+    [draggingSlotId]
+  );
+
+  const handlePitchDrop = useCallback(
+    (e) => {
+      e.preventDefault();
+      const slotId = e.dataTransfer.getData("text/plain") || draggingSlotId;
+      if (!slotId || !pitchRef.current) return;
+      const rect = pitchRef.current.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      setSlotCoords(slotId, x, y);
+      setDraggingSlotId(null);
+      setHoverY(null);
+    },
+    [draggingSlotId, setSlotCoords]
+  );
+
+  // Dokunmatik cihazlarda native HTML5 DnD (draggable/dataTransfer) touch
+  // olaylarında tetiklenmediği için aynı "sahada serbest taşıma" deneyimini
+  // touchstart/touchmove/touchend ile tekrarlıyoruz -- .pitch-slot-filled ve
+  // .pitch için CSS'te touch-action:none olduğundan parmak sürüklerken sayfa
+  // kaymaz.
+  const handleTouchStart = useCallback((slotId) => {
+    setDraggingSlotId(slotId);
+  }, []);
+
+  const handlePitchTouchMove = useCallback(
+    (e) => {
+      if (!draggingSlotId || !pitchRef.current) return;
+      const touch = e.touches[0];
+      if (!touch) return;
+      const rect = pitchRef.current.getBoundingClientRect();
+      const y = ((touch.clientY - rect.top) / rect.height) * 100;
+      setHoverY(Math.max(0, Math.min(100, y)));
+    },
+    [draggingSlotId]
+  );
+
+  const handlePitchTouchEnd = useCallback(
+    (e) => {
+      if (!draggingSlotId || !pitchRef.current) return;
+      const touch = e.changedTouches[0];
+      if (touch) {
+        const rect = pitchRef.current.getBoundingClientRect();
+        const x = ((touch.clientX - rect.left) / rect.width) * 100;
+        const y = ((touch.clientY - rect.top) / rect.height) * 100;
+        setSlotCoords(draggingSlotId, x, y);
+      }
+      setDraggingSlotId(null);
+      setHoverY(null);
+    },
+    [draggingSlotId, setSlotCoords]
+  );
+
+  const hasCustomPositions = Object.keys(customPositions).length > 0;
 
   const filledPlayers = useMemo(
     () =>
@@ -153,6 +297,10 @@ function SquadBuilder() {
     [squad]
   );
   const filledCount = filledPlayers.length;
+  const { unlock } = useAchievements();
+  useEffect(() => {
+    if (filledCount === SQUAD_SIZE) unlock("kadro-ustasi");
+  }, [filledCount, unlock]);
   const avgRating = filledCount
     ? Math.round(filledPlayers.reduce((s, p) => s + p.rating, 0) / filledCount)
     : 0;
@@ -184,31 +332,86 @@ function SquadBuilder() {
           <span>{competitionsUsed.length > 0 ? competitionsUsed.join(" · ") : "Henüz kadro boş"}</span>
         </div>
         {filledCount > 0 && (
-          <button className="btn-ghost" onClick={clearSquad}>
-            Kadroyu Temizle
+          <>
+            <button className="btn-secondary" onClick={handleShare}>
+              {shareStatus === "copied" ? "✅ Link Kopyalandı!" : "🔗 Kadromu Paylaş"}
+            </button>
+            <button className="btn-ghost" onClick={clearSquad}>
+              Kadroyu Temizle
+            </button>
+          </>
+        )}
+      </div>
+
+      <div className="dreamteam-formation-picker">
+        <span className="dreamteam-tactic-label">Diziliş:</span>
+        {Object.entries(FORMATIONS).map(([key, f]) => (
+          <button
+            key={key}
+            type="button"
+            className={formation === key ? "active" : ""}
+            onClick={() => setFormation(key)}
+          >
+            {f.label}
+          </button>
+        ))}
+        {hasCustomPositions && (
+          <button type="button" className="dreamteam-reset-positions-btn" onClick={resetPositions}>
+            ↺ Sahadaki Konumları Sıfırla
           </button>
         )}
       </div>
 
       <SendToCompetition filledPlayers={filledPlayers} isFull={filledCount === SQUAD_SIZE} />
 
-      <div className="pitch">
+      <p className="pitch-drag-hint">
+        🖐️ Kadrodaki bir oyuncuyu tutup sahanın istediğin noktasına sürükle —
+        hangi banda bıraktığını (Kaleci/Defans/Orta Saha/Forvet) anında görürsün.
+      </p>
+
+      <div
+        className={`pitch ${draggingSlotId ? "is-dragging-player" : ""}`}
+        ref={pitchRef}
+        onDragOver={handlePitchDragOver}
+        onDrop={handlePitchDrop}
+        onTouchMove={handlePitchTouchMove}
+        onTouchEnd={handlePitchTouchEnd}
+      >
         <div className="pitch-lines" aria-hidden="true">
           <span className="pitch-center-circle" />
           <span className="pitch-center-line" />
         </div>
-        {rows.map((rowSlots, i) => (
-          <div className="pitch-row" key={i}>
-            {rowSlots.map((slot) => (
-              <PitchSlot
-                key={slot.id}
-                slot={slot}
-                player={squad[slot.id] ? findPlayerByGlobalId(squad[slot.id]) : null}
-                onPick={setPickerSlot}
-                onClear={clearSlot}
-              />
-            ))}
+
+        {draggingSlotId && (
+          <div className="pitch-zone-overlay" aria-hidden="true">
+            {ZONES.map((z) => {
+              const active = hoverY != null && hoverY >= z.yMin && hoverY < z.yMax;
+              return (
+                <div
+                  key={z.key}
+                  className={`pitch-zone-band ${active ? "active" : ""}`}
+                  style={{ top: `${z.yMin}%`, height: `${Math.min(z.yMax, 100) - z.yMin}%` }}
+                >
+                  <span className="pitch-zone-band-label">{z.label}</span>
+                </div>
+              );
+            })}
           </div>
+        )}
+
+        {formationSlots.map((slot) => (
+          <PitchSlot
+            key={slot.id}
+            slot={slot}
+            coords={coordsOf(slot)}
+            isDragging={draggingSlotId === slot.id}
+            player={squad[slot.id] ? findPlayerByGlobalId(squad[slot.id]) : null}
+            onPick={setPickerSlot}
+            onClear={clearSlot}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onTouchStart={handleTouchStart}
+          />
         ))}
       </div>
 
@@ -266,6 +469,11 @@ function normalize(value, min, max) {
 
 function ComparePanel() {
   const { compareA, compareB, setCompareA, setCompareB } = useDreamTeam();
+  const { unlock } = useAchievements();
+
+  useEffect(() => {
+    if (compareA && compareB) unlock("karsilastirma-uzmani");
+  }, [compareA, compareB, unlock]);
 
   const radarData = useMemo(() => {
     if (!compareA && !compareB) return [];

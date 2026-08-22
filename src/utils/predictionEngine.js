@@ -14,11 +14,61 @@
 // sayıları/formatları için) çalışır. Kullanıcı ileride gerçek bir veri seti
 // verdiğinde de (farklı takım sayısı/coeff'ler) aynen doğru çalışmaya devam
 // eder çünkü hiçbir yerde "36" ya da "18" sabit kodlanmamıştır.
+//
+// GERÇEKÇİLİK KATMANLARI: temel coeff/λ modelinin üstüne, tek bir maçı
+// bağımsız bir olaydan çıkarıp "sezon" hissi veren iki katman eklenmiştir:
+//   1) FORM MOMENTUMU -- bir takım art arda kazandıkça hafifçe güçlenir
+//      (daha çok gol atar/daha az yer), kaybettikçe zayıflar. Beraberlik
+//      formu nötre doğru çeker. bkz. applyForm/updateForm.
+//   2) DERBİ YOĞUNLUĞU -- klasik rekabetlerde (bkz. derbies.js) maçlar hem
+//      biraz daha az gollü (daha gergin/temkinli) hem de kart oranı daha
+//      yüksek olur. bkz. DERBY_GOAL_DAMPEN / DERBY_CARD_MULT.
+import { findDerby } from "./derbies.js";
 
 const BASE_GOALS_TOTAL = 2.7; // ort. maç başına toplam gol
 const HOME_ADVANTAGE_GOALS = 0.32;
 const MIN_LAMBDA = 0.2;
 const MAX_LAMBDA = 4.4;
+
+// "Gelişmiş Ayarlar" panelinden (bkz. SettingsContext) kullanıcının ince
+// ayar yapabildiği model parametreleri. simulateSeason'a options.settings
+// olarak verilmezse hepsi bu varsayılanlara düşer -- mevcut tüm çağıranlar
+// (settings vermeyenler) davranışını AYNEN korur.
+export const DEFAULT_MODEL_SETTINGS = {
+  baseGoalsTotal: BASE_GOALS_TOTAL,
+  homeAdvantage: HOME_ADVANTAGE_GOALS,
+  injuryChance: 0.1,
+  cardIntensity: 1,
+};
+
+export const MODEL_SETTING_RANGES = {
+  baseGoalsTotal: { min: 1.5, max: 4.5, step: 0.1, label: "Gol Ortalaması", unit: "gol/maç" },
+  homeAdvantage: { min: 0, max: 0.8, step: 0.02, label: "Ev Sahibi Avantajı", unit: "" },
+  injuryChance: { min: 0, max: 0.4, step: 0.01, label: "Sakatlık Sıklığı", unit: "" },
+  cardIntensity: { min: 0.3, max: 2.5, step: 0.1, label: "Kart Yoğunluğu", unit: "x" },
+};
+
+export const MODEL_PRESETS = {
+  gercekci: { key: "gercekci", label: "Gerçekçi", icon: "⚖️", settings: { ...DEFAULT_MODEL_SETTINGS } },
+  gol_soleni: {
+    key: "gol_soleni",
+    label: "Gol Şöleni",
+    icon: "🎉",
+    settings: { ...DEFAULT_MODEL_SETTINGS, baseGoalsTotal: 3.6 },
+  },
+  defansif_kilit: {
+    key: "defansif_kilit",
+    label: "Defansif Kilit",
+    icon: "🔒",
+    settings: { ...DEFAULT_MODEL_SETTINGS, baseGoalsTotal: 1.9 },
+  },
+  kaotik: {
+    key: "kaotik",
+    label: "Kaotik Sezon",
+    icon: "🌪️",
+    settings: { ...DEFAULT_MODEL_SETTINGS, injuryChance: 0.25, cardIntensity: 1.8 },
+  },
+};
 
 function clamp(v, min, max) {
   return Math.max(min, Math.min(max, v));
@@ -46,20 +96,22 @@ function resolveTactic(teamId, tacticsById) {
 
 // coeff farkından ev/deplasman beklenen gol sayısını (λ) türetir. tacticsById
 // verilirse (ör. { teamId: "attack" }) ilgili takımların λ'sı buna göre
-// ayarlanır.
-export function expectedGoals(homeTeam, awayTeam, tacticsById) {
+// ayarlanır. settings verilmezse DEFAULT_MODEL_SETTINGS kullanılır.
+export function expectedGoals(homeTeam, awayTeam, tacticsById, settings) {
+  const baseGoalsTotal = settings?.baseGoalsTotal ?? BASE_GOALS_TOTAL;
+  const homeAdvantage = settings?.homeAdvantage ?? HOME_ADVANTAGE_GOALS;
   const hs = attackStrength(homeTeam.coeff);
   const as = attackStrength(awayTeam.coeff);
   const total = hs + as;
   const hShare = hs / total;
   const aShare = as / total;
   let lambdaHome = clamp(
-    BASE_GOALS_TOTAL * hShare + HOME_ADVANTAGE_GOALS,
+    baseGoalsTotal * hShare + homeAdvantage,
     MIN_LAMBDA,
     MAX_LAMBDA
   );
   let lambdaAway = clamp(
-    BASE_GOALS_TOTAL * aShare - HOME_ADVANTAGE_GOALS * 0.5,
+    baseGoalsTotal * aShare - homeAdvantage * 0.5,
     MIN_LAMBDA,
     MAX_LAMBDA
   );
@@ -116,13 +168,40 @@ export function matchProbabilities(lambdaHome, lambdaAway, maxGoals = 8) {
   };
 }
 
-// Tek bir maçın tahmini skorunu ve olasılıklarını üretir.
-export function simulateMatch(homeTeam, awayTeam, tacticsById) {
-  const { lambdaHome, lambdaAway } = expectedGoals(homeTeam, awayTeam, tacticsById);
+const DERBY_GOAL_DAMPEN = 0.9; // derbiler biraz daha temkinli/az gollü oynanır
+export const DERBY_CARD_MULT = 1.55; // derbilerde kart oranı belirgin şekilde artar
+
+// Tek bir maçın tahmini skorunu ve olasılıklarını üretir. isDerby verilirse
+// (bkz. derbies.js) skor beklentisi hafifçe aşağı çekilir (gerilim/temkin).
+export function simulateMatch(homeTeam, awayTeam, tacticsById, isDerby, settings) {
+  let { lambdaHome, lambdaAway } = expectedGoals(homeTeam, awayTeam, tacticsById, settings);
+  if (isDerby) {
+    lambdaHome *= DERBY_GOAL_DAMPEN;
+    lambdaAway *= DERBY_GOAL_DAMPEN;
+  }
   const homeGoals = samplePoisson(lambdaHome);
   const awayGoals = samplePoisson(lambdaAway);
   const probs = matchProbabilities(lambdaHome, lambdaAway);
   return { homeGoals, awayGoals, lambdaHome, lambdaAway, ...probs };
+}
+
+// --- Form momentumu --------------------------------------------------------
+const FORM_STEP = 0.05; // form birimi başına ~%5 etkili coeff değişimi
+const FORM_MAX = 3; // en fazla ±3 birim (yani ±%15 coeff)
+
+function updateForm(formById, teamId, result) {
+  const cur = formById[teamId] || 0;
+  if (result === "win") formById[teamId] = Math.min(FORM_MAX, cur + 1);
+  else if (result === "loss") formById[teamId] = Math.max(-FORM_MAX, cur - 1);
+  else formById[teamId] = cur > 0 ? cur - 0.5 : cur < 0 ? cur + 0.5 : 0;
+}
+
+// Takımın güncel formunu coeff'e geçici bir çarpan olarak uygular -- gerçek
+// `coeff` verisini DEĞİŞTİRMEZ, sadece o maç için türetilmiş bir kopya döner.
+function applyForm(team, formById) {
+  const form = formById[team.id] || 0;
+  if (!form) return team;
+  return { ...team, coeff: Math.max(1, (team.coeff || 6) * (1 + form * FORM_STEP)) };
 }
 
 const GOAL_WEIGHT = { FW: 5, MF: 2.2, DF: 0.5, GK: 0.05 };
@@ -172,11 +251,12 @@ function distributeGoals(players, goals, playerStats) {
 }
 
 // Takım başına ort. ~1.6 sarı kart + nadiren kırmızı kart üretir, mevkiye
-// göre ağırlıklandırır (defans/orta saha > forvet > kaleci).
-function distributeCards(players, playerStats) {
+// göre ağırlıklandırır (defans/orta saha > forvet > kaleci). intensityMult
+// derbi maçlarında (bkz. DERBY_CARD_MULT) kart oranını artırmak için kullanılır.
+function distributeCards(players, playerStats, intensityMult = 1) {
   const events = [];
   if (!players.length) return events;
-  const yellowCount = Math.min(3, samplePoisson(1.6));
+  const yellowCount = Math.min(4, samplePoisson(1.6 * intensityMult));
   for (let i = 0; i < yellowCount; i++) {
     const p = weightedPick(players, (pl) => CARD_WEIGHT[pl.position] ?? 1);
     if (p) {
@@ -184,7 +264,7 @@ function distributeCards(players, playerStats) {
       events.push({ playerId: p.id, type: "yellow" });
     }
   }
-  if (Math.random() < 0.05) {
+  if (Math.random() < 0.05 * intensityMult) {
     const p = weightedPick(players, (pl) => CARD_WEIGHT[pl.position] ?? 1);
     if (p) {
       playerStats[p.id].reds++;
@@ -196,6 +276,34 @@ function distributeCards(players, playerStats) {
 
 function randomMinute() {
   return Math.min(90, Math.floor(Math.random() * 90) + 1);
+}
+
+// --- Sakatlık / cezalı oyuncular ---------------------------------------
+// Kırmızı kart gören bir oyuncu bir sonraki haftayı otomatik olarak
+// cezalı geçirir; ayrıca her maçta küçük bir olasılıkla oynayan
+// oyunculardan biri rastgele 1-3 hafta sürecek bir sakatlık yaşar. Bu
+// oyuncular kadro dışı kaldıkları haftalarda gol/asist/kart dağıtımına
+// (ve dolayısıyla "Maç Merkezi" olay akışına) hiç girmez -- tamamen
+// kurgusal bir gerçekçilik katmanıdır, gerçek sakatlık verisi değildir.
+const INJURY_CHANCE_PER_MATCH = 0.1;
+const INJURY_MIN_MATCHDAYS = 1;
+const INJURY_MAX_MATCHDAYS = 3;
+
+function markUnavailable(untilMap, reasonMap, playerId, untilMatchday, reason) {
+  const cur = untilMap[playerId] || 0;
+  if (untilMatchday > cur) {
+    untilMap[playerId] = untilMatchday;
+    reasonMap[playerId] = reason;
+  }
+}
+
+// Bir takımın tam kadrosunu, o haftada kadro dışı kalanları çıkararak
+// döner. Havuz tamamen boşalırsa (aşırı uç durum) güvenlik amacıyla tam
+// kadroya geri düşer -- maç motorunun oyuncu bulamayıp çökmesini önler.
+function splitAvailability(players, unavailableUntil, matchdayNumber) {
+  const sidelined = players.filter((p) => (unavailableUntil[p.id] || 0) >= matchdayNumber);
+  const available = sidelined.length < players.length ? players.filter((p) => !sidelined.includes(p)) : players;
+  return { available, sidelined };
 }
 
 // Süs amaçlı bir oyuncu değişikliği (istatistiklere etki etmez -- sadece
@@ -335,13 +443,24 @@ function finalizeStandings(standingsMap, zones) {
 // çağrıda Poisson örneklemesi yeniden yapıldığı için sonuç her seferinde
 // biraz farklı olur ("tahminleri yenile" ile yeni bir simülasyon alınır).
 //
-// options: { teams, allPlayers, zones, tacticsById }
+// options: { teams, allPlayers, zones, tacticsById, initialStandings, settings }
+// initialStandings (opsiyonel): { [teamId]: {played,w,d,l,gf,ga,pts} } -- ör.
+// Süper Lig'de gerçek dünyada zaten oynanmış haftaların puan durumundan
+// devam ederek SADECE kalan maçları simüle etmek için kullanılır (bkz.
+// buildSuperLigContinuation). Verilmezse her takım 0'dan başlar.
+// settings (opsiyonel): DEFAULT_MODEL_SETTINGS şeklinde, "Gelişmiş Ayarlar"
+// panelinden (bkz. SettingsContext) gelen model ince ayarları. Verilmezse
+// varsayılan (gerçekçi) değerler kullanılır.
 export function simulateSeason(matchdays, options) {
-  const { teams, allPlayers = [], zones, tacticsById } = options;
+  const { teams, allPlayers = [], zones, tacticsById, initialStandings, settings } = options;
   const resolvedZones = zones || buildSwissZones(teams.length);
+  const injuryChance = settings?.injuryChance ?? INJURY_CHANCE_PER_MATCH;
+  const cardIntensityBase = settings?.cardIntensity ?? 1;
 
   const standings = {};
-  for (const t of teams) standings[t.id] = emptyStandingsRow(t.id);
+  for (const t of teams) {
+    standings[t.id] = { ...emptyStandingsRow(t.id), ...(initialStandings?.[t.id] || {}) };
+  }
 
   const playersByTeam = {};
   for (const p of allPlayers) {
@@ -355,10 +474,16 @@ export function simulateSeason(matchdays, options) {
   }
 
   const matchResults = [];
+  const formById = {}; // sezon boyunca birikimli form momentumu (bkz. dosya başı notu)
+  const unavailableUntil = {}; // sezon boyunca birikimli sakatlık/ceza takibi
+  const unavailableReason = {};
 
   for (const md of matchdays) {
     for (const m of md.matches) {
-      const sim = simulateMatch(m.homeTeam, m.awayTeam, tacticsById);
+      const homeWithForm = applyForm(m.homeTeam, formById);
+      const awayWithForm = applyForm(m.awayTeam, formById);
+      const isDerby = Boolean(findDerby(m.homeTeam.short, m.awayTeam.short));
+      const sim = simulateMatch(homeWithForm, awayWithForm, tacticsById, isDerby, settings);
       const hs = standings[m.homeTeam.id];
       const as_ = standings[m.awayTeam.id];
       if (!hs || !as_) continue;
@@ -372,23 +497,41 @@ export function simulateSeason(matchdays, options) {
         hs.w++;
         hs.pts += 3;
         as_.l++;
+        updateForm(formById, m.homeTeam.id, "win");
+        updateForm(formById, m.awayTeam.id, "loss");
       } else if (sim.homeGoals < sim.awayGoals) {
         as_.w++;
         as_.pts += 3;
         hs.l++;
+        updateForm(formById, m.homeTeam.id, "loss");
+        updateForm(formById, m.awayTeam.id, "win");
       } else {
         hs.d++;
         as_.d++;
         hs.pts++;
         as_.pts++;
+        updateForm(formById, m.homeTeam.id, "draw");
+        updateForm(formById, m.awayTeam.id, "draw");
       }
 
-      const homePlayers = playersByTeam[m.homeTeam.id] || [];
-      const awayPlayers = playersByTeam[m.awayTeam.id] || [];
+      const homePlayersFull = playersByTeam[m.homeTeam.id] || [];
+      const awayPlayersFull = playersByTeam[m.awayTeam.id] || [];
+      const { available: homePlayers, sidelined: homeSidelined } = splitAvailability(
+        homePlayersFull,
+        unavailableUntil,
+        md.number
+      );
+      const { available: awayPlayers, sidelined: awaySidelined } = splitAvailability(
+        awayPlayersFull,
+        unavailableUntil,
+        md.number
+      );
+
+      const cardIntensity = (isDerby ? DERBY_CARD_MULT : 1) * cardIntensityBase;
       const homeGoalEvents = distributeGoals(homePlayers, sim.homeGoals, playerStats);
       const awayGoalEvents = distributeGoals(awayPlayers, sim.awayGoals, playerStats);
-      const homeCardEvents = distributeCards(homePlayers, playerStats);
-      const awayCardEvents = distributeCards(awayPlayers, playerStats);
+      const homeCardEvents = distributeCards(homePlayers, playerStats, cardIntensity);
+      const awayCardEvents = distributeCards(awayPlayers, playerStats, cardIntensity);
       const events = buildMatchTimeline({
         homeTeam: m.homeTeam,
         awayTeam: m.awayTeam,
@@ -399,6 +542,31 @@ export function simulateSeason(matchdays, options) {
         homePlayers,
         awayPlayers,
       });
+
+      // Kırmızı kart -> bir sonraki hafta cezalı.
+      for (const c of [...homeCardEvents, ...awayCardEvents]) {
+        if (c.type === "red") {
+          markUnavailable(unavailableUntil, unavailableReason, c.playerId, md.number + 1, "kırmızı kart cezası");
+        }
+      }
+      // Küçük bir olasılıkla, bu maçta oynayan bir oyuncu sakatlanır (bir
+      // sonraki 1-3 hafta kadro dışı kalır) -- bu maçın kendisini etkilemez.
+      if (Math.random() < injuryChance) {
+        const candidates = [...homePlayers, ...awayPlayers];
+        if (candidates.length > 0) {
+          const injured = candidates[Math.floor(Math.random() * candidates.length)];
+          const duration =
+            INJURY_MIN_MATCHDAYS + Math.floor(Math.random() * (INJURY_MAX_MATCHDAYS - INJURY_MIN_MATCHDAYS + 1));
+          markUnavailable(unavailableUntil, unavailableReason, injured.id, md.number + duration, "sakatlık");
+        }
+      }
+
+      const sidelined = [...homeSidelined, ...awaySidelined].map((p) => ({
+        playerId: p.id,
+        name: p.name,
+        teamId: p.teamId,
+        reason: unavailableReason[p.id] || "sakatlık",
+      }));
 
       matchResults.push({
         matchdayNumber: md.number,
@@ -411,7 +579,9 @@ export function simulateSeason(matchdays, options) {
         homeWinProb: sim.homeWinProb,
         drawProb: sim.drawProb,
         awayWinProb: sim.awayWinProb,
+        isDerby,
         events,
+        sidelined,
       });
     }
   }
@@ -426,12 +596,17 @@ export function simulateSeason(matchdays, options) {
 
 // Kullanıcının kendi girdiği skorlardan (matchId -> {home, away}) puan
 // durumu hesaplar. Girilmemiş maçlar hesaba katılmaz (henüz oynanmamış sayılır).
+// initialStandings (opsiyonel): simulateSeason'daki gibi, gerçek dünyada
+// zaten oynanmış haftalardan devam etmek için kullanılır (bkz. Süper Lig
+// Canlı Skorlar entegrasyonu).
 export function computeStandingsFromUserScores(matchdays, userScores, options) {
-  const { teams, zones } = options;
+  const { teams, zones, initialStandings } = options;
   const resolvedZones = zones || buildSwissZones(teams.length);
 
   const standings = {};
-  for (const t of teams) standings[t.id] = emptyStandingsRow(t.id);
+  for (const t of teams) {
+    standings[t.id] = { ...emptyStandingsRow(t.id), ...(initialStandings?.[t.id] || {}) };
+  }
 
   for (const md of matchdays) {
     for (const m of md.matches) {

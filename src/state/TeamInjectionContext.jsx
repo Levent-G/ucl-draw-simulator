@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { COMPETITIONS } from "../data/competitions.js";
+import { useAchievements } from "./AchievementsContext.jsx";
 
 // Rüya Takım'ı bir yarışmaya "gönderince" ne olur: o yarışmadaki takımlardan
 // rastgele biri çıkarılır, yerine Rüya Takım (kadrosuyla birlikte) eklenir.
@@ -10,21 +11,26 @@ const TeamInjectionContext = createContext(null);
 export function TeamInjectionProvider({ children }) {
   // { [compKey]: { removedTeam, team, players } }
   const [injections, setInjections] = useState({});
+  const { unlock } = useAchievements();
 
-  const sendDreamTeam = useCallback((compKey, teamTemplate, players) => {
-    const comp = COMPETITIONS[compKey];
-    if (!comp) return null;
-    const removedTeam = comp.teams[Math.floor(Math.random() * comp.teams.length)];
-    // Torba/pot yerine geçtiği takımdan devralınır -- böylece kura torba
-    // dengesi (UCL/Avrupa Ligi'nde 4 torba x 9 takım) bozulmaz.
-    const team = { ...teamTemplate, pot: removedTeam.pot };
-    const finalPlayers = players.map((p) => ({ ...p, teamId: team.id }));
-    setInjections((prev) => ({
-      ...prev,
-      [compKey]: { removedTeam, team, players: finalPlayers },
-    }));
-    return removedTeam;
-  }, []);
+  const sendDreamTeam = useCallback(
+    (compKey, teamTemplate, players) => {
+      const comp = COMPETITIONS[compKey];
+      if (!comp) return null;
+      const removedTeam = comp.teams[Math.floor(Math.random() * comp.teams.length)];
+      // Torba/pot yerine geçtiği takımdan devralınır -- böylece kura torba
+      // dengesi (UCL/Avrupa Ligi'nde 4 torba x 9 takım) bozulmaz.
+      const team = { ...teamTemplate, pot: removedTeam.pot };
+      const finalPlayers = players.map((p) => ({ ...p, teamId: team.id }));
+      setInjections((prev) => ({
+        ...prev,
+        [compKey]: { removedTeam, team, players: finalPlayers },
+      }));
+      unlock("taktisyen");
+      return removedTeam;
+    },
+    [unlock]
+  );
 
   const clearInjection = useCallback((compKey) => {
     setInjections((prev) => {

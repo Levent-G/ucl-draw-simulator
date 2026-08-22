@@ -45,6 +45,47 @@ export const SUPER_LIG_LIVE_RESULTS = [
   { label: "1. Hafta", date: "17 Ağu", home: "Samsunspor", homeGoals: 3, away: "Göztepe", awayGoals: 3 },
 ];
 
+// Simüle edilmiş TAM fikstürü (roundRobinEngine'den gelen, gerçek dünyayla
+// hiçbir ilgisi olmayan bağımsız bir dizilim) gerçek 1. Hafta sonuçlarıyla
+// UZLAŞTIRIR: zaten gerçekte oynanmış eşleşmeleri fikstürden çıkarır, geri
+// kalan maçları "sıradaki tahminler" olarak bırakır; puan durumu tahmini de
+// sıfırdan değil GERÇEK 1. Hafta puan durumundan devam eder. Böylece
+// "tahmin" hiçbir zaman zaten bilinen gerçek bir sonucu tekrar üretmeye
+// çalışmaz -- sadece henüz oynanmamış maçları tahmin eder.
+export function buildSuperLigContinuation(teams, fullFixture) {
+  const teamByName = Object.fromEntries(teams.map((t) => [t.name, t]));
+  const playedPairs = new Set(
+    SUPER_LIG_LIVE_RESULTS.map((r) => `${r.home}|${r.away}`)
+  );
+
+  const remainingFixture = fullFixture
+    .map((md) => ({
+      ...md,
+      matches: md.matches.filter(
+        (m) => !playedPairs.has(`${m.homeTeam.name}|${m.awayTeam.name}`)
+      ),
+    }))
+    .filter((md) => md.matches.length > 0);
+
+  const initialStandings = {};
+  for (const row of SUPER_LIG_LIVE_STANDINGS) {
+    const team = teamByName[row.teamName];
+    if (!team) continue;
+    initialStandings[team.id] = {
+      teamId: team.id,
+      played: row.played,
+      w: row.w,
+      d: row.d,
+      l: row.l,
+      gf: row.gf,
+      ga: row.ga,
+      pts: row.pts,
+    };
+  }
+
+  return { remainingFixture, initialStandings };
+}
+
 // UCL / Avrupa Ligi lig fazı henüz başlamadı -- gerçek başlangıç tarihleri.
 export const UCL_SEASON_STATUS = {
   phaseStart: "8 Eylül 2026",

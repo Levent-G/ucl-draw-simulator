@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useCompetition } from "../state/CompetitionContext.jsx";
-import CompetitionSubNav from "../components/CompetitionSubNav.jsx";
+import CompetitionStepper from "../components/CompetitionStepper.jsx";
 import TeamFilterSelect from "../components/stats/TeamFilterSelect.jsx";
 import Crest from "../components/Crest.jsx";
 
@@ -56,7 +56,7 @@ export default function HeadToHeadPage() {
 
   return (
     <div className="page-shell">
-      <CompetitionSubNav competitionKey={competitionKey} />
+      <CompetitionStepper competitionKey={competitionKey} />
       <header className="page-header">
         <div>
           <div className="page-eyebrow">İki Takım · Tüm Simülasyonlar</div>

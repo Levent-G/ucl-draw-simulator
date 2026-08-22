@@ -1,8 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import Crest from "../Crest.jsx";
 
 // teams: o yarışmanın takım listesi (yarışmadan bağımsız bileşen).
-export default function StandingsTable({ standings, title, teams }) {
+// defaultVisible: kısaltılmış görünümde gösterilecek satır sayısı (uzun
+// tabloları kısaltıp "Tümünü Göster" ile açmak için).
+// competitionKey verilirse takım adları takım profil sayfasına link olur.
+export default function StandingsTable({ standings, title, teams, defaultVisible = 10, competitionKey }) {
+  const [expanded, setExpanded] = useState(false);
+
   if (!standings || standings.length === 0) {
     return (
       <div className="standings-card">
@@ -13,6 +19,9 @@ export default function StandingsTable({ standings, title, teams }) {
   }
 
   const teamById = Object.fromEntries((teams || []).map((t) => [t.id, t]));
+  const shouldCollapse = standings.length > defaultVisible + 3;
+  const visibleStandings = expanded || !shouldCollapse ? standings : standings.slice(0, defaultVisible);
+  const hiddenCount = standings.length - visibleStandings.length;
 
   return (
     <div className="standings-card">
@@ -35,15 +44,24 @@ export default function StandingsTable({ standings, title, teams }) {
             </tr>
           </thead>
           <tbody>
-            {standings.map((s) => {
+            {visibleStandings.map((s) => {
               const team = teamById[s.teamId];
               if (!team) return null;
               return (
                 <tr key={s.teamId} className={`standings-row status-tone-${s.statusTone}`}>
                   <td>{s.rank}</td>
                   <td className="standings-team-cell">
-                    <Crest team={team} size={18} />
-                    <span>{team.name}</span>
+                    {competitionKey ? (
+                      <Link to={`/${competitionKey}/takim/${team.id}`} className="standings-team-link">
+                        <Crest team={team} size={18} />
+                        <span>{team.name}</span>
+                      </Link>
+                    ) : (
+                      <>
+                        <Crest team={team} size={18} />
+                        <span>{team.name}</span>
+                      </>
+                    )}
                   </td>
                   <td>{s.played}</td>
                   <td>{s.w}</td>
@@ -62,6 +80,11 @@ export default function StandingsTable({ standings, title, teams }) {
           </tbody>
         </table>
       </div>
+      {shouldCollapse && (
+        <button className="standings-toggle-btn" onClick={() => setExpanded((e) => !e)}>
+          {expanded ? "▲ Daralt" : `▼ Tümünü Göster (+${hiddenCount})`}
+        </button>
+      )}
     </div>
   );
 }

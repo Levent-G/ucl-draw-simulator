@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   ResponsiveContainer,
   BarChart,
@@ -24,7 +25,7 @@ import PlayerAvatar from "../PlayerAvatar.jsx";
 import { CHART_SERIES, POSITION_COLORS, CHART_GRID, CHART_AXIS } from "../../utils/chartTheme.js";
 import { topScorers, topCarded, allPlayersWithStats, positionCounts } from "../../utils/statsSelectors.js";
 
-export default function PlayersTab({ competition, simulation, selectedTeam }) {
+export default function PlayersTab({ competition, simulation, selectedTeam, competitionKey }) {
   const { teams, getAllPlayers, positionLabels } = competition;
   const allPlayers = useMemo(() => getAllPlayers(), [getAllPlayers]);
   const teamById = useMemo(() => Object.fromEntries(teams.map((t) => [t.id, t])), [teams]);
@@ -204,10 +205,10 @@ export default function PlayersTab({ competition, simulation, selectedTeam }) {
               key: "name",
               label: "Oyuncu",
               render: (p) => (
-                <span className="table-player-cell">
+                <Link to={`/${competitionKey}/oyuncu/${p.id}`} className="table-player-cell">
                   <PlayerAvatar player={p} size={26} />
                   {p.name}
-                </span>
+                </Link>
               ),
             },
             { key: "teamName", label: "Takım" },

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Link } from "react-router-dom";
 import { COMPETITION_LIST, getCompetition } from "../data/competitions.js";
 import { useTransferMarket } from "../state/TransferContext.jsx";
+import { useAchievements } from "../state/AchievementsContext.jsx";
 import { generateTransferHeadline } from "../utils/transferNews.js";
 import PlayerAvatar from "../components/PlayerAvatar.jsx";
 import Crest from "../components/Crest.jsx";
@@ -10,16 +11,32 @@ const TICKER_INTERVAL_MS = 1500;
 const AUTO_STOP_COUNT = 16;
 const MAX_HEADLINES = 40;
 
-function TransferTeamCard({ team, players, query, draggingPlayerId, onDragStartPlayer, onDragEndPlayer, onDropPlayer }) {
+function TransferTeamCard({
+  team,
+  players,
+  query,
+  isOpen,
+  onToggle,
+  competitionKey,
+  draggingPlayerId,
+  onDragStartPlayer,
+  onDragEndPlayer,
+  onDropPlayer,
+}) {
   const [dragOver, setDragOver] = useState(false);
 
   const q = query.trim().toLowerCase();
   const visiblePlayers = q ? players.filter((p) => p.name.toLowerCase().includes(q)) : players;
   if (q && visiblePlayers.length === 0) return null;
 
+  // Arama yapılırken eşleşen kartlar otomatik açık gösterilir; aksi halde
+  // kullanıcının açık/kapalı tercihi (isOpen) geçerlidir.
+  const open = isOpen || Boolean(q);
+
   return (
     <div
-      className={`transfer-team-card ${dragOver ? "drag-over" : ""}`}
+      className={`transfer-team-card ${dragOver ? "drag-over" : ""} ${open ? "is-open" : "is-collapsed"}`}
+      data-team-id={team.id}
       onDragOver={(e) => {
         e.preventDefault();
         setDragOver(true);
@@ -32,54 +49,95 @@ function TransferTeamCard({ team, players, query, draggingPlayerId, onDragStartP
         if (playerId) onDropPlayer(playerId, team.id);
       }}
     >
-      <div className="transfer-team-card-header">
-        <Crest team={team} size={24} />
-        <span className="transfer-team-card-name">{team.name}</span>
+      <div
+        className="transfer-team-card-header"
+        role="button"
+        tabIndex={0}
+        onClick={() => onToggle(team.id)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onToggle(team.id);
+          }
+        }}
+        aria-expanded={open}
+      >
+        <span className="transfer-team-card-name-link">
+          <Crest team={team} size={24} />
+          <span className="transfer-team-card-name">{team.name}</span>
+        </span>
         <span className="transfer-team-card-count">{players.length}</span>
+        <Link
+          to={`/${competitionKey}/takim/${team.id}`}
+          className="transfer-team-card-profile-link"
+          onClick={(e) => e.stopPropagation()}
+          title="Takım profilini gör"
+        >
+          ↗
+        </Link>
+        <span className="transfer-team-card-chevron" aria-hidden="true">
+          {open ? "▲" : "▼"}
+        </span>
       </div>
-      <div className="transfer-roster-scroll">
-        <table className="transfer-roster-table">
-          <thead>
-            <tr>
-              <th>Oyuncu</th>
-              <th>Mvk</th>
-              <th>Güç</th>
-            </tr>
-          </thead>
-          <tbody>
-            {visiblePlayers.map((p) => (
-              <tr
-                key={p.id}
-                draggable
-                onDragStart={(e) => {
-                  e.dataTransfer.setData("text/player-id", p.id);
-                  e.dataTransfer.effectAllowed = "move";
-                  onDragStartPlayer(p.id);
-                }}
-                onDragEnd={onDragEndPlayer}
-                className={`transfer-roster-row ${draggingPlayerId === p.id ? "is-dragging" : ""} ${
-                  p.transferred ? "is-transferred" : ""
-                }`}
-                title="Başka bir takıma sürükleyerek transfer edebilirsin"
-              >
-                <td className="transfer-roster-name-cell">
-                  <PlayerAvatar player={p} size={22} />
-                  <span>{p.name}</span>
-                </td>
-                <td className="transfer-roster-pos">{p.position}</td>
-                <td className="transfer-roster-rating">{p.rating}</td>
-              </tr>
-            ))}
-            {visiblePlayers.length === 0 && (
+      {open && (
+        <div className="transfer-roster-scroll">
+          <table className="transfer-roster-table">
+            <thead>
               <tr>
-                <td colSpan={3} className="transfer-roster-empty">
-                  Kadroda oyuncu yok
-                </td>
+                <th>Oyuncu</th>
+                <th>Mvk</th>
+                <th>Güç</th>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {visiblePlayers.map((p) => (
+                <tr
+                  key={p.id}
+                  draggable
+                  onDragStart={(e) => {
+                    e.dataTransfer.setData("text/player-id", p.id);
+                    e.dataTransfer.effectAllowed = "move";
+                    onDragStartPlayer(p.id);
+                  }}
+                  onDragEnd={onDragEndPlayer}
+                  // Dokunmatik cihazlarda native HTML5 DnD çalışmadığı için
+                  // (draggable/dataTransfer touch olaylarında tetiklenmiyor)
+                  // aynı transfer mantığını touch olaylarıyla tekrarlıyoruz:
+                  // parmağı kaldırdığı noktadaki takım kartını bulup oraya
+                  // bırakıyoruz.
+                  onTouchStart={() => onDragStartPlayer(p.id)}
+                  onTouchEnd={(e) => {
+                    const touch = e.changedTouches[0];
+                    const el = touch ? document.elementFromPoint(touch.clientX, touch.clientY) : null;
+                    const card = el?.closest(".transfer-team-card");
+                    const targetTeamId = card?.dataset.teamId;
+                    if (targetTeamId) onDropPlayer(p.id, targetTeamId);
+                    onDragEndPlayer();
+                  }}
+                  className={`transfer-roster-row ${draggingPlayerId === p.id ? "is-dragging" : ""} ${
+                    p.transferred ? "is-transferred" : ""
+                  }`}
+                  title="Başka bir takıma sürükleyerek transfer edebilirsin"
+                >
+                  <td className="transfer-roster-name-cell">
+                    <PlayerAvatar player={p} size={22} />
+                    <span>{p.name}</span>
+                  </td>
+                  <td className="transfer-roster-pos">{p.position}</td>
+                  <td className="transfer-roster-rating">{p.rating}</td>
+                </tr>
+              ))}
+              {visiblePlayers.length === 0 && (
+                <tr>
+                  <td colSpan={3} className="transfer-roster-empty">
+                    Kadroda oyuncu yok
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
@@ -89,6 +147,12 @@ export default function TransferMarketPage() {
   const competition = getCompetition(poolKey);
   const { effectiveAllPlayers, getEffectivePlayersByTeam, transfers, hasTransfers, transferPlayer, undoTransfer, resetTransfers } =
     useTransferMarket(poolKey);
+  const { unlock } = useAchievements();
+
+  useEffect(() => {
+    if (transfers.length >= 5) unlock("transfer-guru");
+    if (transfers.length >= 15) unlock("transfer-canavari");
+  }, [transfers.length, unlock]);
 
   const [running, setRunning] = useState(false);
   const [paused, setPaused] = useState(false);
@@ -100,6 +164,16 @@ export default function TransferMarketPage() {
   const [query, setQuery] = useState("");
   const [draggingPlayerId, setDraggingPlayerId] = useState(null);
   const [justTransferred, setJustTransferred] = useState(null);
+  const [openTeams, setOpenTeams] = useState(() => new Set());
+
+  const toggleTeam = useCallback((teamId) => {
+    setOpenTeams((prev) => {
+      const next = new Set(prev);
+      if (next.has(teamId)) next.delete(teamId);
+      else next.add(teamId);
+      return next;
+    });
+  }, []);
 
   // Bir oyuncuyu sürüklerken imleç ekranın üst/alt kenarına yaklaşınca
   // sayfayı otomatik kaydır -- native HTML5 drag&drop bunu kendiliğinden
@@ -146,6 +220,7 @@ export default function TransferMarketPage() {
     setCompleted(false);
     setHeadlines([]);
     setQuery("");
+    setOpenTeams(new Set());
     stopInterval();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [poolKey]);
@@ -287,6 +362,12 @@ export default function TransferMarketPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
+        <button className="btn-ghost" onClick={() => setOpenTeams(new Set(competition.teams.map((t) => t.id)))}>
+          Tümünü Aç
+        </button>
+        <button className="btn-ghost" onClick={() => setOpenTeams(new Set())}>
+          Tümünü Kapat
+        </button>
       </div>
 
       {hasTransfers && (
@@ -302,7 +383,13 @@ export default function TransferMarketPage() {
                   <span>→</span>
                   <Crest team={t.toTeam} size={16} />
                 </span>
-                <button className="btn-ghost transfer-undo" onClick={() => undoTransfer(t.playerId)}>
+                <button
+                  className="btn-ghost transfer-undo"
+                  onClick={() => {
+                    undoTransfer(t.playerId);
+                    unlock("pisman-oldum");
+                  }}
+                >
                   Geri Al
                 </button>
               </div>
@@ -312,8 +399,9 @@ export default function TransferMarketPage() {
       )}
 
       <div className="transfer-board-hint">
-        🖐️ Bir oyuncu satırını tutup başka bir takımın kartına bırak — transfer
-        anında uygulanır. {justTransferred && <span className="transfer-board-hint-flash">Transfer uygulandı!</span>}
+        🖐️ Bir takım kartına tıklayarak kadrosunu aç/kapat, oyuncu satırını
+        tutup başka bir takımın kartına bırak — transfer anında uygulanır.{" "}
+        {justTransferred && <span className="transfer-board-hint-flash">Transfer uygulandı!</span>}
       </div>
 
       <div className="transfer-board">
@@ -323,6 +411,9 @@ export default function TransferMarketPage() {
             team={team}
             players={rosterByTeam[team.id] || []}
             query={query}
+            isOpen={openTeams.has(team.id)}
+            onToggle={toggleTeam}
+            competitionKey={poolKey}
             draggingPlayerId={draggingPlayerId}
             onDragStartPlayer={setDraggingPlayerId}
             onDragEndPlayer={() => setDraggingPlayerId(null)}

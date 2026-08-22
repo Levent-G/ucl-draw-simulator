@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Crest from "../Crest.jsx";
 
-export default function MatchRow({ match, userScore, onUserScoreChange, competitionKey }) {
+export default function MatchRow({ match, userScore, onUserScoreChange, competitionKey, readOnly = false }) {
   const { homeTeam, awayTeam } = match;
   const hasSim = match.homeGoals != null && match.awayGoals != null;
   const homePct = Math.round((match.homeWinProb ?? 0) * 100);
@@ -26,6 +26,7 @@ export default function MatchRow({ match, userScore, onUserScoreChange, competit
       </div>
 
       <div className="match-row-center">
+        {hasSim && match.isDerby && <span className="match-row-derby-badge">🔥 Derbi</span>}
         <div className="match-row-score">
           {hasSim ? `${match.homeGoals} : ${match.awayGoals}` : "– : –"}
         </div>
@@ -54,6 +55,7 @@ export default function MatchRow({ match, userScore, onUserScoreChange, competit
           </>
         )}
 
+        {!readOnly && (
         <div className={`predict-box ${predicted ? "predict-box-filled" : ""}`}>
           <label className="predict-check" title="Bu maça tahmin girdin mi?">
             <input type="checkbox" checked={predicted} readOnly disabled />
@@ -122,6 +124,7 @@ export default function MatchRow({ match, userScore, onUserScoreChange, competit
             </button>
           </div>
         </div>
+        )}
       </div>
 
       <div className="match-row-team match-row-away">

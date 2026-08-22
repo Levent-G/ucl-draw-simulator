@@ -1197,6 +1197,44 @@ button {
      SPHERE REVEAL OVERLAY -- toplar sadece bir sonraki takım çekilmeden hemen
      önce, ekranın ortasında belirip karışır
      ========================================================================== */
+/* Çekiliş töreni sırasında (toplar karışırken, kağıt açılırken -- fark
+   etmeksizin) HER ZAMAN tıklanabilir kalan yüzen "sonuca atla" düğmesi.
+   Ceremony overlay'lerinin (65/70) üstünde durur ki kullanıcı istediği an
+   sonucu görebilsin. */
+.draw-skip-fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 90;
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 14px 22px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(180deg, var(--accent-bright), var(--accent));
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 10px 30px -8px rgba(84, 104, 255, 0.8);
+  animation: draw-skip-fab-pulse 2.4s ease-in-out infinite;
+}
+.draw-skip-fab:hover {
+  filter: brightness(1.1);
+}
+@keyframes draw-skip-fab-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+@media (max-width: 640px) {
+  .draw-skip-fab {
+    right: 14px;
+    bottom: 14px;
+    padding: 12px 18px;
+    font-size: 12px;
+  }
+}
+
 .sphere-reveal-backdrop {
   position: fixed;
   inset: 0;

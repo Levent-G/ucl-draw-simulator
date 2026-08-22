@@ -13,6 +13,7 @@
 // sadece bir `standings` (sıralı puan durumu) ve `teamById` lookup'ı alır,
 // takım sayısına göre orantılı çalışır.
 import { simulateMatch } from "./predictionEngine.js";
+import { findDerby } from "./derbies.js";
 
 function shuffle(arr) {
   const a = [...arr];
@@ -26,14 +27,15 @@ function shuffle(arr) {
 // twoLegged: true ise ikinci takım (b) ilk maçı evinde oynar (dezavantajlı
 // taraf), ilk takım (a) ikinci (rövanş) maçı evinde oynar -- gerçek UEFA
 // kuralına benzer şekilde "daha güçlü taraf" son maçı evinde oynar.
-function simulateTie(a, b, twoLegged) {
-  const leg1 = simulateMatch(b, a); // b evinde
+function simulateTie(a, b, twoLegged, tacticsById) {
+  const isDerby = Boolean(findDerby(a.short, b.short));
+  const leg1 = simulateMatch(b, a, tacticsById, isDerby); // b evinde
   let leg2 = null;
   let aggA = leg1.awayGoals;
   let aggB = leg1.homeGoals;
 
   if (twoLegged) {
-    leg2 = simulateMatch(a, b); // a evinde (rövanş)
+    leg2 = simulateMatch(a, b, tacticsById, isDerby); // a evinde (rövanş)
     aggA += leg2.homeGoals;
     aggB += leg2.awayGoals;
   }
@@ -50,12 +52,13 @@ function simulateTie(a, b, twoLegged) {
     penalty = { winnerId: winner.id };
   }
 
-  return { teamA: a, teamB: b, twoLegged, leg1, leg2, aggA, aggB, winner, penalty };
+  return { teamA: a, teamB: b, twoLegged, leg1, leg2, aggA, aggB, winner, penalty, isDerby };
 }
 
 // standings: predictionEngine.simulateSeason()'dan gelen sıralı dizi.
-// teamById: { [teamId]: teamObject }.
-export function generateKnockoutBracket(standings, teamById) {
+// teamById: { [teamId]: teamObject }. tacticsById: Antrenör Modu'nda
+// atanmış taktikler -- lig fazındaki gibi eleme turlarında da geçerli olur.
+export function generateKnockoutBracket(standings, teamById, tacticsById) {
   const ranked = standings
     .map((s) => teamById[s.teamId])
     .filter(Boolean);
@@ -80,7 +83,7 @@ export function generateKnockoutBracket(standings, teamById) {
       const higher = higherSeeds[i];
       const lower = lowerSeeds[i] || pool[pool.length - 1 - i];
       if (!higher || !lower || higher.id === lower.id) continue;
-      ties.push(simulateTie(higher, lower, true));
+      ties.push(simulateTie(higher, lower, true, tacticsById));
     }
     rounds.push({ name: "Play-off Turu", ties });
     field = [...field, ...ties.map((t) => t.winner)];
@@ -94,7 +97,7 @@ export function generateKnockoutBracket(standings, teamById) {
     const ties = [];
     for (let i = 0; i < field.length - 1; i += 2) {
       const twoLegged = name !== "Final";
-      ties.push(simulateTie(field[i], field[i + 1], twoLegged));
+      ties.push(simulateTie(field[i], field[i + 1], twoLegged, tacticsById));
     }
     rounds.push({ name, ties });
     field = ties.map((t) => t.winner);

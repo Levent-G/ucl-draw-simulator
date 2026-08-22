@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { COMPETITIONS } from "../data/competitions.js";
 import { generateFixture } from "../utils/fixtureEngine.js";
 import { generateRoundRobinFixture } from "../utils/roundRobinEngine.js";
@@ -6,6 +6,9 @@ import { simulateSeason } from "../utils/predictionEngine.js";
 import { generateKnockoutBracket } from "../utils/knockoutEngine.js";
 import { useTeamInjection, applyInjection } from "./TeamInjectionContext.jsx";
 import { useTacticsContext } from "./TacticsContext.jsx";
+import { useAchievements } from "./AchievementsContext.jsx";
+import { useSettings } from "./SettingsContext.jsx";
+import { useCareer, applyCareerCoeffs } from "./CareerContext.jsx";
 
 // NOT: Bu context BİLİNÇLİ OLARAK localStorage kullanmaz -- her sayfa
 // yenilemesinde (F5) TÜM yarışma verileri (çekiliş, fikstür, tahminler)
@@ -56,12 +59,28 @@ export function CompetitionProvider({ children }) {
   // yarışmanın takım/oyuncu listesi buradan itibaren HER YERDE (kura,
   // fikstür, simülasyon, eleme turu) enjeksiyon uygulanmış haliyle kullanılır.
   const { injections } = useTeamInjection();
-  const getComp = useCallback((key) => applyInjection(COMPETITIONS[key], injections[key]), [injections]);
+  const { applyCoeffDelta, advanceSeason: advanceCareerSeason, getCareer } = useCareer();
+  const getComp = useCallback(
+    (key) => {
+      const injected = applyInjection(COMPETITIONS[key], injections[key]);
+      return applyCareerCoeffs(injected, key, applyCoeffDelta);
+    },
+    [injections, applyCoeffDelta]
+  );
   const { tactics } = useTacticsContext();
+  const { unlock } = useAchievements();
+  const { settings } = useSettings();
 
   const patch = useCallback((key, partial) => {
     setState((prev) => ({ ...prev, [key]: { ...prev[key], ...partial } }));
   }, []);
+
+  // Üç yarışmanın da en az bir kez başlatıldığı an "Sezon Gezgini" başarısını
+  // açar -- state değiştikçe kontrol edilir (aksiyonun kendisinde değil,
+  // burada tek bir yerde tutmak daha güvenli).
+  useEffect(() => {
+    if (Object.values(state).every((s) => s.started)) unlock("sezon-gezgini");
+  }, [state, unlock]);
 
   // ---- Swiss (UCL / Avrupa Ligi) ----
   const setDrawResults = useCallback(
@@ -77,8 +96,9 @@ export function CompetitionProvider({ children }) {
         standingsOrder: null,
         knockout: null,
       });
+      unlock("ilk-kura");
     },
-    [patch, getComp]
+    [patch, getComp, unlock]
   );
 
   // ---- League (Trendyol Süper Lig) ----
@@ -94,8 +114,10 @@ export function CompetitionProvider({ children }) {
         standingsOrder: null,
         knockout: null,
       });
+      unlock("ilk-kura");
+      if (key === "superlig") unlock("super-lig-taraftari");
     },
-    [patch, getComp]
+    [patch, getComp, unlock]
   );
 
   // ---- Ortak: fikstür üret / yeniden dağıt ----
@@ -145,13 +167,18 @@ export function CompetitionProvider({ children }) {
         allPlayers: allPlayersOverride || comp.getAllPlayers(),
         zones: comp.zones,
         tacticsById: tacticsOverride || tactics[key],
+        settings,
       });
       const prevHistory = state[key]?.matchHistory || [];
-      const historyEntry = { runId: Date.now(), matches: sim.matchResults };
-      patch(key, { simulation: sim, knockout: null, matchHistory: [...prevHistory, historyEntry] });
+      const newHistory = [...prevHistory, { runId: Date.now(), matches: sim.matchResults }];
+      patch(key, { simulation: sim, knockout: null, matchHistory: newHistory });
+      unlock("sampiyon-belirleyici");
+      if (key === "ucl") unlock("ucl-yolcusu");
+      if (key === "europa") unlock("avrupa-fatihi");
+      if (newHistory.length >= 5) unlock("yenileme-bagimlisi");
       return sim;
     },
-    [state, patch, getComp, tactics]
+    [state, patch, getComp, tactics, unlock, settings]
   );
 
   const generateKnockout = useCallback(
@@ -160,11 +187,15 @@ export function CompetitionProvider({ children }) {
       const slot = state[key];
       if (!comp.hasKnockout || !slot?.simulation) return null;
       const teamById = Object.fromEntries(comp.teams.map((t) => [t.id, t]));
-      const bracket = generateKnockoutBracket(slot.simulation.standings, teamById);
+      const bracket = generateKnockoutBracket(slot.simulation.standings, teamById, tactics[key]);
       patch(key, { knockout: bracket });
+      if (bracket?.champion) {
+        unlock("sampiyon-belirleyici");
+        unlock("kupa-sahibi");
+      }
       return bracket;
     },
-    [state, patch, getComp]
+    [state, patch, getComp, tactics, unlock]
   );
 
   const updateUserScore = useCallback((key, matchId, field, value) => {
@@ -199,6 +230,20 @@ export function CompetitionProvider({ children }) {
     [patch]
   );
 
+  // "Kariyer Modu": mevcut sezonun puan durumuna göre takım katsayılarını
+  // (bkz. CareerContext) günceller, sonra yarışmayı sıfırlayıp yeni bir
+  // kura/sezona hazır hale getirir. bonusTeamId (opsiyonel) -- ör. eleme
+  // turu şampiyonu -- ekstra bir katsayı bonusu alır.
+  const advanceToNextSeason = useCallback(
+    (key, bonusTeamId) => {
+      const slot = state[key];
+      if (!slot?.simulation?.standings) return;
+      advanceCareerSeason(key, slot.simulation.standings, bonusTeamId);
+      patch(key, emptyCompetitionState());
+    },
+    [state, advanceCareerSeason, patch]
+  );
+
   const value = {
     state,
     setDrawResults,
@@ -211,6 +256,7 @@ export function CompetitionProvider({ children }) {
     clearUserScores,
     setStandingsOrder,
     clearCompetition,
+    advanceToNextSeason,
   };
 
   return <CompetitionContext.Provider value={value}>{children}</CompetitionContext.Provider>;
@@ -222,26 +268,34 @@ export function CompetitionProvider({ children }) {
 export function useCompetition(key) {
   const ctx = useContext(CompetitionContext);
   if (!ctx) throw new Error("useCompetition, bir <CompetitionProvider> içinde kullanılmalıdır.");
+  // Geçersiz/bilinmeyen bir yarışma anahtarıyla (ör. hatalı yazılmış bir URL)
+  // çökmek yerine getCompetition() ile aynı şekilde UCL'e geri düşer.
+  const resolvedKey = COMPETITIONS[key] ? key : "ucl";
   const { injections } = useTeamInjection();
-  const comp = applyInjection(COMPETITIONS[key], injections[key]);
-  const slot = ctx.state[key] || emptyCompetitionState();
+  const { applyCoeffDelta, getCareer } = useCareer();
+  const injected = applyInjection(COMPETITIONS[resolvedKey], injections[resolvedKey]);
+  const comp = applyCareerCoeffs(injected, resolvedKey, applyCoeffDelta);
+  const slot = ctx.state[resolvedKey] || emptyCompetitionState();
+  const careerSeason = getCareer(resolvedKey).season;
   return {
     competition: comp,
+    careerSeason,
     ...slot,
     hasDraw: comp.format === "swiss" ? isCompleteResults(slot.results, comp.teams) : slot.started,
     hasFixture: !!slot.fixture,
     hasSimulation: !!slot.simulation,
     hasKnockout: !!slot.knockout,
-    setDrawResults: (results) => ctx.setDrawResults(key, results),
-    startLeagueSeason: () => ctx.startLeagueSeason(key),
-    ensureFixture: () => ctx.ensureFixture(key),
-    regenerateFixture: () => ctx.regenerateFixture(key),
+    setDrawResults: (results) => ctx.setDrawResults(resolvedKey, results),
+    startLeagueSeason: () => ctx.startLeagueSeason(resolvedKey),
+    ensureFixture: () => ctx.ensureFixture(resolvedKey),
+    regenerateFixture: () => ctx.regenerateFixture(resolvedKey),
     runSimulation: (fx, allPlayersOverride, tacticsOverride) =>
-      ctx.runSimulation(key, fx, allPlayersOverride, tacticsOverride),
-    generateKnockout: () => ctx.generateKnockout(key),
-    updateUserScore: (matchId, field, value) => ctx.updateUserScore(key, matchId, field, value),
-    clearUserScores: () => ctx.clearUserScores(key),
-    setStandingsOrder: (order) => ctx.setStandingsOrder(key, order),
-    clearCompetition: () => ctx.clearCompetition(key),
+      ctx.runSimulation(resolvedKey, fx, allPlayersOverride, tacticsOverride),
+    generateKnockout: () => ctx.generateKnockout(resolvedKey),
+    updateUserScore: (matchId, field, value) => ctx.updateUserScore(resolvedKey, matchId, field, value),
+    clearUserScores: () => ctx.clearUserScores(resolvedKey),
+    setStandingsOrder: (order) => ctx.setStandingsOrder(resolvedKey, order),
+    clearCompetition: () => ctx.clearCompetition(resolvedKey),
+    advanceToNextSeason: (bonusTeamId) => ctx.advanceToNextSeason(resolvedKey, bonusTeamId),
   };
 }

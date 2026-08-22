@@ -24,7 +24,7 @@ import FavoriteTeamPicker from "../components/FavoriteTeamPicker.jsx";
 import StartOrb from "../components/StartOrb.jsx";
 import Confetti from "../components/Confetti.jsx";
 import FixtureCta from "../components/fixture/FixtureCta.jsx";
-import CompetitionSubNav from "../components/CompetitionSubNav.jsx";
+import CompetitionStepper from "../components/CompetitionStepper.jsx";
 
 // mix: sıradaki takım çekilmeden önce topların karışma süresi
 // eject: topun küreden fırlayıp ekrana gelme süresi
@@ -452,13 +452,18 @@ export default function DrawPage() {
 
   return (
     <div className="app-shell page-shell">
-      <CompetitionSubNav competitionKey={competitionKey} />
+      <CompetitionStepper competitionKey={competitionKey} />
       {showConfetti && <Confetti />}
       {competitionKey === "ucl" && (
         <audio ref={audioRef} src="/audio/anthem.mp3" loop preload="none" />
       )}
       <DrumSphere visible={sphereVisible} activePot={activePot} pickSignal={pickSignal} />
       <PaperReveal team={revealTeam} visible={paperVisible} revealKey={revealKey} countryNames={COUNTRY_NAMES} />
+      {phase === "drawing" && (
+        <button className="draw-skip-fab" onClick={handleSkip}>
+          Sonuca Atla ⏭
+        </button>
+      )}
       <CurrentDrawPanel
         team={phase === "drawing" ? activeTeam : null}
         revealedOpponents={currentTeamOpponents}

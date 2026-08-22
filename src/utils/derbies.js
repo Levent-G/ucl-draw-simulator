@@ -20,3 +20,12 @@ export function findDerby(shortA, shortB) {
       (d.pair[0] === shortB && d.pair[1] === shortA)
   )
 }
+
+// Bir takımın (short kodu) tüm ezeli rakiplerini döner -- Takım Profili
+// sayfasında "Ezeli Rakip(ler)" bölümü için kullanılır.
+export function getRivalsOf(short) {
+  return DERBIES.filter((d) => d.pair.includes(short)).map((d) => ({
+    opponentShort: d.pair[0] === short ? d.pair[1] : d.pair[0],
+    label: d.label,
+  }))
+}

@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   ResponsiveContainer,
   BarChart,
@@ -10,16 +11,121 @@ import {
   Cell,
 } from "recharts";
 import { COMPETITION_LIST, getCompetition } from "../data/competitions.js";
+import { useCompetition } from "../state/CompetitionContext.jsx";
+import { useTeamTactics } from "../state/TacticsContext.jsx";
+import { useSettings } from "../state/SettingsContext.jsx";
 import {
   SUPER_LIG_LIVE_ASOF,
   SUPER_LIG_LIVE_STANDINGS,
   SUPER_LIG_LIVE_RESULTS,
   UCL_SEASON_STATUS,
   EUROPA_SEASON_STATUS,
+  buildSuperLigContinuation,
 } from "../data/liveStatus.js";
 import Crest from "../components/Crest.jsx";
+import PlayerAvatar from "../components/PlayerAvatar.jsx";
 import ChartTooltip from "../components/stats/ChartTooltip.jsx";
+import StandingsTable from "../components/fixture/StandingsTable.jsx";
+import InteractivePrediction from "../components/live/InteractivePrediction.jsx";
 import { CHART_SERIES, CHART_GRID, CHART_AXIS } from "../utils/chartTheme.js";
+import { topScorers } from "../utils/statsSelectors.js";
+import { simulateSeason } from "../utils/predictionEngine.js";
+import { generateFullDraw } from "../utils/drawEngine.js";
+import { buildResultsFromMatches } from "../utils/resultsHelpers.js";
+
+// Gerçek 1. Hafta zaten oynandığı için o haftayı yeniden "tahmin etmiyoruz"
+// -- gerçek puan durumundan devam ederek SADECE henüz oynanmamış maçları
+// (sıradaki hafta + kalan sezon) simüle ediyoruz. Süper Lig sezonu
+// LeagueHomePage'den başlatılmış olmalı (fikstür orada üretiliyor).
+function SuperLigPrediction() {
+  const { competition, hasDraw, fixture } = useCompetition("superlig");
+  const { teamTactics } = useTeamTactics("superlig");
+  const { settings } = useSettings();
+
+  const continuation = useMemo(() => {
+    if (!fixture) return null;
+    const { remainingFixture, initialStandings } = buildSuperLigContinuation(competition.teams, fixture);
+    if (remainingFixture.length === 0) return null;
+    const sim = simulateSeason(remainingFixture, {
+      teams: competition.teams,
+      allPlayers: competition.getAllPlayers(),
+      zones: competition.zones,
+      tacticsById: teamTactics,
+      initialStandings,
+      settings,
+    });
+    return { remainingFixture, initialStandings, sim };
+  }, [competition, fixture, teamTactics, settings]);
+
+  if (!hasDraw || !fixture) {
+    return (
+      <div className="stats-callout live-sim-empty">
+        Sıradaki maçlar ve sıralama tahminini görebilmek için önce sezonu
+        başlatmalısın. <Link to="/superlig">Süper Lig'e git →</Link>
+      </div>
+    );
+  }
+
+  if (!continuation) {
+    return (
+      <div className="stats-callout live-sim-empty">
+        Fikstürdeki tüm maçlar zaten gerçek sonuçlarla eşleşiyor, tahmin
+        edilecek yeni bir maç kalmadı.
+      </div>
+    );
+  }
+
+  const nextMatchday = continuation.remainingFixture[0];
+  const nextMatches = nextMatchday
+    ? continuation.sim.matchResults.filter((m) => m.matchdayNumber === nextMatchday.number)
+    : [];
+
+  return (
+    <div className="live-sim-preview">
+      <div className="live-asof live-sim-badge">
+        🎲 Tahmin — gerçek 1. Hafta sonuçlarından devam eden, henüz oynanmamış
+        maçların model tahmini
+      </div>
+
+      <div className="chart-card chart-card-wide">
+        <h3>Sıradaki Maçlar{nextMatchday ? ` — ${nextMatchday.number}. Hafta` : ""}</h3>
+        <div className="live-results-list">
+          {nextMatches.map((m) => (
+            <div key={m.id} className="live-result-row">
+              <span className="live-result-label">Tahmin</span>
+              <span className="live-result-team">
+                <Crest team={m.homeTeam} size={20} />
+                <span className="live-result-team-name">{m.homeTeam.name}</span>
+              </span>
+              <span className="live-result-score">
+                {m.homeGoals} - {m.awayGoals}
+              </span>
+              <span className="live-result-team">
+                <span className="live-result-team-name">{m.awayTeam.name}</span>
+                <Crest team={m.awayTeam} size={20} />
+              </span>
+            </div>
+          ))}
+          {nextMatches.length === 0 && <p className="standings-empty">Sıradaki hafta bulunamadı.</p>}
+        </div>
+      </div>
+
+      <h3 className="ip-section-title">Tahminini Kendin Şekillendir</h3>
+      <InteractivePrediction
+        competitionKey="superlig"
+        dataSource={{
+          fixture: continuation.remainingFixture,
+          modelStandings: continuation.sim.standings,
+          modelKnockout: null,
+          modelMatchResults: continuation.sim.matchResults,
+          modelPlayerStats: continuation.sim.playerStats,
+          initialStandings: continuation.initialStandings,
+          hasKnockout: false,
+        }}
+      />
+    </div>
+  );
+}
 
 function SuperLigLive() {
   const competition = getCompetition("superlig");
@@ -119,6 +225,8 @@ function SuperLigLive() {
         </div>
       </div>
 
+      <SuperLigPrediction />
+
       <div className="stats-grid live-stats-grid">
         <div className="chart-card">
           <h3>En Golcü Takımlar</h3>
@@ -166,21 +274,145 @@ function SuperLigLive() {
   );
 }
 
+// Gerçek sezon henüz başlamadığında bile, kullanıcı BURADAN (törensiz,
+// anında) kendi kurasını çekip tam bir tahmin üretebilir: kiminle
+// karşılaşacağı, ligde kaçıncı olacağı, eleme turundaki eşleşme sonuçları.
+// Bu, "tahmin" deneyiminin TEK adresi -- Fikstür/Eleme Turu sayfaları hâlâ
+// var (Maç Merkezi, taktik ayarları gibi detaylar için) ama birincil akış
+// artık burası.
+function YourSimulationPreview({ competitionKey }) {
+  const {
+    competition,
+    hasDraw,
+    fixture,
+    simulation,
+    knockout,
+    setDrawResults,
+    ensureFixture,
+    runSimulation,
+    generateKnockout,
+  } = useCompetition(competitionKey);
+  const [drawing, setDrawing] = useState(false);
+
+  useEffect(() => {
+    if (hasDraw && !fixture) ensureFixture();
+  }, [hasDraw, fixture, ensureFixture]);
+
+  useEffect(() => {
+    if (fixture && !simulation) runSimulation(fixture, competition.getAllPlayers());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fixture, simulation]);
+
+  useEffect(() => {
+    if (simulation && !knockout && competition.hasKnockout) generateKnockout();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [simulation, knockout]);
+
+  const handleInstantDraw = () => {
+    setDrawing(true);
+    try {
+      const matches = generateFullDraw(competition.teams);
+      const results = buildResultsFromMatches(competition.teams, matches);
+      setDrawResults(results);
+    } finally {
+      setDrawing(false);
+    }
+  };
+
+  if (!hasDraw) {
+    return (
+      <div className="live-sim-cta">
+        <p>
+          Ligde kiminle eşleşeceğini, kaçıncı olacağını ve eleme turu
+          sonuçlarını görmek için kendi kurani hemen burada çek -- tören
+          animasyonu olmadan, anında.
+        </p>
+        <button className="btn-primary" onClick={handleInstantDraw} disabled={drawing}>
+          🎲 Kura Çek ve Tahmin Yap
+        </button>
+      </div>
+    );
+  }
+
+  if (!simulation) {
+    return <div className="stats-callout live-sim-empty">Tahmin hesaplanıyor…</div>;
+  }
+
+  const allPlayers = competition.getAllPlayers();
+  const scorers = topScorers(allPlayers, simulation.playerStats, 5);
+
+  return (
+    <div className="live-sim-preview">
+      <div className="live-asof live-sim-badge">
+        🎲 Senin Simülasyonun — gerçek veri değil, bu oturumda ürettiğin model tahmini
+      </div>
+      <div className="stats-grid">
+        <StandingsTable
+          standings={simulation.standings}
+          teams={competition.teams}
+          title="Tahmini Puan Durumu"
+          competitionKey={competitionKey}
+        />
+        <div className="chart-card">
+          <h3>Tahmini Gol Kralı</h3>
+          <div className="live-sim-scorers">
+            {scorers.map((p, i) => (
+              <div className="live-sim-scorer-row" key={p.id}>
+                <span className="live-sim-scorer-rank">{i + 1}</span>
+                <PlayerAvatar player={p} size={26} />
+                <span className="live-sim-scorer-name">{p.name}</span>
+                <span className="live-sim-scorer-goals">{p.goals} gol</span>
+              </div>
+            ))}
+            {scorers.length === 0 && <p className="standings-empty">Henüz gol verisi yok.</p>}
+          </div>
+        </div>
+      </div>
+
+      <h3 className="ip-section-title">Tahminini Kendin Şekillendir</h3>
+      <InteractivePrediction
+        competitionKey={competitionKey}
+        dataSource={{
+          fixture,
+          modelStandings: simulation.standings,
+          modelKnockout: knockout,
+          modelMatchResults: simulation.matchResults,
+          modelPlayerStats: simulation.playerStats,
+          initialStandings: undefined,
+          hasKnockout: competition.hasKnockout,
+        }}
+      />
+
+      <div className="live-sim-actions">
+        <button className="btn-secondary" onClick={handleInstantDraw} disabled={drawing}>
+          🔄 Yeni Kura Çek (Baştan)
+        </button>
+        <Link to={`/${competitionKey}/fikstur`} className="btn-secondary">
+          Maç Maç Detay ve Taktikler →
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 function SeasonNotStarted({ competitionKey, status }) {
   const competition = getCompetition(competitionKey);
   return (
-    <div className="empty-card live-not-started">
-      <h2>Lig fazı henüz başlamadı</h2>
-      <p>
-        {competition.name} 2026-27 sezonu lig fazı <b>{status.phaseStart}</b>{" "}
-        tarihinde başlıyor.
-      </p>
-      {status.note && <p className="live-not-started-note">{status.note}</p>}
-      <p className="live-not-started-note">
-        Gerçek sonuçlar başladığında bu sayfa güncellenecek. Bu arada
-        yukarıdaki menüden kendi kura çekimini/simülasyonunu çalıştırabilirsin.
-      </p>
-    </div>
+    <>
+      <div className="empty-card live-not-started">
+        <h2>Gerçek lig fazı henüz başlamadı</h2>
+        <p>
+          {competition.name} 2026-27 sezonu lig fazı <b>{status.phaseStart}</b>{" "}
+          tarihinde başlıyor.
+        </p>
+        {status.note && <p className="live-not-started-note">{status.note}</p>}
+        <p className="live-not-started-note">
+          Gerçek sonuçlar başladığında bu sayfa güncellenecek. Bu arada aşağıdan
+          kendi tahminini oluşturabilirsin.
+        </p>
+      </div>
+      <YourSimulationPreview competitionKey={competitionKey} />
+    </>
   );
 }
 

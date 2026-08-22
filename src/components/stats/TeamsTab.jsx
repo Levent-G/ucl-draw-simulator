@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { Link } from "react-router-dom";
 import {
   ResponsiveContainer,
   BarChart,
@@ -36,7 +37,7 @@ function potAverages(teams) {
   }));
 }
 
-export default function TeamsTab({ competition, simulation, selectedTeam }) {
+export default function TeamsTab({ competition, simulation, selectedTeam, competitionKey }) {
   const { teams, countryNames } = competition;
   const allByCoeff = useMemo(() => teamsByCoeffDesc(teams), [teams]);
   const topByCoeff = useMemo(() => allByCoeff.slice(0, 15), [allByCoeff]);
@@ -57,9 +58,11 @@ export default function TeamsTab({ competition, simulation, selectedTeam }) {
     <div className="stats-grid">
       {selectedInfo && (
         <div className="chart-card chart-card-wide team-profile-card">
-          <Crest team={selectedTeam} size={48} />
+          <Link to={`/${competitionKey}/takim/${selectedTeam.id}`} className="team-profile-card-link">
+            <Crest team={selectedTeam} size={48} />
+          </Link>
           <div className="team-profile-info">
-            <div className="team-profile-name">{selectedTeam.name}</div>
+            <Link to={`/${competitionKey}/takim/${selectedTeam.id}`} className="team-profile-name">{selectedTeam.name}</Link>
             <div className="team-profile-meta">
               {countryNames[selectedTeam.country] || selectedTeam.country}
               {selectedTeam.pot ? ` · Torba ${selectedTeam.pot}` : ""} · Katsayı sırası #{selectedInfo.coeffRank}
@@ -190,10 +193,10 @@ export default function TeamsTab({ competition, simulation, selectedTeam }) {
               key: "name",
               label: "Takım",
               render: (t) => (
-                <span className="table-team-cell">
+                <Link to={`/${competitionKey}/takim/${t.id}`} className="table-team-cell">
                   <Crest team={t} size={18} />
                   {t.name}
-                </span>
+                </Link>
               ),
             },
             {

@@ -41,6 +41,32 @@ export function countryAggregates(teams, countryNames) {
     .sort((a, b) => b.totalCoeff - a.totalCoeff);
 }
 
+// Bir formasyonun (bkz. DreamTeamContext FORMATIONS) slotlarına, o
+// simülasyondaki gol/asist/reyting performansına göre en iyi 11'i otomatik
+// yerleştirir -- "Sezonun 11'i" için kullanılır. Kart cezası (reds/yellows)
+// hafif bir düşüş uygular; kaleci gibi gol/asist üretmeyen mevkilerde asıl
+// belirleyici reyting olur.
+export function computeTeamOfSeason(allPlayers, playerStats, formationSlots) {
+  if (!playerStats || !allPlayers.length) return null;
+  const scored = allPlayers.map((p) => {
+    const s = playerStats[p.id] || { goals: 0, assists: 0, yellows: 0, reds: 0 };
+    const composite = (s.goals || 0) * 4 + (s.assists || 0) * 2 - (s.reds || 0) * 3 - (s.yellows || 0) * 0.4 + p.rating * 0.5;
+    return { ...p, ...s, composite };
+  });
+
+  const byPosition = { GK: [], DF: [], MF: [], FW: [] };
+  for (const p of scored) byPosition[p.position]?.push(p);
+  for (const pos of Object.keys(byPosition)) byPosition[pos].sort((a, b) => b.composite - a.composite);
+
+  const cursor = { GK: 0, DF: 0, MF: 0, FW: 0 };
+  return formationSlots.map((slot) => {
+    const pool = byPosition[slot.position] || [];
+    const player = pool[cursor[slot.position]] || null;
+    cursor[slot.position]++;
+    return { slot, player };
+  });
+}
+
 export function topScorers(allPlayers, playerStats, limit = 12) {
   if (!playerStats) return [];
   return allPlayers
