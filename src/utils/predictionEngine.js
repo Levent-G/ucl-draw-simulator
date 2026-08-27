@@ -81,8 +81,23 @@ function clamp(v, min, max) {
   return Math.max(min, Math.min(max, v));
 }
 
-function attackStrength(coeff) {
-  return Math.max(6, coeff || 6);
+// Takım gücü farkının gol paylaşımına yansıması İSTATİSTİKSEL OLARAK
+// KESKİN (lojistik/Elo tarzı) olmalı -- iki takımın ham coeff'lerinin
+// DOĞRUSAL payını almak (eski yöntem: hs/(hs+as)) büyük katsayı farklarını
+// yeterince ayırt edemiyordu: ör. bir elit kulüp (coeff ~125) bir play-off
+// ekibine (coeff ~46) deplasmanda giderken doğrusal pay ona sadece ~%73'lük
+// bir gol payı veriyordu -- gerçek hayatta bu neredeyse kesin bir favorilik
+// ilişkisidir, yaklaşık bir yarı yarıya maç değil. Bunun yerine
+// eloExpectedScore ile AYNI lojistik eğriyi (ama kendi bağımsız bölenini)
+// kullanıyoruz: fark ne kadar büyükse pay o kadar keskin kayar, fark küçükse
+// (aynı torbadaki iki takım gibi) ev sahibi avantajı dışında neredeyse
+// yarı yarıya kalır.
+const STRENGTH_SHARE_DIVISOR = 150;
+
+function strengthShare(ownCoeff, oppCoeff) {
+  const own = Math.max(1, ownCoeff || 6);
+  const opp = Math.max(1, oppCoeff || 6);
+  return 1 / (1 + Math.pow(10, (opp - own) / STRENGTH_SHARE_DIVISOR));
 }
 
 // --- Hücum / Defans profili -------------------------------------------
@@ -167,11 +182,8 @@ function resolveTactic(teamId, tacticsById) {
 export function expectedGoals(homeTeam, awayTeam, tacticsById, settings) {
   const baseGoalsTotal = settings?.baseGoalsTotal ?? BASE_GOALS_TOTAL;
   const homeAdvantage = settings?.homeAdvantage ?? HOME_ADVANTAGE_GOALS;
-  const hs = attackStrength(homeTeam.coeff);
-  const as = attackStrength(awayTeam.coeff);
-  const total = hs + as;
-  const hShare = hs / total;
-  const aShare = as / total;
+  const hShare = strengthShare(homeTeam.coeff, awayTeam.coeff);
+  const aShare = 1 - hShare;
   let lambdaHome = clamp(
     baseGoalsTotal * hShare + homeAdvantage,
     MIN_LAMBDA,

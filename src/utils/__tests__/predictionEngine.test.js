@@ -26,6 +26,40 @@ describe("predictionEngine.expectedGoals / matchProbabilities", () => {
     expect(lambdaHome).toBeGreaterThan(lambdaAway);
   });
 
+  it("gives two equal-coeff teams a near-even split (home advantage aside)", () => {
+    const a = { id: "a", coeff: 70 };
+    const b = { id: "b", coeff: 70 };
+    const { lambdaHome, lambdaAway } = expectedGoals(a, b);
+    // Sadece ev sahibi avantajı kadar bir fark olmalı, büyük bir sapma değil.
+    expect(lambdaHome - lambdaAway).toBeLessThan(1);
+    expect(lambdaHome).toBeGreaterThan(lambdaAway);
+  });
+
+  it("scales the goal-share gap SUPER-LINEARLY with the coeff gap (a huge mismatch is far more lopsided than a small one)", () => {
+    const base = { id: "base", coeff: 70 };
+    const smallGapAway = { id: "small", coeff: 60 }; // 10 puan fark
+    const bigGapAway = { id: "big", coeff: 20 }; // 50 puan fark
+    const smallGap = expectedGoals(base, smallGapAway);
+    const bigGap = expectedGoals(base, bigGapAway);
+    const smallRatio = smallGap.lambdaHome / smallGap.lambdaAway;
+    const bigRatio = bigGap.lambdaHome / bigGap.lambdaAway;
+    // 50 puanlık fark, 10 puanlık farktan orantısız derecede daha keskin bir
+    // gol oranı üretmeli -- doğrusal bir modelde puan farkı 5 kat artınca
+    // oran neredeyse hiç büyümezdi (payların ikisi de küçük kaymalar
+    // yaşardı); burada oran belirgin şekilde (%50'den fazla) büyüyor.
+    expect(bigRatio).toBeGreaterThan(smallRatio * 1.5);
+  });
+
+  it("makes a European-elite-vs-modest-club mismatch a clear (not coinflip) favorite", () => {
+    // Gerçek UCL'de olduğu gibi: elit bir Pot 1 kulübü (coeff ~125), bir
+    // Pot 3 kulübüne (coeff ~46) deplasmanda gitse bile net favori olmalı.
+    const elite = { id: "elite", coeff: 125 };
+    const modest = { id: "modest", coeff: 46 };
+    // modest ev sahibi, elite deplasmanda (favorinin en dezavantajlı hali).
+    const { lambdaHome, lambdaAway } = expectedGoals(modest, elite);
+    expect(lambdaAway).toBeGreaterThan(lambdaHome * 1.8);
+  });
+
   it("respects a custom baseGoalsTotal setting", () => {
     const a = { id: "a", coeff: 60 };
     const b = { id: "b", coeff: 60 };
