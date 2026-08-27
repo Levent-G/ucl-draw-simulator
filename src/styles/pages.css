@@ -3272,18 +3272,56 @@ a.team-profile-match-row:hover {
   font-size: 13px;
 }
 .prediction-league-avatar {
-  width: 28px;
-  height: 28px;
   border-radius: 50%;
   object-fit: cover;
-}
-.prediction-league-avatar-sm {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 6px;
+  flex-shrink: 0;
   vertical-align: middle;
+  margin-right: 6px;
+}
+.prediction-league-avatar-initials {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-family: var(--font-display);
+  user-select: none;
+}
+.prediction-champion-result,
+.prediction-champion-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+.prediction-champion-picker {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.prediction-champion-picker select {
+  background: var(--bg-panel-alt);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  padding: 8px 10px;
+  font-size: 13px;
+  min-width: 220px;
+}
+.prediction-knockout-round {
+  margin-bottom: 18px;
+}
+.prediction-knockout-round h3 {
+  margin-bottom: 8px;
+}
+.stats-tabs button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.prediction-danger-zone {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--line);
 }
 .prediction-league-matches {
   display: flex;
@@ -3365,6 +3403,83 @@ a.team-profile-match-row:hover {
   .prediction-row-team-away {
     flex-direction: row;
   }
+}
+.prediction-league-transfer-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.prediction-league-name-input {
+  width: 260px;
+  max-width: 100%;
+  text-align: left;
+}
+.prediction-league-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.prediction-league-list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+.prediction-league-list-row:hover {
+  border-color: var(--accent);
+}
+.prediction-league-list-name {
+  font-weight: 600;
+}
+.prediction-league-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.prediction-league-filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.prediction-team-filter {
+  background: var(--bg-panel-alt);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  padding: 8px 10px;
+  font-size: 13px;
+}
+.prediction-row-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.prediction-others-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 14px 4px;
+}
+.prediction-others-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-faint);
+  background: var(--bg-panel-alt);
+  border-radius: 999px;
+  padding: 3px 8px 3px 4px;
 }
 .live-not-started-note {
   font-size: 12.5px;

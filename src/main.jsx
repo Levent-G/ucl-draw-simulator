@@ -73,6 +73,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                             <Route path="/:competitionKey/takim/:teamId" element={<TeamProfilePage />} />
                             <Route path="/:competitionKey/oyuncu/:playerId" element={<PlayerProfilePage />} />
                             <Route path="/:competitionKey/tahmin-ligi" element={<PredictionLeaguePage />} />
+                            <Route path="/:competitionKey/tahmin-ligi/:leagueId" element={<PredictionLeaguePage />} />
                           </Routes>
                         </Suspense>
                       </SeasonArchiveProvider>

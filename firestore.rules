@@ -6,45 +6,68 @@ rules_version = '2';
 // (console.firebase.google.com -> projeniz -> Firestore Database -> Rules
 // sekmesi) bu dosyanın içeriğini yapıştırıp "Yayınla" demeniz gerekir. (Ya da
 // Firebase CLI kuruluysa: `firebase deploy --only firestore:rules`.)
+//
+// VERİ MODELİ: Tahmin Ligi ÇOKLU, link ile paylaşılan "lig odaları" şeklinde
+// çalışır (tek bir global sezon değil) -- bir kullanıcı yeni bir lig
+// oluşturur, linkini (leagueId) arkadaşlarıyla paylaşır, onlar da o AYNI
+// odaya katılır.
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // seasons/{competitionKey}: bir yarışma için ORTAK tahmin ligi sezonu
-    // (kura + fikstür + gerçek sonuçlar). Herkes (giriş yapmış herhangi bir
-    // kullanıcı) okuyabilir. Sadece HENÜZ YOKSA oluşturulabilir (ilk basan
-    // kazanır) -- oluşturulduktan sonra client'tan bir daha
-    // güncellenemez/silinemez, böylece bir sezon başladıktan sonra kimse
-    // (yanlışlıkla ya da kasıtlı olarak) fikstürü/sonuçları değiştirip
-    // tahminleri geçersiz kılamaz.
-    match /seasons/{competitionKey} {
+    // leagues/{leagueId}: bir kullanıcının oluşturduğu, link ile paylaşılan
+    // Tahmin Ligi odası (kura + fikstür + gerçek sonuçlar). leagueId
+    // Firestore tarafından OTOMATİK üretilir (addDoc) -- tahmin edilemez,
+    // bu yüzden linki bilmeyen biri bu odaya "rastgele" giremez. Herkes
+    // (giriş yapmış herhangi bir kullanıcı, linke sahip olan) okuyabilir.
+    // Sadece OLUŞTURAN kişi olarak (createdBy) yaratılabilir --
+    // oluşturulduktan sonra İÇERİĞİ client'tan bir daha güncellenemez
+    // (fikstür/sonuçlar sabit kalır). SİLİNEBİLİR ("Ligi Sil" özelliği) --
+    // "kendi aramızda" güvene dayalı bir özellik, herhangi bir üye
+    // silebilir.
+    match /leagues/{leagueId} {
       allow read: if request.auth != null;
       allow create: if request.auth != null
                     && request.resource.data.createdBy == request.auth.uid;
-      allow update, delete: if false;
+      allow delete: if request.auth != null;
+      allow update: if false;
+    }
+
+    // memberships/{membershipId}: membershipId HER ZAMAN
+    // "{leagueId}_{uid}" biçiminde olmalı. Bir kullanıcı bir lig linkini
+    // açtığında (ya da yeni bir lig oluşturduğunda) kendi üyeliğini
+    // oluşturur -- "Liglerim" listesi bunları okur. Sadece kendi uid'ni
+    // taşıyan bir üyelik oluşturabilir/silebilirsin (ligden ayrılmak için).
+    match /memberships/{membershipId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+                    && request.resource.data.uid == request.auth.uid
+                    && membershipId == request.resource.data.leagueId + '_' + request.auth.uid;
+      allow delete: if request.auth != null
+                    && resource.data.uid == request.auth.uid;
+      allow update: if false;
     }
 
     // predictions/{predictionId}: predictionId HER ZAMAN
-    // "{competitionKey}_{matchId}_{uid}" biçiminde olmalı -- bu, bir
-    // kullanıcının aynı maça birden fazla (çakışan) tahmin belgesi
-    // oluşturmasını yapısal olarak imkansız kılar (aynı id'yi tekrar
-    // "create" etmeye çalışmak zaten izin verilmeyen bir update sayılır).
-    // Bir kullanıcı SADECE kendi uid'siyle etiketlenmiş bir tahmin
-    // oluşturabilir, ve tahminler oluşturulduktan sonra DEĞİŞTİRİLEMEZ
-    // (gerçek sonucu gördükten sonra geriye dönüp "düzeltme" yapılamasın
-    // diye) -- bu, dürüst oyuncular için tasarlanmış hafif bir önlemdir,
-    // sonuçlar `seasons/{competitionKey}` içinde herkesin okuyabildiği bir
-    // alanda tutulduğundan (Cloud Functions olmadan tam bir "sunucu
-    // onaylamadan sonucu gösterme" garantisi verilemez -- bkz.
-    // PredictionLeagueContext.jsx başındaki not).
+    // "{leagueId}_{matchId}_{uid}" biçiminde olmalı -- bu, bir kullanıcının
+    // aynı maça birden fazla (çakışan) tahmin belgesi oluşturmasını yapısal
+    // olarak imkansız kılar. Bir kullanıcı SADECE kendi uid'siyle
+    // etiketlenmiş bir tahmin oluşturabilir, ve mevcut bir tahmin asla
+    // GÜNCELLENEMEZ (gerçek sonucu gördükten sonra geriye dönüp "düzeltme"
+    // yapılamasın diye) -- bu, dürüst oyuncular için tasarlanmış hafif bir
+    // önlemdir (bkz. PredictionLeagueContext.jsx başındaki güvenlik notu).
+    // SİLİNEBİLİR: "Tahminlerimi Sıfırla" (kendi tahminini) ve "Ligi Sil"
+    // (o ligdeki HERKESİN tahminini) özellikleri bunu kullanır.
     match /predictions/{predictionId} {
       allow read: if request.auth != null;
       allow create: if request.auth != null
                     && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.kind in ['score', 'champion', 'knockout', 'standings']
                     && predictionId ==
-                       request.resource.data.competitionKey + '_' +
+                       request.resource.data.leagueId + '_' +
                        request.resource.data.matchId + '_' +
                        request.auth.uid;
-      allow update, delete: if false;
+      allow delete: if request.auth != null;
+      allow update: if false;
     }
   }
 }

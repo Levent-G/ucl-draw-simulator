@@ -149,7 +149,7 @@ function scheduleAllRounds(allMatches, matchdayCount, maxAttemptsPerRound) {
 // Tamamlanmış bir kura sonucunu (results) ve o yarışmanın takım listesini
 // alıp 8 haftalık fikstürü döner:
 // [{ number, label, matches: [{ id, homeTeam, awayTeam, viaPot }, ...18] }, ...8]
-export function generateFixture(results, teams, maxTopLevelAttempts = 40, maxAttemptsPerRound = 200) {
+export function generateFixture(results, teams, maxTopLevelAttempts = 80, maxAttemptsPerRound = 200) {
   const allMatches = buildMatchList(results, teams);
   if (allMatches.length === 0) return [];
 

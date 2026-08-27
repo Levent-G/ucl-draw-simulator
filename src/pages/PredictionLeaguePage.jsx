@@ -1,19 +1,78 @@
 import React, { useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { getCompetition } from "../data/competitions.js";
 import {
   PredictionLeagueProvider,
   usePredictionAuth,
-  useSharedSeason,
+  useCreateLeague,
+  useLeague,
+  useMyLeagues,
   usePredictions,
   scorePrediction,
+  pointsForPrediction,
   buildLeaderboard,
+  CHAMPION_PICK_POINTS,
+  KNOCKOUT_TIE_POINTS,
 } from "../state/PredictionLeagueContext.jsx";
 import CompetitionStepper from "../components/CompetitionStepper.jsx";
 import MatchdayTabs from "../components/fixture/MatchdayTabs.jsx";
+import DragStandings from "../components/fixture/DragStandings.jsx";
 import Crest from "../components/Crest.jsx";
 
+const START_STAGE_LABEL = {
+  draw: "Kura çekiliyor…",
+  fixture: "Fikstür oluşturuluyor…",
+  simulate: "Sezon simüle ediliyor…",
+  knockout: "Eleme turu hesaplanıyor…",
+  save: "Kaydediliyor…",
+};
+
 const POINT_LABEL = { 5: "Tam İsabet!", 3: "Sonuç + Fark", 1: "Sonuç Doğru", 0: "Iskaladın" };
+
+// Google hesabının bir profil fotoğrafı yoksa (ya da fotoğraf yüklenemezse --
+// bazı Google hesaplarında/gizlilik ayarlarında bu URL 404 dönebiliyor) boş
+// bir kutu göstermek yerine isminin baş harflerinden oluşan, isme göre sabit
+// bir renge boyanmış basit bir rozet gösteriyoruz -- klasik "initials avatar"
+// deseni.
+function initialsOf(name) {
+  if (!name) return "?";
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  const first = parts[0][0] || "";
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+  return (first + last).toUpperCase();
+}
+
+function avatarColor(name) {
+  let hash = 0;
+  const s = name || "?";
+  for (let i = 0; i < s.length; i++) hash = s.charCodeAt(i) + ((hash << 5) - hash);
+  return `hsl(${Math.abs(hash) % 360}, 55%, 42%)`;
+}
+
+function Avatar({ photoURL, name, size = 24 }) {
+  const [failed, setFailed] = useState(false);
+  if (photoURL && !failed) {
+    return (
+      <img
+        src={photoURL}
+        alt=""
+        onError={() => setFailed(true)}
+        className="prediction-league-avatar"
+        style={{ width: size, height: size }}
+      />
+    );
+  }
+  return (
+    <span
+      className="prediction-league-avatar prediction-league-avatar-initials"
+      style={{ width: size, height: size, background: avatarColor(name), fontSize: size * 0.42 }}
+      title={name}
+    >
+      {initialsOf(name)}
+    </span>
+  );
+}
 
 // Firebase, giriş hatalarını ham bir `error.code` (ör. "auth/configuration-not-found")
 // olarak fırlatır -- bunlar Firebase Console'da eksik bir kurulum adımına
@@ -35,33 +94,49 @@ function describeAuthError(error) {
   return error?.message || "Giriş yapılamadı, lütfen tekrar dene.";
 }
 
+// Firestore hatalarını da aynı şekilde eyleme geçirilebilir bir mesaja
+// çeviriyoruz -- "client is offline" gibi mesajlar genelde gerçek bir
+// internet kopukluğu DEĞİL, Firestore Database'in projede hiç
+// oluşturulmamış olmasının (ya da kuralların henüz yayınlanmamış olmasının)
+// en yaygın belirtisidir.
+function describeFirestoreError(error) {
+  const code = error?.code || "";
+  const message = error?.message || "";
+  if (code === "unavailable" || message.includes("client is offline")) {
+    return "Firestore'a bağlanılamadı. Bu genelde internet kopukluğundan değil, Firebase Console'da Firestore Database'in HENÜZ OLUŞTURULMAMIŞ olmasından kaynaklanır -- Firestore Database sayfasına gidip 'Create database' demen gerekebilir. Veritabanı zaten varsa, bir sonraki adım firestore.rules'un yayınlanmış olduğundan emin olmak.";
+  }
+  if (code === "permission-denied") {
+    return "Firestore bu isteği reddetti (permission-denied) -- firestore.rules dosyasının içeriğini Firebase Console -> Firestore Database -> Rules sekmesine yapıştırıp Yayınla demen gerekiyor.";
+  }
+  if (code === "failed-precondition") {
+    return "Firestore Database projede henüz oluşturulmamış görünüyor -- Firebase Console -> Firestore Database -> Create database.";
+  }
+  return message || "Beklenmeyen bir Firestore hatası oluştu.";
+}
+
 // PredictionLeagueProvider (dolayısıyla firebase/auth + firebase/firestore
 // paketleri) BİLEREK bu sayfaya ÖZEL, yerel bir sarmalayıcıda tutuluyor --
-// main.jsx'te GLOBAL olarak sarılsaydı, Firebase SDK'sı (~470KB) Tahmin
+// main.jsx'te GLOBAL olarak sarılsaydı, Firebase SDK'sı (~650KB) Tahmin
 // Ligi'ni hiç kullanmayan herkesin de ilk yükleme paketine dahil olurdu. Bu
 // sayfa zaten lazy-load edildiğinden (bkz. main.jsx), sağlayıcıyı da burada
 // tutmak Firebase'i SADECE bu sayfaya girildiğinde indirtir.
 export default function PredictionLeaguePage() {
   return (
     <PredictionLeagueProvider>
-      <PredictionLeagueContent />
+      <PredictionLeagueGate />
     </PredictionLeagueProvider>
   );
 }
 
-function PredictionLeagueContent() {
-  const { competitionKey } = useParams();
-  const competition = getCompetition(competitionKey);
-  const { user, authLoading, signInWithGoogle, signOutUser } = usePredictionAuth();
-  const { season, loading: seasonLoading, error: seasonError, fixture, startSeason } = useSharedSeason(competitionKey);
-  const { predictions, myPredictionsByMatch, submitPrediction } = usePredictions(competitionKey);
+// /:competitionKey/tahmin-ligi (leagueId YOK) -> Liglerim + Yeni Lig Oluştur.
+// /:competitionKey/tahmin-ligi/:leagueId (leagueId VAR) -> o lig odası.
+function PredictionLeagueGate() {
+  const { leagueId } = useParams();
+  return leagueId ? <PredictionLeagueRoom /> : <PredictionLeagueLanding />;
+}
 
-  const [tab, setTab] = useState("maclar");
-  const [activeMatchday, setActiveMatchday] = useState(1);
-  const [starting, setStarting] = useState(false);
-  const [startError, setStartError] = useState(null);
-  const [drafts, setDrafts] = useState({});
-  const [submitting, setSubmitting] = useState({});
+function AuthHeader({ competition, title }) {
+  const { user, authLoading, signInWithGoogle, signOutUser } = usePredictionAuth();
   const [signingIn, setSigningIn] = useState(false);
   const [signInError, setSignInError] = useState(null);
 
@@ -78,60 +153,16 @@ function PredictionLeagueContent() {
     }
   };
 
-  const leaderboard = useMemo(
-    () => (season ? buildLeaderboard(predictions, season.results) : []),
-    [predictions, season]
-  );
-
-  const activeMatches = useMemo(
-    () => fixture?.find((md) => md.number === activeMatchday)?.matches || [],
-    [fixture, activeMatchday]
-  );
-
-  const handleStart = async () => {
-    setStarting(true);
-    setStartError(null);
-    try {
-      await startSeason();
-    } catch (e) {
-      setStartError(e.message || "Sezon oluşturulamadı.");
-    } finally {
-      setStarting(false);
-    }
-  };
-
-  const handleDraftChange = (matchId, field, value) => {
-    setDrafts((prev) => ({ ...prev, [matchId]: { ...prev[matchId], [field]: value } }));
-  };
-
-  const handleSubmit = async (matchId) => {
-    const draft = drafts[matchId];
-    if (!draft || draft.home === "" || draft.away === "" || draft.home == null || draft.away == null) return;
-    setSubmitting((prev) => ({ ...prev, [matchId]: true }));
-    try {
-      await submitPrediction(matchId, Number(draft.home), Number(draft.away));
-    } finally {
-      setSubmitting((prev) => ({ ...prev, [matchId]: false }));
-    }
-  };
-
   return (
-    <div className="page-shell">
-      <CompetitionStepper competitionKey={competitionKey} />
+    <>
       <header className="page-header">
         <div>
           <div className="page-eyebrow">Kendi Aramızda</div>
-          <h1>{competition.shortName} — Tahmin Ligi</h1>
-          <p>
-            Arkadaşlarınla ORTAK bir sezon üzerinden maç sonucu tahmin et, doğru
-            bildikçe puan topla: <b>5 puan</b> tam skor · <b>3 puan</b> doğru
-            sonuç + doğru gol farkı · <b>1 puan</b> sadece doğru sonuç
-            (galibiyet/beraberlik) · <b>0 puan</b> ıska.
-          </p>
+          <h1>{title}</h1>
         </div>
         {user && (
           <div className="page-header-actions prediction-league-user">
-            {user.photoURL && <img src={user.photoURL} alt="" className="prediction-league-avatar" />}
+            <Avatar photoURL={user.photoURL} name={user.displayName} size={28} />
             <span>{user.displayName}</span>
             <button className="btn-secondary" onClick={signOutUser}>
               Çıkış Yap
@@ -151,111 +182,564 @@ function PredictionLeagueContent() {
           {signInError && <p style={{ color: "#f87171" }}>{signInError}</p>}
         </div>
       )}
+    </>
+  );
+}
 
-      {user && seasonLoading && <p className="footnote">Sezon kontrol ediliyor…</p>}
+// ============================================================================
+// LANDING: /:competitionKey/tahmin-ligi -- Liglerim + Yeni Lig Oluştur.
+// ============================================================================
+function PredictionLeagueLanding() {
+  const { competitionKey } = useParams();
+  const navigate = useNavigate();
+  const competition = getCompetition(competitionKey);
+  const hasDraw = competition.format === "swiss";
+  const { user } = usePredictionAuth();
+  const createLeague = useCreateLeague();
+  const { leagues, loading: leaguesLoading } = useMyLeagues(competitionKey);
 
-      {user && seasonError && (
-        <div className="stats-callout" style={{ borderColor: "#f87171" }}>
-          <p style={{ color: "#f87171" }}>⚠️ {seasonError.message}</p>
-          <p className="footnote">
-            (Tarayıcı konsolunda -- F12 -- daha ayrıntılı bir hata kodu görebilirsin, ör. "permission-denied" Firestore
-            kurallarının henüz yayınlanmadığı anlamına gelir.)
-          </p>
-        </div>
-      )}
+  const [starting, setStarting] = useState(false);
+  const [startStage, setStartStage] = useState(null);
+  const [startError, setStartError] = useState(null);
 
-      {user && !seasonLoading && !season && !seasonError && (
-        <div className="stats-callout">
-          <p>
-            {competition.shortName} için henüz ortak bir Tahmin Ligi sezonu yok.
-            Başlatırsan, o an üretilen kura/fikstür üzerinden herkes AYNI
-            maçları tahmin etmeye başlar -- bir kez oluşturulduktan sonra
-            sabit kalır, değiştirilemez.
-          </p>
-          <button className="btn-primary" onClick={handleStart} disabled={starting}>
-            {starting ? "Oluşturuluyor…" : "🏆 Tahmin Ligi Sezonunu Başlat"}
-          </button>
-          {startError && <p style={{ color: "#f87171" }}>{startError}</p>}
-        </div>
-      )}
+  // hasDraw (UCL/Avrupa Ligi) yarışmalarda lig burada HEADLESS (arka planda
+  // sessizce) oluşturulmaz -- kullanıcı önce GERÇEK, animasyonlu Kura
+  // Çekimi ekranını görmeli. "Kura Çek" düğmesi oraya yönlendirir; kura
+  // bitince oradaki "Tahmin Ligi Oluştur" düğmesi yeni lig odasını yaratıp
+  // doğrudan o odaya (/tahmin-ligi/{leagueId}) yönlendirir (bkz.
+  // DrawPage.jsx: PredictionLeagueTransferCta).
+  const handleGoToDraw = () => {
+    navigate(`/${competitionKey}?tahminLigi=1`);
+  };
 
-      {user && season && fixture && (
+  // hasDraw OLMAYAN (ör. Süper Lig) yarışmalarda gerçek bir "kura" kavramı
+  // yok -- fikstür zaten deterministik/rastgele bir round-robin, o yüzden
+  // burada doğrudan (headless) oluşturulabilir.
+  const handleCreateHeadless = async () => {
+    setStarting(true);
+    setStartError(null);
+    setStartStage("fixture");
+    try {
+      const leagueId = await createLeague(competitionKey, "", setStartStage);
+      navigate(`/${competitionKey}/tahmin-ligi/${leagueId}`);
+    } catch (e) {
+      setStartError(describeFirestoreError(e));
+    } finally {
+      setStarting(false);
+      setStartStage(null);
+    }
+  };
+
+  return (
+    <div className="page-shell">
+      <CompetitionStepper competitionKey={competitionKey} />
+      <AuthHeader competition={competition} title={`${competition.shortName} — Tahmin Ligi`} />
+
+      {user && (
         <>
-          <div className="stats-tabs">
-            <button className={tab === "maclar" ? "active" : ""} onClick={() => setTab("maclar")}>
-              Maçlar
+          <div className="stats-callout">
+            <p>
+              Bir Tahmin Ligi <b>arkadaşlarınla paylaştığın bir link</b> üzerinden çalışır: sen bir lig oluşturursun,
+              linkini gönderirsin, onlar da katılıp AYNI eşleşmeleri tahmin eder. Herkes birbirinin tahminini
+              görebilir (kendi tahminini yaptıktan sonra).
+            </p>
+            {hasDraw ? (
+              <button className="btn-primary" onClick={handleGoToDraw}>
+                🎟️ Kura Çek ve Yeni Tahmin Ligi Oluştur
+              </button>
+            ) : (
+              <button className="btn-primary" onClick={handleCreateHeadless} disabled={starting}>
+                {starting ? (startStage ? START_STAGE_LABEL[startStage] : "Oluşturuluyor…") : "🏆 Yeni Tahmin Ligi Oluştur"}
+              </button>
+            )}
+            {startError && <p style={{ color: "#f87171" }}>{startError}</p>}
+          </div>
+
+          <div className="chart-card chart-card-wide">
+            <h3>Liglerim</h3>
+            {leaguesLoading ? (
+              <p className="footnote">Yükleniyor…</p>
+            ) : leagues.length === 0 ? (
+              <p className="footnote">
+                Henüz bir Tahmin Ligi'ne katılmadın -- yukarıdan yeni bir tane oluştur, ya da bir arkadaşının sana
+                attığı linke tıkla.
+              </p>
+            ) : (
+              <div className="prediction-league-list">
+                {leagues.map((l) => (
+                  <Link key={l.id} to={`/${competitionKey}/tahmin-ligi/${l.id}`} className="prediction-league-list-row">
+                    <span className="prediction-league-list-name">🏆 {l.name}</span>
+                    <span className="footnote">{l.createdByName} tarafından oluşturuldu</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ============================================================================
+// ROOM: /:competitionKey/tahmin-ligi/:leagueId -- gerçek tahmin akışı.
+// ============================================================================
+function PredictionLeagueRoom() {
+  const { competitionKey, leagueId } = useParams();
+  const competition = getCompetition(competitionKey);
+  const hasDraw = competition.format === "swiss";
+  const { user } = usePredictionAuth();
+  const { league, loading: leagueLoading, error: leagueError, fixture, deleteLeague } = useLeague(leagueId);
+  const {
+    predictions,
+    myPredictionsByMatch,
+    othersPredictionsByMatch,
+    submitScorePrediction,
+    submitChampionPick,
+    submitKnockoutPick,
+    submitStandingsPick,
+    resetMyPredictions,
+  } = usePredictions(leagueId);
+
+  const championPrediction = myPredictionsByMatch.champion;
+  const standingsPrediction = myPredictionsByMatch.standings;
+  // "Adım adım" akış: 1) Lig Sıralaması (sürükle-bırak) HERKES için ilk adım
+  // -- bu yapılmadan haftalık skorlar/eleme turu/şampiyon sekmeleri kilitli
+  // kalır. 2) Haftalık skorlar. 3) Eleme turu (varsa). 4) En sonda şampiyon
+  // tahmini (varsa).
+  const [tab, setTab] = useState("standings");
+  const laterStagesUnlocked = !!standingsPrediction;
+
+  const [activeMatchday, setActiveMatchday] = useState(1);
+  const [teamFilter, setTeamFilter] = useState(""); // "" = tüm takımlar
+  const [drafts, setDrafts] = useState({});
+  const [submitting, setSubmitting] = useState({});
+  const [submitErrors, setSubmitErrors] = useState({});
+  const [championDraft, setChampionDraft] = useState("");
+  const [championSubmitting, setChampionSubmitting] = useState(false);
+  const [championError, setChampionError] = useState(null);
+  const [standingsDraft, setStandingsDraft] = useState(null);
+  const [standingsSubmitting, setStandingsSubmitting] = useState(false);
+  const [standingsError, setStandingsError] = useState(null);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const leaderboard = useMemo(() => (league ? buildLeaderboard(predictions, league) : []), [predictions, league]);
+
+  const activeMatches = useMemo(() => {
+    const all = fixture?.find((md) => md.number === activeMatchday)?.matches || [];
+    if (!teamFilter) return all;
+    return all.filter((m) => m.homeTeam.id === teamFilter || m.awayTeam.id === teamFilter);
+  }, [fixture, activeMatchday, teamFilter]);
+
+  const teamById = useMemo(() => Object.fromEntries(competition.teams.map((t) => [t.id, t])), [competition]);
+  const sortedTeams = useMemo(
+    () => [...competition.teams].sort((a, b) => a.name.localeCompare(b.name, "tr")),
+    [competition]
+  );
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setLinkCopied(true);
+      window.setTimeout(() => setLinkCopied(false), 2000);
+    } catch {
+      window.prompt("Linki kopyala:", window.location.href);
+    }
+  };
+
+  const handleStandingsSubmit = async () => {
+    const order = standingsDraft || sortedTeams.map((t) => t.id);
+    setStandingsSubmitting(true);
+    setStandingsError(null);
+    try {
+      await submitStandingsPick(order);
+      setTab("lig");
+    } catch (e) {
+      setStandingsError(describeFirestoreError(e));
+    } finally {
+      setStandingsSubmitting(false);
+    }
+  };
+
+  const [resettingMine, setResettingMine] = useState(false);
+  const [resetMineError, setResetMineError] = useState(null);
+  const handleResetMine = async () => {
+    if (!window.confirm("Bu ligdeki TÜM tahminlerini silmek istediğine emin misin? Bu işlem geri alınamaz.")) return;
+    setResettingMine(true);
+    setResetMineError(null);
+    try {
+      await resetMyPredictions();
+    } catch (e) {
+      setResetMineError(describeFirestoreError(e));
+    } finally {
+      setResettingMine(false);
+    }
+  };
+
+  const navigate = useNavigate();
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
+  const handleDeleteLeague = async () => {
+    if (
+      !window.confirm(
+        "Bu Tahmin Ligi'ni silmek, ligdeki HERKESİN tahminlerini kalıcı olarak silecek. Emin misin?"
+      )
+    )
+      return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteLeague();
+      navigate(`/${competitionKey}/tahmin-ligi`);
+    } catch (e) {
+      setDeleteError(describeFirestoreError(e));
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleDraftChange = (matchId, field, value) => {
+    setDrafts((prev) => ({ ...prev, [matchId]: { ...prev[matchId], [field]: value } }));
+  };
+
+  const handleSubmit = async (matchId) => {
+    const draft = drafts[matchId];
+    if (!draft || draft.home === "" || draft.away === "" || draft.home == null || draft.away == null) return;
+    setSubmitting((prev) => ({ ...prev, [matchId]: true }));
+    setSubmitErrors((prev) => ({ ...prev, [matchId]: null }));
+    try {
+      await submitScorePrediction(matchId, Number(draft.home), Number(draft.away));
+    } catch (e) {
+      setSubmitErrors((prev) => ({ ...prev, [matchId]: describeFirestoreError(e) }));
+    } finally {
+      setSubmitting((prev) => ({ ...prev, [matchId]: false }));
+    }
+  };
+
+  const handleChampionSubmit = async () => {
+    if (!championDraft) return;
+    setChampionSubmitting(true);
+    setChampionError(null);
+    try {
+      await submitChampionPick(championDraft);
+      setTab("leaderboard");
+    } catch (e) {
+      setChampionError(describeFirestoreError(e));
+    } finally {
+      setChampionSubmitting(false);
+    }
+  };
+
+  const [knockoutSubmitting, setKnockoutSubmitting] = useState({});
+  const [knockoutErrors, setKnockoutErrors] = useState({});
+  const handleKnockoutPick = async (tieId, pickedTeamId) => {
+    setKnockoutSubmitting((prev) => ({ ...prev, [tieId]: true }));
+    setKnockoutErrors((prev) => ({ ...prev, [tieId]: null }));
+    try {
+      await submitKnockoutPick(tieId, pickedTeamId);
+    } catch (e) {
+      setKnockoutErrors((prev) => ({ ...prev, [tieId]: describeFirestoreError(e) }));
+    } finally {
+      setKnockoutSubmitting((prev) => ({ ...prev, [tieId]: false }));
+    }
+  };
+
+  return (
+    <div className="page-shell">
+      <CompetitionStepper competitionKey={competitionKey} />
+      <AuthHeader competition={competition} title={league ? `🏆 ${league.name}` : `${competition.shortName} — Tahmin Ligi`} />
+
+      {user && (
+        <div className="prediction-league-toolbar">
+          <button className="btn-secondary btn-small" onClick={handleCopyLink}>
+            {linkCopied ? "✅ Kopyalandı" : "🔗 Davet Linkini Kopyala"}
+          </button>
+          <Link to={`/${competitionKey}/tahmin-ligi`} className="footnote">
+            ← Liglerim
+          </Link>
+          {league && (
+            <button className="btn-ghost btn-small" onClick={handleResetMine} disabled={resettingMine}>
+              {resettingMine ? "…" : "🔄 Tahminlerimi Sıfırla"}
             </button>
-            <button className={tab === "siralama" ? "active" : ""} onClick={() => setTab("siralama")}>
+          )}
+        </div>
+      )}
+      {resetMineError && <p style={{ color: "#f87171" }}>{resetMineError}</p>}
+
+      {user && leagueLoading && <p className="footnote">Lig kontrol ediliyor…</p>}
+
+      {user && leagueError && (
+        <div className="stats-callout" style={{ borderColor: "#f87171" }}>
+          <p style={{ color: "#f87171" }}>⚠️ {describeFirestoreError(leagueError)}</p>
+        </div>
+      )}
+
+      {user && !leagueLoading && !league && !leagueError && (
+        <div className="stats-callout">
+          <p>Bu link geçersiz ya da lig silinmiş olabilir.</p>
+          <Link to={`/${competitionKey}/tahmin-ligi`} className="btn-primary">
+            Tahmin Ligi'ne Dön
+          </Link>
+        </div>
+      )}
+
+      {user && league && fixture && (
+        <>
+          <p className="footnote">
+            {hasDraw && (
+              <>
+                <b>{CHAMPION_PICK_POINTS} puan</b> şampiyon tahmini ·{" "}
+              </>
+            )}
+            <b>5 puan</b> tam skor · <b>3 puan</b> doğru sonuç + doğru gol farkı · <b>1 puan</b> sadece doğru sonuç
+            {hasDraw && (
+              <>
+                {" "}
+                · eleme turunda doğru tahmin, tur ilerledikçe (<b>{KNOCKOUT_TIE_POINTS[0]}</b>→
+                <b>{KNOCKOUT_TIE_POINTS[3]}</b> puan) daha değerli.
+              </>
+            )}
+          </p>
+
+          <div className="stats-tabs">
+            <button className={tab === "standings" ? "active" : ""} onClick={() => setTab("standings")}>
+              1. Lig Sıralaması
+            </button>
+            <button
+              className={tab === "lig" ? "active" : ""}
+              onClick={() => laterStagesUnlocked && setTab("lig")}
+              disabled={!laterStagesUnlocked}
+              title={laterStagesUnlocked ? "" : "Önce lig sıralaması tahminini yap"}
+            >
+              2. Haftalık Skorlar
+            </button>
+            {league.knockout && (
+              <button
+                className={tab === "eleme" ? "active" : ""}
+                onClick={() => laterStagesUnlocked && setTab("eleme")}
+                disabled={!laterStagesUnlocked}
+                title={laterStagesUnlocked ? "" : "Önce lig sıralaması tahminini yap"}
+              >
+                3. Eleme Turu
+              </button>
+            )}
+            {hasDraw && (
+              <button
+                className={tab === "sampiyon" ? "active" : ""}
+                onClick={() => laterStagesUnlocked && setTab("sampiyon")}
+                disabled={!laterStagesUnlocked}
+                title={laterStagesUnlocked ? "" : "Önce lig sıralaması tahminini yap"}
+              >
+                4. Şampiyon Tahmini
+              </button>
+            )}
+            <button className={tab === "leaderboard" ? "active" : ""} onClick={() => setTab("leaderboard")}>
               🏅 Sıralama
             </button>
           </div>
 
-          {tab === "maclar" && (
+          {tab === "standings" && (
+            <div className="chart-card chart-card-wide">
+              <h3>🖐️ Lig Sıralamasını Sürükle-Bırak ile Tahmin Et</h3>
+              {standingsPrediction ? (
+                <div className="prediction-champion-result">
+                  <p className="footnote">
+                    Tahminini kaydettin -- gerçek sıralama, sezonun geri kalanı (haftalık skorlar/eleme turu/şampiyon)
+                    açığa çıktıkça netleşecek. Puanın: her takım için tahmin ettiğin sıra gerçeğe ne kadar yakınsa o
+                    kadar puan (tam isabet = 3, ±1 sıra = 2, ±2 sıra = 1).
+                  </p>
+                  <p>
+                    <b>{pointsForPrediction(standingsPrediction, league)} puan</b> (şu ana kadarki hesaplama)
+                  </p>
+                  <button className="btn-secondary btn-small" onClick={() => setTab("lig")}>
+                    Haftalık Skorlara Geç →
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <p className="footnote">
+                    Kura tamamlandı, eşleşmeler belli oldu -- lig aşaması başlamadan ÖNCE, final puan durumunu
+                    (1'den son sıraya) tahmin et. Bu, Tahmin Ligi'nin İLK adımı; diğer sekmeler bunu tamamlayana kadar
+                    kilitli kalır.
+                  </p>
+                  <DragStandings
+                    teams={competition.teams}
+                    order={standingsDraft || sortedTeams.map((t) => t.id)}
+                    onReorder={setStandingsDraft}
+                    zones={competition.zones}
+                  />
+                  <button
+                    className="btn-primary"
+                    onClick={handleStandingsSubmit}
+                    disabled={standingsSubmitting}
+                    style={{ marginTop: 12 }}
+                  >
+                    {standingsSubmitting ? "Kaydediliyor…" : "Tahminimi Kaydet"}
+                  </button>
+                  {standingsError && <p style={{ color: "#f87171" }}>{standingsError}</p>}
+                </>
+              )}
+            </div>
+          )}
+
+          {tab === "sampiyon" && hasDraw && laterStagesUnlocked && (
+            <div className="chart-card chart-card-wide">
+              <h3>🔮 Son Tahmin: Şampiyon Kim Olur?</h3>
+              {championPrediction ? (
+                <div className="prediction-champion-result">
+                  <p>
+                    Tahminin: <b>{teamById[championPrediction.pickedTeamId]?.name || "?"}</b>
+                  </p>
+                  {league.knockout?.champion ? (
+                    <p>
+                      Gerçek şampiyon: <b>{teamById[league.knockout.champion]?.name || "?"}</b>{" "}
+                      <span
+                        className={`prediction-points prediction-points-${
+                          league.knockout.champion === championPrediction.pickedTeamId ? 5 : 0
+                        }`}
+                      >
+                        ({pointsForPrediction(championPrediction, league)} puan)
+                      </span>
+                    </p>
+                  ) : (
+                    <p className="footnote">Eleme turu henüz oynanmadı -- şampiyon belli olunca burada göreceksin.</p>
+                  )}
+                  <button className="btn-secondary btn-small" onClick={() => setTab("leaderboard")}>
+                    Sıralamaya Bak →
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <p className="footnote">
+                    Bu, Tahmin Ligi'nin SON adımı -- lig sıralaması, haftalık skorlar ve eleme turu tahminlerini
+                    yaptıktan sonra, her şeyi göz önünde bulundurarak kimin şampiyon olacağına karar ver. Doğru
+                    bilirsen <b>{CHAMPION_PICK_POINTS} puan</b> kazanırsın (Tahmin Ligi'ndeki en yüksek tekil puan).
+                  </p>
+                  <div className="prediction-champion-picker">
+                    <select value={championDraft} onChange={(e) => setChampionDraft(e.target.value)}>
+                      <option value="">Bir takım seç…</option>
+                      {sortedTeams.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.name}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      className="btn-primary"
+                      onClick={handleChampionSubmit}
+                      disabled={!championDraft || championSubmitting}
+                    >
+                      {championSubmitting ? "Kaydediliyor…" : "Tahminimi Kaydet"}
+                    </button>
+                  </div>
+                  {championError && <p style={{ color: "#f87171" }}>{championError}</p>}
+                </>
+              )}
+            </div>
+          )}
+
+          {tab === "lig" && laterStagesUnlocked && (
             <>
-              <MatchdayTabs matchdays={fixture} active={activeMatchday} onSelect={setActiveMatchday} />
+              <div className="prediction-league-filter-row">
+                <MatchdayTabs matchdays={fixture} active={activeMatchday} onSelect={setActiveMatchday} />
+                <select
+                  value={teamFilter}
+                  onChange={(e) => setTeamFilter(e.target.value)}
+                  className="prediction-team-filter"
+                  aria-label="Takıma göre filtrele"
+                >
+                  <option value="">Tüm takımlar</option>
+                  {sortedTeams.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div className="chart-card chart-card-wide prediction-league-matches">
+                {activeMatches.length === 0 && (
+                  <p className="footnote">Bu hafta, seçtiğin takımın oynadığı bir maç yok.</p>
+                )}
                 {activeMatches.map((m) => {
                   const mine = myPredictionsByMatch[m.id];
-                  const actual = season.results[m.id];
+                  const actual = league.results[m.id];
                   const draft = drafts[m.id] || {};
                   const points = mine && actual ? scorePrediction(mine, actual) : null;
+                  const others = mine ? othersPredictionsByMatch[m.id] || [] : [];
                   return (
-                    <div key={m.id} className="prediction-row">
-                      <div className="prediction-row-team">
-                        <Crest team={m.homeTeam} size={22} />
-                        <span>{m.homeTeam.name}</span>
-                      </div>
-
-                      {mine ? (
-                        <div className="prediction-row-result">
-                          <span className="prediction-row-mine">
-                            {mine.homeGoals} - {mine.awayGoals}
-                          </span>
-                          <span className="prediction-row-actual">
-                            {actual ? `Gerçek: ${actual.homeGoals} - ${actual.awayGoals}` : "Gerçek: ?"}
-                            {points != null && (
-                              <b className={`prediction-points prediction-points-${points}`}>
-                                {" "}
-                                {POINT_LABEL[points]} (+{points})
-                              </b>
-                            )}
-                          </span>
+                    <div key={m.id} className="prediction-row-wrap">
+                      <div className="prediction-row">
+                        <div className="prediction-row-team">
+                          <Crest team={m.homeTeam} size={22} />
+                          <span>{m.homeTeam.name}</span>
                         </div>
-                      ) : (
-                        <div className="prediction-row-input">
-                          <input
-                            type="number"
-                            min="0"
-                            max="20"
-                            value={draft.home ?? ""}
-                            onChange={(e) => handleDraftChange(m.id, "home", e.target.value)}
-                            className="prediction-score-input"
-                            aria-label={`${m.homeTeam.name} tahmini gol`}
-                          />
-                          <span>-</span>
-                          <input
-                            type="number"
-                            min="0"
-                            max="20"
-                            value={draft.away ?? ""}
-                            onChange={(e) => handleDraftChange(m.id, "away", e.target.value)}
-                            className="prediction-score-input"
-                            aria-label={`${m.awayTeam.name} tahmini gol`}
-                          />
-                          <button
-                            className="btn-primary btn-small"
-                            onClick={() => handleSubmit(m.id)}
-                            disabled={submitting[m.id]}
-                          >
-                            {submitting[m.id] ? "…" : "Tahmin Et"}
-                          </button>
+
+                        {mine ? (
+                          <div className="prediction-row-result">
+                            <span className="prediction-row-mine">
+                              {mine.homeGoals} - {mine.awayGoals}
+                            </span>
+                            <span className="prediction-row-actual">
+                              {actual ? `Gerçek: ${actual.homeGoals} - ${actual.awayGoals}` : "Gerçek: ?"}
+                              {points != null && (
+                                <b className={`prediction-points prediction-points-${points}`}>
+                                  {" "}
+                                  {POINT_LABEL[points]} (+{points})
+                                </b>
+                              )}
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="prediction-row-input">
+                            <input
+                              type="number"
+                              min="0"
+                              max="20"
+                              value={draft.home ?? ""}
+                              onChange={(e) => handleDraftChange(m.id, "home", e.target.value)}
+                              className="prediction-score-input"
+                              aria-label={`${m.homeTeam.name} tahmini gol`}
+                            />
+                            <span>-</span>
+                            <input
+                              type="number"
+                              min="0"
+                              max="20"
+                              value={draft.away ?? ""}
+                              onChange={(e) => handleDraftChange(m.id, "away", e.target.value)}
+                              className="prediction-score-input"
+                              aria-label={`${m.awayTeam.name} tahmini gol`}
+                            />
+                            <button
+                              className="btn-primary btn-small"
+                              onClick={() => handleSubmit(m.id)}
+                              disabled={submitting[m.id]}
+                            >
+                              {submitting[m.id] ? "…" : "Tahmin Et"}
+                            </button>
+                            {submitErrors[m.id] && (
+                              <span className="footnote" style={{ color: "#f87171" }}>
+                                {submitErrors[m.id]}
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        <div className="prediction-row-team prediction-row-team-away">
+                          <span>{m.awayTeam.name}</span>
+                          <Crest team={m.awayTeam} size={22} />
+                        </div>
+                      </div>
+                      {others.length > 0 && (
+                        <div className="prediction-others-row">
+                          {others.map((o) => (
+                            <span key={o.uid} className="prediction-others-chip">
+                              <Avatar photoURL={o.photoURL} name={o.displayName} size={16} /> {o.displayName}:{" "}
+                              {o.homeGoals}-{o.awayGoals}
+                            </span>
+                          ))}
                         </div>
                       )}
-
-                      <div className="prediction-row-team prediction-row-team-away">
-                        <span>{m.awayTeam.name}</span>
-                        <Crest team={m.awayTeam} size={22} />
-                      </div>
                     </div>
                   );
                 })}
@@ -263,9 +747,90 @@ function PredictionLeagueContent() {
             </>
           )}
 
-          {tab === "siralama" && (
+          {tab === "eleme" && laterStagesUnlocked && league.knockout && (
+            <div className="chart-card chart-card-wide prediction-league-matches">
+              {league.knockout.rounds.map((round) => (
+                <div key={round.name} className="prediction-knockout-round">
+                  <h3>{round.name}</h3>
+                  {round.ties.map((tie) => {
+                    const teamA = teamById[tie.teamAId];
+                    const teamB = teamById[tie.teamBId];
+                    const mine = myPredictionsByMatch[tie.id];
+                    const pts = mine ? pointsForPrediction(mine, league) : null;
+                    const others = mine ? othersPredictionsByMatch[tie.id] || [] : [];
+                    return (
+                      <div key={tie.id} className="prediction-row-wrap">
+                        <div className="prediction-row">
+                          <div className="prediction-row-team">
+                            <Crest team={teamA} size={22} />
+                            <span>{teamA?.name}</span>
+                          </div>
+
+                          {mine ? (
+                            <div className="prediction-row-result">
+                              <span className="prediction-row-mine">
+                                Tahminin: {teamById[mine.pickedTeamId]?.short}
+                              </span>
+                              <span className="prediction-row-actual">
+                                Kazanan: {teamById[tie.winnerId]?.short} ({tie.aggA}-{tie.aggB})
+                                {pts != null && (
+                                  <b className={`prediction-points prediction-points-${pts > 0 ? 5 : 0}`}>
+                                    {" "}
+                                    (+{pts} puan)
+                                  </b>
+                                )}
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="prediction-row-input">
+                              <button
+                                className="btn-secondary btn-small"
+                                onClick={() => handleKnockoutPick(tie.id, teamA.id)}
+                                disabled={knockoutSubmitting[tie.id]}
+                              >
+                                {teamA?.short} kazanır
+                              </button>
+                              <button
+                                className="btn-secondary btn-small"
+                                onClick={() => handleKnockoutPick(tie.id, teamB.id)}
+                                disabled={knockoutSubmitting[tie.id]}
+                              >
+                                {teamB?.short} kazanır
+                              </button>
+                              {knockoutErrors[tie.id] && (
+                                <span className="footnote" style={{ color: "#f87171" }}>
+                                  {knockoutErrors[tie.id]}
+                                </span>
+                              )}
+                            </div>
+                          )}
+
+                          <div className="prediction-row-team prediction-row-team-away">
+                            <span>{teamB?.name}</span>
+                            <Crest team={teamB} size={22} />
+                          </div>
+                        </div>
+                        {others.length > 0 && (
+                          <div className="prediction-others-row">
+                            {others.map((o) => (
+                              <span key={o.uid} className="prediction-others-chip">
+                                <Avatar photoURL={o.photoURL} name={o.displayName} size={16} /> {o.displayName}:{" "}
+                                {teamById[o.pickedTeamId]?.short}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {tab === "leaderboard" && (
             <div className="chart-card chart-card-wide">
-              <h3>🏅 {competition.shortName} Tahmin Ligi Sıralaması</h3>
+              <h3>🏅 {league.name} Sıralaması</h3>
               {leaderboard.length === 0 ? (
                 <p className="footnote">Henüz kimse tahmin girmedi -- ilk sen ol!</p>
               ) : (
@@ -283,7 +848,7 @@ function PredictionLeagueContent() {
                       <tr key={row.uid} className={user && row.uid === user.uid ? "sorted" : ""}>
                         <td>{i + 1}</td>
                         <td className="table-team-cell">
-                          {row.photoURL && <img src={row.photoURL} alt="" className="prediction-league-avatar-sm" />}
+                          <Avatar photoURL={row.photoURL} name={row.displayName} size={20} />
                           {row.displayName}
                         </td>
                         <td>{row.predicted}</td>
@@ -295,16 +860,24 @@ function PredictionLeagueContent() {
                   </tbody>
                 </table>
               )}
+
+              <div className="prediction-danger-zone">
+                <p className="footnote">Bu Tahmin Ligi'ni tamamen silmek -- HERKESİN tahminini ve puanını kalıcı olarak silmek -- istersen:</p>
+                <button className="btn-secondary btn-small" onClick={handleDeleteLeague} disabled={deleting}>
+                  {deleting ? "Siliniyor…" : "🗑️ Bu Ligi Sil"}
+                </button>
+                {deleteError && <p style={{ color: "#f87171" }}>{deleteError}</p>}
+              </div>
             </div>
           )}
         </>
       )}
 
       <p className="footnote">
-        Not: Gerçek skorlar teknik olarak ortak sezon kaydında (Firestore)
-        saklanır -- arayüz, sen tahmin etmeden o maçın sonucunu gizler, ama bu
-        sunucu tarafı bir garanti değildir; tamamen dürüst oyuncular için
-        tasarlanmış bir deneyimdir.
+        Not: Gerçek skorlar teknik olarak lig kaydında (Firestore) saklanır --
+        arayüz, sen tahmin etmeden o maçın sonucunu (ve diğerlerinin
+        tahminlerini) gizler, ama bu sunucu tarafı bir garanti değildir;
+        tamamen dürüst oyuncular için tasarlanmış bir deneyimdir.
       </p>
     </div>
   );
