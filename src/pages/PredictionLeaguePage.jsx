@@ -15,6 +15,26 @@ import Crest from "../components/Crest.jsx";
 
 const POINT_LABEL = { 5: "Tam İsabet!", 3: "Sonuç + Fark", 1: "Sonuç Doğru", 0: "Iskaladın" };
 
+// Firebase, giriş hatalarını ham bir `error.code` (ör. "auth/configuration-not-found")
+// olarak fırlatır -- bunlar Firebase Console'da eksik bir kurulum adımına
+// işaret eder, kullanıcının anlayabileceği bir dile çeviriyoruz.
+function describeAuthError(error) {
+  const code = error?.code || "";
+  if (code === "auth/configuration-not-found") {
+    return "Firebase projesinde Authentication henüz kurulmamış görünüyor -- Firebase Console'da Authentication -> Sign-in method -> Google'ı etkinleştirmen gerekiyor.";
+  }
+  if (code === "auth/popup-blocked") {
+    return "Tarayıcı giriş penceresini engelledi -- bu site için pop-up engelleyiciyi kapatıp tekrar dene.";
+  }
+  if (code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+    return null; // kullanıcı bilerek kapattı, hata göstermeye gerek yok
+  }
+  if (code === "auth/unauthorized-domain") {
+    return "Bu site adresi Firebase projesinde yetkili domainler listesinde değil -- Authentication -> Settings -> Authorized domains'e eklenmesi gerekiyor.";
+  }
+  return error?.message || "Giriş yapılamadı, lütfen tekrar dene.";
+}
+
 // PredictionLeagueProvider (dolayısıyla firebase/auth + firebase/firestore
 // paketleri) BİLEREK bu sayfaya ÖZEL, yerel bir sarmalayıcıda tutuluyor --
 // main.jsx'te GLOBAL olarak sarılsaydı, Firebase SDK'sı (~470KB) Tahmin
@@ -42,6 +62,21 @@ function PredictionLeagueContent() {
   const [startError, setStartError] = useState(null);
   const [drafts, setDrafts] = useState({});
   const [submitting, setSubmitting] = useState({});
+  const [signingIn, setSigningIn] = useState(false);
+  const [signInError, setSignInError] = useState(null);
+
+  const handleSignIn = async () => {
+    setSigningIn(true);
+    setSignInError(null);
+    try {
+      await signInWithGoogle();
+    } catch (e) {
+      const message = describeAuthError(e);
+      if (message) setSignInError(message);
+    } finally {
+      setSigningIn(false);
+    }
+  };
 
   const leaderboard = useMemo(
     () => (season ? buildLeaderboard(predictions, season.results) : []),
@@ -110,9 +145,10 @@ function PredictionLeagueContent() {
       {!authLoading && !user && (
         <div className="stats-callout prediction-league-signin">
           <p>Tahmin Ligi'ne katılmak için Google hesabınla giriş yapmalısın.</p>
-          <button className="btn-primary" onClick={signInWithGoogle}>
-            🔑 Google ile Giriş Yap
+          <button className="btn-primary" onClick={handleSignIn} disabled={signingIn}>
+            {signingIn ? "Giriş yapılıyor…" : "🔑 Google ile Giriş Yap"}
           </button>
+          {signInError && <p style={{ color: "#f87171" }}>{signInError}</p>}
         </div>
       )}
 
