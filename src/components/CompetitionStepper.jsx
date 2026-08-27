@@ -71,6 +71,10 @@ export default function CompetitionStepper({ competitionKey }) {
         <Link to={`${base}/istatistik`}>İstatistikler</Link>
         <span aria-hidden="true">·</span>
         <Link to={`${base}/karsilikli`}>Karşılıklı Geçmiş</Link>
+        <span aria-hidden="true">·</span>
+        <Link to={`${base}/tahmin-ligi`} className="stepper-prediction-league-link">
+          🏆 Tahmin Ligi
+        </Link>
       </div>
     </div>
   );

@@ -37,6 +37,7 @@ const AchievementsPage = lazy(() => import('./pages/AchievementsPage.jsx'))
 const SettingsPage = lazy(() => import('./pages/SettingsPage.jsx'))
 const TeamProfilePage = lazy(() => import('./pages/TeamProfilePage.jsx'))
 const PlayerProfilePage = lazy(() => import('./pages/PlayerProfilePage.jsx'))
+const PredictionLeaguePage = lazy(() => import('./pages/PredictionLeaguePage.jsx'))
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -71,6 +72,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                             <Route path="/:competitionKey/eleme-turu" element={<KnockoutPage />} />
                             <Route path="/:competitionKey/takim/:teamId" element={<TeamProfilePage />} />
                             <Route path="/:competitionKey/oyuncu/:playerId" element={<PlayerProfilePage />} />
+                            <Route path="/:competitionKey/tahmin-ligi" element={<PredictionLeaguePage />} />
                           </Routes>
                         </Suspense>
                       </SeasonArchiveProvider>

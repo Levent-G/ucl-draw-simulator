@@ -1,0 +1,50 @@
+rules_version = '2';
+
+// Tahmin Ligi modülü için Firestore güvenlik kuralları.
+// UYGULAMA: Bu dosyanın kodu bu repoda tutulur ama BURADAN otomatik olarak
+// Firebase projenize DEPLOY EDİLMEZ -- Firebase konsolunda
+// (console.firebase.google.com -> projeniz -> Firestore Database -> Rules
+// sekmesi) bu dosyanın içeriğini yapıştırıp "Yayınla" demeniz gerekir. (Ya da
+// Firebase CLI kuruluysa: `firebase deploy --only firestore:rules`.)
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // seasons/{competitionKey}: bir yarışma için ORTAK tahmin ligi sezonu
+    // (kura + fikstür + gerçek sonuçlar). Herkes (giriş yapmış herhangi bir
+    // kullanıcı) okuyabilir. Sadece HENÜZ YOKSA oluşturulabilir (ilk basan
+    // kazanır) -- oluşturulduktan sonra client'tan bir daha
+    // güncellenemez/silinemez, böylece bir sezon başladıktan sonra kimse
+    // (yanlışlıkla ya da kasıtlı olarak) fikstürü/sonuçları değiştirip
+    // tahminleri geçersiz kılamaz.
+    match /seasons/{competitionKey} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+                    && request.resource.data.createdBy == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    // predictions/{predictionId}: predictionId HER ZAMAN
+    // "{competitionKey}_{matchId}_{uid}" biçiminde olmalı -- bu, bir
+    // kullanıcının aynı maça birden fazla (çakışan) tahmin belgesi
+    // oluşturmasını yapısal olarak imkansız kılar (aynı id'yi tekrar
+    // "create" etmeye çalışmak zaten izin verilmeyen bir update sayılır).
+    // Bir kullanıcı SADECE kendi uid'siyle etiketlenmiş bir tahmin
+    // oluşturabilir, ve tahminler oluşturulduktan sonra DEĞİŞTİRİLEMEZ
+    // (gerçek sonucu gördükten sonra geriye dönüp "düzeltme" yapılamasın
+    // diye) -- bu, dürüst oyuncular için tasarlanmış hafif bir önlemdir,
+    // sonuçlar `seasons/{competitionKey}` içinde herkesin okuyabildiği bir
+    // alanda tutulduğundan (Cloud Functions olmadan tam bir "sunucu
+    // onaylamadan sonucu gösterme" garantisi verilemez -- bkz.
+    // PredictionLeagueContext.jsx başındaki not).
+    match /predictions/{predictionId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+                    && request.resource.data.uid == request.auth.uid
+                    && predictionId ==
+                       request.resource.data.competitionKey + '_' +
+                       request.resource.data.matchId + '_' +
+                       request.auth.uid;
+      allow update, delete: if false;
+    }
+  }
+}
