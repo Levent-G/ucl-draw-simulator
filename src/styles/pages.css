@@ -3481,12 +3481,21 @@ a.team-profile-match-row:hover {
   border-radius: 999px;
   padding: 3px 8px 3px 4px;
 }
-.prediction-guess-hit {
-  color: #22c55e;
-  font-weight: 600;
+.prediction-others-list {
+  width: 100%;
+  border-top: 1px dashed var(--line);
+  padding-top: 10px;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
-.prediction-league-draw-hint {
-  font-size: 13px;
+.prediction-other-full-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--text-dim);
 }
 .live-not-started-note {
   font-size: 12.5px;

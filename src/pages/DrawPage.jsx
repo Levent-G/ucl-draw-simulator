@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useCompetition } from "../state/CompetitionContext.jsx";
 import { generateFullDraw, buildAnnouncementPlan } from "../utils/drawEngine.js";
 import { createEmptyResults } from "../utils/resultsHelpers.js";
@@ -90,166 +90,9 @@ function isResultsComplete(results, teams) {
   return true;
 }
 
-// Sadece ?tahminLigi=1 ile buraya yönlendirilmiş bir kura tamamlandığında
-// gösterilir. Firebase'i (Auth + Firestore) TAMAMEN dinamik import ile
-// yükler -- DrawPage her kullanıcı için (Tahmin Ligi'yle hiç ilgilenmeyenler
-// dahil) her zaman yüklenen bir sayfa olduğundan, buraya statik bir Firebase
-// import'u main bundle'ı büyütürdü (bkz. PredictionLeaguePage.jsx'teki AYNI
-// endişe). `auth`/`db` tekil (singleton) modüller olduğundan, kullanıcı bu
-// akışa girmeden önce Tahmin Ligi sayfasında zaten giriş yapmış olmalı --
-// dinamik import burada AYNI modül örneğine ulaşır, oturum durumu korunur.
-// auth.currentUser bazen (özellikle bu sayfaya doğrudan/yeni bir sekmede
-// gelindiğinde) Firebase'in tarayıcı depolamasından oturumu geri yükleme
-// işlemi HENÜZ bitmediği için bir an null görünebilir -- bunu senkron
-// olarak kontrol etmek, kullanıcı AslıNDA giriş yapmış olsa bile yanlışlıkla
-// "önce giriş yap" hatası verdirebiliyordu. Bunun yerine ilk
-// onAuthStateChanged tetiklenişini (zaten giriş yapılmışsa neredeyse anında
-// gelir) bekliyoruz.
-function waitForAuthUser(auth, onAuthStateChanged) {
-  return new Promise((resolve) => {
-    const unsub = onAuthStateChanged(auth, (u) => {
-      unsub();
-      resolve(u);
-    });
-  });
-}
-
-// PredictionLeaguePage.jsx'teki describeFirestoreError ile AYNI mesajlar --
-// burada (Firebase'i statik import etmemek için) bilerek küçük bir kopyası
-// tutuluyor.
-function describeFirestoreErrorLocal(error) {
-  const code = error?.code || "";
-  const message = error?.message || "";
-  if (code === "unavailable" || message.includes("client is offline")) {
-    return "Firestore'a bağlanılamadı. Bu genelde Firebase Console'da Firestore Database'in henüz oluşturulmamış olmasından kaynaklanır.";
-  }
-  if (code === "permission-denied") {
-    return "Firestore bu isteği reddetti (permission-denied) -- firestore.rules dosyasının içeriğini Firebase Console -> Firestore Database -> Rules sekmesine yapıştırıp Yayınla demen gerekiyor.";
-  }
-  if (code === "failed-precondition") {
-    return "Firestore Database projede henüz oluşturulmamış görünüyor -- Firebase Console -> Firestore Database -> Create database.";
-  }
-  return message || "Oluşturulamadı, tekrar dene.";
-}
-
-function PredictionLeagueTransferCta({ competitionKey, results, favoriteTeamId, predictions }) {
-  const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(null);
-  const ctaRef = useRef(null);
-
-  // Kura bitip bu CTA ekrana gelince (bkz. handleStart -> tableSectionRef'e
-  // scroll), kullanıcı hâlâ yukarıda kura tablosuna bakıyor olabilir -- bu
-  // düğme görünür alanın dışında kalıp fark edilmeyebiliyordu. Göründüğü an
-  // kendini görünüre kaydırıyoruz.
-  useEffect(() => {
-    ctaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-  }, []);
-
-  const handleTransfer = async () => {
-    setSubmitting(true);
-    setError(null);
-    try {
-      const [{ auth, db }, firestore, { buildLeaguePayload }] = await Promise.all([
-        import("../lib/firebase.js"),
-        import("firebase/firestore"),
-        import("../state/PredictionLeagueContext.jsx"),
-      ]);
-      const { addDoc, collection, doc, setDoc, serverTimestamp } = firestore;
-      const { onAuthStateChanged } = await import("firebase/auth");
-      const user = auth.currentUser || (await waitForAuthUser(auth, onAuthStateChanged));
-      if (!user) {
-        setError("Önce Tahmin Ligi sayfasından Google ile giriş yapmalısın, sonra buraya dönüp tekrar dene.");
-        return;
-      }
-      // Bu kura, bir ÖNCEKİ ziyarette Tahmin Ligi tarafından mı başlatıldı
-      // (bkz. PredictionLeaguePage: "Kura Çek" -> buraya ?tahminLigi=1 ile
-      // yönlendirir) yoksa kullanıcı bu kurayı sıradan bir kura olarak mı
-      // çekti fark etmez -- her iki durumda da GERÇEKTEN İZLEDİĞİ bu kura
-      // (results) yeni bir lig odasının temelini oluşturur.
-      const payload = await buildLeaguePayload(competitionKey, null, results);
-      const leagueRef = await addDoc(collection(db, "leagues"), {
-        ...payload,
-        name: name.trim() || `${competitionKey.toUpperCase()} Tahmin Ligi`,
-        createdBy: user.uid,
-        createdByName: user.displayName || "Bilinmeyen",
-        createdAt: serverTimestamp(),
-      });
-      await setDoc(doc(db, "memberships", `${leagueRef.id}_${user.uid}`), {
-        leagueId: leagueRef.id,
-        competitionKey,
-        uid: user.uid,
-        displayName: user.displayName || "Bilinmeyen",
-        photoURL: user.photoURL || null,
-        joinedAt: serverTimestamp(),
-      });
-      // Kullanıcı, kura başlamadan ÖNCE (bkz. FavoriteTeamPicker, phase==="idle"
-      // iken görünen "3 rakip tahmin et" kutusu) tuttuğu takım için rakip
-      // tahmini yaptıysa, bunu da ligin İLK tahmini olarak kaydediyoruz --
-      // Tahmin Ligi akışının "önce kura eşleşmesini tahmin et, sonra lig
-      // sıralamasını tahmin et" sırasını başlatan adım budur. Bu tahmin SADECE
-      // kurayı o an İZLEYEN kişi tarafından yapılabilir (kura bir kez çekilir),
-      // bu yüzden burada -- ligin ta kendisiyle birlikte -- kaydediliyor.
-      if (favoriteTeamId && predictions?.length > 0) {
-        await setDoc(doc(db, "predictions", `${leagueRef.id}_draw_${user.uid}`), {
-          uid: user.uid,
-          displayName: user.displayName || "Bilinmeyen",
-          photoURL: user.photoURL || null,
-          leagueId: leagueRef.id,
-          matchId: "draw",
-          kind: "draw",
-          favoriteTeamId,
-          guesses: predictions,
-          createdAt: serverTimestamp(),
-        });
-      }
-      navigate(`/${competitionKey}/tahmin-ligi/${leagueRef.id}`);
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error("Tahmin Ligi oluşturulamadı ->", e);
-      setError(describeFirestoreErrorLocal(e));
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  return (
-    <div className="stats-callout prediction-league-transfer-cta" ref={ctaRef}>
-      <p>🏆 Bu kurayla yeni bir Tahmin Ligi odası oluştur -- linkini arkadaşlarınla paylaşınca onlar da bu AYNI eşleşmeleri görüp tahmin edecek.</p>
-      {favoriteTeamId && predictions?.length > 0 && (
-        <p className="footnote">
-          🔮 Kura başlamadan önceki "{predictions.length} rakip" tahminin de bu ligin ilk tahmini olarak kaydedilecek.
-        </p>
-      )}
-      <div className="prediction-league-transfer-form">
-        <input
-          type="text"
-          placeholder={`Lig adı (opsiyonel, ör. "${competitionKey.toUpperCase()} Arkadaş Grubu")`}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="prediction-score-input prediction-league-name-input"
-        />
-        <button className="btn-primary" onClick={handleTransfer} disabled={submitting}>
-          {submitting ? "Oluşturuluyor…" : "✅ Tahmin Ligi Oluştur"}
-        </button>
-      </div>
-      {error && <p style={{ color: "#f87171" }}>{error}</p>}
-    </div>
-  );
-}
-
 export default function DrawPage() {
   const { competitionKey } = useParams();
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  // Tahmin Ligi'nin "Kura Çek" düğmesi buraya ?tahminLigi=1 ile yönlendirir --
-  // kura biter bitmez ekstra bir "Tahmin Ligi'ne Aktar" butonu gösteriyoruz
-  // (bkz. aşağıdaki PredictionLeagueTransferCta). Firebase/Firestore bu
-  // sayfada HİÇ import edilmiyor (bundle boyutu için, bkz.
-  // PredictionLeaguePage.jsx'teki not) -- o kod sadece butona tıklanınca
-  // dinamik import ile yüklenir.
-  const forPredictionLeague = searchParams.get("tahminLigi") === "1";
   const {
     competition,
     setDrawResults,
@@ -692,13 +535,6 @@ export default function DrawPage() {
 
       {error && <p style={{ color: "#f87171" }}>{error}</p>}
 
-      {phase === "idle" && forPredictionLeague && (
-        <div className="stats-callout prediction-league-draw-hint">
-          🔮 Tahmin Ligi'nin İLK adımı burada: kura başlamadan önce tuttuğun bir takım seçip onun 3 rakibini tahmin
-          et -- kura çekilince kaç tanesini bildiğin, ligdeki ilk puanın olacak.
-        </div>
-      )}
-
       {phase === "idle" && (
         <FavoriteTeamPicker
           teams={TEAMS}
@@ -738,14 +574,6 @@ export default function DrawPage() {
 
       {phase === "done" && (
         <>
-          {forPredictionLeague && (
-            <PredictionLeagueTransferCta
-              competitionKey={competitionKey}
-              results={results}
-              favoriteTeamId={favoriteTeamId}
-              predictions={predictions}
-            />
-          )}
           <FinalFavoriteSummary
             teams={TEAMS}
             results={results}

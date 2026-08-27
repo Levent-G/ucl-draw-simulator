@@ -121,21 +121,16 @@ export function usePredictionAuth() {
 // SIKIŞTIRILMIŞ bir biçime çevirir -- takım nesnelerinin kendisi (logo
 // import'ları dahil) hiçbir zaman Firestore'a yazılmaz, sadece id'ler.
 //
-// providedDrawResults (opsiyonel, sadece "swiss" formatta anlamlı): GERÇEK
-// kura çekimi ekranından (DrawPage.jsx) gelen, kullanıcının bizzat izlediği/
-// çektiği bir kuranın `results` çıktısı ({ teamId: { pot: {home,away} } }
-// şeklinde, DrawPage zaten bu şekle çeviriyor). Verilmişse YENİ bir kura
-// ÜRETİLMEZ, doğrudan bu kullanılır -- "Kura Çek" akışının (bkz.
-// PredictionLeaguePage: kura ekranına git, kura çek, geri dön) amacı tam
-// olarak bu: yeni lig, arka planda sessizce üretilen başka bir kura değil,
-// kullanıcının GERÇEKTEN İZLEDİĞİ o kurayı kullansın. Verilmezse (headless
-// senaryo) generateFullDraw ile taze bir kura üretilir.
+// Kura çekimi ekranından TAMAMEN BAĞIMSIZ çalışır -- kullanıcı hiçbir
+// animasyon izlemeden, doğrudan burada arka planda (headless) bir kura +
+// fikstür + simülasyon üretilir. Puanlama şu an bu şekilde üretilen
+// kurgusal simülasyona göre hesaplanıyor; gerçek/canlı sonuçlara göre
+// puanlama ayrı bir iyileştirme olarak ileride eklenecek.
 //
 // onProgress(stage): "draw" | "fixture" | "simulate" | "knockout" | "save"
-// aşamalarını sırayla bildirir -- kullanıcı önce kuranın, sonra fikstürün,
-// sonra simülasyonun bittiğini GÖREREK bekler, arayüz hepsi bitene kadar
-// (tek bir opak "Oluşturuluyor…" yerine) hangi adımda olduğunu gösterir.
-export async function buildLeaguePayload(competitionKey, onProgress, providedDrawResults) {
+// aşamalarını sırayla bildirir -- arayüz hepsi bitene kadar (tek bir opak
+// "Oluşturuluyor…" yerine) hangi adımda olduğunu gösterir.
+export async function buildLeaguePayload(competitionKey, onProgress) {
   const notify = onProgress || (() => {});
   const comp = COMPETITIONS[competitionKey];
   if (!comp) throw new Error("Bilinmeyen yarışma.");
@@ -146,42 +141,31 @@ export async function buildLeaguePayload(competitionKey, onProgress, providedDra
   let serializedFixture;
   if (comp.format === "swiss") {
     notify("draw");
-    if (providedDrawResults) {
-      // Kullanıcı bu kurayı GERÇEKTEN çekti (DrawPage'de izledi) -- aynı
-      // eşleşmeyi tekrar üretmeye çalışmak yerine doğrudan kullanıyoruz.
-      // generateFixture yine de (nadiren) tıkanabilir; bu durumda yeni bir
-      // kura üretmenin anlamı yok (kullanıcının izlediği kura BOZULMUŞ
-      // olur), o yüzden burada retry YOK -- hata direkt yukarı fırlatılır ve
-      // kullanıcıya "kura ekranından yeniden çek" denir.
-      fixture = generateFixture(providedDrawResults, enrichedTeams);
-    } else {
-      // generateFixture (haftalara bölme) matematiksel olarak her zaman
-      // çözülebilir bir problemdir (bkz. fixtureEngine.js) ama sınırlı
-      // adımlı backtracking arayışı NADİREN tıkanıp "Fikstür haftalara
-      // bölünemedi" hatası fırlatabilir -- TAMAMEN YENİ bir kura (farklı
-      // eşleşme grafiği) çekmek neredeyse her zaman çözer, o yüzden burada
-      // (headless -- kullanıcının izlediği belirli bir kura olmadığı için)
-      // birkaç kez otomatik deniyoruz.
-      let lastError = null;
-      for (let attempt = 0; attempt < 5 && !fixture; attempt++) {
-        try {
-          // generateFullDraw ham bir { teamId: [{opponentId, home, viaPot}] }
-          // haritası döner -- generateFixture ise { teamId: { pot: {home,away} } }
-          // şeklinde bir `results` bekler. buildResultsFromMatches (bkz.
-          // DrawPage.jsx'in "hızlı kura" senaryosuyla AYNI dönüşüm) bu ikisi
-          // arasındaki köprü; bunu atlamak generateFixture'a boş/eksik bir
-          // sonuç geçmek anlamına gelir (bu YÜZDEN "Fikstür haftalara
-          // bölünemedi" hatası %100 oranında oluyordu -- algoritmanın
-          // kendisi değil, burası bozuktu).
-          const drawMatches = generateFullDraw(enrichedTeams);
-          const drawResults = buildResultsFromMatches(enrichedTeams, drawMatches);
-          fixture = generateFixture(drawResults, enrichedTeams);
-        } catch (e) {
-          lastError = e;
-        }
+    // generateFixture (haftalara bölme) matematiksel olarak her zaman
+    // çözülebilir bir problemdir (bkz. fixtureEngine.js) ama sınırlı adımlı
+    // backtracking arayışı NADİREN tıkanıp "Fikstür haftalara bölünemedi"
+    // hatası fırlatabilir -- TAMAMEN YENİ bir kura (farklı eşleşme grafiği)
+    // çekmek neredeyse her zaman çözer, o yüzden burada birkaç kez otomatik
+    // deniyoruz.
+    let lastError = null;
+    for (let attempt = 0; attempt < 5 && !fixture; attempt++) {
+      try {
+        // generateFullDraw ham bir { teamId: [{opponentId, home, viaPot}] }
+        // haritası döner -- generateFixture ise { teamId: { pot: {home,away} } }
+        // şeklinde bir `results` bekler. buildResultsFromMatches (bkz.
+        // DrawPage.jsx'in "hızlı kura" senaryosuyla AYNI dönüşüm) bu ikisi
+        // arasındaki köprü; bunu atlamak generateFixture'a boş/eksik bir
+        // sonuç geçmek anlamına gelir (bu YÜZDEN "Fikstür haftalara
+        // bölünemedi" hatası %100 oranında oluyordu -- algoritmanın kendisi
+        // değil, burası bozuktu).
+        const drawMatches = generateFullDraw(enrichedTeams);
+        const drawResults = buildResultsFromMatches(enrichedTeams, drawMatches);
+        fixture = generateFixture(drawResults, enrichedTeams);
+      } catch (e) {
+        lastError = e;
       }
-      if (!fixture) throw lastError || new Error("Fikstür oluşturulamadı.");
     }
+    if (!fixture) throw lastError || new Error("Fikstür oluşturulamadı.");
     notify("fixture");
     serializedFixture = serializeFixture(fixture);
   } else {
@@ -226,12 +210,21 @@ export async function buildLeaguePayload(competitionKey, onProgress, providedDra
 // `leagues` belgesi) ve leagueId'sini döner -- bu id, paylaşılabilir linkin
 // (/{competitionKey}/tahmin-ligi/{leagueId}) parçası olur. Ayrıca oluşturan
 // kişiyi otomatik olarak o liginin bir üyesi yapar (bkz. joinLeague).
+//
+// drawGuesses (opsiyonel, sadece "swiss" formatta anlamlı): [{favoriteTeamId,
+// guesses: [teamId,...]}, ...] -- kullanıcının, lig (ve dolayısıyla gerçek
+// fikstür) oluşmadan HEMEN ÖNCE seçtiği BİRDEN FAZLA takım için yaptığı
+// "kura eşleşmesi" tahminleri. Bu tahmin SADECE lig OLUŞTURULURKEN
+// yapılabilir -- lig zaten var olduktan sonra gerçek fikstür herkese açık
+// olduğundan (bkz. dosya başındaki güvenlik notu) geriye dönük anlamsız
+// olurdu. Her takım için AYRI bir "draw" tahmini kaydedilir (matchId:
+// "draw_{teamId}").
 export function useCreateLeague() {
   const { user } = usePredictionAuth();
   return useCallback(
-    async (competitionKey, name, onProgress, providedDrawResults) => {
+    async (competitionKey, name, onProgress, drawGuesses) => {
       if (!user) throw new Error("Önce Google ile giriş yapmalısın.");
-      const payload = await buildLeaguePayload(competitionKey, onProgress, providedDrawResults);
+      const payload = await buildLeaguePayload(competitionKey, onProgress);
       const ref = await addDoc(collection(db, "leagues"), {
         ...payload,
         name: name || `${COMPETITIONS[competitionKey]?.shortName || competitionKey} Tahmin Ligi`,
@@ -247,6 +240,21 @@ export function useCreateLeague() {
         photoURL: user.photoURL || null,
         joinedAt: serverTimestamp(),
       });
+      for (const guess of drawGuesses || []) {
+        if (!guess.favoriteTeamId || !guess.guesses?.length) continue;
+        const matchId = `draw_${guess.favoriteTeamId}`;
+        await setDoc(doc(db, "predictions", `${ref.id}_${matchId}_${user.uid}`), {
+          uid: user.uid,
+          displayName: user.displayName || "Bilinmeyen",
+          photoURL: user.photoURL || null,
+          leagueId: ref.id,
+          matchId,
+          kind: "draw",
+          favoriteTeamId: guess.favoriteTeamId,
+          guesses: guess.guesses,
+          createdAt: serverTimestamp(),
+        });
+      }
       return ref.id;
     },
     [user]
@@ -533,9 +541,10 @@ export const KNOCKOUT_TIE_POINTS = { 0: 2, 1: 3, 2: 4, 3: 5, 4: 6 }; // round in
 // yanılmak 2, 2 sıra yanılmak 1, daha fazlası 0 -- ne kadar YAKIN o kadar
 // puan, sadece "birebir tuttu/tutmadı" değil.
 const STANDINGS_MAX_POINTS_PER_TEAM = 3;
-// Kura tahmininde (bkz. DrawPage.jsx: FavoriteTeamPicker) doğru bilinen HER
-// rakip için verilen puan -- en fazla 3 tahmin edilebildiğinden en yüksek
-// olası kura puanı 3 * 4 = 12.
+// Kura tahmininde (bkz. PredictionLeaguePage: lig oluşturulmadan önceki
+// "kura eşleşmesi tahmini" adımı) doğru bilinen HER rakip için verilen puan
+// -- en fazla 3 tahmin edilebildiğinden takım başına en yüksek olası puan
+// 3 * 4 = 12; birden fazla takım için tahmin yapılırsa toplanır.
 export const DRAW_GUESS_POINTS_PER_HIT = 4;
 
 // Bir takımın GERÇEK (serileştirilmiş) fikstürdeki tüm rakiplerinin id

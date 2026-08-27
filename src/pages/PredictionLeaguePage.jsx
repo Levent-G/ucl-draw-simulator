@@ -190,6 +190,9 @@ function AuthHeader({ competition, title }) {
 // ============================================================================
 // LANDING: /:competitionKey/tahmin-ligi -- Liglerim + Yeni Lig Oluştur.
 // ============================================================================
+const MAX_DRAW_GUESS_TEAMS = 5;
+const MAX_DRAW_GUESSES_PER_TEAM = 3;
+
 function PredictionLeagueLanding() {
   const { competitionKey } = useParams();
   const navigate = useNavigate();
@@ -199,29 +202,57 @@ function PredictionLeagueLanding() {
   const createLeague = useCreateLeague();
   const { leagues, loading: leaguesLoading, error: leaguesError } = useMyLeagues(competitionKey);
 
+  const [name, setName] = useState("");
   const [starting, setStarting] = useState(false);
   const [startStage, setStartStage] = useState(null);
   const [startError, setStartError] = useState(null);
 
-  // hasDraw (UCL/Avrupa Ligi) yarışmalarda lig burada HEADLESS (arka planda
-  // sessizce) oluşturulmaz -- kullanıcı önce GERÇEK, animasyonlu Kura
-  // Çekimi ekranını görmeli. "Kura Çek" düğmesi oraya yönlendirir; kura
-  // bitince oradaki "Tahmin Ligi Oluştur" düğmesi yeni lig odasını yaratıp
-  // doğrudan o odaya (/tahmin-ligi/{leagueId}) yönlendirir (bkz.
-  // DrawPage.jsx: PredictionLeagueTransferCta).
-  const handleGoToDraw = () => {
-    navigate(`/${competitionKey}?tahminLigi=1`);
+  // Kura eşleşmesi tahmini (opsiyonel, sadece swiss formatta): lig (ve
+  // dolayısıyla gerçek fikstür) oluşmadan HEMEN ÖNCE, kullanıcı BİRDEN FAZLA
+  // takım seçip her biri için rakip tahmin edebilir -- bu SADECE burada,
+  // lig oluşturulmadan önce yapılabilir (bkz. useCreateLeague'deki not).
+  const [drawGuesses, setDrawGuesses] = useState([]); // [{favoriteTeamId, guesses:[]}]
+  const [pickerTeamId, setPickerTeamId] = useState("");
+  const teamById = useMemo(() => Object.fromEntries(competition.teams.map((t) => [t.id, t])), [competition]);
+  const sortedTeams = useMemo(
+    () => [...competition.teams].sort((a, b) => a.name.localeCompare(b.name, "tr")),
+    [competition]
+  );
+  const usedTeamIds = useMemo(() => new Set(drawGuesses.map((g) => g.favoriteTeamId)), [drawGuesses]);
+  const pickableTeams = useMemo(() => sortedTeams.filter((t) => !usedTeamIds.has(t.id)), [sortedTeams, usedTeamIds]);
+
+  const addDrawGuessTeam = () => {
+    if (!pickerTeamId || drawGuesses.length >= MAX_DRAW_GUESS_TEAMS) return;
+    setDrawGuesses((prev) => [...prev, { favoriteTeamId: pickerTeamId, guesses: [] }]);
+    setPickerTeamId("");
+  };
+  const removeDrawGuessTeam = (teamId) => {
+    setDrawGuesses((prev) => prev.filter((g) => g.favoriteTeamId !== teamId));
+  };
+  const toggleDrawGuessOpponent = (teamId, opponentId) => {
+    setDrawGuesses((prev) =>
+      prev.map((g) => {
+        if (g.favoriteTeamId !== teamId) return g;
+        const has = g.guesses.includes(opponentId);
+        if (has) return { ...g, guesses: g.guesses.filter((id) => id !== opponentId) };
+        if (g.guesses.length >= MAX_DRAW_GUESSES_PER_TEAM) return g;
+        return { ...g, guesses: [...g.guesses, opponentId] };
+      })
+    );
   };
 
-  // hasDraw OLMAYAN (ör. Süper Lig) yarışmalarda gerçek bir "kura" kavramı
-  // yok -- fikstür zaten deterministik/rastgele bir round-robin, o yüzden
-  // burada doğrudan (headless) oluşturulabilir.
-  const handleCreateHeadless = async () => {
+  // Kura çekimi ekranından TAMAMEN bağımsız: yarışma formatı ne olursa olsun
+  // (UCL/Avrupa Ligi'nin İsviçre modeli kura+fikstürü dahil), lig burada
+  // doğrudan, arka planda (headless) oluşturulur -- kullanıcının önce
+  // animasyonlu kura ekranına gidip kura çekmesi GEREKMEZ. Puanlama şu an
+  // bu şekilde üretilen kurgusal simülasyona göre hesaplanıyor; gerçek/canlı
+  // sonuçlara göre puanlama ileride ayrı bir iyileştirme olarak eklenecek.
+  const handleCreate = async () => {
     setStarting(true);
     setStartError(null);
-    setStartStage("fixture");
+    setStartStage("draw");
     try {
-      const leagueId = await createLeague(competitionKey, "", setStartStage);
+      const leagueId = await createLeague(competitionKey, name.trim(), setStartStage, drawGuesses);
       navigate(`/${competitionKey}/tahmin-ligi/${leagueId}`);
     } catch (e) {
       setStartError(describeFirestoreError(e));
@@ -244,17 +275,82 @@ function PredictionLeagueLanding() {
               linkini gönderirsin, onlar da katılıp AYNI eşleşmeleri tahmin eder. Herkes birbirinin tahminini
               görebilir (kendi tahminini yaptıktan sonra).
             </p>
-            {hasDraw ? (
-              <button className="btn-primary" onClick={handleGoToDraw}>
-                🎟️ Kura Çek ve Yeni Tahmin Ligi Oluştur
-              </button>
-            ) : (
-              <button className="btn-primary" onClick={handleCreateHeadless} disabled={starting}>
+            <div className="prediction-league-transfer-form">
+              <input
+                type="text"
+                placeholder={`Lig adı (opsiyonel, ör. "${competition.shortName} Arkadaş Grubu")`}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="prediction-score-input prediction-league-name-input"
+              />
+              <button className="btn-primary" onClick={handleCreate} disabled={starting}>
                 {starting ? (startStage ? START_STAGE_LABEL[startStage] : "Oluşturuluyor…") : "🏆 Yeni Tahmin Ligi Oluştur"}
               </button>
-            )}
+            </div>
             {startError && <p style={{ color: "#f87171" }}>{startError}</p>}
           </div>
+
+          {hasDraw && (
+            <div className="chart-card chart-card-wide">
+              <h3>🔮 Kura Eşleşmesi Tahmini (opsiyonel)</h3>
+              <p className="footnote">
+                Lig oluşmadan HEMEN ÖNCE, istediğin kadar takım seç (en fazla {MAX_DRAW_GUESS_TEAMS}) ve her biri için
+                kimlerle eşleşeceğini tahmin et (takım başına en fazla {MAX_DRAW_GUESSES_PER_TEAM}) -- doğru bilinen
+                her rakip <b>{4} puan</b> kazandırır. Bu tahmin sadece burada, lig kurulmadan önce yapılabilir.
+              </p>
+
+              {drawGuesses.map((g) => {
+                const favTeam = teamById[g.favoriteTeamId];
+                const eligible = sortedTeams.filter((t) => t.id !== g.favoriteTeamId && t.country !== favTeam?.country);
+                return (
+                  <div key={g.favoriteTeamId} className="prediction-picker">
+                    <div className="prediction-title">
+                      <Crest team={favTeam} size={22} />
+                      <span>{favTeam?.name} için {MAX_DRAW_GUESSES_PER_TEAM} rakip tahmin et</span>
+                      <span className="prediction-count">{g.guesses.length}/{MAX_DRAW_GUESSES_PER_TEAM}</span>
+                      <button className="btn-ghost btn-small" onClick={() => removeDrawGuessTeam(g.favoriteTeamId)}>
+                        ✕ Kaldır
+                      </button>
+                    </div>
+                    <div className="prediction-chips">
+                      {eligible.map((t) => {
+                        const selected = g.guesses.includes(t.id);
+                        const disabled = !selected && g.guesses.length >= MAX_DRAW_GUESSES_PER_TEAM;
+                        return (
+                          <button
+                            key={t.id}
+                            type="button"
+                            className={`prediction-chip ${selected ? "selected" : ""}`}
+                            disabled={disabled}
+                            onClick={() => toggleDrawGuessOpponent(g.favoriteTeamId, t.id)}
+                          >
+                            <Crest team={t} size={16} />
+                            {t.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+
+              {drawGuesses.length < MAX_DRAW_GUESS_TEAMS && pickableTeams.length > 0 && (
+                <div className="prediction-league-transfer-form" style={{ marginTop: 10 }}>
+                  <select value={pickerTeamId} onChange={(e) => setPickerTeamId(e.target.value)}>
+                    <option value="">Tahmin eklemek için bir takım seç…</option>
+                    {pickableTeams.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </select>
+                  <button className="btn-secondary btn-small" onClick={addDrawGuessTeam} disabled={!pickerTeamId}>
+                    + Takım Ekle
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="chart-card chart-card-wide">
             <h3>Liglerim</h3>
@@ -306,14 +402,11 @@ function PredictionLeagueRoom() {
 
   const championPrediction = myPredictionsByMatch.champion;
   const standingsPrediction = myPredictionsByMatch.standings;
-  const drawPredictions = useMemo(() => predictions.filter((p) => p.kind === "draw"), [predictions]);
-  // "Adım adım" akış: 0) Kura Tahmini (sadece kurayı çeken kişi, kura
-  // başlamadan önce yapabilir -- bkz. DrawPage.jsx) BİLGİLENDİRME amaçlı,
-  // kimseyi KİLİTLEMEZ (geriye dönük tamamlanamayacağı için). 1) Lig
-  // Sıralaması (sürükle-bırak) HERKES için asıl ilk adım -- bu yapılmadan
-  // haftalık skorlar/eleme turu/şampiyon sekmeleri kilitli kalır. 2) Haftalık
-  // skorlar. 3) Eleme turu (varsa). 4) En sonda şampiyon tahmini (varsa).
-  const [tab, setTab] = useState(hasDraw ? "kura" : "standings");
+  // "Adım adım" akış: 1) Lig Sıralaması (sürükle-bırak) HERKES için ilk adım
+  // -- bu yapılmadan haftalık skorlar/eleme turu/şampiyon sekmeleri kilitli
+  // kalır. 2) Haftalık skorlar. 3) Eleme turu (varsa). 4) En sonda şampiyon
+  // tahmini (varsa).
+  const [tab, setTab] = useState("standings");
   const laterStagesUnlocked = !!standingsPrediction;
 
   const [activeMatchday, setActiveMatchday] = useState(1);
@@ -330,6 +423,7 @@ function PredictionLeagueRoom() {
   const [linkCopied, setLinkCopied] = useState(false);
 
   const leaderboard = useMemo(() => (league ? buildLeaderboard(predictions, league) : []), [predictions, league]);
+  const drawPredictions = useMemo(() => predictions.filter((p) => p.kind === "draw"), [predictions]);
 
   const activeMatches = useMemo(() => {
     const all = fixture?.find((md) => md.number === activeMatchday)?.matches || [];
@@ -507,14 +601,54 @@ function PredictionLeagueRoom() {
             )}
           </p>
 
+          {drawPredictions.length > 0 && (
+            <div className="chart-card chart-card-wide">
+              <h3>🔮 Kura Eşleşmesi Tahminleri</h3>
+              <p className="footnote">
+                Lig kurulmadan önce yapılan tahminler -- doğru bilinen her rakip{" "}
+                <b>{DRAW_GUESS_POINTS_PER_HIT} puan</b> kazandırdı.
+              </p>
+              <div className="prediction-league-matches">
+                {drawPredictions.map((p) => {
+                  const favTeam = teamById[p.favoriteTeamId];
+                  const realOpponents = new Set(
+                    (fixture || []).flatMap((md) =>
+                      md.matches
+                        .filter((m) => m.homeTeam.id === p.favoriteTeamId || m.awayTeam.id === p.favoriteTeamId)
+                        .map((m) => (m.homeTeam.id === p.favoriteTeamId ? m.awayTeam.id : m.homeTeam.id))
+                    )
+                  );
+                  return (
+                    <div key={`${p.uid}_${p.favoriteTeamId}`} className="prediction-row-wrap">
+                      <div className="prediction-champion-result">
+                        <span className="table-team-cell">
+                          <Avatar photoURL={p.photoURL} name={p.displayName} size={20} /> <b>{p.displayName}</b> —{" "}
+                          {favTeam?.name} için tahmin:
+                        </span>
+                        <div className="prediction-others-row">
+                          {(p.guesses || []).map((teamId) => (
+                            <span
+                              key={teamId}
+                              className={`prediction-others-chip ${realOpponents.has(teamId) ? "prediction-guess-hit" : ""}`}
+                            >
+                              {realOpponents.has(teamId) ? "✅" : "❌"} {teamById[teamId]?.name || teamId}
+                            </span>
+                          ))}
+                        </div>
+                        <p>
+                          <b>{pointsForPrediction(p, league)} puan</b>
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           <div className="stats-tabs">
-            {hasDraw && (
-              <button className={tab === "kura" ? "active" : ""} onClick={() => setTab("kura")}>
-                1. Kura Tahmini
-              </button>
-            )}
             <button className={tab === "standings" ? "active" : ""} onClick={() => setTab("standings")}>
-              {hasDraw ? "2." : "1."} Lig Sıralaması
+              1. Lig Sıralaması
             </button>
             <button
               className={tab === "lig" ? "active" : ""}
@@ -522,7 +656,7 @@ function PredictionLeagueRoom() {
               disabled={!laterStagesUnlocked}
               title={laterStagesUnlocked ? "" : "Önce lig sıralaması tahminini yap"}
             >
-              {hasDraw ? "3." : "2."} Haftalık Skorlar
+              2. Haftalık Skorlar
             </button>
             {league.knockout && (
               <button
@@ -531,7 +665,7 @@ function PredictionLeagueRoom() {
                 disabled={!laterStagesUnlocked}
                 title={laterStagesUnlocked ? "" : "Önce lig sıralaması tahminini yap"}
               >
-                4. Eleme Turu
+                3. Eleme Turu
               </button>
             )}
             {hasDraw && (
@@ -541,65 +675,13 @@ function PredictionLeagueRoom() {
                 disabled={!laterStagesUnlocked}
                 title={laterStagesUnlocked ? "" : "Önce lig sıralaması tahminini yap"}
               >
-                5. Şampiyon Tahmini
+                4. Şampiyon Tahmini
               </button>
             )}
             <button className={tab === "leaderboard" ? "active" : ""} onClick={() => setTab("leaderboard")}>
               🏅 Sıralama
             </button>
           </div>
-
-          {tab === "kura" && hasDraw && (
-            <div className="chart-card chart-card-wide">
-              <h3>🔮 Kura Eşleşme Tahmini</h3>
-              <p className="footnote">
-                Bu tahmin SADECE kurayı o an izleyen kişi tarafından, kura başlamadan HEMEN ÖNCE yapılabilir (bkz.
-                kura ekranındaki "3 rakip tahmin et" kutusu) -- bu ligin ilk tahmini, geriye dönük yapılamaz. Doğru
-                bilinen her rakip <b>{DRAW_GUESS_POINTS_PER_HIT} puan</b> kazandırır.
-              </p>
-              {drawPredictions.length === 0 ? (
-                <p className="footnote">Bu ligin kurucusu kura başlamadan önce bir tahmin yapmamış -- bu adım atlanmış.</p>
-              ) : (
-                <div className="prediction-league-matches">
-                  {drawPredictions.map((p) => {
-                    const favTeam = teamById[p.favoriteTeamId];
-                    const realOpponents = fixture
-                      ? new Set(
-                          fixture.flatMap((md) =>
-                            md.matches
-                              .filter((m) => m.homeTeam.id === p.favoriteTeamId || m.awayTeam.id === p.favoriteTeamId)
-                              .map((m) => (m.homeTeam.id === p.favoriteTeamId ? m.awayTeam.id : m.homeTeam.id))
-                          )
-                        )
-                      : new Set();
-                    return (
-                      <div key={p.uid} className="prediction-row-wrap">
-                        <div className="prediction-champion-result">
-                          <span className="table-team-cell">
-                            <Avatar photoURL={p.photoURL} name={p.displayName} size={20} /> <b>{p.displayName}</b> —{" "}
-                            {favTeam?.name} için tahmin:
-                          </span>
-                          <div className="prediction-others-row">
-                            {(p.guesses || []).map((teamId) => (
-                              <span
-                                key={teamId}
-                                className={`prediction-others-chip ${realOpponents.has(teamId) ? "prediction-guess-hit" : ""}`}
-                              >
-                                {realOpponents.has(teamId) ? "✅" : "❌"} {teamById[teamId]?.name || teamId}
-                              </span>
-                            ))}
-                          </div>
-                          <p>
-                            <b>{pointsForPrediction(p, league)} puan</b>
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
 
           {tab === "standings" && (
             <div className="chart-card chart-card-wide">
@@ -617,6 +699,22 @@ function PredictionLeagueRoom() {
                   <button className="btn-secondary btn-small" onClick={() => setTab("lig")}>
                     Haftalık Skorlara Geç →
                   </button>
+
+                  {(othersPredictionsByMatch.standings || []).length > 0 && (
+                    <div className="prediction-others-list">
+                      <p className="footnote" style={{ marginTop: 14 }}>
+                        Diğerlerinin şampiyon tahmini (sıralamalarının 1.si):
+                      </p>
+                      {(othersPredictionsByMatch.standings || []).map((p) => (
+                        <div key={p.uid} className="prediction-other-full-row">
+                          <Avatar photoURL={p.photoURL} name={p.displayName} size={18} />
+                          <span>{p.displayName}:</span>
+                          <b>{teamById[p.order?.[0]]?.name || "?"}</b>
+                          <span className="footnote">({pointsForPrediction(p, league)} puan)</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <>
@@ -670,6 +768,21 @@ function PredictionLeagueRoom() {
                   <button className="btn-secondary btn-small" onClick={() => setTab("leaderboard")}>
                     Sıralamaya Bak →
                   </button>
+
+                  {(othersPredictionsByMatch.champion || []).length > 0 && (
+                    <div className="prediction-others-list">
+                      <p className="footnote" style={{ marginTop: 14 }}>
+                        Diğerlerinin şampiyon tahmini:
+                      </p>
+                      {(othersPredictionsByMatch.champion || []).map((p) => (
+                        <div key={p.uid} className="prediction-other-full-row">
+                          <Avatar photoURL={p.photoURL} name={p.displayName} size={18} />
+                          <span>{p.displayName}:</span>
+                          <b>{teamById[p.pickedTeamId]?.name || "?"}</b>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <>

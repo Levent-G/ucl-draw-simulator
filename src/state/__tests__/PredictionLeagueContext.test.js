@@ -5,48 +5,7 @@ import {
   buildLeaderboard,
   CHAMPION_PICK_POINTS,
   KNOCKOUT_TIE_POINTS,
-  DRAW_GUESS_POINTS_PER_HIT,
 } from "../PredictionLeagueContext.jsx";
-
-describe("PredictionLeagueContext.pointsForPrediction (kind: draw, pre-draw opponent guess)", () => {
-  // real-madrid'in gerçek fikstürdeki (serileştirilmiş, homeId/awayId) 8
-  // rakibi: barcelona, bayern, psg, dortmund, arsenal, inter, napoli, roma.
-  const league = {
-    fixture: [
-      { number: 1, matches: [{ id: "m1", homeId: "real-madrid", awayId: "barcelona" }] },
-      { number: 2, matches: [{ id: "m2", homeId: "bayern", awayId: "real-madrid" }] },
-      { number: 3, matches: [{ id: "m3", homeId: "real-madrid", awayId: "psg" }] },
-      { number: 4, matches: [{ id: "m4", homeId: "dortmund", awayId: "real-madrid" }] },
-      { number: 5, matches: [{ id: "m5", homeId: "real-madrid", awayId: "arsenal" }] },
-      { number: 6, matches: [{ id: "m6", homeId: "inter", awayId: "real-madrid" }] },
-      { number: 7, matches: [{ id: "m7", homeId: "real-madrid", awayId: "napoli" }] },
-      { number: 8, matches: [{ id: "m8", homeId: "roma", awayId: "real-madrid" }] },
-      // real-madrid'i hiç ilgilendirmeyen, alakasız bir maç -- yanlışlıkla
-      // dahil edilmediğini doğrular.
-      { number: 1, matches: [{ id: "m9", homeId: "villarreal", awayId: "sabah" }] },
-    ],
-  };
-
-  it("awards DRAW_GUESS_POINTS_PER_HIT for each guessed opponent that actually appears in the real fixture", () => {
-    const prediction = { kind: "draw", favoriteTeamId: "real-madrid", guesses: ["barcelona", "bayern", "psg"] };
-    expect(pointsForPrediction(prediction, league)).toBe(3 * DRAW_GUESS_POINTS_PER_HIT);
-  });
-
-  it("gives partial credit when only some guesses are correct", () => {
-    const prediction = { kind: "draw", favoriteTeamId: "real-madrid", guesses: ["barcelona", "villarreal", "sabah"] };
-    expect(pointsForPrediction(prediction, league)).toBe(1 * DRAW_GUESS_POINTS_PER_HIT);
-  });
-
-  it("gives 0 when none of the guessed opponents were actually drawn", () => {
-    const prediction = { kind: "draw", favoriteTeamId: "real-madrid", guesses: ["villarreal", "sabah"] };
-    expect(pointsForPrediction(prediction, league)).toBe(0);
-  });
-
-  it("gives 0 when there is no fixture yet", () => {
-    const prediction = { kind: "draw", favoriteTeamId: "real-madrid", guesses: ["barcelona"] };
-    expect(pointsForPrediction(prediction, { fixture: [] })).toBe(0);
-  });
-});
 
 describe("PredictionLeagueContext.scorePrediction (kind: score)", () => {
   it("gives 5 points for an exact score match", () => {
