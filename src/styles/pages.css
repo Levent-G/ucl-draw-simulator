@@ -3415,6 +3415,10 @@ a.team-profile-match-row:hover {
   max-width: 100%;
   text-align: left;
 }
+.prediction-team-add-row {
+  margin-top: 10px;
+  max-width: 320px;
+}
 .prediction-league-list {
   display: flex;
   flex-direction: column;
@@ -3451,14 +3455,6 @@ a.team-profile-match-row:hover {
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
-}
-.prediction-team-filter {
-  background: var(--bg-panel-alt);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  color: var(--text-primary);
-  padding: 8px 10px;
-  font-size: 13px;
 }
 .prediction-row-wrap {
   display: flex;

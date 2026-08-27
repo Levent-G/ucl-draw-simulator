@@ -3,7 +3,10 @@ import Crest from "../Crest.jsx";
 
 // Native <select>/<option> takım amblemi gösteremediği için, kendi
 // oluşturduğumuz (arama kutulu, amblemli) bir açılır liste.
-export default function TeamFilterSelect({ teams, value, onChange }) {
+// placeholder/allowClear (opsiyonel): "hangi takımı filtreleyeyim" dışında
+// (ör. "bir takım seç ve ekle" gibi) senaryolarda da yeniden kullanılabilsin
+// diye -- verilmezse mevcut tüm çağıranların davranışı AYNEN korunur.
+export default function TeamFilterSelect({ teams, value, onChange, placeholder = "Tüm takımlar", allowClear = true }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const ref = useRef(null);
@@ -45,7 +48,7 @@ export default function TeamFilterSelect({ teams, value, onChange }) {
             <span>{selected.name}</span>
           </>
         ) : (
-          <span className="team-filter-placeholder">Tüm takımlar</span>
+          <span className="team-filter-placeholder">{placeholder}</span>
         )}
         <span className="team-filter-caret" aria-hidden="true">
           ▾
@@ -63,16 +66,18 @@ export default function TeamFilterSelect({ teams, value, onChange }) {
             onChange={(e) => setQuery(e.target.value)}
           />
           <div className="team-filter-options">
-            <button
-              type="button"
-              className={`team-filter-option ${!value ? "active" : ""}`}
-              onClick={() => choose("")}
-            >
-              <span className="team-filter-all-icon" aria-hidden="true">
-                🌍
-              </span>
-              Tüm takımlar
-            </button>
+            {allowClear && (
+              <button
+                type="button"
+                className={`team-filter-option ${!value ? "active" : ""}`}
+                onClick={() => choose("")}
+              >
+                <span className="team-filter-all-icon" aria-hidden="true">
+                  🌍
+                </span>
+                {placeholder}
+              </button>
+            )}
             {filtered.map((t) => (
               <button
                 key={t.id}

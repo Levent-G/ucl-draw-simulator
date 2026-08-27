@@ -19,6 +19,7 @@ import CompetitionStepper from "../components/CompetitionStepper.jsx";
 import MatchdayTabs from "../components/fixture/MatchdayTabs.jsx";
 import DragStandings from "../components/fixture/DragStandings.jsx";
 import Crest from "../components/Crest.jsx";
+import TeamFilterSelect from "../components/stats/TeamFilterSelect.jsx";
 
 const START_STAGE_LABEL = {
   draw: "Kura çekiliyor…",
@@ -221,9 +222,9 @@ function PredictionLeagueLanding() {
   const usedTeamIds = useMemo(() => new Set(drawGuesses.map((g) => g.favoriteTeamId)), [drawGuesses]);
   const pickableTeams = useMemo(() => sortedTeams.filter((t) => !usedTeamIds.has(t.id)), [sortedTeams, usedTeamIds]);
 
-  const addDrawGuessTeam = () => {
-    if (!pickerTeamId || drawGuesses.length >= MAX_DRAW_GUESS_TEAMS) return;
-    setDrawGuesses((prev) => [...prev, { favoriteTeamId: pickerTeamId, guesses: [] }]);
+  const addDrawGuessTeam = (teamId) => {
+    if (!teamId || drawGuesses.length >= MAX_DRAW_GUESS_TEAMS) return;
+    setDrawGuesses((prev) => [...prev, { favoriteTeamId: teamId, guesses: [] }]);
     setPickerTeamId("");
   };
   const removeDrawGuessTeam = (teamId) => {
@@ -335,18 +336,14 @@ function PredictionLeagueLanding() {
               })}
 
               {drawGuesses.length < MAX_DRAW_GUESS_TEAMS && pickableTeams.length > 0 && (
-                <div className="prediction-league-transfer-form" style={{ marginTop: 10 }}>
-                  <select value={pickerTeamId} onChange={(e) => setPickerTeamId(e.target.value)}>
-                    <option value="">Tahmin eklemek için bir takım seç…</option>
-                    {pickableTeams.map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {t.name}
-                      </option>
-                    ))}
-                  </select>
-                  <button className="btn-secondary btn-small" onClick={addDrawGuessTeam} disabled={!pickerTeamId}>
-                    + Takım Ekle
-                  </button>
+                <div className="prediction-team-add-row">
+                  <TeamFilterSelect
+                    teams={pickableTeams}
+                    value={pickerTeamId}
+                    onChange={addDrawGuessTeam}
+                    placeholder="Tahmin eklemek için bir takım seç…"
+                    allowClear={false}
+                  />
                 </div>
               )}
             </div>
@@ -792,14 +789,13 @@ function PredictionLeagueRoom() {
                     bilirsen <b>{CHAMPION_PICK_POINTS} puan</b> kazanırsın (Tahmin Ligi'ndeki en yüksek tekil puan).
                   </p>
                   <div className="prediction-champion-picker">
-                    <select value={championDraft} onChange={(e) => setChampionDraft(e.target.value)}>
-                      <option value="">Bir takım seç…</option>
-                      {sortedTeams.map((t) => (
-                        <option key={t.id} value={t.id}>
-                          {t.name}
-                        </option>
-                      ))}
-                    </select>
+                    <TeamFilterSelect
+                      teams={sortedTeams}
+                      value={championDraft}
+                      onChange={setChampionDraft}
+                      placeholder="Bir takım seç…"
+                      allowClear={false}
+                    />
                     <button
                       className="btn-primary"
                       onClick={handleChampionSubmit}
@@ -818,19 +814,7 @@ function PredictionLeagueRoom() {
             <>
               <div className="prediction-league-filter-row">
                 <MatchdayTabs matchdays={fixture} active={activeMatchday} onSelect={setActiveMatchday} />
-                <select
-                  value={teamFilter}
-                  onChange={(e) => setTeamFilter(e.target.value)}
-                  className="prediction-team-filter"
-                  aria-label="Takıma göre filtrele"
-                >
-                  <option value="">Tüm takımlar</option>
-                  {sortedTeams.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name}
-                    </option>
-                  ))}
-                </select>
+                <TeamFilterSelect teams={sortedTeams} value={teamFilter} onChange={setTeamFilter} />
               </div>
               <div className="chart-card chart-card-wide prediction-league-matches">
                 {activeMatches.length === 0 && (
