@@ -6,6 +6,7 @@ import TeamsTab from "../components/stats/TeamsTab.jsx";
 import PlayersTab from "../components/stats/PlayersTab.jsx";
 import CountriesTab from "../components/stats/CountriesTab.jsx";
 import TeamOfSeasonTab from "../components/stats/TeamOfSeasonTab.jsx";
+import FinanceTab from "../components/stats/FinanceTab.jsx";
 import TeamFilterSelect from "../components/stats/TeamFilterSelect.jsx";
 
 const TABS = [
@@ -13,11 +14,12 @@ const TABS = [
   { key: "players", label: "Oyuncular" },
   { key: "countries", label: "Ülkeler" },
   { key: "season-xi", label: "Sezonun 11'i" },
+  { key: "finance", label: "💰 Finans" },
 ];
 
 export default function StatsPage() {
   const { competitionKey } = useParams();
-  const { competition, simulation, hasFixture } = useCompetition(competitionKey);
+  const { competition, simulation, knockout, hasFixture } = useCompetition(competitionKey);
   const [tab, setTab] = useState("teams");
   const [selectedTeamId, setSelectedTeamId] = useState("");
 
@@ -84,6 +86,15 @@ export default function StatsPage() {
       {tab === "countries" && <CountriesTab competition={competition} />}
       {tab === "season-xi" && (
         <TeamOfSeasonTab competition={competition} simulation={simulation} competitionKey={competitionKey} />
+      )}
+      {tab === "finance" && (
+        <FinanceTab
+          competition={competition}
+          simulation={simulation}
+          knockout={knockout}
+          selectedTeam={selectedTeam}
+          competitionKey={competitionKey}
+        />
       )}
 
       <p className="footnote">

@@ -42,8 +42,8 @@ export default function LeagueHomePage() {
   const championStanding = simulation?.standings?.[0] || null;
   const champion = championStanding ? teamById[championStanding.teamId] : null;
 
-  const handleSimulateSeason = () => {
-    const sim = runSimulation();
+  const handleSimulateSeason = async () => {
+    const sim = await runSimulation();
     if (!sim) return;
 
     const winnerStanding = sim.standings?.[0];
@@ -114,9 +114,13 @@ export default function LeagueHomePage() {
     if (!simulation && !autoSimFiredRef.current) {
       autoSimFiredRef.current = true;
       setDetermining(true);
-      const t = window.setTimeout(() => {
+      // Simülasyon artık bir Web Worker'da (asenkron) çalıştığı için
+      // "belirleniyor" ekranı yapay 1sn bekleme + GERÇEK hesaplama süresi
+      // boyunca (hangisi uzunsa) açık kalır -- sonuç hazır olmadan
+      // kapanmaz.
+      const t = window.setTimeout(async () => {
+        await handleSimulateSeason();
         setDetermining(false);
-        handleSimulateSeason();
       }, 1000);
       return () => window.clearTimeout(t);
     }

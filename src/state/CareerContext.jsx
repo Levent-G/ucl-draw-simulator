@@ -8,9 +8,39 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 // tarayıcıda kalıcı tutulur. Böylece "Yeni Sezona Geç" dendiğinde aynı
 // takımlarla ama az farklı bir güç dengesiyle yeni bir kura/sezon başlar.
 const STORAGE_KEY = "futbolSimulatorKariyer";
-const MAX_CUMULATIVE_DELTA = 25;
+const MAX_CUMULATIVE_DELTA = 35; // uç bir güvenlik sınırı -- normal koşulda ekseriyetle denge (aşağıya bakın) buna hiç ulaşmaz
 const MAX_SEASON_DELTA = 4;
 const MIN_EFFECTIVE_COEFF = 6;
+// Her sezon, bir önceki BİRİKİMLİ delta bu oranla "hafifçe küçülür" (mean
+// reversion) YENİ sezonun deltası eklenmeden önce. Sabit bir tavana çarpıp
+// SONSUZA DEK orada donmak yerine (bkz. 15 sezonluk stres testinde
+// gözlemlenen gerçek sorun: min/max 9. sezondan itibaren tamamen sabitlendi),
+// bir takımın güçlü/zayıf kalması ancak PERFORMANSINI SÜRDÜRMESİYLE mümkün
+// olur -- tıpkı gerçek hayattaki katsayı/sıralama sistemleri gibi.
+const DECAY_FACTOR = 0.9;
+
+function clamp(v, min, max) {
+  return Math.max(min, Math.min(max, v));
+}
+
+// Saf (yan etkisiz) hesaplama -- ayrı test edilebilsin diye component'ten
+// çıkarıldı. prevDeltas: { [teamId]: number }. standings: finalizeStandings
+// çıktısı ({ teamId, rank, ... }[]). bonusTeamId (opsiyonel): ekstra bonus
+// alacak takım (ör. eleme turu şampiyonu).
+export function computeNextCoeffDeltas(prevDeltas, standings, bonusTeamId) {
+  if (!standings || standings.length === 0) return { ...prevDeltas };
+  const n = standings.length;
+  const nextDeltas = { ...prevDeltas };
+  for (const s of standings) {
+    const raw = (((n + 1) / 2 - s.rank) / n) * (MAX_SEASON_DELTA * 2);
+    let seasonDelta = Math.round(raw);
+    if (s.teamId === bonusTeamId) seasonDelta += 3;
+    seasonDelta = clamp(seasonDelta, -MAX_SEASON_DELTA - 3, MAX_SEASON_DELTA + 3);
+    const decayed = (nextDeltas[s.teamId] || 0) * DECAY_FACTOR;
+    nextDeltas[s.teamId] = clamp(Math.round((decayed + seasonDelta) * 10) / 10, -MAX_CUMULATIVE_DELTA, MAX_CUMULATIVE_DELTA);
+  }
+  return nextDeltas;
+}
 
 function emptyCareer() {
   return { season: 1, coeffDeltas: {} };
@@ -56,21 +86,9 @@ export function CareerProvider({ children }) {
   // yansıtmadığı için.
   const advanceSeason = useCallback((compKey, standings, bonusTeamId) => {
     if (!standings || standings.length === 0) return;
-    const n = standings.length;
     setCareer((prev) => {
       const prevEntry = prev[compKey] || emptyCareer();
-      const nextDeltas = { ...prevEntry.coeffDeltas };
-      for (const s of standings) {
-        const raw = (((n + 1) / 2 - s.rank) / n) * (MAX_SEASON_DELTA * 2);
-        let seasonDelta = Math.round(raw);
-        if (s.teamId === bonusTeamId) seasonDelta += 3;
-        seasonDelta = Math.max(-MAX_SEASON_DELTA - 3, Math.min(MAX_SEASON_DELTA + 3, seasonDelta));
-        const cur = nextDeltas[s.teamId] || 0;
-        nextDeltas[s.teamId] = Math.max(
-          -MAX_CUMULATIVE_DELTA,
-          Math.min(MAX_CUMULATIVE_DELTA, cur + seasonDelta)
-        );
-      }
+      const nextDeltas = computeNextCoeffDeltas(prevEntry.coeffDeltas, standings, bonusTeamId);
       return {
         ...prev,
         [compKey]: { season: prevEntry.season + 1, coeffDeltas: nextDeltas },

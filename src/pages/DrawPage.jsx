@@ -92,7 +92,13 @@ function isResultsComplete(results, teams) {
 
 export default function DrawPage() {
   const { competitionKey } = useParams();
-  const { competition, setDrawResults, clearCompetition } = useCompetition(competitionKey);
+  const {
+    competition,
+    setDrawResults,
+    clearCompetition,
+    hasDraw,
+    results: persistedResults,
+  } = useCompetition(competitionKey);
   const { teams: TEAMS, potColors: POT_COLORS, countryNames: COUNTRY_NAMES } = competition;
   const [phase, setPhase] = useState("idle"); // idle | drawing | done
   const [speed, setSpeed] = useState("normal");
@@ -142,6 +148,30 @@ export default function DrawPage() {
     setPredictions([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [competitionKey]);
+
+  // Kullanıcı zaten tamamlanmış bir çekilişi olan bir yarışmaya (Fikstür/
+  // Eleme Turu sayfalarından ya da başka bir sekmeden) geri dönerse -- bu
+  // sayfanın animasyon durumu (phase/results/drawnTeamIds) SADECE bu sayfa
+  // örneğine özel yerel state olduğundan, context'teki kalıcı çekiliş
+  // sonucundan HABERSİZ kalıp yanılgı yaratacak şekilde "boş, ilk kez
+  // buradasın" görünümüne (ÇEKİLİŞİ BAŞLAT overlay'i) dönerdi. Bunun yerine
+  // context'te zaten tamam bir çekiliş varsa (hasDraw), animasyonu atlayıp
+  // doğrudan tamamlanmış sonucu ve "Yeniden Çek" düğmesini gösteriyoruz --
+  // böylece kullanıcı, üstüne yeni bir çekiliş yapmanın MEVCUT fikstürü/
+  // eleme turunu sıfırlayacağını görerek bilinçli şekilde "Yeniden Çek"e
+  // basabiliyor (bu da handleStart -> resetAll -> clearCompetition() ile
+  // fikstür/simülasyon/eleme turunu doğru şekilde temizleyip yeni çekilişe
+  // göre yeniden oluşturulmasını tetikler, bkz. FixturePage'teki
+  // `if (hasDraw && !fixture) ensureFixture()` efekti).
+  useEffect(() => {
+    if (hasDraw && persistedResults) {
+      resultsRef.current = persistedResults;
+      setResults(persistedResults);
+      setDrawnTeamIds(new Set(TEAMS.map((t) => t.id)));
+      setPhase("done");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [competitionKey, hasDraw]);
 
   useEffect(() => {
     speedRef.current = speed;

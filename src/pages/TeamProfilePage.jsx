@@ -8,6 +8,7 @@ import PlayerAvatar from "../components/PlayerAvatar.jsx";
 import { topScorers } from "../utils/statsSelectors.js";
 import { getRivalsOf } from "../utils/derbies.js";
 import { derivePhysicalAttributes } from "../utils/playerAttributes.js";
+import { estimateFinancialPower, estimateSquadValue, estimateCompetitionEarnings, formatMoney } from "../utils/financeEngine.js";
 
 const RESULT_LABEL = { W: "G", D: "B", L: "M" };
 const POSITION_ORDER = ["GK", "DF", "MF", "FW"];
@@ -69,7 +70,7 @@ function buildAllTeamMatches(fixture, matchResults, teamId) {
 
 export default function TeamProfilePage() {
   const { competitionKey, teamId } = useParams();
-  const { competition, simulation, hasFixture, fixture } = useCompetition(competitionKey);
+  const { competition, simulation, knockout, hasFixture, fixture } = useCompetition(competitionKey);
   const { getEffectivePlayersByTeam, transfers } = useTransferMarket(competitionKey);
   const { getCoeffDelta } = useCareer();
 
@@ -84,6 +85,13 @@ export default function TeamProfilePage() {
     () => Object.fromEntries(transfers.filter((t) => t.toTeam?.id === teamId).map((t) => [t.playerId, t.fromTeam])),
     [transfers, teamId]
   );
+  const financialPower = useMemo(() => (team ? estimateFinancialPower(team) : 0), [team]);
+  const squadValue = useMemo(() => estimateSquadValue(rosterWithAttrs), [rosterWithAttrs]);
+  const seasonEarnings = useMemo(() => {
+    if (!simulation) return null;
+    const earnings = estimateCompetitionEarnings(competition, simulation, knockout);
+    return earnings[teamId] ?? null;
+  }, [competition, simulation, knockout, teamId]);
 
   const standingRow = useMemo(
     () => simulation?.standings?.find((s) => s.teamId === teamId) || null,
@@ -169,6 +177,14 @@ export default function TeamProfilePage() {
             )}
           </div>
         </div>
+      </div>
+
+      <div className="team-profile-stat-row">
+        <div className="team-profile-stat"><span>{formatMoney(financialPower)}</span><small>💰 Mali Güç</small></div>
+        <div className="team-profile-stat"><span>{formatMoney(squadValue)}</span><small>Kadro Değeri</small></div>
+        {seasonEarnings != null && (
+          <div className="team-profile-stat"><span>{formatMoney(seasonEarnings)}</span><small>Bu Sezon Kazanç</small></div>
+        )}
       </div>
 
       {standingRow && (

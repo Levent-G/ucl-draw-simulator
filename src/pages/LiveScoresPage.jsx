@@ -33,9 +33,20 @@ import { simulateSeason } from "../utils/predictionEngine.js";
 import { generateFullDraw } from "../utils/drawEngine.js";
 import { buildResultsFromMatches } from "../utils/resultsHelpers.js";
 
-// Gerçek 1. Hafta zaten oynandığı için o haftayı yeniden "tahmin etmiyoruz"
-// -- gerçek puan durumundan devam ederek SADECE henüz oynanmamış maçları
-// (sıradaki hafta + kalan sezon) simüle ediyoruz. Süper Lig sezonu
+// Oynanan haftaların etiketleri SUPER_LIG_LIVE_RESULTS'tan TÜRETİLİR (hardcode
+// edilmez) -- liveStatus.js her yeni hafta sonrası güncellendiğinde bu
+// sayfadaki başlıklar da otomatik doğru kalır, ayrıca elle senkronize
+// edilmesi gerekmez.
+const PLAYED_WEEK_LABELS = [...new Set(SUPER_LIG_LIVE_RESULTS.map((r) => r.label))];
+const LATEST_PLAYED_LABEL = PLAYED_WEEK_LABELS[PLAYED_WEEK_LABELS.length - 1] || "";
+const PLAYED_WEEK_RANGE_LABEL =
+  PLAYED_WEEK_LABELS.length > 1
+    ? `${PLAYED_WEEK_LABELS[0]} – ${LATEST_PLAYED_LABEL}`
+    : LATEST_PLAYED_LABEL;
+
+// Gerçek oynanan haftalar zaten oynandığı için onları yeniden "tahmin
+// etmiyoruz" -- gerçek puan durumundan devam ederek SADECE henüz oynanmamış
+// maçları (sıradaki hafta + kalan sezon) simüle ediyoruz. Süper Lig sezonu
 // LeagueHomePage'den başlatılmış olmalı (fikstür orada üretiliyor).
 function SuperLigPrediction() {
   const { competition, hasDraw, fixture } = useCompetition("superlig");
@@ -83,8 +94,8 @@ function SuperLigPrediction() {
   return (
     <div className="live-sim-preview">
       <div className="live-asof live-sim-badge">
-        🎲 Tahmin — gerçek 1. Hafta sonuçlarından devam eden, henüz oynanmamış
-        maçların model tahmini
+        🎲 Tahmin — gerçek {LATEST_PLAYED_LABEL} sonuçlarından devam eden,
+        henüz oynanmamış maçların model tahmini
       </div>
 
       <div className="chart-card chart-card-wide">
@@ -197,7 +208,7 @@ function SuperLigLive() {
       </div>
 
       <div className="chart-card chart-card-wide live-results-card">
-        <h3>1. Hafta — Tüm Sonuçlar ({SUPER_LIG_LIVE_RESULTS.length} maç)</h3>
+        <h3>{PLAYED_WEEK_RANGE_LABEL} — Tüm Sonuçlar ({SUPER_LIG_LIVE_RESULTS.length} maç)</h3>
         <div className="live-results-list">
           {SUPER_LIG_LIVE_RESULTS.map((r, i) => {
             const home = teamByName[r.home];

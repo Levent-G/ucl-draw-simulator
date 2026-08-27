@@ -68,6 +68,7 @@ export default function FixturePage() {
   const { teamTactics, setTeamTactic } = useTeamTactics(competitionKey);
 
   const [activeMatchday, setActiveMatchday] = useState(1);
+  const [resimulating, setResimulating] = useState(false);
 
   useEffect(() => {
     setActiveMatchday(1);
@@ -81,6 +82,18 @@ export default function FixturePage() {
     if (fixture && !simulation) runSimulation(fixture, effectiveAllPlayers);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fixture, simulation, runSimulation]);
+
+  // Simülasyon artık bir Web Worker'da (asenkron) çalıştığı için, buton
+  // hesaplama sürerken tekrar tıklanıp aynı anda birden fazla istek
+  // gönderilmesin diye devre dışı bırakılır.
+  const handleResimulate = async (nextTactics) => {
+    setResimulating(true);
+    try {
+      await runSimulation(fixture, effectiveAllPlayers, nextTactics);
+    } finally {
+      setResimulating(false);
+    }
+  };
 
   const simMatchById = useMemo(() => {
     if (!simulation) return {};
@@ -211,8 +224,8 @@ export default function FixturePage() {
           <button className="btn-secondary" onClick={handleDownload} disabled={!simulation}>
             ⬇ Tahminlerini İndir
           </button>
-          <button className="btn-primary" onClick={() => runSimulation(fixture, effectiveAllPlayers)}>
-            Model Tahminlerini Yenile
+          <button className="btn-primary" onClick={() => handleResimulate()} disabled={resimulating}>
+            {resimulating ? "Hesaplanıyor…" : "Model Tahminlerini Yenile"}
           </button>
         </div>
       </header>
@@ -221,7 +234,7 @@ export default function FixturePage() {
         teams={competition.teams}
         teamTactics={teamTactics}
         setTeamTactic={setTeamTactic}
-        onChanged={(nextTactics) => runSimulation(fixture, effectiveAllPlayers, nextTactics)}
+        onChanged={(nextTactics) => handleResimulate(nextTactics)}
       />
 
       <section className="fixture-standings-section">

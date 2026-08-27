@@ -1822,13 +1822,24 @@ button {
      ========================================================================== */
 .derby-banner {
   position: fixed;
-  top: 22px;
+  /* navbar'ın altında, ondan bağımsız sabit bir "top" değeri kullanmak
+     (eskiden 22px) navbar'ın üzerine biniyordu -- hem masaüstünde (11 nav
+     linki iki satıra sarabiliyor) hem mobilde (hamburger menü açıkken).
+     Navbar zaten sticky/top:0 olduğu için, ondan HEMEN SONRA başlaması
+     için görünür navbar yüksekliğinden bağımsız, yeterince cömert sabit
+     bir boşluk bırakılır. */
+  top: 92px;
   left: 50%;
   transform: translateX(-50%) translateY(-40px) scale(0.9);
   z-index: 66;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.3, 1.4, 0.4, 1);
+}
+@media (max-width: 700px) {
+  .derby-banner {
+    top: 68px;
+  }
 }
 .derby-banner.show {
   opacity: 1;

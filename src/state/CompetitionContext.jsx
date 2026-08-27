@@ -1,9 +1,10 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { COMPETITIONS } from "../data/competitions.js";
 import { generateFixture } from "../utils/fixtureEngine.js";
 import { generateRoundRobinFixture } from "../utils/roundRobinEngine.js";
-import { simulateSeason } from "../utils/predictionEngine.js";
+import { simulateSeasonAsync } from "../utils/simulateSeasonAsync.js";
 import { generateKnockoutBracket } from "../utils/knockoutEngine.js";
+import { enrichTeamsWithAttackDefense } from "../utils/predictionEngine.js";
 import { useTeamInjection, applyInjection } from "./TeamInjectionContext.jsx";
 import { useTacticsContext } from "./TacticsContext.jsx";
 import { useAchievements } from "./AchievementsContext.jsx";
@@ -60,6 +61,11 @@ export function CompetitionProvider({ children }) {
   // fikstür, simülasyon, eleme turu) enjeksiyon uygulanmış haliyle kullanılır.
   const { injections } = useTeamInjection();
   const { applyCoeffDelta, advanceSeason: advanceCareerSeason, getCareer } = useCareer();
+  // "Yenileme Bağımlısı" başarısı için kaç kez yeniden simüle edildiğini
+  // takip eder -- matchHistory.length'e güvenmek yerine ayrı bir ref
+  // kullanılır çünkü runSimulation artık asenkron (Web Worker) ve state'in
+  // await sonrası GÜNCEL olduğu garanti değildir.
+  const historyCountRef = useRef({});
   const getComp = useCallback(
     (key) => {
       const injected = applyInjection(COMPETITIONS[key], injections[key]);
@@ -156,29 +162,41 @@ export function CompetitionProvider({ children }) {
     [state, patch, getComp]
   );
 
+  // Ağır sezon simülasyonunu (144 maç + oyuncu istatistikleri) ana thread'i
+  // kilitlememesi için bir Web Worker'da çalıştırır (bkz.
+  // simulateSeasonAsync.js) -- bu yüzden artık ASENKRON'dur. Çağıranların
+  // çoğu "fire and forget" olduğu için bunu fark etmez; senkron dönüş
+  // değeri KULLANAN tek yer (LeagueHomePage) zaten await ediyor.
   const runSimulation = useCallback(
-    (key, fx, allPlayersOverride, tacticsOverride) => {
+    async (key, fx, allPlayersOverride, tacticsOverride) => {
       const comp = getComp(key);
       const slot = state[key];
       const targetFixture = fx || slot?.fixture;
       if (!targetFixture) return null;
-      const sim = simulateSeason(targetFixture, {
+      const sim = await simulateSeasonAsync(targetFixture, {
         teams: comp.teams,
         allPlayers: allPlayersOverride || comp.getAllPlayers(),
         zones: comp.zones,
         tacticsById: tacticsOverride || tactics[key],
         settings,
       });
-      const prevHistory = state[key]?.matchHistory || [];
-      const newHistory = [...prevHistory, { runId: Date.now(), matches: sim.matchResults }];
-      patch(key, { simulation: sim, knockout: null, matchHistory: newHistory });
+      const historyEntry = { runId: Date.now(), matches: sim.matchResults };
+      setState((prev) => {
+        const prevSlot = prev[key] || emptyCompetitionState();
+        const newHistory = [...(prevSlot.matchHistory || []), historyEntry];
+        return {
+          ...prev,
+          [key]: { ...prevSlot, simulation: sim, knockout: null, matchHistory: newHistory },
+        };
+      });
+      historyCountRef.current[key] = (historyCountRef.current[key] || 0) + 1;
       unlock("sampiyon-belirleyici");
       if (key === "ucl") unlock("ucl-yolcusu");
       if (key === "europa") unlock("avrupa-fatihi");
-      if (newHistory.length >= 5) unlock("yenileme-bagimlisi");
+      if (historyCountRef.current[key] >= 5) unlock("yenileme-bagimlisi");
       return sim;
     },
-    [state, patch, getComp, tactics, unlock, settings]
+    [state, getComp, tactics, unlock, settings]
   );
 
   const generateKnockout = useCallback(
@@ -186,7 +204,8 @@ export function CompetitionProvider({ children }) {
       const comp = getComp(key);
       const slot = state[key];
       if (!comp.hasKnockout || !slot?.simulation) return null;
-      const teamById = Object.fromEntries(comp.teams.map((t) => [t.id, t]));
+      const enrichedTeams = enrichTeamsWithAttackDefense(comp.teams, comp.getAllPlayers());
+      const teamById = Object.fromEntries(enrichedTeams.map((t) => [t.id, t]));
       const bracket = generateKnockoutBracket(slot.simulation.standings, teamById, tactics[key]);
       patch(key, { knockout: bracket });
       if (bracket?.champion) {

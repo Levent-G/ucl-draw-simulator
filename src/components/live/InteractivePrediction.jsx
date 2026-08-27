@@ -3,7 +3,11 @@ import { useSearchParams } from "react-router-dom";
 import { useCompetition } from "../../state/CompetitionContext.jsx";
 import { useTeamTactics } from "../../state/TacticsContext.jsx";
 import { useAchievements } from "../../state/AchievementsContext.jsx";
-import { standingsFromOrder, computeStandingsFromUserScores } from "../../utils/predictionEngine.js";
+import {
+  standingsFromOrder,
+  computeStandingsFromUserScores,
+  enrichTeamsWithAttackDefense,
+} from "../../utils/predictionEngine.js";
 import { generateKnockoutBracket } from "../../utils/knockoutEngine.js";
 import { encodeShareData, decodeShareData, copyToClipboard } from "../../utils/shareLink.js";
 import DragStandings from "../fixture/DragStandings.jsx";
@@ -114,7 +118,13 @@ export default function InteractivePrediction({ competitionKey, dataSource }) {
     if (topId && topGoals > 0 && topId === myScorerId) unlock("gol-krali-kahin");
   }, [myScorerId, modelPlayerStats, unlock]);
 
-  const teamById = useMemo(() => Object.fromEntries(competition.teams.map((t) => [t.id, t])), [competition]);
+  const teamById = useMemo(
+    () =>
+      Object.fromEntries(
+        enrichTeamsWithAttackDefense(competition.teams, competition.getAllPlayers()).map((t) => [t.id, t])
+      ),
+    [competition]
+  );
 
   const modelOrder = useMemo(
     () => (modelStandings ? modelStandings.map((s) => s.teamId) : competition.teams.map((t) => t.id)),

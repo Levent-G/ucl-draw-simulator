@@ -71,11 +71,15 @@ button.site-nav-link-icon {
   cursor: pointer;
 }
 
-/* Mobilde 10+ nav linki alt alta sarılıp sayfanın büyük bir kısmını
-   kaplıyordu (bkz. kullanıcı geri bildirimi: "her sayfada çok karmaşık
-   geliyor"). Bu yüzden mobilde linkler bir hamburger menüsünün ARDINA
-   gizlenir; masaüstünde davranış tamamen aynı kalır. */
-@media (max-width: 700px) {
+/* 11 nav linki + arama kutusu, 700px'in ÇOK üzerindeki "normal" masaüstü
+   genişliklerinde bile tek satıra sığmayıp 2 satıra sarıyordu -- ölçülen
+   gerçek kırılma noktası 1350-1400px arasıydı (1350px'de 120px yükseklik/
+   2 satır, 1400px'de 64px/tek satır). Kullanıcı geri bildirimi ("her
+   sayfada çok karmaşık geliyor") aslında sadece telefon boyutlarıyla sınırlı
+   değildi. Bu yüzden kırılma noktası 1400px'e çıkarıldı; bunun altında
+   (küçük laptop/tablet dahil) linkler bir hamburger menüsünün ardına
+   gizlenir. */
+@media (max-width: 1400px) {
   .site-nav-inner {
     padding: 10px 14px;
     gap: 10px;
