@@ -12,6 +12,7 @@ import {
   deriveAttackDefenseRatio,
   eloExpectedScore,
   updateForm,
+  computeMaxDrift,
   DEFAULT_MODEL_SETTINGS,
   MODEL_PRESETS,
 } from "../predictionEngine.js";
@@ -48,6 +49,41 @@ describe("predictionEngine.expectedGoals / matchProbabilities", () => {
     // oran neredeyse hiç büyümezdi (payların ikisi de küçük kaymalar
     // yaşardı); burada oran belirgin şekilde (%50'den fazla) büyüyor.
     expect(bigRatio).toBeGreaterThan(smallRatio * 1.5);
+  });
+
+  it("gives a historically deep club (pedigree) a real edge over a same-coeff club with no history", () => {
+    const storied = { id: "storied", coeff: 70, pedigree: 15 };
+    const newcomer = { id: "newcomer", coeff: 70, pedigree: 0 };
+    const { lambdaHome, lambdaAway } = expectedGoals(storied, newcomer);
+    expect(lambdaHome).toBeGreaterThan(lambdaAway);
+  });
+
+  it("does not let pedigree alone flip a large coeff mismatch (it's a nudge, not the primary driver)", () => {
+    const weakButStoried = { id: "weak", coeff: 20, pedigree: 20 };
+    const strongNewcomer = { id: "strong", coeff: 130, pedigree: 0 };
+    const { lambdaHome, lambdaAway } = expectedGoals(weakButStoried, strongNewcomer);
+    expect(lambdaAway).toBeGreaterThan(lambdaHome);
+  });
+
+  it("gives a historically decorated Süper Lig club (ör. Galatasaray tarzı, pedigree 20) an edge over a same-coeff club with no title history (ör. yeni yükselen bir takım, pedigree 0)", () => {
+    // Süper Lig'in gerçek coeff ölçeğini (kabaca 38-92) yansıtan sentetik
+    // takımlar -- gerçek data/superLigTeams.js dosyasını import ETMİYORUZ
+    // (bkz. testFixtures.js başındaki not: testler PNG logo import'larına
+    // bağımlı gerçek veri setinden bağımsız kalır).
+    const decorated = { id: "storied-sl", coeff: 78, pedigree: 20 };
+    const newlyPromoted = { id: "newcomer-sl", coeff: 78, pedigree: 0 };
+    const { lambdaHome, lambdaAway } = expectedGoals(decorated, newlyPromoted);
+    expect(lambdaHome).toBeGreaterThan(lambdaAway);
+  });
+
+  it("falls back to coeff-only behavior when pedigree is undefined (backward compatible)", () => {
+    const withPedigree = { id: "a", coeff: 70, pedigree: 0 };
+    const withoutPedigree = { id: "a", coeff: 70 };
+    const opponent = { id: "b", coeff: 55 };
+    const a = expectedGoals(withPedigree, opponent);
+    const b = expectedGoals(withoutPedigree, opponent);
+    expect(a.lambdaHome).toBeCloseTo(b.lambdaHome, 10);
+    expect(a.lambdaAway).toBeCloseTo(b.lambdaAway, 10);
   });
 
   it("makes a European-elite-vs-modest-club mismatch a clear (not coinflip) favorite", () => {
@@ -208,6 +244,72 @@ describe("predictionEngine.eloExpectedScore / updateForm (in-season Elo-style dr
     }
     expect(formById.underdog).toBeLessThanOrEqual(20);
   });
+
+  it("accepts an explicit maxDrift override (used by computeMaxDrift-derived, competition-proportional caps)", () => {
+    const formById = {};
+    for (let i = 0; i < 50; i++) {
+      updateForm(formById, "underdog", 20, 120, 1, 9);
+    }
+    expect(formById.underdog).toBeLessThanOrEqual(9);
+    expect(formById.underdog).toBeGreaterThan(8); // actually reaches the (smaller) cap, isn't stuck far below it
+  });
+});
+
+describe("predictionEngine.computeMaxDrift (in-season drift cap proportional to the competition's own coeff spread)", () => {
+  // Kök neden: ELO_MAX_DRIFT (±20) başlangıçta SADECE UCL'nin coeff
+  // açıklığına (kabaca 12-136, açıklık ~124) göre kalibre edilmişti. Süper
+  // Lig'in açıklığı çok daha dar (kabaca 38-92, açıklık ~54) olduğundan AYNI
+  // mutlak ±20 sınırı orada açıklığın %37'sine denk geliyor, ~%16'sına değil
+  // -- bu da coeff'i en düşük takımlardan birinin sezon içi form kaymasıyla
+  // lig genelindeki en güçlü takımı geride bırakabilmesine yol açıyordu.
+  it("returns close to the legacy ±20 UCL-calibrated cap for a UCL-like wide coeff spread", () => {
+    const ucLikeTeams = [{ coeff: 136 }, { coeff: 12 }]; // gerçek UCL açıklığı (~124)
+    expect(computeMaxDrift(ucLikeTeams)).toBeCloseTo(20, 0);
+  });
+
+  it("returns a proportionally much smaller cap for Süper Lig's narrower coeff spread", () => {
+    const ucLikeTeams = [{ coeff: 136 }, { coeff: 12 }];
+    const superLigLikeTeams = [{ coeff: 92 }, { coeff: 38 }]; // gerçek Süper Lig açıklığı (~54)
+    const wideMax = computeMaxDrift(ucLikeTeams);
+    const narrowMax = computeMaxDrift(superLigLikeTeams);
+    expect(narrowMax).toBeLessThan(wideMax / 2);
+    expect(narrowMax).toBeGreaterThan(0); // mekanizma tamamen devre dışı kalmıyor
+  });
+
+  it("falls back to the legacy fixed cap when given no/insufficient team context (backward compatible)", () => {
+    expect(computeMaxDrift(null)).toBe(20);
+    expect(computeMaxDrift([{ coeff: 70 }])).toBe(20);
+  });
+
+  it("prevents a narrow-spread competition's bottom team from fully closing the gap on the top team via drift alone (the observed bug), while the old fixed ±20 cap would have let it get much closer", () => {
+    const superLigLikeTeams = [{ coeff: 92 }, { coeff: 38 }];
+    const range = 92 - 38;
+    const properMax = computeMaxDrift(superLigLikeTeams);
+    const legacyFixedMax = 20;
+
+    // En iyi senaryoda (alt takım tam pozitif kaymaya, üst takım tam negatif
+    // kaymaya doyar) kalan coeff farkı ne olurdu?
+    const gapWithProportionalCap = 92 - properMax - (38 + properMax);
+    const gapWithLegacyFixedCap = 92 - legacyFixedMax - (38 + legacyFixedMax);
+
+    expect(gapWithProportionalCap).toBeGreaterThan(gapWithLegacyFixedCap);
+    // Orantılı sınırla, açıklığın makul bir payı (en azından üçte biri) her
+    // zaman korunmalı -- yani hiyerarşi salt form kaymasıyla asla TAMAMEN
+    // tersine dönemez.
+    expect(gapWithProportionalCap).toBeGreaterThan(range / 3);
+  });
+
+  it("still allows the previously-tested amount of drift for UCL's wide spread (no regression)", () => {
+    const ucLikeTeams = [{ coeff: 136 }, { coeff: 12 }];
+    const properMax = computeMaxDrift(ucLikeTeams);
+    const formById = {};
+    for (let i = 0; i < 50; i++) {
+      updateForm(formById, "underdog", 20, 120, 1, properMax);
+    }
+    // Bu sezon zaten test edilmiş/onaylanmış UCL davranışı: doyum noktası
+    // hâlâ ~20 civarında (eski sabitten pratikte ayırt edilemez).
+    expect(formById.underdog).toBeCloseTo(20, 0);
+  });
 });
 
 describe("predictionEngine.buildLeagueZones / buildSwissZones / resolveZone", () => {
@@ -328,6 +430,60 @@ describe("predictionEngine.simulateSeason", () => {
     // Seeded 3 already-played + every match in the given fixture gets simulated on top.
     expect(row.played).toBe(3 + fixture.length);
     expect(row.pts).toBeGreaterThanOrEqual(9);
+  });
+
+  it("with a narrow (Süper Lig-like) coeff spread, the proportional drift cap keeps the top team competitive at the top far more often than the bottom team, across many simulated seasons", () => {
+    // Gerçek data/superLigTeams.js'i import ETMİYORUZ (bkz. dosya başındaki
+    // not) -- ama coeff/pedigree DEĞERLERİ oradaki gerçek verilerle
+    // BİREBİR eşleşiyor, böylece bu test gerçek Süper Lig senaryosunu
+    // sadakatle yansıtır. Eski (sabit ±20) davranışta bu açıklıkta (~54)
+    // en altta bir takımın form kaymasıyla zirvedeki takımı geride
+    // bırakması gözlemlenmişti (bkz. predictionEngine.js'teki ELO_MAX_DRIFT
+    // notu) -- bu test o regresyona karşı bir güvenlik ağıdır.
+    const coeffsAndPedigree = [
+      { coeff: 92, pedigree: 20 }, // Galatasaray
+      { coeff: 90, pedigree: 15 }, // Fenerbahçe
+      { coeff: 82, pedigree: 12 }, // Beşiktaş
+      { coeff: 78, pedigree: 8 }, // Trabzonspor
+      { coeff: 62, pedigree: 3 },
+      { coeff: 60, pedigree: 0 },
+      { coeff: 58, pedigree: 1 },
+      { coeff: 55, pedigree: 0 },
+      { coeff: 54, pedigree: 0 },
+      { coeff: 53, pedigree: 0 },
+      { coeff: 52, pedigree: 0 },
+      { coeff: 50, pedigree: 0 },
+      { coeff: 44, pedigree: 0 },
+      { coeff: 43, pedigree: 0 },
+      { coeff: 46, pedigree: 0 },
+      { coeff: 45, pedigree: 0 },
+      { coeff: 40, pedigree: 1 },
+      { coeff: 38, pedigree: 0 }, // en düşük coeff, hiç pedigree yok
+    ];
+    const teams = coeffsAndPedigree.map((t, i) => ({
+      id: `sl${i + 1}`,
+      name: `SL Takım ${i + 1}`,
+      short: `SL${i + 1}`,
+      country: "TUR",
+      ...t,
+    }));
+    const fixture = generateRoundRobinFixture(teams);
+    const zones = buildLeagueZones(teams.length);
+    const top = teams[0]; // en yüksek coeff + pedigree (Galatasaray benzeri)
+    const bottom = teams[teams.length - 1]; // en düşük coeff, pedigree yok
+
+    let topTop3Count = 0;
+    let bottomTop3Count = 0;
+    const N = 20;
+    for (let i = 0; i < N; i++) {
+      const sim = simulateSeason(fixture, { teams, zones });
+      const topRow = sim.standings.find((s) => s.teamId === top.id);
+      const bottomRow = sim.standings.find((s) => s.teamId === bottom.id);
+      if (topRow.rank <= 3) topTop3Count++;
+      if (bottomRow.rank <= 3) bottomTop3Count++;
+    }
+
+    expect(topTop3Count).toBeGreaterThan(bottomTop3Count);
   });
 });
 

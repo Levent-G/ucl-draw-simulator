@@ -24,6 +24,24 @@ function shuffle(arr) {
   return a;
 }
 
+// Penaltı atışlarında kazanma olasılığı -- coeff'e takımın TARİHİ
+// pedigree'sini (bkz. teams.js, predictionEngine.js'teki effectiveStrength
+// ile AYNI fikir) küçük bir ek olarak katar, eskiden burada sadece ham
+// coeff'in DOĞRUSAL oranı kullanılıyordu (predictionEngine.js'teki eski
+// hatalı yöntemle aynı sorun, ayrıca pedigree'yi hiç görmüyordu). Gerçek
+// hayatta penaltılar takım kalitesinden nispeten BAĞIMSIZ bir "şans"
+// unsuru taşır (maç içi performanstan çok kalıcı sinir/nokta atışı
+// meselesidir) -- bu yüzden expectedGoals'taki kadar keskin değil, daha
+// YUMUŞAK bir bölen kullanılır; favori yine de hafif öndedir ama sürpriz
+// SIK görülür (gerçek UEFA penaltı istatistikleriyle uyumlu).
+const PENALTY_SHOOTOUT_DIVISOR = 260;
+
+function penaltyWinProbability(teamA, teamB) {
+  const strengthA = Math.max(1, (teamA.coeff || 6) + (teamA.pedigree ?? 0));
+  const strengthB = Math.max(1, (teamB.coeff || 6) + (teamB.pedigree ?? 0));
+  return 1 / (1 + Math.pow(10, (strengthB - strengthA) / PENALTY_SHOOTOUT_DIVISOR));
+}
+
 // twoLegged: true ise ikinci takım (b) ilk maçı evinde oynar (dezavantajlı
 // taraf), ilk takım (a) ikinci (rövanş) maçı evinde oynar -- gerçek UEFA
 // kuralına benzer şekilde "daha güçlü taraf" son maçı evinde oynar.
@@ -45,10 +63,7 @@ function simulateTie(a, b, twoLegged, tacticsById) {
   if (aggA > aggB) winner = a;
   else if (aggB > aggA) winner = b;
   else {
-    const strengthA = Math.max(6, a.coeff || 6);
-    const strengthB = Math.max(6, b.coeff || 6);
-    const pA = strengthA / (strengthA + strengthB);
-    winner = Math.random() < pA ? a : b;
+    winner = Math.random() < penaltyWinProbability(a, b) ? a : b;
     penalty = { winnerId: winner.id };
   }
 

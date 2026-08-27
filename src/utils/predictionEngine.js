@@ -92,7 +92,7 @@ function clamp(v, min, max) {
 // kullanıyoruz: fark ne kadar büyükse pay o kadar keskin kayar, fark küçükse
 // (aynı torbadaki iki takım gibi) ev sahibi avantajı dışında neredeyse
 // yarı yarıya kalır.
-const STRENGTH_SHARE_DIVISOR = 150;
+const STRENGTH_SHARE_DIVISOR = 120;
 
 // Bir takımın coeff'ine, o takımın TARİHİ Avrupa Kupası/UCL derinliğini
 // (bkz. teams.js'teki `pedigree` alanı, 0-20) KÜÇÜK bir ek olarak katar.
@@ -370,7 +370,41 @@ const ELO_K = 5;
 // güvenlik sınırı; pratikte Elo'nun kendi kendini dengeleyen doğası (takım
 // güçlendikçe beklenen skoru da yükselir, dolayısıyla ileri sürprizler
 // küçülür) sayesinde bu sınıra nadiren dayanılır.
+//
+// NEDEN SABİT DEĞİL: Bu sabit başlangıçta SADECE UCL'nin coeff aralığına
+// (kabaca 12-136, açıklık ~124) karşı kalibre edilmişti -- ±20, o açıklığın
+// ~%16'sı gibi mütevazı bir pay. Ama motor YARIŞMADAN BAĞIMSIZ (bkz. dosya
+// başı notu) ve Süper Lig'in coeff aralığı ÇOK DAHA DAR (kabaca 38-92,
+// açıklık ~54). AYNI mutlak ±20 sınırı orada açıklığın ~%37'sine denk gelir
+// -- yani coeff'i zaten en düşük takımlardan biri olan bir kulüp, sırf
+// birkaç sürpriz sonuçla (form drift + gerçek coeff'i) lig genelindeki en
+// güçlü takımı geride bırakabilecek kadar büyük bir sezon-içi kayma
+// kazanabiliyordu. Bu, gözlemlenen "coeff 54'lük bir takımın coeff 92'lik
+// Galatasaray'ı geride bırakıp şampiyon olması" gibi gerçekçilik dışı
+// sonuçların kök nedeniydi. Çözüm: sabit bir sayı yerine, o an simüle edilen
+// YARIŞMANIN KENDİ coeff açıklığının bir YÜZDESİ olarak türetilen bir sınır
+// (bkz. computeMaxDrift) -- UCL'nin geniş açıklığında eski ~20 civarı
+// davranışı (ve dolayısıyla bu sezon zaten test edilmiş/onaylanmış
+// gerçekçilik hissini) KORUR, dar açıklıklı yarışmalarda (Süper Lig gibi)
+// orantılı olarak küçülür.
 const ELO_MAX_DRIFT = 20;
+// Yukarıdaki UCL kalibrasyonundan (20 / ~124 açıklık) türetilen oran --
+// computeMaxDrift bunu HER yarışmanın kendi coeff açıklığına uygular.
+const ELO_MAX_DRIFT_RATIO = ELO_MAX_DRIFT / 124;
+// Açıklığı sıfıra yakın (ör. tüm takımların coeff'i neredeyse eşit) bir
+// yarışmada bile form mekaniğinin tamamen etkisiz kalmaması için taban değer.
+const ELO_MAX_DRIFT_FLOOR = 4;
+
+// teams: o an simüle edilen yarışmanın TAM takım listesi (bkz. simulateSeason
+// options.teams) -- coeff açıklığını (max-min) buradan türetir. Yarışma
+// bilgisi yoksa (ör. tek bir maç bağlamında doğrudan çağrılırsa) eski sabit
+// davranışa (ELO_MAX_DRIFT) güvenli biçimde geri düşer.
+export function computeMaxDrift(teams) {
+  if (!teams || teams.length < 2) return ELO_MAX_DRIFT;
+  const coeffs = teams.map((t) => Math.max(1, t?.coeff || 6));
+  const range = Math.max(...coeffs) - Math.min(...coeffs);
+  return Math.max(ELO_MAX_DRIFT_FLOOR, range * ELO_MAX_DRIFT_RATIO);
+}
 
 export function eloExpectedScore(ownCoeff, oppCoeff) {
   return 1 / (1 + Math.pow(10, (Math.max(1, oppCoeff) - Math.max(1, ownCoeff)) / ELO_DIVISOR));
@@ -380,11 +414,13 @@ export function eloExpectedScore(ownCoeff, oppCoeff) {
 // takımların SEZON BAŞI (form uygulanmamış) coeff'leridir -- "beklenti" her
 // zaman takımın gerçek gücüne göre ölçülür, o ana kadar birikmiş kaymaya göre
 // değil, böylece kayma saf biçimde "coeff'in öngördüğünden ne kadar
-// iyi/kötü performans gösterildiği"ni yansıtır.
-export function updateForm(formById, teamId, ownCoeff, oppCoeff, actualScore) {
+// iyi/kötü performans gösterildiği"ni yansıtır. maxDrift (opsiyonel): bkz.
+// computeMaxDrift -- verilmezse eski sabit ELO_MAX_DRIFT'e düşer (GERİYE
+// DÖNÜK UYUMLU: bu imzayla doğrudan çağıran mevcut testler/kod aynen çalışır).
+export function updateForm(formById, teamId, ownCoeff, oppCoeff, actualScore, maxDrift = ELO_MAX_DRIFT) {
   const expected = eloExpectedScore(ownCoeff, oppCoeff);
   const cur = formById[teamId] || 0;
-  formById[teamId] = clamp(cur + ELO_K * (actualScore - expected), -ELO_MAX_DRIFT, ELO_MAX_DRIFT);
+  formById[teamId] = clamp(cur + ELO_K * (actualScore - expected), -maxDrift, maxDrift);
 }
 
 // Takımın güncel (Elo tarzı) formunu coeff'e geçici bir ek olarak uygular --
@@ -705,6 +741,10 @@ export function simulateSeason(matchdays, options) {
 
   const matchResults = [];
   const formById = {}; // sezon boyunca birikimli form momentumu (bkz. dosya başı notu)
+  // Bu YARIŞMANIN kendi coeff açıklığına göre orantılı form-kayma sınırı --
+  // bkz. computeMaxDrift'in başındaki not (sabit ±20, dar açıklıklı
+  // yarışmalarda -- ör. Süper Lig -- orantısız büyük kalıyordu).
+  const formMaxDrift = computeMaxDrift(teams);
   const unavailableUntil = {}; // sezon boyunca birikimli sakatlık/ceza takibi
   const unavailableReason = {};
 
@@ -733,21 +773,21 @@ export function simulateSeason(matchdays, options) {
         hs.w++;
         hs.pts += 3;
         as_.l++;
-        updateForm(formById, m.homeTeam.id, m.homeTeam.coeff, m.awayTeam.coeff, 1);
-        updateForm(formById, m.awayTeam.id, m.awayTeam.coeff, m.homeTeam.coeff, 0);
+        updateForm(formById, m.homeTeam.id, m.homeTeam.coeff, m.awayTeam.coeff, 1, formMaxDrift);
+        updateForm(formById, m.awayTeam.id, m.awayTeam.coeff, m.homeTeam.coeff, 0, formMaxDrift);
       } else if (sim.homeGoals < sim.awayGoals) {
         as_.w++;
         as_.pts += 3;
         hs.l++;
-        updateForm(formById, m.homeTeam.id, m.homeTeam.coeff, m.awayTeam.coeff, 0);
-        updateForm(formById, m.awayTeam.id, m.awayTeam.coeff, m.homeTeam.coeff, 1);
+        updateForm(formById, m.homeTeam.id, m.homeTeam.coeff, m.awayTeam.coeff, 0, formMaxDrift);
+        updateForm(formById, m.awayTeam.id, m.awayTeam.coeff, m.homeTeam.coeff, 1, formMaxDrift);
       } else {
         hs.d++;
         as_.d++;
         hs.pts++;
         as_.pts++;
-        updateForm(formById, m.homeTeam.id, m.homeTeam.coeff, m.awayTeam.coeff, 0.5);
-        updateForm(formById, m.awayTeam.id, m.awayTeam.coeff, m.homeTeam.coeff, 0.5);
+        updateForm(formById, m.homeTeam.id, m.homeTeam.coeff, m.awayTeam.coeff, 0.5, formMaxDrift);
+        updateForm(formById, m.awayTeam.id, m.awayTeam.coeff, m.homeTeam.coeff, 0.5, formMaxDrift);
       }
 
       const homePlayersFull = playersByTeam[m.homeTeam.id] || [];
