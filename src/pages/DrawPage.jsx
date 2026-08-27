@@ -98,11 +98,54 @@ function isResultsComplete(results, teams) {
 // endişe). `auth`/`db` tekil (singleton) modüller olduğundan, kullanıcı bu
 // akışa girmeden önce Tahmin Ligi sayfasında zaten giriş yapmış olmalı --
 // dinamik import burada AYNI modül örneğine ulaşır, oturum durumu korunur.
-function PredictionLeagueTransferCta({ competitionKey, results }) {
+// auth.currentUser bazen (özellikle bu sayfaya doğrudan/yeni bir sekmede
+// gelindiğinde) Firebase'in tarayıcı depolamasından oturumu geri yükleme
+// işlemi HENÜZ bitmediği için bir an null görünebilir -- bunu senkron
+// olarak kontrol etmek, kullanıcı AslıNDA giriş yapmış olsa bile yanlışlıkla
+// "önce giriş yap" hatası verdirebiliyordu. Bunun yerine ilk
+// onAuthStateChanged tetiklenişini (zaten giriş yapılmışsa neredeyse anında
+// gelir) bekliyoruz.
+function waitForAuthUser(auth, onAuthStateChanged) {
+  return new Promise((resolve) => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      unsub();
+      resolve(u);
+    });
+  });
+}
+
+// PredictionLeaguePage.jsx'teki describeFirestoreError ile AYNI mesajlar --
+// burada (Firebase'i statik import etmemek için) bilerek küçük bir kopyası
+// tutuluyor.
+function describeFirestoreErrorLocal(error) {
+  const code = error?.code || "";
+  const message = error?.message || "";
+  if (code === "unavailable" || message.includes("client is offline")) {
+    return "Firestore'a bağlanılamadı. Bu genelde Firebase Console'da Firestore Database'in henüz oluşturulmamış olmasından kaynaklanır.";
+  }
+  if (code === "permission-denied") {
+    return "Firestore bu isteği reddetti (permission-denied) -- firestore.rules dosyasının içeriğini Firebase Console -> Firestore Database -> Rules sekmesine yapıştırıp Yayınla demen gerekiyor.";
+  }
+  if (code === "failed-precondition") {
+    return "Firestore Database projede henüz oluşturulmamış görünüyor -- Firebase Console -> Firestore Database -> Create database.";
+  }
+  return message || "Oluşturulamadı, tekrar dene.";
+}
+
+function PredictionLeagueTransferCta({ competitionKey, results, favoriteTeamId, predictions }) {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const ctaRef = useRef(null);
+
+  // Kura bitip bu CTA ekrana gelince (bkz. handleStart -> tableSectionRef'e
+  // scroll), kullanıcı hâlâ yukarıda kura tablosuna bakıyor olabilir -- bu
+  // düğme görünür alanın dışında kalıp fark edilmeyebiliyordu. Göründüğü an
+  // kendini görünüre kaydırıyoruz.
+  useEffect(() => {
+    ctaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, []);
 
   const handleTransfer = async () => {
     setSubmitting(true);
@@ -114,7 +157,8 @@ function PredictionLeagueTransferCta({ competitionKey, results }) {
         import("../state/PredictionLeagueContext.jsx"),
       ]);
       const { addDoc, collection, doc, setDoc, serverTimestamp } = firestore;
-      const user = auth.currentUser;
+      const { onAuthStateChanged } = await import("firebase/auth");
+      const user = auth.currentUser || (await waitForAuthUser(auth, onAuthStateChanged));
       if (!user) {
         setError("Önce Tahmin Ligi sayfasından Google ile giriş yapmalısın, sonra buraya dönüp tekrar dene.");
         return;
@@ -140,17 +184,44 @@ function PredictionLeagueTransferCta({ competitionKey, results }) {
         photoURL: user.photoURL || null,
         joinedAt: serverTimestamp(),
       });
+      // Kullanıcı, kura başlamadan ÖNCE (bkz. FavoriteTeamPicker, phase==="idle"
+      // iken görünen "3 rakip tahmin et" kutusu) tuttuğu takım için rakip
+      // tahmini yaptıysa, bunu da ligin İLK tahmini olarak kaydediyoruz --
+      // Tahmin Ligi akışının "önce kura eşleşmesini tahmin et, sonra lig
+      // sıralamasını tahmin et" sırasını başlatan adım budur. Bu tahmin SADECE
+      // kurayı o an İZLEYEN kişi tarafından yapılabilir (kura bir kez çekilir),
+      // bu yüzden burada -- ligin ta kendisiyle birlikte -- kaydediliyor.
+      if (favoriteTeamId && predictions?.length > 0) {
+        await setDoc(doc(db, "predictions", `${leagueRef.id}_draw_${user.uid}`), {
+          uid: user.uid,
+          displayName: user.displayName || "Bilinmeyen",
+          photoURL: user.photoURL || null,
+          leagueId: leagueRef.id,
+          matchId: "draw",
+          kind: "draw",
+          favoriteTeamId,
+          guesses: predictions,
+          createdAt: serverTimestamp(),
+        });
+      }
       navigate(`/${competitionKey}/tahmin-ligi/${leagueRef.id}`);
     } catch (e) {
-      setError(e.message || "Oluşturulamadı, tekrar dene.");
+      // eslint-disable-next-line no-console
+      console.error("Tahmin Ligi oluşturulamadı ->", e);
+      setError(describeFirestoreErrorLocal(e));
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="stats-callout prediction-league-transfer-cta">
+    <div className="stats-callout prediction-league-transfer-cta" ref={ctaRef}>
       <p>🏆 Bu kurayla yeni bir Tahmin Ligi odası oluştur -- linkini arkadaşlarınla paylaşınca onlar da bu AYNI eşleşmeleri görüp tahmin edecek.</p>
+      {favoriteTeamId && predictions?.length > 0 && (
+        <p className="footnote">
+          🔮 Kura başlamadan önceki "{predictions.length} rakip" tahminin de bu ligin ilk tahmini olarak kaydedilecek.
+        </p>
+      )}
       <div className="prediction-league-transfer-form">
         <input
           type="text"
@@ -621,6 +692,13 @@ export default function DrawPage() {
 
       {error && <p style={{ color: "#f87171" }}>{error}</p>}
 
+      {phase === "idle" && forPredictionLeague && (
+        <div className="stats-callout prediction-league-draw-hint">
+          🔮 Tahmin Ligi'nin İLK adımı burada: kura başlamadan önce tuttuğun bir takım seçip onun 3 rakibini tahmin
+          et -- kura çekilince kaç tanesini bildiğin, ligdeki ilk puanın olacak.
+        </div>
+      )}
+
       {phase === "idle" && (
         <FavoriteTeamPicker
           teams={TEAMS}
@@ -660,7 +738,14 @@ export default function DrawPage() {
 
       {phase === "done" && (
         <>
-          {forPredictionLeague && <PredictionLeagueTransferCta competitionKey={competitionKey} results={results} />}
+          {forPredictionLeague && (
+            <PredictionLeagueTransferCta
+              competitionKey={competitionKey}
+              results={results}
+              favoriteTeamId={favoriteTeamId}
+              predictions={predictions}
+            />
+          )}
           <FinalFavoriteSummary
             teams={TEAMS}
             results={results}

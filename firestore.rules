@@ -61,7 +61,7 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow create: if request.auth != null
                     && request.resource.data.uid == request.auth.uid
-                    && request.resource.data.kind in ['score', 'champion', 'knockout', 'standings']
+                    && request.resource.data.kind in ['draw', 'score', 'champion', 'knockout', 'standings']
                     && predictionId ==
                        request.resource.data.leagueId + '_' +
                        request.resource.data.matchId + '_' +

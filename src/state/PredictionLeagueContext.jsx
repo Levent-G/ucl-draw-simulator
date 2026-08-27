@@ -350,9 +350,11 @@ export function useMyLeagues(competitionKey) {
   const { user } = usePredictionAuth();
   const [leagues, setLeagues] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     setLeagues([]);
+    setError(null);
     if (!user || !competitionKey) {
       setLoading(false);
       return undefined;
@@ -378,12 +380,17 @@ export function useMyLeagues(competitionKey) {
         );
         setLoading(false);
       },
-      () => setLoading(false)
+      (err) => {
+        // eslint-disable-next-line no-console
+        console.error("Tahmin Ligi: 'Liglerim' listesi okunamadı ->", err);
+        setError(err);
+        setLoading(false);
+      }
     );
     return unsub;
   }, [user, competitionKey]);
 
-  return { leagues, loading };
+  return { leagues, loading, error };
 }
 
 // Bir lig odasının TÜM üyelerinin tahminlerini canlı dinler ("herkes
@@ -526,6 +533,23 @@ export const KNOCKOUT_TIE_POINTS = { 0: 2, 1: 3, 2: 4, 3: 5, 4: 6 }; // round in
 // yanılmak 2, 2 sıra yanılmak 1, daha fazlası 0 -- ne kadar YAKIN o kadar
 // puan, sadece "birebir tuttu/tutmadı" değil.
 const STANDINGS_MAX_POINTS_PER_TEAM = 3;
+// Kura tahmininde (bkz. DrawPage.jsx: FavoriteTeamPicker) doğru bilinen HER
+// rakip için verilen puan -- en fazla 3 tahmin edilebildiğinden en yüksek
+// olası kura puanı 3 * 4 = 12.
+export const DRAW_GUESS_POINTS_PER_HIT = 4;
+
+// Bir takımın GERÇEK (serileştirilmiş) fikstürdeki tüm rakiplerinin id
+// kümesini çıkarır -- kura tahmininin (kind:"draw") puanlanması için.
+function realOpponentsOf(league, teamId) {
+  const opponents = new Set();
+  for (const md of league?.fixture || []) {
+    for (const m of md.matches) {
+      if (m.homeId === teamId) opponents.add(m.awayId);
+      else if (m.awayId === teamId) opponents.add(m.homeId);
+    }
+  }
+  return opponents;
+}
 
 function standingsPoints(predictedOrder, actualOrder) {
   if (!Array.isArray(predictedOrder) || !Array.isArray(actualOrder) || actualOrder.length === 0) return 0;
@@ -545,6 +569,11 @@ function standingsPoints(predictedOrder, actualOrder) {
 // (ör. knockout hiç üretilmemişse) 0 döner.
 export function pointsForPrediction(prediction, league) {
   if (!prediction || !league) return 0;
+  if (prediction.kind === "draw") {
+    const real = realOpponentsOf(league, prediction.favoriteTeamId);
+    const hits = (prediction.guesses || []).filter((teamId) => real.has(teamId)).length;
+    return hits * DRAW_GUESS_POINTS_PER_HIT;
+  }
   if (prediction.kind === "champion") {
     return league.knockout?.champion && league.knockout.champion === prediction.pickedTeamId
       ? CHAMPION_PICK_POINTS
