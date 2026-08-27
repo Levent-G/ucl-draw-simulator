@@ -13,7 +13,13 @@ export default function FavoriteTeamPicker({
 }) {
   const [query, setQuery] = useState('')
   const favoriteTeam = teams.find((t) => t.id === favoriteTeamId)
-  const otherTeams = teams.filter((t) => t.id !== favoriteTeamId)
+  // Gerçek kura kuralı: bir takım kendi federasyonundan (aynı ülke) bir
+  // takımla ASLA eşleşmez (bkz. drawEngine.js kural 4) -- bu yüzden aynı
+  // ülkeden takımlar zaten imkansız bir tahmin olur, seçilebilir listeden
+  // çıkarılıyor.
+  const otherTeams = favoriteTeam
+    ? teams.filter((t) => t.id !== favoriteTeamId && t.country !== favoriteTeam.country)
+    : []
   const filtered = query
     ? otherTeams.filter((t) => t.name.toLowerCase().includes(query.toLowerCase()))
     : otherTeams
@@ -54,6 +60,10 @@ export default function FavoriteTeamPicker({
             <span>{favoriteTeam.name} için 3 rakip tahmin et (opsiyonel)</span>
             <span className="prediction-count">{predictions.length}/3</span>
           </div>
+          <p className="prediction-hint">
+            Kura kuralı gereği kendi federasyonundan ({favoriteTeam.country}) bir takımla asla eşleşemez -- bu yüzden
+            aşağıdaki listede yer almıyorlar.
+          </p>
           <input
             type="text"
             className="prediction-search"
