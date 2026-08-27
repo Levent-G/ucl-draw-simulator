@@ -94,9 +94,23 @@ function clamp(v, min, max) {
 // yarı yarıya kalır.
 const STRENGTH_SHARE_DIVISOR = 150;
 
-function strengthShare(ownCoeff, oppCoeff) {
-  const own = Math.max(1, ownCoeff || 6);
-  const opp = Math.max(1, oppCoeff || 6);
+// Bir takımın coeff'ine, o takımın TARİHİ Avrupa Kupası/UCL derinliğini
+// (bkz. teams.js'teki `pedigree` alanı, 0-20) KÜÇÜK bir ek olarak katar.
+// Neden gerekli: coeff son 5 yılın performansını yakalar ama "bu kulüp
+// tarihi boyunca hiç zirvede bitirmedi" gerçeğini görmez -- coeff'i bu
+// sezon şans eseri yüksek çıkan (ör. rastgele iyi bir Poisson serisi
+// yakalayan) tarihi olmayan bir kulübün, salt o sezonun katsayısıyla bir
+// Real Madrid/Bayern kadar "güçlü" sayılması, uzun vadede gerçekçi
+// hissettirmiyordu. pedigree yokluğunda (ör. Süper Lig/Avrupa Ligi
+// takımlarında alan tanımlı değilse) ?? 0 ile sessizce devre dışı kalır --
+// davranış AYNEN coeff-only haliyle korunur.
+function effectiveStrength(team) {
+  return Math.max(1, (team?.coeff || 6) + (team?.pedigree ?? 0));
+}
+
+function strengthShare(homeTeam, awayTeam) {
+  const own = effectiveStrength(homeTeam);
+  const opp = effectiveStrength(awayTeam);
   return 1 / (1 + Math.pow(10, (opp - own) / STRENGTH_SHARE_DIVISOR));
 }
 
@@ -182,7 +196,7 @@ function resolveTactic(teamId, tacticsById) {
 export function expectedGoals(homeTeam, awayTeam, tacticsById, settings) {
   const baseGoalsTotal = settings?.baseGoalsTotal ?? BASE_GOALS_TOTAL;
   const homeAdvantage = settings?.homeAdvantage ?? HOME_ADVANTAGE_GOALS;
-  const hShare = strengthShare(homeTeam.coeff, awayTeam.coeff);
+  const hShare = strengthShare(homeTeam, awayTeam);
   const aShare = 1 - hShare;
   let lambdaHome = clamp(
     baseGoalsTotal * hShare + homeAdvantage,

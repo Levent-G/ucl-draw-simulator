@@ -80,7 +80,16 @@ export const COUNTRY_NAMES = {
   BUL: "Bulgaristan",
 };
 
-// pot: 1-4, coeff: gösterim amaçlı UEFA kulüp katsayısı (yaklaşık)
+// pot: 1-4, coeff: gösterim amaçlı UEFA kulüp katsayısı (yaklaşık).
+// pedigree (opsiyonel, 0-20): kulübün Avrupa Şampiyon Kulüpler Kupası/UCL
+// TARİHİNDEKİ derinliği -- kupa sayısı + final/yarı final sıklığı temel
+// alınarak elle belirlenmiş kaba bir puan (ör. Real Madrid'in 15 kupası ->
+// 20, hiç finale kalmamış bir kulüp -> 0-2). predictionEngine.js'teki
+// strengthShare bunu coeff'e KÜÇÜK bir ek olarak katar -- amaç, coeff'in tek
+// başına yakalayamadığı "bu kulüp tarihi boyunca hiç zirvede bitirmedi"
+// gerçeğini modele az da olsa yansıtmak (bkz. predictionEngine.js başındaki
+// PEDIGREE notu). Sadece UCL için dolduruldu; diğer yarışmalarda alan
+// yoksa (ör. Avrupa Ligi/Süper Lig) ?? 0 ile sessizce devre dışı kalır.
 const RAW_TEAMS = [
   // ---- Pot 1 ----
   {
@@ -89,6 +98,7 @@ const RAW_TEAMS = [
     country: "ESP",
     pot: 1,
     coeff: 136.0,
+    pedigree: 20,
     logo: RealMadridLogo,
   },
   {
@@ -97,6 +107,7 @@ const RAW_TEAMS = [
     country: "ENG",
     pot: 1,
     coeff: 120.0,
+    pedigree: 8,
     logo: ManchesterCityLogo,
   },
   {
@@ -105,6 +116,7 @@ const RAW_TEAMS = [
     country: "GER",
     pot: 1,
     coeff: 118.0,
+    pedigree: 17,
     logo: BayernMunihLogo,
   },
   {
@@ -113,6 +125,7 @@ const RAW_TEAMS = [
     country: "FRA",
     pot: 1,
     coeff: 125.0,
+    pedigree: 6,
     logo: ParisSaintGermainLogo,
   },
   {
@@ -121,6 +134,7 @@ const RAW_TEAMS = [
     country: "ENG",
     pot: 1,
     coeff: 115.0,
+    pedigree: 17,
     logo: LiverpoolLogo,
   },
   {
@@ -129,6 +143,7 @@ const RAW_TEAMS = [
     country: "ITA",
     pot: 1,
     coeff: 98.0,
+    pedigree: 12,
     logo: InterLogo,
   },
   {
@@ -137,6 +152,7 @@ const RAW_TEAMS = [
     country: "ESP",
     pot: 1,
     coeff: 108.0,
+    pedigree: 16,
     logo: BarcelonaLogo,
   },
   {
@@ -145,6 +161,7 @@ const RAW_TEAMS = [
     country: "ENG",
     pot: 2,
     coeff: 70.0,
+    pedigree: 12,
     logo: ManchesterUnitedLogo,
   },
   {
@@ -153,6 +170,7 @@ const RAW_TEAMS = [
     country: "ITA",
     pot: 3,
     coeff: 82.0,
+    pedigree: 2,
     logo: NapoliLogo,
   },
 
@@ -162,6 +180,7 @@ const RAW_TEAMS = [
     country: "ESP",
     pot: 1,
     coeff: 94.0,
+    pedigree: 7,
     logo: AtleticoMadridLogo,
   },
   {
@@ -170,6 +189,7 @@ const RAW_TEAMS = [
     country: "ENG",
     pot: 1,
     coeff: 102.0,
+    pedigree: 5,
     logo: ArsenalLogo,
   },
   {
@@ -178,6 +198,7 @@ const RAW_TEAMS = [
     country: "GER",
     pot: 2,
     coeff: 88.0,
+    pedigree: 8,
     logo: BorussiaDortmundLogo,
   },
   {
@@ -186,6 +207,7 @@ const RAW_TEAMS = [
     country: "ITA",
     pot: 2,
     coeff: 78.0,
+    pedigree: 4,
     logo: RomaLogo,
   },
   {
@@ -194,6 +216,7 @@ const RAW_TEAMS = [
     country: "ESP",
     pot: 3,
     coeff: 74.0,
+    pedigree: 4,
     logo: VillarrealLogo,
   },
   {
@@ -202,6 +225,7 @@ const RAW_TEAMS = [
     country: "GER",
     pot: 3,
     coeff: 72.0,
+    pedigree: 3,
     logo: RBLeipzigLogo,
   },
   {
@@ -210,6 +234,7 @@ const RAW_TEAMS = [
     country: "NED",
     pot: 3,
     coeff: 65.0,
+    pedigree: 6,
     logo: FeyenoordLogo,
   },
   {
@@ -218,6 +243,7 @@ const RAW_TEAMS = [
     country: "BEL",
     pot: 2,
     coeff: 58.0,
+    pedigree: 3,
     logo: ClubBruggeLogo,
   },
   {
@@ -226,6 +252,7 @@ const RAW_TEAMS = [
     country: "UKR",
     pot: 3,
     coeff: 62.0,
+    pedigree: 2,
     logo: ShakhtarLogo,
   },
 
@@ -235,6 +262,7 @@ const RAW_TEAMS = [
     country: "ESP",
     pot: 2,
     coeff: 45.0,
+    pedigree: 1,
     logo: RealBetisLogo,
   },
   {
@@ -243,6 +271,7 @@ const RAW_TEAMS = [
     country: "ENG",
     pot: 2,
     coeff: 55.0,
+    pedigree: 6,
     logo: AstonVillaLogo,
   },
   {
@@ -251,6 +280,7 @@ const RAW_TEAMS = [
     country: "GER",
     pot: 4,
     coeff: 52.0,
+    pedigree: 2,
     logo: StuttgartLogo,
   },
   {
@@ -259,6 +289,7 @@ const RAW_TEAMS = [
     country: "FRA",
     pot: 4,
     coeff: 42.0,
+    pedigree: 1,
     logo: RCLensLogo,
   },
   {
@@ -267,6 +298,7 @@ const RAW_TEAMS = [
     country: "POR",
     pot: 2,
     coeff: 50.0,
+    pedigree: 2,
     logo: SportingLogo,
   },
   {
@@ -275,6 +307,7 @@ const RAW_TEAMS = [
     country: "NED",
     pot: 2,
     coeff: 48.0,
+    pedigree: 6,
     logo: PSVLogo,
   },
   {
@@ -286,6 +319,7 @@ const RAW_TEAMS = [
     country: "TUR",
     pot: 3,
     coeff: 44.0,
+    pedigree: 1,
     logo: FenerbahceLogo,
   },
   {
@@ -294,6 +328,7 @@ const RAW_TEAMS = [
     country: "FRA",
     pot: 3,
     coeff: 40.0,
+    pedigree: 1,
     logo: LilleLogo,
   },
   {
@@ -304,6 +339,7 @@ const RAW_TEAMS = [
     country: "BUL",
     pot: 4,
     coeff: 15.0,
+    pedigree: 0,
     logo: LevskiSofiaLogo,
   },
 
@@ -313,6 +349,7 @@ const RAW_TEAMS = [
     country: "POR",
     pot: 2,
     coeff: 68.0,
+    pedigree: 10,
     logo: FCPortoLogo,
   },
   {
@@ -321,6 +358,7 @@ const RAW_TEAMS = [
     country: "CZE",
     pot: 4,
     coeff: 31.0,
+    pedigree: 1,
     logo: SlaviaPragueLogo,
   },
   {
@@ -331,6 +369,7 @@ const RAW_TEAMS = [
     country: "CRO",
     pot: 3,
     coeff: 36.0,
+    pedigree: 1,
     logo: DinamoZagrebLogo,
   },
   {
@@ -343,6 +382,7 @@ const RAW_TEAMS = [
     country: "AZE",
     pot: 4,
     coeff: 12.0,
+    pedigree: 0,
   },
   {
     name: "Slovan Bratislava",
@@ -350,6 +390,7 @@ const RAW_TEAMS = [
     country: "SVK",
     pot: 4,
     coeff: 20.0,
+    pedigree: 1,
     logo: SlovanBratislavaLogo,
   },
   {
@@ -360,6 +401,7 @@ const RAW_TEAMS = [
     country: "AUT",
     pot: 4,
     coeff: 17.0,
+    pedigree: 0,
     logo: LASKLogo,
   },
   {
@@ -368,6 +410,7 @@ const RAW_TEAMS = [
     country: "ITA",
     pot: 4,
     coeff: 37.0,
+    pedigree: 0,
     logo: ComoLogo,
   },
   {
@@ -376,6 +419,7 @@ const RAW_TEAMS = [
     country: "TUR",
     pot: 3,
     coeff: 46.0,
+    pedigree: 3,
     logo: GalatasarayLogo,
   },
   {
@@ -386,6 +430,7 @@ const RAW_TEAMS = [
     country: "NOR",
     pot: 4,
     coeff: 19.0,
+    pedigree: 1,
     logo: BodoGlimtLogo,
   },
 ];
