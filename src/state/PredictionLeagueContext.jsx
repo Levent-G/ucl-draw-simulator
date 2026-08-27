@@ -132,21 +132,63 @@ async function buildFreshSeasonPayload(competitionKey) {
 // yok" durumunu döner. startSeason() -- sadece sezon YOKKEN çağrılmalı --
 // taze bir sezon üretip Firestore'a yazar (bkz. firestore.rules: bir sezon
 // belgesi sadece YOKSA oluşturulabilir, üzerine yazılamaz).
+// Firestore'a hiç ulaşılamazsa (ör. Firestore Database projede hiç
+// oluşturulmadıysa, ya da kurallar yayınlanmadan önceki garip bir ara
+// durumdaysa) onSnapshot'ın ne başarı ne de hata callback'ini hiç
+// çağırmadığı görülebiliyor -- bu da arayüzde SONSUZA KADAR "Sezon kontrol
+// ediliyor…" yazısında takılı kalmaya yol açar. Bu süre sınırı, kullanıcıya
+// en azından eyleme geçirilebilir bir hata mesajı göstermek için bir
+// güvenlik ağı.
+const SEASON_LOAD_TIMEOUT_MS = 8000;
+
 export function useSharedSeason(competitionKey) {
-  const { user } = usePredictionAuth();
+  const { user, authLoading } = usePredictionAuth();
   const [state, setState] = useState(buildEmptySeasonState);
 
   useEffect(() => {
     setState(buildEmptySeasonState());
-    if (!competitionKey) return undefined;
+    // Firestore güvenlik kuralları okumayı `request.auth != null` şartına
+    // bağlıyor (bkz. firestore.rules) -- auth durumu netleşmeden (authLoading)
+    // ya da kullanıcı yoksa abone OLMUYORUZ; aksi halde ilk denemede
+    // "izin reddedildi" hatası alıp o dinleyici tamamen ölür, kullanıcı
+    // giriş yaptıktan SONRA bile (competitionKey değişmediği için efekt
+    // yeniden çalışmaz) asla yeniden denenmezdi.
+    if (!competitionKey || authLoading || !user) return undefined;
+
     const ref = doc(db, "seasons", competitionKey);
+    let settled = false;
+    const timeoutId = window.setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      setState({
+        season: null,
+        loading: false,
+        error: new Error(
+          "Firestore'dan yanıt alınamadı (zaman aşımı). Firebase Console'da Firestore Database'in oluşturulduğundan ve firestore.rules'un yayınlandığından emin ol."
+        ),
+      });
+    }, SEASON_LOAD_TIMEOUT_MS);
+
     const unsub = onSnapshot(
       ref,
-      (snap) => setState({ season: snap.exists() ? snap.data() : null, loading: false, error: null }),
-      (error) => setState({ season: null, loading: false, error })
+      (snap) => {
+        settled = true;
+        window.clearTimeout(timeoutId);
+        setState({ season: snap.exists() ? snap.data() : null, loading: false, error: null });
+      },
+      (error) => {
+        settled = true;
+        window.clearTimeout(timeoutId);
+        // eslint-disable-next-line no-console
+        console.error("Tahmin Ligi: sezon dinlenemedi ->", error);
+        setState({ season: null, loading: false, error });
+      }
     );
-    return unsub;
-  }, [competitionKey]);
+    return () => {
+      window.clearTimeout(timeoutId);
+      unsub();
+    };
+  }, [competitionKey, user, authLoading]);
 
   const comp = COMPETITIONS[competitionKey];
   const fixture = useMemo(() => {

@@ -53,7 +53,7 @@ function PredictionLeagueContent() {
   const { competitionKey } = useParams();
   const competition = getCompetition(competitionKey);
   const { user, authLoading, signInWithGoogle, signOutUser } = usePredictionAuth();
-  const { season, loading: seasonLoading, fixture, startSeason } = useSharedSeason(competitionKey);
+  const { season, loading: seasonLoading, error: seasonError, fixture, startSeason } = useSharedSeason(competitionKey);
   const { predictions, myPredictionsByMatch, submitPrediction } = usePredictions(competitionKey);
 
   const [tab, setTab] = useState("maclar");
@@ -154,7 +154,17 @@ function PredictionLeagueContent() {
 
       {user && seasonLoading && <p className="footnote">Sezon kontrol ediliyor…</p>}
 
-      {user && !seasonLoading && !season && (
+      {user && seasonError && (
+        <div className="stats-callout" style={{ borderColor: "#f87171" }}>
+          <p style={{ color: "#f87171" }}>⚠️ {seasonError.message}</p>
+          <p className="footnote">
+            (Tarayıcı konsolunda -- F12 -- daha ayrıntılı bir hata kodu görebilirsin, ör. "permission-denied" Firestore
+            kurallarının henüz yayınlanmadığı anlamına gelir.)
+          </p>
+        </div>
+      )}
+
+      {user && !seasonLoading && !season && !seasonError && (
         <div className="stats-callout">
           <p>
             {competition.shortName} için henüz ortak bir Tahmin Ligi sezonu yok.
