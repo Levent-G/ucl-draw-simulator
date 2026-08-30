@@ -8,12 +8,12 @@ import React, {
 import { useParams, useNavigate } from "react-router-dom";
 import { useCompetition } from "../state/CompetitionContext.jsx";
 import { generateFullDraw, buildAnnouncementPlan } from "../utils/drawEngine.js";
-import { createEmptyResults } from "../utils/resultsHelpers.js";
+import { createEmptyResults, buildResultsFromMatches } from "../utils/resultsHelpers.js";
+import { REAL_DRAW_2026_MATCHES } from "../data/realDraw2026.js";
 import { findDerby } from "../utils/derbies.js";
 import { speak, cancelSpeech, unlockSpeech } from "../utils/speech.js";
 import ControlBar from "../components/ControlBar.jsx";
 import DrumSphere from "../components/DrumSphere.jsx";
-import AnnouncerPanel from "../components/AnnouncerPanel.jsx";
 import PotTablesPanel from "../components/PotTablesPanel.jsx";
 import FinalResultsGrid from "../components/FinalResultsGrid.jsx";
 import FinalFavoriteSummary from "../components/FinalFavoriteSummary.jsx";
@@ -99,6 +99,8 @@ export default function DrawPage() {
     clearCompetition,
     hasDraw,
     results: persistedResults,
+    favoriteTeamId,
+    setFavoriteTeam,
   } = useCompetition(competitionKey);
   const { teams: TEAMS, potColors: POT_COLORS, countryNames: COUNTRY_NAMES } = competition;
   const [phase, setPhase] = useState("idle"); // idle | drawing | done
@@ -120,8 +122,9 @@ export default function DrawPage() {
   const [error, setError] = useState(null);
   const [uclLogoFailed, setUclLogoFailed] = useState(false);
 
-  // Favori takım / tahmin oyunu / sesli anlatım / yerel çekiliş sayacı
-  const [favoriteTeamId, setFavoriteTeamId] = useState(null);
+  // Tahmin oyunu / sesli anlatım / yerel çekiliş sayacı -- tuttuğun takım
+  // (favoriteTeamId) artık CompetitionContext'te (kura/fikstür/eleme turu
+  // boyunca kalıcı kalsın, Fikstür/Eleme Turu sayfaları da görsün diye).
   const [predictions, setPredictions] = useState([]);
   const [ttsEnabled, setTtsEnabled] = useState(true);
   const [drawCount, setDrawCount] = useState(0);
@@ -145,7 +148,6 @@ export default function DrawPage() {
     setPhase("idle");
     setResults(createEmptyResults(TEAMS));
     setDrawnTeamIds(new Set());
-    setFavoriteTeamId(null);
     setPredictions([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [competitionKey]);
@@ -255,10 +257,13 @@ export default function DrawPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [clearCompetition, TEAMS]);
 
-  const handleToggleFavorite = useCallback((teamId) => {
-    setFavoriteTeamId(teamId);
-    setPredictions([]);
-  }, []);
+  const handleToggleFavorite = useCallback(
+    (teamId) => {
+      setFavoriteTeam(teamId);
+      setPredictions([]);
+    },
+    [setFavoriteTeam]
+  );
 
   const handleTogglePrediction = useCallback((teamId) => {
     setPredictions((prev) => {
@@ -479,7 +484,34 @@ export default function DrawPage() {
     setTimeout(() => setShowConfetti(false), 4200);
   }, [TEAMS, POT_COLORS]);
 
-  const isTumbling = phase === "drawing";
+  // 27 Ağustos 2026'da Monako'da yapılan GERÇEK UEFA lig fazı çekilişinin
+  // sonucunu (animasyonsuz, doğrudan) yükler -- rastgele simülasyonun
+  // yerine geçer. setDrawResults zaten her çağrıldığında fikstür/simülasyon/
+  // eleme turunu sıfırlar (bkz. CompetitionContext.setDrawResults), bu
+  // yüzden ayrıca resetAll/clearCompetition çağırmaya gerek yok.
+  const handleUseRealDraw = useCallback(() => {
+    clearTimeout(timeoutRef.current);
+    cancelSpeech();
+    if (audioRef.current) audioRef.current.pause();
+    const liveResults = buildResultsFromMatches(TEAMS, REAL_DRAW_2026_MATCHES);
+    resultsRef.current = liveResults;
+    setResults(liveResults);
+    setDrawnTeamIds(new Set(TEAMS.map((t) => t.id)));
+    setLogs([
+      "<b>Gerçek kura sonucu yüklendi.</b> 27 Ağustos 2026'da Monako'da (Grimaldi Forum) yapılan gerçek UEFA lig fazı çekiliminin tüm eşleşmeleri.",
+    ]);
+    setActiveTeamId(null);
+    setSphereVisible(false);
+    setCurrentTeamOpponents([]);
+    setPendingCells(new Set());
+    setRevealTeam(null);
+    setPaperVisible(false);
+    setProgress(1);
+    setPhase("done");
+    setShowConfetti(true);
+    setTimeout(() => setShowConfetti(false), 4200);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [TEAMS]);
 
   return (
     <div className="app-shell page-shell">
@@ -524,6 +556,47 @@ export default function DrawPage() {
         <div className="season-badge">{TEAMS.length} TAKIM · 4 TORBA · 8 MAÇ</div>
       </header>
 
+      {phase === "idle" && (
+        <div className="draw-first-step">
+          <div className="draw-first-step-eyebrow">1. Adım</div>
+          <h2 className="draw-first-step-title">Kura Çekimini Başlat</h2>
+          <p className="draw-first-step-desc">
+            Topa bas -- {TEAMS.length} takımın 4 torbadan hangi rakiplerle
+            eşleşeceğini gösteren tören başlasın. Çekiliş bitince sıradaki
+            adım (Fikstür) otomatik olarak açılır.
+          </p>
+          <StartOrb onClick={handleStart} label="ÇEKİLİŞİ" sublabel="BAŞLAT" />
+
+          <div className="draw-first-step-favorite">
+            <FavoriteTeamPicker
+              teams={TEAMS}
+              favoriteTeamId={favoriteTeamId}
+              onSelectFavorite={handleToggleFavorite}
+              predictions={predictions}
+              onTogglePrediction={handleTogglePrediction}
+              ttsEnabled={ttsEnabled}
+              onToggleTts={setTtsEnabled}
+              drawCount={drawCount}
+            />
+          </div>
+        </div>
+      )}
+
+      {competitionKey === "ucl" && phase !== "drawing" && (
+        <div className="real-draw-banner">
+          <div className="real-draw-banner-text">
+            <b>🏆 Gerçek kura çekildi:</b> 27 Ağustos 2026'da Monako'da
+            (Grimaldi Forum) UEFA'nın yaptığı gerçek lig fazı çekiliminin tüm
+            36 takım / 144 maçlık eşleşme sonucunu (rastgele simülasyon
+            değil) yükleyip buradan itibaren fikstür, puan durumu tahmini ve
+            eleme turu simülasyonunu bu GERÇEK eşleşmelerle çalıştırabilirsin.
+          </div>
+          <button className="btn-primary real-draw-banner-btn" onClick={handleUseRealDraw}>
+            Gerçek Kura Sonucunu Yükle
+          </button>
+        </div>
+      )}
+
       <ControlBar
         phase={phase}
         speed={speed}
@@ -535,27 +608,8 @@ export default function DrawPage() {
 
       {error && <p style={{ color: "#f87171" }}>{error}</p>}
 
-      {phase === "idle" && (
-        <FavoriteTeamPicker
-          teams={TEAMS}
-          favoriteTeamId={favoriteTeamId}
-          onSelectFavorite={handleToggleFavorite}
-          predictions={predictions}
-          onTogglePrediction={handleTogglePrediction}
-          ttsEnabled={ttsEnabled}
-          onToggleTts={setTtsEnabled}
-          drawCount={drawCount}
-        />
-      )}
-
-      {phase === "idle" && (
-        <div className="mobile-start-cta">
-          <StartOrb onClick={handleStart} label="ÇEKİLİŞİ" sublabel="BAŞLAT" />
-        </div>
-      )}
-
-      <div className="main-layout" ref={tableSectionRef}>
-        <div className="main-left">
+      {phase !== "idle" && (
+        <div className="main-layout main-layout-single" ref={tableSectionRef}>
           <PotTablesPanel
             teams={TEAMS}
             results={results}
@@ -566,11 +620,7 @@ export default function DrawPage() {
             onStart={handleStart}
           />
         </div>
-
-        <div className="main-right">
-          <AnnouncerPanel logs={logs} live={isTumbling} />
-        </div>
-      </div>
+      )}
 
       {phase === "done" && (
         <>

@@ -205,13 +205,16 @@ export default function LeagueHomePage() {
               </button>
             </>
           ) : (
-            <button className="btn-primary league-start-btn" onClick={handleStart} disabled={starting}>
-              <span className="league-start-btn-shine" aria-hidden="true" />
-              <span className="league-start-btn-icon" aria-hidden="true">
-                🏆
-              </span>
-              {starting ? "Sezon Hazırlanıyor…" : "Sezonu Başlat"}
-            </button>
+            <div className="league-start-cta">
+              <span className="draw-first-step-eyebrow">1. Adım</span>
+              <button className="btn-primary league-start-btn" onClick={handleStart} disabled={starting}>
+                <span className="league-start-btn-shine" aria-hidden="true" />
+                <span className="league-start-btn-icon" aria-hidden="true">
+                  🏆
+                </span>
+                {starting ? "Sezon Hazırlanıyor…" : "Sezonu Başlat"}
+              </button>
+            </div>
           )}
         </div>
       </header>

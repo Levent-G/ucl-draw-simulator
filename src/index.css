@@ -666,6 +666,9 @@ button {
   gap: 18px;
   margin-bottom: 20px;
 }
+.main-layout-single {
+  grid-template-columns: 1fr;
+}
 @media (max-width: 980px) {
   .main-layout {
     grid-template-columns: 1fr;
@@ -1075,6 +1078,7 @@ button {
   cursor: pointer;
   background: none;
   padding: 10;
+  margin: 0 auto;
 }
 .start-orb:disabled {
   cursor: not-allowed;
@@ -1180,18 +1184,6 @@ button {
   color: var(--text-faint);
 }
 
-/* Mobilde tablolar alt alta dizilince çok uzayabiliyor; bu buton, sayfanın
-     normal akışında (overlay değil) her zaman görünür ve hiçbir şeyi bloklamaz. */
-.mobile-start-cta {
-  display: none;
-  justify-content: center;
-  margin: 4px 0 18px;
-}
-@media (max-width: 700px) {
-  .mobile-start-cta {
-    display: flex;
-  }
-}
 
 /* ==========================================================================
      SPHERE REVEAL OVERLAY -- toplar sadece bir sonraki takım çekilmeden hemen
@@ -1540,6 +1532,21 @@ button {
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--text-faint);
+}
+.final-grid-search {
+  width: 100%;
+  max-width: 360px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line-strong);
+  background: var(--bg-panel);
+  color: var(--text-primary);
+  font-size: 13px;
+}
+.final-grid-search:focus {
+  outline: none;
+  border-color: var(--ucl-blue-2);
 }
 
 .final-grid {
@@ -2296,4 +2303,79 @@ button {
   line-height: 1.6;
   border-top: 1px solid var(--line);
   padding-top: 18px;
+}
+
+.league-start-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+.league-start-cta .draw-first-step-eyebrow {
+  margin-bottom: 0;
+}
+
+.draw-first-step {
+  background: linear-gradient(150deg, rgba(84, 104, 255, 0.22), rgba(45, 212, 191, 0.12) 60%, transparent);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  padding: 22px 26px;
+  margin: 16px 0;
+  text-align: center;
+}
+.draw-first-step-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ucl-blue-3);
+  margin-bottom: 6px;
+}
+.draw-first-step-title {
+  font-size: clamp(20px, 3vw, 28px);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.draw-first-step-desc {
+  font-size: 13px;
+  color: var(--text-dim);
+  max-width: 560px;
+  margin: 0 auto 18px;
+  line-height: 1.6;
+}
+.draw-first-step-btn {
+  font-size: 15px;
+  padding: 15px 34px;
+}
+.draw-first-step-favorite {
+  text-align: left;
+  margin-top: 22px;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.draw-first-step-favorite .setup-panel {
+  margin-bottom: 0;
+}
+
+.real-draw-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--bg-panel);
+  border: 1px solid var(--ucl-blue-2);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  margin: 14px 0;
+}
+.real-draw-banner-text {
+  flex: 1;
+  min-width: 240px;
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+.real-draw-banner-btn {
+  white-space: nowrap;
 }

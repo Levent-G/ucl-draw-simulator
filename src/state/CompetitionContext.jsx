@@ -38,6 +38,11 @@ function emptyCompetitionState() {
     userScores: {},
     standingsOrder: null,
     knockout: null,
+    // Kura çekimi BAŞLAMADAN ÖNCE (DrawPage'deki FavoriteTeamPicker'dan)
+    // seçilebilen "tuttuğun takım" -- kura/fikstür/eleme turu boyunca
+    // KALICI kalır (setDrawResults tarafından SIFIRLANMAZ) ki Fikstür ve
+    // Eleme Turu sayfaları bu takımı görsel olarak belirginleştirebilsin.
+    favoriteTeamId: null,
     // "Karşılıklı Geçmiş" (Head-to-Head) için: her simülasyon çalıştırması
     // (ilk otomatik simülasyon + her "tahminleri yenile") BİRİKTİRİLEREK
     // tutulur -- böylece iki takım arasındaki önceki simülasyon
@@ -242,6 +247,13 @@ export function CompetitionProvider({ children }) {
     [patch]
   );
 
+  const setFavoriteTeam = useCallback(
+    (key, teamId) => {
+      patch(key, { favoriteTeamId: teamId });
+    },
+    [patch]
+  );
+
   const clearCompetition = useCallback(
     (key) => {
       patch(key, emptyCompetitionState());
@@ -274,6 +286,7 @@ export function CompetitionProvider({ children }) {
     updateUserScore,
     clearUserScores,
     setStandingsOrder,
+    setFavoriteTeam,
     clearCompetition,
     advanceToNextSeason,
   };
@@ -314,6 +327,7 @@ export function useCompetition(key) {
     updateUserScore: (matchId, field, value) => ctx.updateUserScore(resolvedKey, matchId, field, value),
     clearUserScores: () => ctx.clearUserScores(resolvedKey),
     setStandingsOrder: (order) => ctx.setStandingsOrder(resolvedKey, order),
+    setFavoriteTeam: (teamId) => ctx.setFavoriteTeam(resolvedKey, teamId),
     clearCompetition: () => ctx.clearCompetition(resolvedKey),
     advanceToNextSeason: (bonusTeamId) => ctx.advanceToNextSeason(resolvedKey, bonusTeamId),
   };

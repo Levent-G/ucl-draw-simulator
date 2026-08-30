@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useCompetition } from "../state/CompetitionContext.jsx";
 import CompetitionStepper from "../components/CompetitionStepper.jsx";
+import EmptyState from "../components/EmptyState.jsx";
 import TeamFilterSelect from "../components/stats/TeamFilterSelect.jsx";
 import Crest from "../components/Crest.jsx";
 
@@ -70,10 +71,11 @@ export default function HeadToHeadPage() {
       </header>
 
       {!hasSimulation && (
-        <div className="stats-callout">
-          Henüz bir model tahmini üretilmedi.{" "}
-          <Link to={`/${competitionKey}/fikstur`}>Fikstür &amp; Tahmin sayfasına git →</Link>
-        </div>
+        <EmptyState
+          variant="inline"
+          description="Henüz bir model tahmini üretilmedi."
+          primaryCta={{ label: "Fikstür & Tahmin sayfasına git", to: `/${competitionKey}/fikstur` }}
+        />
       )}
 
       <div className="h2h-picker-row">

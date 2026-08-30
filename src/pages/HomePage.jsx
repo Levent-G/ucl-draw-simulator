@@ -1,6 +1,8 @@
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { TEAMS } from "../data/teams.js";
+import { COMPETITION_LIST } from "../data/competitions.js";
+import { useCompetition } from "../state/CompetitionContext.jsx";
 import Crest from "../components/Crest.jsx";
 
 const CATEGORIES = [
@@ -130,11 +132,45 @@ const CATEGORIES = [
   },
 ];
 
-const STEPS = [
-  { n: 1, title: "Kura Çek", desc: "Bir lig seç, çekiliş törenini izle (ya da anında sonuca atla)." },
-  { n: 2, title: "Tahmin Oluştur", desc: "Fikstür otomatik kurulur, model her maçı tahmin eder. İstersen taktik ver." },
-  { n: 3, title: "Sonuçları İzle", desc: "Maç Merkezi'nde dakika dakika izle, eleme turuna geç, şampiyonu gör." },
-];
+const COMPETITION_ICONS = { ucl: "🏆", europa: "🌟", superlig: "🇹🇷" };
+
+// Kullanıcının "hangi ligi nereden oynayacağım" sorusunu tek bakışta
+// cevaplaması için: her ligin GERÇEK ilerleme durumunu okuyup (kura çekildi
+// mi, fikstür hazır mı, eleme turu başladı mı...) tek, net bir sıradaki adım
+// CTA'sı üretir -- aynı kural seti CompetitionStepper'da da kullanılıyor.
+function nextStepFor(competitionKey, comp, status) {
+  const base = `/${competitionKey}`;
+  if (comp.format !== "swiss") {
+    if (!status.hasDraw) return { label: "Henüz başlamadı", cta: "Sezonu Başlat", to: base };
+    if (!status.hasSimulation) return { label: "Sezon başladı", cta: "Sezona Git", to: base };
+    return { label: "Şampiyon belli oldu", cta: "İstatistiklere Git", to: `${base}/istatistik` };
+  }
+  if (!status.hasDraw) return { label: "Henüz başlamadı", cta: "Kura Çekimini Başlat", to: base };
+  if (!status.hasFixture) return { label: "Kura çekildi", cta: "Fikstürü Oluştur", to: `${base}/fikstur` };
+  if (!status.hasKnockout) return { label: "Fikstür hazır", cta: "Fikstürü Görüntüle", to: `${base}/fikstur` };
+  return { label: "Eleme turu başladı", cta: "Eleme Turunu Gör", to: `${base}/eleme-turu` };
+}
+
+function CompetitionEntryCard({ competitionKey }) {
+  const status = useCompetition(competitionKey);
+  const { competition } = status;
+  const step = nextStepFor(competitionKey, competition, status);
+  return (
+    <div className="home-comp-card">
+      <div className="home-comp-card-top">
+        <span className="home-comp-card-icon" aria-hidden="true">
+          {COMPETITION_ICONS[competitionKey] || "⚽"}
+        </span>
+        <span className={`home-comp-card-status ${status.hasDraw ? "is-active" : ""}`}>{step.label}</span>
+      </div>
+      <div className="home-comp-card-name">{competition.shortName}</div>
+      <p className="home-comp-card-tagline">{competition.tagline}</p>
+      <Link to={step.to} className="btn-primary home-comp-card-btn">
+        {step.cta} →
+      </Link>
+    </div>
+  );
+}
 
 const STATS = [
   { n: "3", label: "Lig" },
@@ -204,52 +240,62 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="home-steps">
-        {STEPS.map((s, i) => (
-          <React.Fragment key={s.n}>
-            <div className="home-step home-step-in" style={{ animationDelay: `${i * 120}ms` }}>
-              <span className="home-step-num">{s.n}</span>
-              <div>
-                <div className="home-step-title">{s.title}</div>
-                <div className="home-step-desc">{s.desc}</div>
-              </div>
-            </div>
-            {i < STEPS.length - 1 && <span className="home-step-arrow" aria-hidden="true">→</span>}
-          </React.Fragment>
-        ))}
+      <section className="home-competitions">
+        <div className="home-competitions-head">
+          <h2 className="home-section-title">Hangi Ligi Oynamak İstiyorsun?</h2>
+          <p className="home-cat-desc">
+            Bir lig seç -- durumuna göre (henüz başlamadı / kura çekildi /
+            fikstür hazır / eleme turu) buton seni doğrudan sıradaki adıma
+            götürür.
+          </p>
+        </div>
+        <div className="home-comp-grid">
+          {COMPETITION_LIST.map((comp) => (
+            <CompetitionEntryCard key={comp.key} competitionKey={comp.key} />
+          ))}
+        </div>
       </section>
 
-      {CATEGORIES.map((cat) => (
-        <section className={`home-cat home-cat-${cat.key}`} key={cat.key}>
-          <div className="home-cat-head">
-            <h2 className="home-section-title">{cat.title}</h2>
-            <p className="home-cat-desc">{cat.desc}</p>
-          </div>
-          <div className="home-feature-grid">
-            {cat.features.map((f, i) => (
-              <Link
-                to={f.to}
-                className={`home-feature-card home-feature-card-in home-feature-card-${cat.key}`}
-                key={f.title}
-                style={{ animationDelay: `${i * 70}ms` }}
-              >
-                <span className="home-feature-card-glow" aria-hidden="true" />
-                <div className="home-feature-card-top">
-                  <span className="home-feature-icon-badge" aria-hidden="true">
-                    {f.icon}
+      <section className="home-secondary-tools">
+        <div className="home-secondary-head">
+          <h2 className="home-section-title">Diğer Araçlar</h2>
+          <p className="home-cat-desc">
+            Kadro kur, tahmin yap, sezonları arşivle, rozet topla -- ligini
+            seçtikten sonra keşfedebileceğin ek özellikler.
+          </p>
+        </div>
+        {CATEGORIES.map((cat) => (
+          <section className={`home-cat home-cat-${cat.key} home-cat-compact`} key={cat.key}>
+            <div className="home-cat-head">
+              <h3 className="home-cat-title">{cat.title}</h3>
+              <p className="home-cat-desc">{cat.desc}</p>
+            </div>
+            <div className="home-feature-grid home-feature-grid-compact">
+              {cat.features.map((f, i) => (
+                <Link
+                  to={f.to}
+                  className={`home-feature-card home-feature-card-compact home-feature-card-in home-feature-card-${cat.key}`}
+                  key={f.title}
+                  style={{ animationDelay: `${i * 70}ms` }}
+                >
+                  <span className="home-feature-card-glow" aria-hidden="true" />
+                  <div className="home-feature-card-top">
+                    <span className="home-feature-icon-badge" aria-hidden="true">
+                      {f.icon}
+                    </span>
+                    {f.stat && <span className="home-feature-stat">{f.stat}</span>}
+                  </div>
+                  <div className="home-feature-title">{f.title}</div>
+                  <p className="home-feature-desc">{f.desc}</p>
+                  <span className="home-feature-cta">
+                    {f.cta} <span className="home-feature-cta-arrow">→</span>
                   </span>
-                  {f.stat && <span className="home-feature-stat">{f.stat}</span>}
-                </div>
-                <div className="home-feature-title">{f.title}</div>
-                <p className="home-feature-desc">{f.desc}</p>
-                <span className="home-feature-cta">
-                  {f.cta} <span className="home-feature-cta-arrow">→</span>
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      ))}
+                </Link>
+              ))}
+            </div>
+          </section>
+        ))}
+      </section>
 
       <p className="footnote home-footnote">
         Bu site bir simülasyon/eğlence projesidir. Skorlar, oyuncu istatistikleri

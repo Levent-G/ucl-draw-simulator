@@ -42,9 +42,7 @@ export default function ControlBar({ phase, speed, onSpeedChange, onReset, onSki
         </>
       )}
 
-      {phase === 'idle' && (
-        <span className="control-bar-hint">Başlamak için aşağıdaki tablonun ortasındaki düğmeye bas 👇</span>
-      )}
+  
     </div>
   )
 }

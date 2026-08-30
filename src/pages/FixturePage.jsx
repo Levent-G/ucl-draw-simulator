@@ -2,14 +2,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useCompetition } from "../state/CompetitionContext.jsx";
 import { useTransferMarket } from "../state/TransferContext.jsx";
-import { useTeamTactics } from "../state/TacticsContext.jsx";
 import CompetitionStepper from "../components/CompetitionStepper.jsx";
 import MatchdayTabs from "../components/fixture/MatchdayTabs.jsx";
 import MatchRow from "../components/fixture/MatchRow.jsx";
 import StandingsTable from "../components/fixture/StandingsTable.jsx";
-import TacticsPanel from "../components/fixture/TacticsPanel.jsx";
 import HighlightMatchCard from "../components/fixture/HighlightMatchCard.jsx";
 import NextStepCta from "../components/NextStepCta.jsx";
+import EmptyState from "../components/EmptyState.jsx";
 
 // Tahmin özetini (puan durumu + tüm fikstür) düz metin olarak indirilebilir
 // bir dosyaya çevirir. Backend yok -- tamamen istemci tarafında bir Blob
@@ -58,14 +57,12 @@ export default function FixturePage() {
     hasDraw,
     fixture,
     ensureFixture,
-    regenerateFixture,
     simulation,
     runSimulation,
-    clearUserScores,
     startLeagueSeason,
+    favoriteTeamId,
   } = useCompetition(competitionKey);
   const { effectiveAllPlayers, hasTransfers } = useTransferMarket(competitionKey);
-  const { teamTactics, setTeamTactic } = useTeamTactics(competitionKey);
 
   const [activeMatchday, setActiveMatchday] = useState(1);
   const [resimulating, setResimulating] = useState(false);
@@ -143,35 +140,26 @@ export default function FixturePage() {
     return (
       <div className="page-shell fixture-empty">
         <CompetitionStepper competitionKey={competitionKey} />
-        <div className="empty-card">
-          {competition.format === "swiss" ? (
-            <>
-              <h2>Önce bir kura çekimi lazım</h2>
-              <p>
-                Fikstür ve tahmin sayfasını görebilmek için önce lig fazı kura
-                çekiminin tamamlanmış olması gerekiyor.
-              </p>
-              <div className="empty-card-actions">
-                <Link to={`/${competitionKey}`} className="btn-primary">
-                  Kura Çekimine Git
-                </Link>
-              </div>
-            </>
-          ) : (
-            <>
-              <h2>Sezon henüz başlamadı</h2>
-              <p>
-                {competition.name} için çift devreli lig fikstürünü oluşturup
-                tahminlere başlayabilirsin.
-              </p>
-              <div className="empty-card-actions">
-                <button className="btn-secondary" onClick={startLeagueSeason}>
-                  Sezonu Başlat ({competition.teams.length} Takım)
-                </button>
-              </div>
-            </>
-          )}
-        </div>
+        {competition.format === "swiss" ? (
+          <EmptyState
+            title="Önce bir kura çekimi lazım"
+            description="Fikstür ve tahmin sayfasını görebilmek için önce lig fazı kura çekiminin tamamlanmış olması gerekiyor."
+            primaryCta={{ label: "Kura Çekimine Git", to: `/${competitionKey}` }}
+          />
+        ) : (
+          <div className="empty-card">
+            <h2>Sezon henüz başlamadı</h2>
+            <p>
+              {competition.name} için çift devreli lig fikstürünü oluşturup
+              tahminlere başlayabilirsin.
+            </p>
+            <div className="empty-card-actions">
+              <button className="btn-secondary" onClick={startLeagueSeason}>
+                Sezonu Başlat ({competition.teams.length} Takım)
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -212,15 +200,6 @@ export default function FixturePage() {
           )}
         </div>
         <div className="page-header-actions">
-          <button
-            className="btn-secondary"
-            onClick={() => {
-              regenerateFixture();
-              clearUserScores();
-            }}
-          >
-            {competition.format === "swiss" ? "Haftaları Yeniden Dağıt" : "Fikstürü Yeniden Oluştur"}
-          </button>
           <button className="btn-secondary" onClick={handleDownload} disabled={!simulation}>
             ⬇ Tahminlerini İndir
           </button>
@@ -230,19 +209,13 @@ export default function FixturePage() {
         </div>
       </header>
 
-      <TacticsPanel
-        teams={competition.teams}
-        teamTactics={teamTactics}
-        setTeamTactic={setTeamTactic}
-        onChanged={(nextTactics) => handleResimulate(nextTactics)}
-      />
-
       <section className="fixture-standings-section">
         <StandingsTable
           standings={simulation?.standings}
           teams={competition.teams}
           title="Model Tahmini Puan Durumu"
           competitionKey={competitionKey}
+          favoriteTeamId={favoriteTeamId}
         />
       </section>
 
@@ -251,7 +224,7 @@ export default function FixturePage() {
         <HighlightMatchCard match={highlightMatch} competitionKey={competitionKey} />
         <div className="match-list">
           {activeMatches.map((m) => (
-            <MatchRow key={m.id} match={m} competitionKey={competitionKey} readOnly />
+            <MatchRow key={m.id} match={m} competitionKey={competitionKey} readOnly favoriteTeamId={favoriteTeamId} />
           ))}
         </div>
       </section>

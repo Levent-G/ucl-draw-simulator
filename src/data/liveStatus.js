@@ -97,17 +97,23 @@ export function buildSuperLigContinuation(teams, fullFixture) {
   return { remainingFixture, initialStandings };
 }
 
-// UCL / Avrupa Ligi lig fazı henüz başlamadı -- gerçek başlangıç tarihleri.
+// UCL lig fazı çekilişi yapıldı (27 Ağustos 2026, Grimaldi Forum, Monako) --
+// ancak 36 takımın tam eşleşme listesi (144 maç) UEFA tarafından henüz
+// (29 Ağustos 2026'ya kadar) resmi olarak yayınlanmadı, ve web'den taranan
+// kaynaklar (ör. Wikipedia) bu aşamada birbiriyle çelişen/hatalı satırlar
+// içerebiliyor (spot-check'te en az bir yanlış satır -- PSV Eindhoven --
+// tespit edildi). Bu yüzden burada SADECE doğrulanmış, düşük riskli tarih
+// bilgisi tutuluyor; 144 maçlık tam fikstür kasıtlı olarak eklenmedi.
 export const UCL_SEASON_STATUS = {
   phaseStart: "8 Eylül 2026",
   drawDate: "27 Ağustos 2026",
   playoffEnds: "26 Ağustos 2026",
   note:
-    "29 takım kesinleşti, kalan 7 yer play-off turuna bağlı (ilk maçlar 18-19 Ağustos, rövanşlar 25-26 Ağustos 2026). Lig fazı çekilişi 27 Ağustos 2026'da yapılacak.",
+    "Lig fazı çekilişi 27 Ağustos 2026'da Monako'da (Grimaldi Forum) yapıldı. Maç günleri 8 Eylül 2026 - 27 Ocak 2027 arasına yayılıyor; UEFA'nın kesin saat/tarih içeren tam fikstürü en geç 29 Ağustos 2026'da açıklanması bekleniyor.",
 };
 
 export const EUROPA_SEASON_STATUS = {
   phaseStart: "Eylül 2026",
   note:
-    "UEFA Avrupa Ligi 2026-27 lig fazı da UCL ile eş zamanlı takvimde; kesin katılımcı listesi play-off turları bitene kadar netleşmiyor.",
+    "UEFA Avrupa Ligi 2026-27 lig fazı çekilişi de UCL ile aynı hafta (Ağustos 2026 sonu) yapıldı; kesin fikstür UEFA'nın resmi açıklamasıyla netleşecek.",
 };

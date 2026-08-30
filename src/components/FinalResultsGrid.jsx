@@ -1,8 +1,15 @@
-import React from 'react'
+import React, { useMemo, useState } from 'react'
 import { POT_COLORS } from '../data/teams.js'
 import Crest from './Crest.jsx'
 
 export default function FinalResultsGrid({ teams, results }) {
+  const [query, setQuery] = useState('')
+  const filteredTeams = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return teams
+    return teams.filter((t) => t.name.toLowerCase().includes(q))
+  }, [teams, query])
+
   return (
     <section className="final-grid-section">
       <div className="final-grid-title">
@@ -10,8 +17,20 @@ export default function FinalResultsGrid({ teams, results }) {
         <span>{teams.length} takım · takım başına 8 maç</span>
       </div>
 
+      <input
+        type="text"
+        className="final-grid-search"
+        placeholder="Bir takımın fikstürünü aramak için isim yaz…"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+
+      {filteredTeams.length === 0 && (
+        <p className="footnote">"{query}" ile eşleşen bir takım bulunamadı.</p>
+      )}
+
       <div className="final-grid">
-        {teams.map((team) => {
+        {filteredTeams.map((team) => {
           const fixtures = results[team.id]
           const rows = [1, 2, 3, 4].flatMap((pot) =>
             ['home', 'away'].map((venue) => ({ pot, venue, opp: fixtures[pot][venue] }))

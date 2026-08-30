@@ -6,12 +6,22 @@ import CompetitionStepper from "../components/CompetitionStepper.jsx";
 import Crest from "../components/Crest.jsx";
 import NextStepCta from "../components/NextStepCta.jsx";
 import TieCard from "../components/knockout/TieCard.jsx";
+import BracketTree from "../components/knockout/BracketTree.jsx";
+import EmptyState from "../components/EmptyState.jsx";
 import { topScorers } from "../utils/statsSelectors.js";
 
 export default function KnockoutPage() {
   const { competitionKey } = useParams();
-  const { competition, hasFixture, simulation, knockout, generateKnockout, careerSeason, advanceToNextSeason } =
-    useCompetition(competitionKey);
+  const {
+    competition,
+    hasFixture,
+    simulation,
+    knockout,
+    generateKnockout,
+    careerSeason,
+    advanceToNextSeason,
+    favoriteTeamId,
+  } = useCompetition(competitionKey);
   const { addEntry } = useSeasonArchive();
   const savedKnockoutRef = useRef(null);
 
@@ -70,17 +80,23 @@ export default function KnockoutPage() {
     );
   }
 
+  // "Play-off Turu" (varsa) ağaçtan AYRI, düz bir bölüm olarak gösterilir --
+  // bkz. BracketTree.jsx başındaki not: bu tur, Son 16 ile sayıca birebir
+  // birleştiği için (yarıya inmediği için) düzgün bir "ikiye daralan ağaç"
+  // şekli oluşturmuyor. Onu çıkarınca geri kalan turlar (Son 16 -> ... ->
+  // Final) her zaman temiz bir 8→4→2→1 yapısı olur.
+  const playoffRound = knockout?.rounds?.find((r) => r.name === "Play-off Turu") || null;
+  const treeRounds = knockout?.rounds?.filter((r) => r.name !== "Play-off Turu") || [];
+
   if (!hasFixture || !simulation) {
     return (
       <div className="page-shell">
         <CompetitionStepper competitionKey={competitionKey} />
-        <div className="empty-card">
-          <h2>Önce lig fazı tamamlanmalı</h2>
-          <p>
-            Eleme turlarını görebilmek için önce Fikstür &amp; Tahmin
-            sayfasından bir model tahmini oluşturulmalı.
-          </p>
-        </div>
+        <EmptyState
+          title="Önce lig fazı tamamlanmalı"
+          description="Eleme turlarını görebilmek için önce Fikstür & Tahmin sayfasından bir model tahmini oluşturulmalı."
+          primaryCta={{ label: "Fikstüre Git", to: `/${competitionKey}/fikstur` }}
+        />
       </div>
     );
   }
@@ -110,25 +126,35 @@ export default function KnockoutPage() {
 
       {knockout ? (
         <>
-          {knockout.rounds.map((round) => (
-            <div key={round.name} className="knockout-round">
-              <h3>{round.name}</h3>
+          {playoffRound && (
+            <div className="knockout-round knockout-round-playoff">
+              <h3>{playoffRound.name}</h3>
               <div className="knockout-ties">
-                {round.ties.map((tie, i) => (
-                  <TieCard key={i} tie={tie} />
+                {playoffRound.ties.map((tie, i) => (
+                  <TieCard key={i} tie={tie} favoriteTeamId={favoriteTeamId} />
                 ))}
               </div>
             </div>
-          ))}
+          )}
+
+          <p className="bracket-tree-hint">👉 Sürükleyerek kaydır: Son 16'dan Final'e daralan eleme ağacı</p>
+          <BracketTree
+            rounds={treeRounds}
+            renderTie={(tie, roundIdx, i) => <TieCard tie={tie} favoriteTeamId={favoriteTeamId} />}
+            championSlot={
+              knockout.champion && (
+                <div className="bracket-champion">
+                  <Crest team={knockout.champion} size={48} />
+                  <div>
+                    <div className="bracket-champion-label">Şampiyon</div>
+                    <div className="bracket-champion-name">{knockout.champion.name}</div>
+                  </div>
+                </div>
+              )
+            }
+          />
           {knockout.champion && (
             <>
-              <div className="knockout-champion">
-                <Crest team={knockout.champion} size={56} />
-                <div>
-                  <div className="knockout-champion-label">Şampiyon</div>
-                  <div className="knockout-champion-name">{knockout.champion.name}</div>
-                </div>
-              </div>
               <NextStepCta
                 title="Şampiyon belli oldu -- peki istatistikler ne diyor?"
                 description={`${knockout.champion.name} ve turnuvanın tüm gol kralı/kart/kadro istatistiklerini incele.`}

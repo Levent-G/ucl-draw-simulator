@@ -175,6 +175,7 @@ export function serializeFixture(matchdays) {
       homeId: m.homeTeam.id,
       awayId: m.awayTeam.id,
       viaPot: m.viaPot,
+      date: m.date,
     })),
   }));
 }
@@ -191,6 +192,7 @@ export function deserializeFixture(raw, teams) {
         homeTeam: teamById[m.homeId],
         awayTeam: teamById[m.awayId],
         viaPot: m.viaPot,
+        date: m.date,
       }))
       .filter((m) => m.homeTeam && m.awayTeam),
   }));

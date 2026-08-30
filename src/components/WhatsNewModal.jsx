@@ -26,29 +26,36 @@ export default function WhatsNewModal() {
     <div className="whatsnew-overlay" onClick={closeTour}>
       <div className="whatsnew-modal" onClick={(e) => e.stopPropagation()}>
         <div className="whatsnew-head">
-          <span className="whatsnew-eyebrow">✨ Yenilikler</span>
-          <h2>Futbol Simülatör'de Neler Var?</h2>
-          <p>Uygulama epey büyüdü -- işte kısa bir tur.</p>
+          <div>
+            <span className="whatsnew-eyebrow">✨ Yenilikler</span>
+            <h2>Futbol Simülatör'de Neler Var?</h2>
+            <p>Uygulama epey büyüdü -- işte kısa bir tur.</p>
+          </div>
+          <button type="button" className="whatsnew-x" onClick={closeTour} aria-label="Kapat">
+            ✕
+          </button>
         </div>
-        <div className="whatsnew-grid">
-          {FEATURES.map((f) => (
-            <button
-              key={f.title}
-              type="button"
-              className={`whatsnew-item ${f.to ? "is-clickable" : ""}`}
-              onClick={() => goTo(f.to)}
-            >
-              <span className="whatsnew-item-icon">{f.icon}</span>
-              <div>
-                <div className="whatsnew-item-title">{f.title}</div>
-                <div className="whatsnew-item-desc">{f.desc}</div>
-              </div>
-            </button>
-          ))}
+        <div className="whatsnew-body">
+          <div className="whatsnew-grid">
+            {FEATURES.map((f) => (
+              <button
+                key={f.title}
+                type="button"
+                className={`whatsnew-item ${f.to ? "is-clickable" : ""}`}
+                onClick={() => goTo(f.to)}
+              >
+                <span className="whatsnew-item-icon">{f.icon}</span>
+                <div>
+                  <div className="whatsnew-item-title">{f.title}</div>
+                  <div className="whatsnew-item-desc">{f.desc}</div>
+                </div>
+              </button>
+            ))}
+          </div>
+          <button className="btn-primary whatsnew-close-btn" onClick={closeTour}>
+            Anladım, Başlayalım →
+          </button>
         </div>
-        <button className="btn-primary whatsnew-close-btn" onClick={closeTour}>
-          Anladım, Başlayalım →
-        </button>
       </div>
     </div>
   );

@@ -11,15 +11,16 @@ import {
   scorePrediction,
   pointsForPrediction,
   buildLeaderboard,
-  CHAMPION_PICK_POINTS,
-  KNOCKOUT_TIE_POINTS,
-  DRAW_GUESS_POINTS_PER_HIT,
+  computeDerivedStandings,
+  standingsPoints,
+  isMatchRevealed,
+  OUTCOME_CORRECT_POINTS,
 } from "../state/PredictionLeagueContext.jsx";
-import CompetitionStepper from "../components/CompetitionStepper.jsx";
-import MatchdayTabs from "../components/fixture/MatchdayTabs.jsx";
-import DragStandings from "../components/fixture/DragStandings.jsx";
+import StandingsTable from "../components/fixture/StandingsTable.jsx";
 import Crest from "../components/Crest.jsx";
 import TeamFilterSelect from "../components/stats/TeamFilterSelect.jsx";
+
+const OUTCOME_LABEL = { win: "Galibiyet", draw: "Beraberlik", loss: "Mağlubiyet" };
 
 const START_STAGE_LABEL = {
   draw: "Kura çekiliyor…",
@@ -191,14 +192,10 @@ function AuthHeader({ competition, title }) {
 // ============================================================================
 // LANDING: /:competitionKey/tahmin-ligi -- Liglerim + Yeni Lig Oluştur.
 // ============================================================================
-const MAX_DRAW_GUESS_TEAMS = 5;
-const MAX_DRAW_GUESSES_PER_TEAM = 3;
-
 function PredictionLeagueLanding() {
   const { competitionKey } = useParams();
   const navigate = useNavigate();
   const competition = getCompetition(competitionKey);
-  const hasDraw = competition.format === "swiss";
   const { user } = usePredictionAuth();
   const createLeague = useCreateLeague();
   const { leagues, loading: leaguesLoading, error: leaguesError } = useMyLeagues(competitionKey);
@@ -207,40 +204,6 @@ function PredictionLeagueLanding() {
   const [starting, setStarting] = useState(false);
   const [startStage, setStartStage] = useState(null);
   const [startError, setStartError] = useState(null);
-
-  // Kura eşleşmesi tahmini (opsiyonel, sadece swiss formatta): lig (ve
-  // dolayısıyla gerçek fikstür) oluşmadan HEMEN ÖNCE, kullanıcı BİRDEN FAZLA
-  // takım seçip her biri için rakip tahmin edebilir -- bu SADECE burada,
-  // lig oluşturulmadan önce yapılabilir (bkz. useCreateLeague'deki not).
-  const [drawGuesses, setDrawGuesses] = useState([]); // [{favoriteTeamId, guesses:[]}]
-  const [pickerTeamId, setPickerTeamId] = useState("");
-  const teamById = useMemo(() => Object.fromEntries(competition.teams.map((t) => [t.id, t])), [competition]);
-  const sortedTeams = useMemo(
-    () => [...competition.teams].sort((a, b) => a.name.localeCompare(b.name, "tr")),
-    [competition]
-  );
-  const usedTeamIds = useMemo(() => new Set(drawGuesses.map((g) => g.favoriteTeamId)), [drawGuesses]);
-  const pickableTeams = useMemo(() => sortedTeams.filter((t) => !usedTeamIds.has(t.id)), [sortedTeams, usedTeamIds]);
-
-  const addDrawGuessTeam = (teamId) => {
-    if (!teamId || drawGuesses.length >= MAX_DRAW_GUESS_TEAMS) return;
-    setDrawGuesses((prev) => [...prev, { favoriteTeamId: teamId, guesses: [] }]);
-    setPickerTeamId("");
-  };
-  const removeDrawGuessTeam = (teamId) => {
-    setDrawGuesses((prev) => prev.filter((g) => g.favoriteTeamId !== teamId));
-  };
-  const toggleDrawGuessOpponent = (teamId, opponentId) => {
-    setDrawGuesses((prev) =>
-      prev.map((g) => {
-        if (g.favoriteTeamId !== teamId) return g;
-        const has = g.guesses.includes(opponentId);
-        if (has) return { ...g, guesses: g.guesses.filter((id) => id !== opponentId) };
-        if (g.guesses.length >= MAX_DRAW_GUESSES_PER_TEAM) return g;
-        return { ...g, guesses: [...g.guesses, opponentId] };
-      })
-    );
-  };
 
   // Kura çekimi ekranından TAMAMEN bağımsız: yarışma formatı ne olursa olsun
   // (UCL/Avrupa Ligi'nin İsviçre modeli kura+fikstürü dahil), lig burada
@@ -253,7 +216,7 @@ function PredictionLeagueLanding() {
     setStartError(null);
     setStartStage("draw");
     try {
-      const leagueId = await createLeague(competitionKey, name.trim(), setStartStage, drawGuesses);
+      const leagueId = await createLeague(competitionKey, name.trim(), setStartStage);
       navigate(`/${competitionKey}/tahmin-ligi/${leagueId}`);
     } catch (e) {
       setStartError(describeFirestoreError(e));
@@ -265,16 +228,14 @@ function PredictionLeagueLanding() {
 
   return (
     <div className="page-shell">
-      <CompetitionStepper competitionKey={competitionKey} />
       <AuthHeader competition={competition} title={`${competition.shortName} — Tahmin Ligi`} />
 
       {user && (
         <>
-          <div className="stats-callout">
+          <div className="stats-callout prediction-league-intro">
             <p>
-              Bir Tahmin Ligi <b>arkadaşlarınla paylaştığın bir link</b> üzerinden çalışır: sen bir lig oluşturursun,
-              linkini gönderirsin, onlar da katılıp AYNI eşleşmeleri tahmin eder. Herkes birbirinin tahminini
-              görebilir (kendi tahminini yaptıktan sonra).
+              🔗 <b>Arkadaşlarınla paylaştığın bir link</b> üzerinden çalışır -- lig oluştur, linki gönder, herkes
+              aynı eşleşmeleri tahmin etsin.
             </p>
             <div className="prediction-league-transfer-form">
               <input
@@ -290,64 +251,6 @@ function PredictionLeagueLanding() {
             </div>
             {startError && <p style={{ color: "#f87171" }}>{startError}</p>}
           </div>
-
-          {hasDraw && (
-            <div className="chart-card chart-card-wide">
-              <h3>🔮 Kura Eşleşmesi Tahmini (opsiyonel)</h3>
-              <p className="footnote">
-                Lig oluşmadan HEMEN ÖNCE, istediğin kadar takım seç (en fazla {MAX_DRAW_GUESS_TEAMS}) ve her biri için
-                kimlerle eşleşeceğini tahmin et (takım başına en fazla {MAX_DRAW_GUESSES_PER_TEAM}) -- doğru bilinen
-                her rakip <b>{4} puan</b> kazandırır. Bu tahmin sadece burada, lig kurulmadan önce yapılabilir.
-              </p>
-
-              {drawGuesses.map((g) => {
-                const favTeam = teamById[g.favoriteTeamId];
-                const eligible = sortedTeams.filter((t) => t.id !== g.favoriteTeamId && t.country !== favTeam?.country);
-                return (
-                  <div key={g.favoriteTeamId} className="prediction-picker">
-                    <div className="prediction-title">
-                      <Crest team={favTeam} size={22} />
-                      <span>{favTeam?.name} için {MAX_DRAW_GUESSES_PER_TEAM} rakip tahmin et</span>
-                      <span className="prediction-count">{g.guesses.length}/{MAX_DRAW_GUESSES_PER_TEAM}</span>
-                      <button className="btn-ghost btn-small" onClick={() => removeDrawGuessTeam(g.favoriteTeamId)}>
-                        ✕ Kaldır
-                      </button>
-                    </div>
-                    <div className="prediction-chips">
-                      {eligible.map((t) => {
-                        const selected = g.guesses.includes(t.id);
-                        const disabled = !selected && g.guesses.length >= MAX_DRAW_GUESSES_PER_TEAM;
-                        return (
-                          <button
-                            key={t.id}
-                            type="button"
-                            className={`prediction-chip ${selected ? "selected" : ""}`}
-                            disabled={disabled}
-                            onClick={() => toggleDrawGuessOpponent(g.favoriteTeamId, t.id)}
-                          >
-                            <Crest team={t} size={16} />
-                            {t.name}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-
-              {drawGuesses.length < MAX_DRAW_GUESS_TEAMS && pickableTeams.length > 0 && (
-                <div className="prediction-team-add-row">
-                  <TeamFilterSelect
-                    teams={pickableTeams}
-                    value={pickerTeamId}
-                    onChange={addDrawGuessTeam}
-                    placeholder="Tahmin eklemek için bir takım seç…"
-                    allowClear={false}
-                  />
-                </div>
-              )}
-            </div>
-          )}
 
           <div className="chart-card chart-card-wide">
             <h3>Liglerim</h3>
@@ -390,49 +293,126 @@ function PredictionLeagueRoom() {
     predictions,
     myPredictionsByMatch,
     othersPredictionsByMatch,
+    deletePrediction,
     submitScorePrediction,
-    submitChampionPick,
-    submitKnockoutPick,
-    submitStandingsPick,
+    submitOutcomePrediction,
+    submitTeamsPick,
     resetMyPredictions,
   } = usePredictions(leagueId);
 
-  const championPrediction = myPredictionsByMatch.champion;
-  const standingsPrediction = myPredictionsByMatch.standings;
-  // "Adım adım" akış: 1) Lig Sıralaması (sürükle-bırak) HERKES için ilk adım
-  // -- bu yapılmadan haftalık skorlar/eleme turu/şampiyon sekmeleri kilitli
-  // kalır. 2) Haftalık skorlar. 3) Eleme turu (varsa). 4) En sonda şampiyon
-  // tahmini (varsa).
-  const [tab, setTab] = useState("standings");
-  const laterStagesUnlocked = !!standingsPrediction;
+  const teamsPrediction = myPredictionsByMatch.teams;
+  // "Adım adım" akış: 1) Hangi takım(lar)ın maçlarını SEN tahmin edeceksin
+  // (geri kalanı sistemin kendi model sonucuna göre otomatik dolar) -- bu
+  // yapılmadan haftalık skorlar/sıralama sekmeleri kilitli kalır. 2) Haftalık
+  // maçlar -- UCL/Avrupa Ligi'nde (İsviçre modeli) basit bir "tuttuğun takım
+  // bu maçtan kaç puan alır" (Galibiyet/Beraberlik/Mağlubiyet) tahmini,
+  // Süper Lig'de (çift devreli) tam skor tahmini. 3) Lig Sıralaması -- elle
+  // sürüklenmiyor, tahminlerden OTOMATİK hesaplanıyor. Eleme turu tahmini
+  // KALDIRILDI -- lig fazı henüz oynanmadığı için gerçek bir eşleşme yok.
+  const [tab, setTab] = useState("takimlar");
+  const teamsUnlocked = !!teamsPrediction;
+  const selectedTeamIds = useMemo(() => new Set(teamsPrediction?.teamIds || []), [teamsPrediction]);
 
-  const [activeMatchday, setActiveMatchday] = useState(1);
-  const [teamFilter, setTeamFilter] = useState(""); // "" = tüm takımlar
   const [drafts, setDrafts] = useState({});
   const [submitting, setSubmitting] = useState({});
   const [submitErrors, setSubmitErrors] = useState({});
-  const [championDraft, setChampionDraft] = useState("");
-  const [championSubmitting, setChampionSubmitting] = useState(false);
-  const [championError, setChampionError] = useState(null);
-  const [standingsDraft, setStandingsDraft] = useState(null);
-  const [standingsSubmitting, setStandingsSubmitting] = useState(false);
-  const [standingsError, setStandingsError] = useState(null);
   const [linkCopied, setLinkCopied] = useState(false);
-
-  const leaderboard = useMemo(() => (league ? buildLeaderboard(predictions, league) : []), [predictions, league]);
-  const drawPredictions = useMemo(() => predictions.filter((p) => p.kind === "draw"), [predictions]);
-
-  const activeMatches = useMemo(() => {
-    const all = fixture?.find((md) => md.number === activeMatchday)?.matches || [];
-    if (!teamFilter) return all;
-    return all.filter((m) => m.homeTeam.id === teamFilter || m.awayTeam.id === teamFilter);
-  }, [fixture, activeMatchday, teamFilter]);
+  const [systemMatchesOpen, setSystemMatchesOpen] = useState(false);
 
   const teamById = useMemo(() => Object.fromEntries(competition.teams.map((t) => [t.id, t])), [competition]);
   const sortedTeams = useMemo(
     () => [...competition.teams].sort((a, b) => a.name.localeCompare(b.name, "tr")),
     [competition]
   );
+
+  // "1. Takımların" -- lig kurulduktan SONRA, gerçek fikstür belli olduktan
+  // sonra yapılan bir seçim (bu yüzden landing'deki "kura eşleşmesi
+  // tahmini"nden ayrı bir kavram): kaç takım seçersen seç, TEK seferlik.
+  const [teamsDraft, setTeamsDraft] = useState([]);
+  const [teamsPickerValue, setTeamsPickerValue] = useState("");
+  const [teamsSubmitting, setTeamsSubmitting] = useState(false);
+  const [teamsError, setTeamsError] = useState(null);
+  const pickableTeamsForDraft = useMemo(
+    () => sortedTeams.filter((t) => !teamsDraft.includes(t.id)),
+    [sortedTeams, teamsDraft]
+  );
+  const addTeamDraft = (teamId) => {
+    if (!teamId) return;
+    setTeamsDraft((prev) => (prev.includes(teamId) ? prev : [...prev, teamId]));
+    setTeamsPickerValue("");
+  };
+  const removeTeamDraft = (teamId) => {
+    setTeamsDraft((prev) => prev.filter((id) => id !== teamId));
+  };
+  const handleTeamsSubmit = async () => {
+    if (teamsDraft.length === 0) return;
+    setTeamsSubmitting(true);
+    setTeamsError(null);
+    try {
+      await submitTeamsPick(teamsDraft);
+      setTab("lig");
+    } catch (e) {
+      setTeamsError(describeFirestoreError(e));
+    } finally {
+      setTeamsSubmitting(false);
+    }
+  };
+  // Zaten seçilmiş takımları değiştirmek istediğinde: eski seçimi siler,
+  // taslağı mevcut seçimle doldurur ki kullanıcı sıfırdan başlamak zorunda
+  // kalmasın (istersen tek tek çıkarıp yenisini ekleyebilir).
+  const handleChangeTeams = async () => {
+    setTeamsSubmitting(true);
+    setTeamsError(null);
+    try {
+      await deletePrediction("teams");
+      setTeamsDraft(teamsPrediction?.teamIds || []);
+    } catch (e) {
+      setTeamsError(describeFirestoreError(e));
+    } finally {
+      setTeamsSubmitting(false);
+    }
+  };
+
+  const leaderboard = useMemo(
+    () =>
+      league
+        ? buildLeaderboard(predictions, league, { fixture, teams: competition.teams, zones: competition.zones })
+        : [],
+    [predictions, league, fixture, competition]
+  );
+
+  const derivedStandings = useMemo(() => {
+    if (!league || !fixture) return [];
+    return computeDerivedStandings(fixture, myPredictionsByMatch, league, competition.teams, competition.zones);
+  }, [league, fixture, myPredictionsByMatch, competition]);
+  const derivedStandingsPoints = useMemo(
+    () => (league ? standingsPoints(derivedStandings.map((s) => s.teamId), league.standings) : 0),
+    [derivedStandings, league]
+  );
+
+  // "Haftalık Skorlar" artık hafta hafta sekmeli DEĞİL -- sezonun tamamındaki
+  // (8 hafta) maçların hepsi tek, sürekli bir listede alt alta sıralanıyor
+  // (küçük "X. Hafta" başlıklarıyla gruplanmış); tahmin girmediğin "Sistem
+  // Tahmini" maçları ise varsayılan olarak KAPALI, ayrı, katlanabilir bir
+  // bölümde -- liste çok uzamasın diye.
+  const myMatchesByWeek = useMemo(() => {
+    if (!fixture) return [];
+    return fixture
+      .map((md) => ({
+        number: md.number,
+        label: md.label,
+        matches: md.matches.filter((m) => selectedTeamIds.has(m.homeTeam.id) || selectedTeamIds.has(m.awayTeam.id)),
+      }))
+      .filter((md) => md.matches.length > 0);
+  }, [fixture, selectedTeamIds]);
+  const systemMatches = useMemo(() => {
+    if (!fixture) return [];
+    return fixture.flatMap((md) =>
+      md.matches
+        .filter((m) => !selectedTeamIds.has(m.homeTeam.id) && !selectedTeamIds.has(m.awayTeam.id))
+        .map((m) => ({ ...m, weekLabel: md.label }))
+    );
+  }, [fixture, selectedTeamIds]);
 
   const handleCopyLink = async () => {
     try {
@@ -441,20 +421,6 @@ function PredictionLeagueRoom() {
       window.setTimeout(() => setLinkCopied(false), 2000);
     } catch {
       window.prompt("Linki kopyala:", window.location.href);
-    }
-  };
-
-  const handleStandingsSubmit = async () => {
-    const order = standingsDraft || sortedTeams.map((t) => t.id);
-    setStandingsSubmitting(true);
-    setStandingsError(null);
-    try {
-      await submitStandingsPick(order);
-      setTab("lig");
-    } catch (e) {
-      setStandingsError(describeFirestoreError(e));
-    } finally {
-      setStandingsSubmitting(false);
     }
   };
 
@@ -513,37 +479,38 @@ function PredictionLeagueRoom() {
     }
   };
 
-  const handleChampionSubmit = async () => {
-    if (!championDraft) return;
-    setChampionSubmitting(true);
-    setChampionError(null);
+  const [outcomeSubmitting, setOutcomeSubmitting] = useState({});
+  const [outcomeErrors, setOutcomeErrors] = useState({});
+  const handleOutcomeSubmit = async (matchId, teamId, result) => {
+    setOutcomeSubmitting((prev) => ({ ...prev, [matchId]: true }));
+    setOutcomeErrors((prev) => ({ ...prev, [matchId]: null }));
     try {
-      await submitChampionPick(championDraft);
-      setTab("leaderboard");
+      await submitOutcomePrediction(matchId, teamId, result);
     } catch (e) {
-      setChampionError(describeFirestoreError(e));
+      setOutcomeErrors((prev) => ({ ...prev, [matchId]: describeFirestoreError(e) }));
     } finally {
-      setChampionSubmitting(false);
+      setOutcomeSubmitting((prev) => ({ ...prev, [matchId]: false }));
     }
   };
 
-  const [knockoutSubmitting, setKnockoutSubmitting] = useState({});
-  const [knockoutErrors, setKnockoutErrors] = useState({});
-  const handleKnockoutPick = async (tieId, pickedTeamId) => {
-    setKnockoutSubmitting((prev) => ({ ...prev, [tieId]: true }));
-    setKnockoutErrors((prev) => ({ ...prev, [tieId]: null }));
+  // Bir maç tahminini SİLİP tekrar seçilebilir hale getirir -- "fikrini
+  // değiştirdim" senaryosu için (bkz. deletePrediction'ın PredictionLeagueContext
+  // üzerindeki notu). Silme başarılı olur olmaz canlı Firestore aboneliği
+  // myPredictionsByMatch[matchId]'yi otomatik günceller, form yeniden açılır.
+  const [changingMatchId, setChangingMatchId] = useState(null);
+  const handleChangePrediction = async (matchId) => {
+    setChangingMatchId(matchId);
     try {
-      await submitKnockoutPick(tieId, pickedTeamId);
+      await deletePrediction(matchId);
     } catch (e) {
-      setKnockoutErrors((prev) => ({ ...prev, [tieId]: describeFirestoreError(e) }));
+      setOutcomeErrors((prev) => ({ ...prev, [matchId]: describeFirestoreError(e) }));
     } finally {
-      setKnockoutSubmitting((prev) => ({ ...prev, [tieId]: false }));
+      setChangingMatchId(null);
     }
   };
 
   return (
     <div className="page-shell">
-      <CompetitionStepper competitionKey={competitionKey} />
       <AuthHeader competition={competition} title={league ? `🏆 ${league.name}` : `${competition.shortName} — Tahmin Ligi`} />
 
       {user && (
@@ -583,271 +550,255 @@ function PredictionLeagueRoom() {
       {user && league && fixture && (
         <>
           <p className="footnote">
-            {hasDraw && (
+            {hasDraw ? (
               <>
-                <b>{CHAMPION_PICK_POINTS} puan</b> şampiyon tahmini ·{" "}
+                Her maç için tuttuğun takımın <b>Galibiyet</b>/<b>Beraberlik</b>/<b>Mağlubiyet</b> alacağını tahmin
+                ediyorsun -- doğru bilirsen <b>{OUTCOME_CORRECT_POINTS} puan</b>, yanlışsa 0 · <b>Lig Sıralaması</b>{" "}
+                elle sürüklenmiyor, bu tahminlerden otomatik hesaplanıyor.
               </>
-            )}
-            <b>5 puan</b> tam skor · <b>3 puan</b> doğru sonuç + doğru gol farkı · <b>1 puan</b> sadece doğru sonuç
-            {hasDraw && (
+            ) : (
               <>
-                {" "}
-                · eleme turunda doğru tahmin, tur ilerledikçe (<b>{KNOCKOUT_TIE_POINTS[0]}</b>→
-                <b>{KNOCKOUT_TIE_POINTS[3]}</b> puan) daha değerli.
+                <b>5 puan</b> tam skor · <b>3 puan</b> doğru sonuç + doğru gol farkı · <b>1 puan</b> sadece doğru
+                sonuç · <b>Lig Sıralaması</b> elle sürüklenmiyor, skor tahminlerinden otomatik hesaplanıyor.
               </>
             )}
           </p>
 
-          {drawPredictions.length > 0 && (
-            <div className="chart-card chart-card-wide">
-              <h3>🔮 Kura Eşleşmesi Tahminleri</h3>
-              <p className="footnote">
-                Lig kurulmadan önce yapılan tahminler -- doğru bilinen her rakip{" "}
-                <b>{DRAW_GUESS_POINTS_PER_HIT} puan</b> kazandırdı.
-              </p>
-              <div className="prediction-league-matches">
-                {drawPredictions.map((p) => {
-                  const favTeam = teamById[p.favoriteTeamId];
-                  const realOpponents = new Set(
-                    (fixture || []).flatMap((md) =>
-                      md.matches
-                        .filter((m) => m.homeTeam.id === p.favoriteTeamId || m.awayTeam.id === p.favoriteTeamId)
-                        .map((m) => (m.homeTeam.id === p.favoriteTeamId ? m.awayTeam.id : m.homeTeam.id))
-                    )
-                  );
-                  return (
-                    <div key={`${p.uid}_${p.favoriteTeamId}`} className="prediction-row-wrap">
-                      <div className="prediction-champion-result">
-                        <span className="table-team-cell">
-                          <Avatar photoURL={p.photoURL} name={p.displayName} size={20} /> <b>{p.displayName}</b> —{" "}
-                          {favTeam?.name} için tahmin:
-                        </span>
-                        <div className="prediction-others-row">
-                          {(p.guesses || []).map((teamId) => (
-                            <span
-                              key={teamId}
-                              className={`prediction-others-chip ${realOpponents.has(teamId) ? "prediction-guess-hit" : ""}`}
-                            >
-                              {realOpponents.has(teamId) ? "✅" : "❌"} {teamById[teamId]?.name || teamId}
-                            </span>
-                          ))}
-                        </div>
-                        <p>
-                          <b>{pointsForPrediction(p, league)} puan</b>
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
           <div className="stats-tabs">
-            <button className={tab === "standings" ? "active" : ""} onClick={() => setTab("standings")}>
-              1. Lig Sıralaması
+            <button className={tab === "takimlar" ? "active" : ""} onClick={() => setTab("takimlar")}>
+              1. Takımların
             </button>
             <button
               className={tab === "lig" ? "active" : ""}
-              onClick={() => laterStagesUnlocked && setTab("lig")}
-              disabled={!laterStagesUnlocked}
-              title={laterStagesUnlocked ? "" : "Önce lig sıralaması tahminini yap"}
+              onClick={() => teamsUnlocked && setTab("lig")}
+              disabled={!teamsUnlocked}
+              title={teamsUnlocked ? "" : "Önce hangi takım(lar)ı tahmin edeceğini seç"}
             >
               2. Haftalık Skorlar
             </button>
-            {league.knockout && (
-              <button
-                className={tab === "eleme" ? "active" : ""}
-                onClick={() => laterStagesUnlocked && setTab("eleme")}
-                disabled={!laterStagesUnlocked}
-                title={laterStagesUnlocked ? "" : "Önce lig sıralaması tahminini yap"}
-              >
-                3. Eleme Turu
-              </button>
-            )}
-            {hasDraw && (
-              <button
-                className={tab === "sampiyon" ? "active" : ""}
-                onClick={() => laterStagesUnlocked && setTab("sampiyon")}
-                disabled={!laterStagesUnlocked}
-                title={laterStagesUnlocked ? "" : "Önce lig sıralaması tahminini yap"}
-              >
-                4. Şampiyon Tahmini
-              </button>
-            )}
+            <button
+              className={tab === "siralama" ? "active" : ""}
+              onClick={() => teamsUnlocked && setTab("siralama")}
+              disabled={!teamsUnlocked}
+              title={teamsUnlocked ? "" : "Önce hangi takım(lar)ı tahmin edeceğini seç"}
+            >
+              3. Lig Sıralaması
+            </button>
             <button className={tab === "leaderboard" ? "active" : ""} onClick={() => setTab("leaderboard")}>
               🏅 Sıralama
             </button>
           </div>
 
-          {tab === "standings" && (
+          {tab === "takimlar" && (
             <div className="chart-card chart-card-wide">
-              <h3>🖐️ Lig Sıralamasını Sürükle-Bırak ile Tahmin Et</h3>
-              {standingsPrediction ? (
-                <div className="prediction-champion-result">
-                  <p className="footnote">
-                    Tahminini kaydettin -- gerçek sıralama, sezonun geri kalanı (haftalık skorlar/eleme turu/şampiyon)
-                    açığa çıktıkça netleşecek. Puanın: her takım için tahmin ettiğin sıra gerçeğe ne kadar yakınsa o
-                    kadar puan (tam isabet = 3, ±1 sıra = 2, ±2 sıra = 1).
-                  </p>
-                  <p>
-                    <b>{pointsForPrediction(standingsPrediction, league)} puan</b> (şu ana kadarki hesaplama)
-                  </p>
-                  <button className="btn-secondary btn-small" onClick={() => setTab("lig")}>
-                    Haftalık Skorlara Geç →
-                  </button>
-
-                  {(othersPredictionsByMatch.standings || []).length > 0 && (
-                    <div className="prediction-others-list">
-                      <p className="footnote" style={{ marginTop: 14 }}>
-                        Diğerlerinin şampiyon tahmini (sıralamalarının 1.si):
-                      </p>
-                      {(othersPredictionsByMatch.standings || []).map((p) => (
-                        <div key={p.uid} className="prediction-other-full-row">
-                          <Avatar photoURL={p.photoURL} name={p.displayName} size={18} />
-                          <span>{p.displayName}:</span>
-                          <b>{teamById[p.order?.[0]]?.name || "?"}</b>
-                          <span className="footnote">({pointsForPrediction(p, league)} puan)</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ) : (
+              {teamsPrediction ? (
                 <>
+                  <h3>✅ Takımların Belli</h3>
                   <p className="footnote">
-                    Kura tamamlandı, eşleşmeler belli oldu -- lig aşaması başlamadan ÖNCE, final puan durumunu
-                    (1'den son sıraya) tahmin et. Bu, Tahmin Ligi'nin İLK adımı; diğer sekmeler bunu tamamlayana kadar
-                    kilitli kalır.
+                    Seçtiğin takımlar -- bundan sonra sadece bunların maçlarına kendi tahminini giriyorsun, geri kalan
+                    tüm maçlar sistemin kendi model sonucuna göre otomatik dolduruluyor.
                   </p>
-                  <DragStandings
-                    teams={competition.teams}
-                    order={standingsDraft || sortedTeams.map((t) => t.id)}
-                    onReorder={setStandingsDraft}
-                    zones={competition.zones}
-                  />
-                  <button
-                    className="btn-primary"
-                    onClick={handleStandingsSubmit}
-                    disabled={standingsSubmitting}
-                    style={{ marginTop: 12 }}
-                  >
-                    {standingsSubmitting ? "Kaydediliyor…" : "Tahminimi Kaydet"}
-                  </button>
-                  {standingsError && <p style={{ color: "#f87171" }}>{standingsError}</p>}
-                </>
-              )}
-            </div>
-          )}
-
-          {tab === "sampiyon" && hasDraw && laterStagesUnlocked && (
-            <div className="chart-card chart-card-wide">
-              <h3>🔮 Son Tahmin: Şampiyon Kim Olur?</h3>
-              {championPrediction ? (
-                <div className="prediction-champion-result">
-                  <p>
-                    Tahminin: <b>{teamById[championPrediction.pickedTeamId]?.name || "?"}</b>
-                  </p>
-                  {league.knockout?.champion ? (
-                    <p>
-                      Gerçek şampiyon: <b>{teamById[league.knockout.champion]?.name || "?"}</b>{" "}
-                      <span
-                        className={`prediction-points prediction-points-${
-                          league.knockout.champion === championPrediction.pickedTeamId ? 5 : 0
-                        }`}
-                      >
-                        ({pointsForPrediction(championPrediction, league)} puan)
+                  <div className="prediction-others-row">
+                    {teamsPrediction.teamIds.map((teamId) => (
+                      <span key={teamId} className="prediction-others-chip">
+                        {teamById[teamId]?.name || teamId}
                       </span>
-                    </p>
-                  ) : (
-                    <p className="footnote">Eleme turu henüz oynanmadı -- şampiyon belli olunca burada göreceksin.</p>
-                  )}
-                  <button className="btn-secondary btn-small" onClick={() => setTab("leaderboard")}>
-                    Sıralamaya Bak →
-                  </button>
-
-                  {(othersPredictionsByMatch.champion || []).length > 0 && (
-                    <div className="prediction-others-list">
-                      <p className="footnote" style={{ marginTop: 14 }}>
-                        Diğerlerinin şampiyon tahmini:
-                      </p>
-                      {(othersPredictionsByMatch.champion || []).map((p) => (
-                        <div key={p.uid} className="prediction-other-full-row">
-                          <Avatar photoURL={p.photoURL} name={p.displayName} size={18} />
-                          <span>{p.displayName}:</span>
-                          <b>{teamById[p.pickedTeamId]?.name || "?"}</b>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <>
-                  <p className="footnote">
-                    Bu, Tahmin Ligi'nin SON adımı -- lig sıralaması, haftalık skorlar ve eleme turu tahminlerini
-                    yaptıktan sonra, her şeyi göz önünde bulundurarak kimin şampiyon olacağına karar ver. Doğru
-                    bilirsen <b>{CHAMPION_PICK_POINTS} puan</b> kazanırsın (Tahmin Ligi'ndeki en yüksek tekil puan).
-                  </p>
-                  <div className="prediction-champion-picker">
-                    <TeamFilterSelect
-                      teams={sortedTeams}
-                      value={championDraft}
-                      onChange={setChampionDraft}
-                      placeholder="Bir takım seç…"
-                      allowClear={false}
-                    />
-                    <button
-                      className="btn-primary"
-                      onClick={handleChampionSubmit}
-                      disabled={!championDraft || championSubmitting}
-                    >
-                      {championSubmitting ? "Kaydediliyor…" : "Tahminimi Kaydet"}
+                    ))}
+                  </div>
+                  <div className="prediction-teams-done-actions">
+                    <button className="btn-secondary btn-small" onClick={() => setTab("lig")}>
+                      Haftalık Skorlara Geç →
+                    </button>
+                    <button className="btn-ghost btn-small" onClick={handleChangeTeams} disabled={teamsSubmitting}>
+                      {teamsSubmitting ? "…" : "✏️ Takımları Değiştir"}
                     </button>
                   </div>
-                  {championError && <p style={{ color: "#f87171" }}>{championError}</p>}
+                  {teamsError && <p style={{ color: "#f87171" }}>{teamsError}</p>}
                 </>
+              ) : (
+                <div className="prediction-teams-step">
+                  <div className="draw-first-step-eyebrow">1. Adım</div>
+                  <h3 className="prediction-teams-step-title">Hangi Takımları Tahmin Edeceksin?</h3>
+                  <p className="prediction-teams-step-desc">
+                    1 ya da daha fazla takım seç. Örneğin sadece <b>Fenerbahçe</b>'yi seçersen, sadece Fenerbahçe'nin
+                    8 maçını sen tahmin edersin -- ligdeki diğer 35 takımın maçlarını sistem kendi modeliyle otomatik
+                    tahmin eder. Diğer sekmeler bunu tamamlayana kadar kilitli kalır; bu seçim TEK seferliktir (baştan
+                    başlamak istersen "Tahminlerimi Sıfırla"yı kullan).
+                  </p>
+
+                  <div className="prediction-teams-picker">
+                    <TeamFilterSelect
+                      teams={pickableTeamsForDraft}
+                      value={teamsPickerValue}
+                      onChange={(v) => {
+                        setTeamsPickerValue(v);
+                        addTeamDraft(v);
+                      }}
+                      placeholder="🔍 Takım ara ve ekle…"
+                      allowClear={false}
+                    />
+                  </div>
+
+                  {teamsDraft.length > 0 ? (
+                    <>
+                      <div className="prediction-teams-count">{teamsDraft.length} takım seçtin:</div>
+                      <div className="prediction-others-row">
+                        {teamsDraft.map((teamId) => (
+                          <button
+                            key={teamId}
+                            type="button"
+                            className="prediction-chip selected"
+                            onClick={() => removeTeamDraft(teamId)}
+                          >
+                            <Crest team={teamById[teamId]} size={16} />
+                            {teamById[teamId]?.name} ✕
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <p className="prediction-teams-count prediction-teams-count-empty">Henüz takım seçmedin.</p>
+                  )}
+
+                  <button
+                    className="btn-primary prediction-teams-submit"
+                    onClick={handleTeamsSubmit}
+                    disabled={teamsDraft.length === 0 || teamsSubmitting}
+                  >
+                    {teamsSubmitting
+                      ? "Kaydediliyor…"
+                      : teamsDraft.length === 0
+                        ? "Önce en az 1 takım seç"
+                        : `${teamsDraft.length} Takımla Devam Et →`}
+                  </button>
+                  {teamsError && <p style={{ color: "#f87171" }}>{teamsError}</p>}
+                </div>
               )}
             </div>
           )}
 
-          {tab === "lig" && laterStagesUnlocked && (
+          {tab === "siralama" && teamsUnlocked && (
+            <div className="chart-card chart-card-wide">
+              <h3>📊 Senin Tahminlerine Göre Lig Sıralaması</h3>
+              <p className="footnote">
+                Bu tablo elle sürüklenmiyor -- seçtiğin takımların maçları için girdiğin skor tahminleri + geri kalan
+                tüm maçlar için sistemin model sonucu birleştirilip otomatik hesaplanıyor. Skor tahminlerini
+                değiştirdikçe (yenilerini ekledikçe) bu tablo da güncellenir.
+              </p>
+              <p>
+                <b>{derivedStandingsPoints} puan</b> (şu ana kadarki hesaplama, sezon sonu simülasyon sıralamasına yakınlığa göre)
+              </p>
+              <StandingsTable
+                standings={derivedStandings}
+                teams={competition.teams}
+                title="Tahminine Göre Puan Durumu"
+                competitionKey={competitionKey}
+              />
+            </div>
+          )}
+
+          {tab === "lig" && teamsUnlocked && (
             <>
-              <div className="prediction-league-filter-row">
-                <MatchdayTabs matchdays={fixture} active={activeMatchday} onSelect={setActiveMatchday} />
-                <TeamFilterSelect teams={sortedTeams} value={teamFilter} onChange={setTeamFilter} />
-              </div>
               <div className="chart-card chart-card-wide prediction-league-matches">
-                {activeMatches.length === 0 && (
-                  <p className="footnote">Bu hafta, seçtiğin takımın oynadığı bir maç yok.</p>
+                <h3>Senin Takımların -- Tüm Sezon</h3>
+                <p className="footnote">
+                  Sezonun 8 haftasındaki TÜM maçların alt alta -- hafta hafta gezinmene gerek yok, sırayla tahminini
+                  gir.
+                </p>
+                {myMatchesByWeek.length === 0 && (
+                  <p className="footnote">Seçtiğin takımların bu sezon hiç maçı yok gibi görünüyor.</p>
                 )}
-                {activeMatches.map((m) => {
-                  const mine = myPredictionsByMatch[m.id];
-                  const actual = league.results[m.id];
+                {myMatchesByWeek.map((md) => (
+                  <div key={md.number} className="prediction-week-group">
+                    <div className="prediction-week-label">{md.label}</div>
+                    {md.matches.map((m) => {
+                      const mine = myPredictionsByMatch[m.id];
+                  const revealed = isMatchRevealed(league, m.id);
+                  const actual = revealed ? league.results[m.id] : null;
                   const draft = drafts[m.id] || {};
-                  const points = mine && actual ? scorePrediction(mine, actual) : null;
                   const others = mine ? othersPredictionsByMatch[m.id] || [] : [];
+                  // hasDraw (swiss, UCL/Avrupa Ligi): basit Galibiyet/Beraberlik/
+                  // Mağlubiyet tahmini, tuttuğun takımın perspektifinden.
+                  // Değilse (Süper Lig, çift devreli): eskisi gibi tam skor.
+                  const favTeam = selectedTeamIds.has(m.homeTeam.id) ? m.homeTeam : m.awayTeam;
+                  const outcomePoints = mine?.kind === "outcome" && actual ? pointsForPrediction(mine, league) : null;
+                  const scorePoints = mine?.kind === "score" && actual ? scorePrediction(mine, actual) : null;
+                  const points = outcomePoints ?? scorePoints;
+                  const stateClass = !mine
+                    ? "needs-action"
+                    : !revealed
+                      ? "is-pending"
+                      : points > 0
+                        ? "is-correct"
+                        : "is-wrong";
                   return (
-                    <div key={m.id} className="prediction-row-wrap">
-                      <div className="prediction-row">
-                        <div className="prediction-row-team">
+                    <div key={m.id} className={`prediction-match ${stateClass}`}>
+                      <div className="prediction-match-teams">
+                        <div className="prediction-match-team-row">
                           <Crest team={m.homeTeam} size={22} />
                           <span>{m.homeTeam.name}</span>
                         </div>
+                        <div className="prediction-match-team-row">
+                          <Crest team={m.awayTeam} size={22} />
+                          <span>{m.awayTeam.name}</span>
+                        </div>
+                      </div>
 
+                      <div className="prediction-match-mid">
                         {mine ? (
-                          <div className="prediction-row-result">
-                            <span className="prediction-row-mine">
-                              {mine.homeGoals} - {mine.awayGoals}
-                            </span>
-                            <span className="prediction-row-actual">
-                              {actual ? `Gerçek: ${actual.homeGoals} - ${actual.awayGoals}` : "Gerçek: ?"}
-                              {points != null && (
-                                <b className={`prediction-points prediction-points-${points}`}>
-                                  {" "}
-                                  {POINT_LABEL[points]} (+{points})
-                                </b>
+                          <>
+                            <div className="prediction-pick-chip">
+                              <span className="tag">Tahminin</span>
+                              <b>{mine.kind === "outcome" ? OUTCOME_LABEL[mine.result] : `${mine.homeGoals} - ${mine.awayGoals}`}</b>
+                              {revealed && points != null && (
+                                <span className={points > 0 ? "status ok" : "status no"}>
+                                  {points > 0 ? `✓ +${points}` : "✗ 0"}
+                                </span>
                               )}
-                            </span>
+                            </div>
+                            {revealed ? (
+                              <div className="prediction-result-line">
+                                Sonuç: <b>{actual.homeGoals} - {actual.awayGoals}</b>
+                              </div>
+                            ) : (
+                              <button
+                                type="button"
+                                className="prediction-change-link"
+                                onClick={() => handleChangePrediction(m.id)}
+                                disabled={changingMatchId === m.id}
+                              >
+                                {changingMatchId === m.id ? "…" : "Değiştir"}
+                              </button>
+                            )}
+                          </>
+                        ) : hasDraw ? (
+                          <div className="prediction-pick-row">
+                            <button
+                              className="prediction-pick-btn"
+                              onClick={() => handleOutcomeSubmit(m.id, favTeam.id, "win")}
+                              disabled={outcomeSubmitting[m.id]}
+                            >
+                              {favTeam.short} Kazanır
+                            </button>
+                            <button
+                              className="prediction-pick-btn"
+                              onClick={() => handleOutcomeSubmit(m.id, favTeam.id, "draw")}
+                              disabled={outcomeSubmitting[m.id]}
+                            >
+                              Berabere
+                            </button>
+                            <button
+                              className="prediction-pick-btn"
+                              onClick={() => handleOutcomeSubmit(m.id, favTeam.id, "loss")}
+                              disabled={outcomeSubmitting[m.id]}
+                            >
+                              {favTeam.short} Kaybeder
+                            </button>
+                            {outcomeErrors[m.id] && (
+                              <span className="footnote" style={{ color: "#f87171" }}>
+                                {outcomeErrors[m.id]}
+                              </span>
+                            )}
                           </div>
                         ) : (
                           <div className="prediction-row-input">
@@ -884,113 +835,72 @@ function PredictionLeagueRoom() {
                             )}
                           </div>
                         )}
-
-                        <div className="prediction-row-team prediction-row-team-away">
-                          <span>{m.awayTeam.name}</span>
-                          <Crest team={m.awayTeam} size={22} />
-                        </div>
                       </div>
+
                       {others.length > 0 && (
-                        <div className="prediction-others-row">
+                        <div className="prediction-others-row prediction-match-others">
                           {others.map((o) => (
                             <span key={o.uid} className="prediction-others-chip">
                               <Avatar photoURL={o.photoURL} name={o.displayName} size={16} /> {o.displayName}:{" "}
-                              {o.homeGoals}-{o.awayGoals}
+                              {o.kind === "outcome" ? OUTCOME_LABEL[o.result] : `${o.homeGoals}-${o.awayGoals}`}
                             </span>
                           ))}
                         </div>
                       )}
                     </div>
                   );
-                })}
+                    })}
+                  </div>
+                ))}
               </div>
-            </>
-          )}
 
-          {tab === "eleme" && laterStagesUnlocked && league.knockout && (
-            <div className="chart-card chart-card-wide prediction-league-matches">
-              {league.knockout.rounds.map((round) => (
-                <div key={round.name} className="prediction-knockout-round">
-                  <h3>{round.name}</h3>
-                  {round.ties.map((tie) => {
-                    const teamA = teamById[tie.teamAId];
-                    const teamB = teamById[tie.teamBId];
-                    const mine = myPredictionsByMatch[tie.id];
-                    const pts = mine ? pointsForPrediction(mine, league) : null;
-                    const others = mine ? othersPredictionsByMatch[tie.id] || [] : [];
-                    return (
-                      <div key={tie.id} className="prediction-row-wrap">
-                        <div className="prediction-row">
-                          <div className="prediction-row-team">
-                            <Crest team={teamA} size={22} />
-                            <span>{teamA?.name}</span>
-                          </div>
-
-                          {mine ? (
-                            <div className="prediction-row-result">
-                              <span className="prediction-row-mine">
-                                Tahminin: {teamById[mine.pickedTeamId]?.short}
-                              </span>
-                              <span className="prediction-row-actual">
-                                Kazanan: {teamById[tie.winnerId]?.short} ({tie.aggA}-{tie.aggB})
-                                {pts != null && (
-                                  <b className={`prediction-points prediction-points-${pts > 0 ? 5 : 0}`}>
-                                    {" "}
-                                    (+{pts} puan)
-                                  </b>
-                                )}
-                              </span>
+              {systemMatches.length > 0 && (
+                <div className="chart-card chart-card-wide prediction-system-matches">
+                  <button
+                    type="button"
+                    className="prediction-system-toggle"
+                    onClick={() => setSystemMatchesOpen((o) => !o)}
+                  >
+                    {systemMatchesOpen ? "▾" : "▸"} Diğer Maçlar (Sistem Tahmini) -- {systemMatches.length} maç
+                  </button>
+                  {systemMatchesOpen && (
+                    <>
+                      <p className="footnote">
+                        Bu maçlar seçtiğin takımları içermiyor -- sistemin model sonucuna göre otomatik dolduruluyor,
+                        ayrıca tahmin girmen gerekmiyor.
+                      </p>
+                      {systemMatches.map((m) => {
+                        const revealed = isMatchRevealed(league, m.id);
+                        const actual = revealed ? league.results[m.id] : null;
+                        return (
+                          <div key={m.id} className="prediction-row prediction-row-system">
+                            <div className="prediction-row-team">
+                              <Crest team={m.homeTeam} size={18} />
+                              <span>{m.homeTeam.name}</span>
                             </div>
-                          ) : (
-                            <div className="prediction-row-input">
-                              <button
-                                className="btn-secondary btn-small"
-                                onClick={() => handleKnockoutPick(tie.id, teamA.id)}
-                                disabled={knockoutSubmitting[tie.id]}
-                              >
-                                {teamA?.short} kazanır
-                              </button>
-                              <button
-                                className="btn-secondary btn-small"
-                                onClick={() => handleKnockoutPick(tie.id, teamB.id)}
-                                disabled={knockoutSubmitting[tie.id]}
-                              >
-                                {teamB?.short} kazanır
-                              </button>
-                              {knockoutErrors[tie.id] && (
-                                <span className="footnote" style={{ color: "#f87171" }}>
-                                  {knockoutErrors[tie.id]}
-                                </span>
-                              )}
+                            <span className="prediction-row-mine">
+                              {actual ? `${actual.homeGoals} - ${actual.awayGoals}` : "⏳ ? - ?"}
+                            </span>
+                            <div className="prediction-row-team prediction-row-team-away">
+                              <span>{m.awayTeam.name}</span>
+                              <Crest team={m.awayTeam} size={18} />
                             </div>
-                          )}
-
-                          <div className="prediction-row-team prediction-row-team-away">
-                            <span>{teamB?.name}</span>
-                            <Crest team={teamB} size={22} />
                           </div>
-                        </div>
-                        {others.length > 0 && (
-                          <div className="prediction-others-row">
-                            {others.map((o) => (
-                              <span key={o.uid} className="prediction-others-chip">
-                                <Avatar photoURL={o.photoURL} name={o.displayName} size={16} /> {o.displayName}:{" "}
-                                {teamById[o.pickedTeamId]?.short}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                        );
+                      })}
+                    </>
+                  )}
                 </div>
-              ))}
-            </div>
+              )}
+            </>
           )}
 
           {tab === "leaderboard" && (
             <div className="chart-card chart-card-wide">
               <h3>🏅 {league.name} Sıralaması</h3>
+              <p className="footnote">
+                Puanlar sadece oynanan maçlar için hesaplanır -- maçların tarihi geldikçe burada güncellenir.
+              </p>
               {leaderboard.length === 0 ? (
                 <p className="footnote">Henüz kimse tahmin girmedi -- ilk sen ol!</p>
               ) : (
@@ -1032,13 +942,6 @@ function PredictionLeagueRoom() {
           )}
         </>
       )}
-
-      <p className="footnote">
-        Not: Gerçek skorlar teknik olarak lig kaydında (Firestore) saklanır --
-        arayüz, sen tahmin etmeden o maçın sonucunu (ve diğerlerinin
-        tahminlerini) gizler, ama bu sunucu tarafı bir garanti değildir;
-        tamamen dürüst oyuncular için tasarlanmış bir deneyimdir.
-      </p>
     </div>
   );
 }

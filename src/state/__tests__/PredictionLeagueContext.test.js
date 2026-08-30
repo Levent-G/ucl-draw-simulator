@@ -3,9 +3,128 @@ import {
   scorePrediction,
   pointsForPrediction,
   buildLeaderboard,
+  computeDerivedStandings,
+  standingsPoints,
+  isMatchRevealed,
+  isSeasonFullyRevealed,
   CHAMPION_PICK_POINTS,
   KNOCKOUT_TIE_POINTS,
+  OUTCOME_CORRECT_POINTS,
 } from "../PredictionLeagueContext.jsx";
+
+describe("PredictionLeagueContext.isMatchRevealed / isSeasonFullyRevealed (sonucu maçın GERÇEK tarihine kadar sakla)", () => {
+  const pastLeague = {
+    fixture: [{ number: 1, matches: [{ id: "m1", homeId: "real-madrid", awayId: "barcelona", date: "2020-01-01" }] }],
+    results: { m1: { homeGoals: 2, awayGoals: 1 } },
+  };
+  const futureLeague = {
+    fixture: [{ number: 1, matches: [{ id: "m1", homeId: "real-madrid", awayId: "barcelona", date: "2099-01-01" }] }],
+    results: { m1: { homeGoals: 2, awayGoals: 1 } },
+  };
+  const noDateLeague = {
+    fixture: [{ number: 1, matches: [{ id: "m1", homeId: "real-madrid", awayId: "barcelona" }] }],
+    results: { m1: { homeGoals: 2, awayGoals: 1 } },
+  };
+
+  it("treats a match with a past real date as revealed", () => {
+    expect(isMatchRevealed(pastLeague, "m1")).toBe(true);
+  });
+
+  it("treats a match with a future real date as NOT revealed", () => {
+    expect(isMatchRevealed(futureLeague, "m1")).toBe(false);
+  });
+
+  it("treats a match with no real date (no live calendar yet) as always revealed", () => {
+    expect(isMatchRevealed(noDateLeague, "m1")).toBe(true);
+  });
+
+  it("isSeasonFullyRevealed is false while any match is still in the future", () => {
+    expect(isSeasonFullyRevealed(futureLeague)).toBe(false);
+    expect(isSeasonFullyRevealed(pastLeague)).toBe(true);
+  });
+
+  it("pointsForPrediction withholds outcome/score points until the match's real date has passed", () => {
+    expect(
+      pointsForPrediction({ kind: "outcome", matchId: "m1", teamId: "real-madrid", result: "win" }, futureLeague)
+    ).toBe(0);
+    expect(
+      pointsForPrediction({ kind: "outcome", matchId: "m1", teamId: "real-madrid", result: "win" }, pastLeague)
+    ).toBe(OUTCOME_CORRECT_POINTS);
+    expect(pointsForPrediction({ kind: "score", matchId: "m1", homeGoals: 2, awayGoals: 1 }, futureLeague)).toBe(0);
+    expect(pointsForPrediction({ kind: "score", matchId: "m1", homeGoals: 2, awayGoals: 1 }, pastLeague)).toBe(5);
+  });
+
+  it("buildLeaderboard withholds the standings-prediction bonus until the whole season is revealed", () => {
+    const teams = [
+      { id: "real-madrid", name: "Real Madrid" },
+      { id: "barcelona", name: "Barcelona" },
+    ];
+    const fixture = [
+      {
+        number: 1,
+        matches: [
+          {
+            id: "m1",
+            homeTeam: teams[0],
+            awayTeam: teams[1],
+          },
+        ],
+      },
+    ];
+    const predictions = [{ uid: "a", displayName: "Ali", kind: "outcome", matchId: "m1", teamId: "real-madrid", result: "win" }];
+
+    const futureBoard = buildLeaderboard(predictions, { ...futureLeague, standings: ["real-madrid", "barcelona"] }, {
+      fixture,
+      teams,
+      zones: [{ key: "none", label: "", tone: "", max: Infinity }],
+    });
+    expect(futureBoard[0].points).toBe(0);
+
+    const pastBoard = buildLeaderboard(predictions, { ...pastLeague, standings: ["real-madrid", "barcelona"] }, {
+      fixture,
+      teams,
+      zones: [{ key: "none", label: "", tone: "", max: Infinity }],
+    });
+    expect(pastBoard[0].points).toBeGreaterThan(0);
+  });
+});
+
+describe("PredictionLeagueContext.pointsForPrediction (kind: outcome, basit Galibiyet/Beraberlik/Mağlubiyet tahmini)", () => {
+  const league = {
+    fixture: [{ number: 1, matches: [{ id: "m1", homeId: "real-madrid", awayId: "barcelona" }] }],
+    results: { m1: { homeGoals: 2, awayGoals: 1 } }, // real-madrid (ev sahibi) kazandı
+  };
+
+  it("awards OUTCOME_CORRECT_POINTS when the home team's predicted result matches reality", () => {
+    const prediction = { kind: "outcome", matchId: "m1", teamId: "real-madrid", result: "win" };
+    expect(pointsForPrediction(prediction, league)).toBe(OUTCOME_CORRECT_POINTS);
+  });
+
+  it("awards OUTCOME_CORRECT_POINTS when the away team's predicted result (from ITS perspective) matches reality", () => {
+    const prediction = { kind: "outcome", matchId: "m1", teamId: "barcelona", result: "loss" };
+    expect(pointsForPrediction(prediction, league)).toBe(OUTCOME_CORRECT_POINTS);
+  });
+
+  it("awards 0 when the predicted result is wrong", () => {
+    const prediction = { kind: "outcome", matchId: "m1", teamId: "barcelona", result: "win" };
+    expect(pointsForPrediction(prediction, league)).toBe(0);
+  });
+
+  it("treats a draw correctly from either team's perspective", () => {
+    const drawLeague = { ...league, results: { m1: { homeGoals: 1, awayGoals: 1 } } };
+    expect(pointsForPrediction({ kind: "outcome", matchId: "m1", teamId: "real-madrid", result: "draw" }, drawLeague)).toBe(
+      OUTCOME_CORRECT_POINTS
+    );
+    expect(pointsForPrediction({ kind: "outcome", matchId: "m1", teamId: "barcelona", result: "draw" }, drawLeague)).toBe(
+      OUTCOME_CORRECT_POINTS
+    );
+  });
+
+  it("returns 0 when the match hasn't been scored yet, or the teamId isn't part of the match", () => {
+    expect(pointsForPrediction({ kind: "outcome", matchId: "m1", teamId: "real-madrid", result: "win" }, { ...league, results: {} })).toBe(0);
+    expect(pointsForPrediction({ kind: "outcome", matchId: "m1", teamId: "villarreal", result: "win" }, league)).toBe(0);
+  });
+});
 
 describe("PredictionLeagueContext.scorePrediction (kind: score)", () => {
   it("gives 5 points for an exact score match", () => {
@@ -47,9 +166,15 @@ describe("PredictionLeagueContext.pointsForPrediction (all 3 kinds: score / cham
     results: { m1: { homeGoals: 2, awayGoals: 1 } },
     knockout: {
       champion: "real-madrid",
+      // Gerçek serializeKnockout() ile birebir tutarlı olsun diye (tie.id
+      // "{roundIdx}-{tieIdx}" biçiminde, roundIdx = rounds dizisindeki GERÇEK
+      // konum) -- Final burada dizinin 4. (index 4) elemanı.
       rounds: [
         { name: "Play-off Turu", ties: [{ id: "0-0", teamAId: "villarreal", teamBId: "sabah", winnerId: "villarreal" }] },
-        { name: "Final", ties: [{ id: "3-0", teamAId: "real-madrid", teamBId: "man-city", winnerId: "real-madrid" }] },
+        { name: "Son 16", ties: [] },
+        { name: "Çeyrek Final", ties: [] },
+        { name: "Yarı Final", ties: [] },
+        { name: "Final", ties: [{ id: "4-0", teamAId: "real-madrid", teamBId: "man-city", winnerId: "real-madrid" }] },
       ],
     },
   };
@@ -71,10 +196,12 @@ describe("PredictionLeagueContext.pointsForPrediction (all 3 kinds: score / cham
 
   it("awards the round-specific points for a correct knockout tie pick, using the round index encoded in the tie id", () => {
     const earlyRoundPick = { kind: "knockout", matchId: "0-0", pickedTeamId: "villarreal" };
-    const finalPick = { kind: "knockout", matchId: "3-0", pickedTeamId: "real-madrid" };
+    const finalPick = { kind: "knockout", matchId: "4-0", pickedTeamId: "real-madrid" };
     expect(pointsForPrediction(earlyRoundPick, season)).toBe(KNOCKOUT_TIE_POINTS[0]);
-    expect(pointsForPrediction(finalPick, season)).toBe(KNOCKOUT_TIE_POINTS[3]);
-    expect(KNOCKOUT_TIE_POINTS[3]).toBeGreaterThan(KNOCKOUT_TIE_POINTS[0]); // final, ilk turdan daha değerli
+    // Final eşleşmesini doğru bilmek hem o turun kendi puanını HEM DE
+    // şampiyon bonusunu getirir (Final'in kazananı = şampiyon).
+    expect(pointsForPrediction(finalPick, season)).toBe(KNOCKOUT_TIE_POINTS[4] + CHAMPION_PICK_POINTS);
+    expect(KNOCKOUT_TIE_POINTS[4]).toBeGreaterThan(KNOCKOUT_TIE_POINTS[0]); // final, ilk turdan daha değerli
   });
 
   it("awards 0 for a wrong knockout tie pick", () => {
@@ -113,6 +240,88 @@ describe("PredictionLeagueContext.pointsForPrediction (kind: standings, drag-and
   it("returns 0 when the season has no final standings yet", () => {
     const prediction = { kind: "standings", order: ["a", "b", "c", "d"] };
     expect(pointsForPrediction(prediction, { standings: null })).toBe(0);
+  });
+});
+
+describe("PredictionLeagueContext.computeDerivedStandings (haftalık skor tahminlerinden otomatik puan durumu)", () => {
+  const teams = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }];
+  const fixture = [
+    {
+      number: 1,
+      matches: [
+        { id: "m1", homeTeam: { id: "a" }, awayTeam: { id: "b" } },
+        { id: "m2", homeTeam: { id: "c" }, awayTeam: { id: "d" } },
+      ],
+    },
+    {
+      number: 2,
+      matches: [
+        { id: "m3", homeTeam: { id: "a" }, awayTeam: { id: "c" } },
+        { id: "m4", homeTeam: { id: "b" }, awayTeam: { id: "d" } },
+      ],
+    },
+  ];
+  const league = {
+    results: {
+      m1: { homeGoals: 2, awayGoals: 0 },
+      m2: { homeGoals: 1, awayGoals: 1 },
+      m3: { homeGoals: 0, awayGoals: 1 },
+      m4: { homeGoals: 3, awayGoals: 0 },
+    },
+  };
+
+  it("uses the user's own score prediction for a match instead of the system result, and falls back to the system result everywhere else", () => {
+    // m1 için kullanıcı KENDİ tahminini (1-0) girdi -- gerçek sonuç (2-0)
+    // DEĞİL bu kullanılmalı. m2/m3/m4 için tahmin yok -- sistemin gerçek
+    // sonucu (league.results) kullanılmalı.
+    const myPredictionsByMatch = { m1: { kind: "score", homeGoals: 1, awayGoals: 0 } };
+    const standings = computeDerivedStandings(fixture, myPredictionsByMatch, league, teams);
+    expect(standings.map((s) => s.teamId)).toEqual(["c", "b", "a", "d"]);
+    const byId = Object.fromEntries(standings.map((s) => [s.teamId, s]));
+    expect(byId.a.pts).toBe(3); // 1-0 tahmini de bir galibiyet
+    expect(byId.b.gd).toBe(2); // m1 fark -1 (tahmin) + m4 fark +3 (gerçek sonuç) = 2
+  });
+
+  it("returns an empty array when there is no fixture or league results yet", () => {
+    expect(computeDerivedStandings(null, {}, league, teams)).toEqual([]);
+    expect(computeDerivedStandings(fixture, {}, { results: null }, teams)).toEqual([]);
+  });
+
+  it("synthesizes a representative scoreline (1-0/0-0/0-1) from an outcome (Win/Draw/Loss) prediction, from the predicted team's own perspective", () => {
+    // m1: a (ev sahibi) - b (deplasman). "b" için "win" tahmini -- b
+    // deplasmanda oynadığı için bu 0-1 (ev 0, deplasman 1) karşılığına gelir.
+    const myPredictionsByMatch = { m1: { kind: "outcome", teamId: "b", result: "win" } };
+    const standings = computeDerivedStandings(fixture, myPredictionsByMatch, league, teams);
+    const byId = Object.fromEntries(standings.map((s) => [s.teamId, s]));
+    expect(byId.b.pts).toBe(6); // m1 tahmini galibiyet (3) + m4 gerçek galibiyet (3)
+    expect(byId.a.pts).toBe(0); // m1 tahmini mağlubiyet (0) + m3 gerçek mağlubiyet (0)
+  });
+});
+
+describe("PredictionLeagueContext.buildLeaderboard with standingsCtx (artık elle sürüklenmeyen, otomatik hesaplanan Lig Sıralaması)", () => {
+  const teams = [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }];
+  const fixture = [
+    {
+      number: 1,
+      matches: [
+        { id: "m1", homeTeam: { id: "a" }, awayTeam: { id: "b" } },
+        { id: "m2", homeTeam: { id: "c" }, awayTeam: { id: "d" } },
+      ],
+    },
+  ];
+  const league = {
+    results: { m1: { homeGoals: 2, awayGoals: 0 }, m2: { homeGoals: 1, awayGoals: 1 } },
+    standings: ["a", "c", "b", "d"], // gerçek final sıra (mock)
+  };
+
+  it("adds each user's own derived-standings score to their leaderboard total when standingsCtx (fixture/teams) is provided", () => {
+    const predictions = [
+      { uid: "u1", displayName: "Ali", kind: "teams", matchId: "teams", teamIds: ["a"] },
+      { uid: "u1", displayName: "Ali", kind: "score", matchId: "m1", homeGoals: 5, awayGoals: 0 },
+    ];
+    const withStandings = buildLeaderboard(predictions, league, { fixture, teams });
+    const without = buildLeaderboard(predictions, league);
+    expect(withStandings[0].points).toBeGreaterThan(without[0].points);
   });
 });
 

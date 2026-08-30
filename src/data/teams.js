@@ -3,16 +3,17 @@
 //
 // NOT: 2026-27 sezonu 36 takımının TAMAMI play-off turu (25-26 Ağustos 2026)
 // sonuçlarına göre GÜNCELLENMİŞTİR: play-off'u kazanan 7 takım (Fenerbahçe,
-// Dinamo Zagreb, Slovan Bratislava, Levski Sofia, Sabah, LASK, Bodø/Glimt)
-// lig fazına katılıyor -- daha önce buradaki placeholder tahminlerden Celtic
+// Viking FK, Slovan Bratislava, AEK Athens, Sabah, LASK, Bodø/Glimt) lig
+// fazına katılıyor -- daha önce buradaki placeholder tahminlerden Celtic
 // (LASK'a elendi), Sparta Prag, Crvena Zvezda, Sturm Graz ve Qarabağ play-off
-// turunu GEÇEMEDİ, bu yüzden listeden çıkarıldı. Torba (pot) dağılımı UEFA'nın
-// 27 Ağustos 2026 çekiliş öncesi açıkladığı Pot 1/Pot 2 ve kısmi Pot 3/Pot 4
-// bilgisine dayanır; Pot 3/Pot 4'e giren 7 play-off kazananının HANGİSİNİN
-// hangi torbaya düştüğü çekiliş anında tam teyit edilemediğinden (kaynaklar
-// "provisional" diyor), göreceli katsayılarına göre EN MANTIKLI dağılım
-// (Fenerbahçe + Dinamo Zagreb -> Pot 3, kalan 5'i -> Pot 4) best-effort olarak
-// uygulanmıştır. Coeff değerleri gösterim amaçlı yaklaşık değerlerdir.
+// turunu GEÇEMEDİ, bu yüzden listeden çıkarıldı. Torba (pot) dağılımı ve
+// takım listesi 27 Ağustos 2026'da yapılan GERÇEK lig fazı çekilişi (UEFA
+// resmi açıklaması + çapraz doğrulanmış haber kaynakları) ile teyit
+// edilmiştir -- artık tahmini/placeholder DEĞİL. (Bu satır ilk yazıldığında
+// burada yanlışlıkla Dinamo Zagreb ve Levski Sofia vardı; play-off'u asıl
+// kazananlar Viking FK ve AEK Athens olduğu için düzeltildi, ve Bodø/Glimt'in
+// gerçek torbası 4 değil 3 çıktı.) Coeff değerleri gösterim amaçlı yaklaşık
+// değerlerdir.
 //
 // logo: /public/logos/ altında bulunması beklenen dosya yolu (kendi lisanslı
 // logo dosyalarını bu isimlerle ekleyince Crest.jsx otomatik olarak kullanır;
@@ -45,17 +46,17 @@ import SportingLogo from "../assets/logos/Portugal - Liga Portugal/Sporting CP.p
 import PSVLogo from "../assets/logos/Netherlands - Eredivisie/PSV Eindhoven.png";
 import FenerbahceLogo from "../assets/logos/Türkiye - Süper Lig/Fenerbahce.png";
 import LilleLogo from "../assets/logos/France - Ligue 1/LOSC Lille.png";
-import LevskiSofiaLogo from "../assets/logos/Bulgaria - efbet Liga/Levski Sofia.png";
 
 import FCPortoLogo from "../assets/logos/Portugal - Liga Portugal/FC Porto.png";
 import SlaviaPragueLogo from "../assets/logos/Czech Republic - Chance Liga/SK Slavia Prague.png";
-import DinamoZagrebLogo from "../assets/logos/Croatia - SuperSport HNL/GNK Dinamo Zagreb.png";
 
 import LASKLogo from "../assets/logos/Austria - Bundesliga/LASK.png";
 import ComoLogo from "../assets/logos/Italy - Serie A/Como 1907.png";
 import GalatasarayLogo from "../assets/logos/Türkiye - Süper Lig/Galatasaray.png";
 import BodoGlimtLogo from "../assets/logos/Norway - Eliteserien/FK BodøGlimt.png";
 import SlovanBratislavaLogo from "../assets/logos/slovakia_s-bratislava.png";
+import AEKAthensLogo from "../assets/logos/Greece - Super League 1/AEK Athens.png";
+import VikingLogo from "../assets/logos/Norway - Eliteserien/Viking FK.png";
 
 export const COUNTRY_NAMES = {
   ESP: "İspanya",
@@ -78,6 +79,7 @@ export const COUNTRY_NAMES = {
   TUR: "Türkiye",
   AZE: "Azerbaycan",
   BUL: "Bulgaristan",
+  GRE: "Yunanistan",
 };
 
 // pot: 1-4, coeff: gösterim amaçlı UEFA kulüp katsayısı (yaklaşık).
@@ -332,15 +334,15 @@ const RAW_TEAMS = [
     logo: LilleLogo,
   },
   {
-    // Play-off Turu'nu (Levski Sofia 2-0 AEK Athens toplam) kazanarak lig
+    // Play-off Turu'nu (AEK Athens 2-0 Levski Sofia toplam) kazanarak lig
     // fazına katıldı -- eski Sparta Prag placeholder'ının yerini alıyor.
-    name: "Levski Sofia",
-    short: "LEV",
-    country: "BUL",
+    name: "AEK Athens",
+    short: "AEK",
+    country: "GRE",
     pot: 4,
-    coeff: 15.0,
+    coeff: 16.0,
     pedigree: 0,
-    logo: LevskiSofiaLogo,
+    logo: AEKAthensLogo,
   },
 
   {
@@ -362,15 +364,15 @@ const RAW_TEAMS = [
     logo: SlaviaPragueLogo,
   },
   {
-    // Play-off Turu'nu (Dinamo Zagreb 7-1 Viking toplam) kazanarak lig
+    // Play-off Turu'nu (Viking 7-1 Dinamo Zagreb toplam) kazanarak lig
     // fazına katıldı.
-    name: "Dinamo Zagreb",
-    short: "DZG",
-    country: "CRO",
-    pot: 3,
-    coeff: 36.0,
-    pedigree: 1,
-    logo: DinamoZagrebLogo,
+    name: "Viking",
+    short: "VIK",
+    country: "NOR",
+    pot: 4,
+    coeff: 14.0,
+    pedigree: 0,
+    logo: VikingLogo,
   },
   {
     // Play-off Turu'nu (Sabah 6-4 Hapoel Beer Sheva toplam) kazanarak lig
@@ -428,7 +430,7 @@ const RAW_TEAMS = [
     name: "Bodø/Glimt",
     short: "BOG",
     country: "NOR",
-    pot: 4,
+    pot: 3,
     coeff: 19.0,
     pedigree: 1,
     logo: BodoGlimtLogo,

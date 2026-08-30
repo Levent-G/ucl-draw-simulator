@@ -1,10 +1,7 @@
 import React from 'react'
 import PotTable from './PotTable.jsx'
-import StartOrb from './StartOrb.jsx'
 
 export default function PotTablesPanel({ teams, results, drawnTeamIds, activeTeamId, pendingCells, phase, onStart }) {
-  const showFullOverlay = phase === 'idle'
-
   return (
     <div className="pot-tables-panel">
       <div className="draw-table-title">
@@ -33,12 +30,6 @@ export default function PotTablesPanel({ teams, results, drawnTeamIds, activeTea
             />
           ))}
         </div>
-
-        {showFullOverlay && (
-          <div className="table-start-overlay">
-            <StartOrb onClick={onStart} label="ÇEKİLİŞİ" sublabel="BAŞLAT" />
-          </div>
-        )}
       </div>
     </div>
   )

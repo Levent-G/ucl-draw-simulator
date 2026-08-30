@@ -2,8 +2,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Crest from "../Crest.jsx";
 
-export default function MatchRow({ match, userScore, onUserScoreChange, competitionKey, readOnly = false }) {
+export default function MatchRow({ match, userScore, onUserScoreChange, competitionKey, readOnly = false, favoriteTeamId = null }) {
   const { homeTeam, awayTeam } = match;
+  const isFavoriteMatch = favoriteTeamId && (homeTeam.id === favoriteTeamId || awayTeam.id === favoriteTeamId);
   const hasSim = match.homeGoals != null && match.awayGoals != null;
   const homePct = Math.round((match.homeWinProb ?? 0) * 100);
   const drawPct = Math.round((match.drawProb ?? 0) * 100);
@@ -19,10 +20,13 @@ export default function MatchRow({ match, userScore, onUserScoreChange, competit
   }
 
   return (
-    <div className="match-row">
+    <div className={`match-row ${isFavoriteMatch ? "match-row-favorite" : ""}`}>
       <div className="match-row-team match-row-home">
         <Crest team={homeTeam} size={26} />
-        <span>{homeTeam.name}</span>
+        <span>
+          {homeTeam.name}
+          {favoriteTeamId === homeTeam.id && <span className="favorite-star" title="Tuttuğun takım">⭐</span>}
+        </span>
       </div>
 
       <div className="match-row-center">
@@ -128,7 +132,10 @@ export default function MatchRow({ match, userScore, onUserScoreChange, competit
       </div>
 
       <div className="match-row-team match-row-away">
-        <span>{awayTeam.name}</span>
+        <span>
+          {favoriteTeamId === awayTeam.id && <span className="favorite-star" title="Tuttuğun takım">⭐</span>}
+          {awayTeam.name}
+        </span>
         <Crest team={awayTeam} size={26} />
       </div>
     </div>

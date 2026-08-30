@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useCompetition } from "../state/CompetitionContext.jsx";
 import CompetitionStepper from "../components/CompetitionStepper.jsx";
+import EmptyState from "../components/EmptyState.jsx";
 import TeamsTab from "../components/stats/TeamsTab.jsx";
 import PlayersTab from "../components/stats/PlayersTab.jsx";
 import CountriesTab from "../components/stats/CountriesTab.jsx";
@@ -43,12 +44,11 @@ export default function StatsPage() {
       </header>
 
       {!hasFixture && (
-        <div className="stats-callout">
-          Henüz bir fikstür/tahmin oluşturulmadı — simüle puan ve gol/kart
-          istatistikleri şimdilik gösterilemiyor, katsayı/ülke/kadro
-          grafikleri zaten görüntülenebilir.{" "}
-          <Link to={`/${competitionKey}/fikstur`}>Fikstür &amp; Tahmin sayfasına git →</Link>
-        </div>
+        <EmptyState
+          variant="inline"
+          description="Henüz bir fikstür/tahmin oluşturulmadı — simüle puan ve gol/kart istatistikleri şimdilik gösterilemiyor, katsayı/ülke/kadro grafikleri zaten görüntülenebilir."
+          primaryCta={{ label: "Fikstür & Tahmin sayfasına git", to: `/${competitionKey}/fikstur` }}
+        />
       )}
 
       <div className="stats-toolbar">

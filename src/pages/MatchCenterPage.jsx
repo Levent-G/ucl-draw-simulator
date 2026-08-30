@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useCompetition } from "../state/CompetitionContext.jsx";
 import CompetitionStepper from "../components/CompetitionStepper.jsx";
+import EmptyState from "../components/EmptyState.jsx";
 import Crest from "../components/Crest.jsx";
 import { speak, unlockSpeech, cancelSpeech } from "../utils/speech.js";
 import { useAchievements } from "../state/AchievementsContext.jsx";
@@ -151,15 +152,11 @@ export default function MatchCenterPage() {
     return (
       <div className="page-shell">
         <CompetitionStepper competitionKey={competitionKey} />
-        <div className="empty-card">
-          <h2>Önce bir model tahmini gerekiyor</h2>
-          <p>Maç Merkezi'ni görebilmek için önce Fikstür &amp; Tahmin sayfasından bir simülasyon üretilmeli.</p>
-          <div className="empty-card-actions">
-            <Link to={`/${competitionKey}/fikstur`} className="btn-primary">
-              Fikstür &amp; Tahmin sayfasına git
-            </Link>
-          </div>
-        </div>
+        <EmptyState
+          title="Önce bir model tahmini gerekiyor"
+          description="Maç Merkezi'ni görebilmek için önce Fikstür & Tahmin sayfasından bir simülasyon üretilmeli."
+          primaryCta={{ label: "Fikstür & Tahmin sayfasına git", to: `/${competitionKey}/fikstur` }}
+        />
       </div>
     );
   }
@@ -168,15 +165,11 @@ export default function MatchCenterPage() {
     return (
       <div className="page-shell">
         <CompetitionStepper competitionKey={competitionKey} />
-        <div className="empty-card">
-          <h2>Maç bulunamadı</h2>
-          <p>Bu maç şu anki fikstürde yok -- fikstür yeniden dağıtılmış olabilir.</p>
-          <div className="empty-card-actions">
-            <Link to={`/${competitionKey}/fikstur`} className="btn-primary">
-              Fikstür &amp; Tahmin sayfasına dön
-            </Link>
-          </div>
-        </div>
+        <EmptyState
+          title="Maç bulunamadı"
+          description="Bu maç şu anki fikstürde yok -- fikstür yeniden dağıtılmış olabilir."
+          primaryCta={{ label: "Fikstür & Tahmin sayfasına dön", to: `/${competitionKey}/fikstur` }}
+        />
       </div>
     );
   }

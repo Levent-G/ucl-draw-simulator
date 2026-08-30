@@ -22,6 +22,8 @@ import { auth, db, googleProvider } from "../lib/firebase.js";
 import { COMPETITIONS } from "../data/competitions.js";
 import { generateFullDraw } from "../utils/drawEngine.js";
 import { buildResultsFromMatches } from "../utils/resultsHelpers.js";
+import { REAL_DRAW_2026_MATCHES } from "../data/realDraw2026.js";
+import { REAL_FIXTURE_2026 } from "../data/realFixture2026.js";
 import {
   generateFixture,
   serializeFixture,
@@ -32,7 +34,7 @@ import {
   serializeRoundRobinFixture,
   deserializeRoundRobinFixture,
 } from "../utils/roundRobinEngine.js";
-import { enrichTeamsWithAttackDefense } from "../utils/predictionEngine.js";
+import { enrichTeamsWithAttackDefense, computeStandingsFromUserScores } from "../utils/predictionEngine.js";
 import { simulateSeasonAsync } from "../utils/simulateSeasonAsync.js";
 import { generateKnockoutBracket } from "../utils/knockoutEngine.js";
 
@@ -147,27 +149,45 @@ export async function buildLeaguePayload(competitionKey, onProgress) {
     // hatası fırlatabilir -- TAMAMEN YENİ bir kura (farklı eşleşme grafiği)
     // çekmek neredeyse her zaman çözer, o yüzden burada birkaç kez otomatik
     // deniyoruz.
-    let lastError = null;
-    for (let attempt = 0; attempt < 5 && !fixture; attempt++) {
-      try {
-        // generateFullDraw ham bir { teamId: [{opponentId, home, viaPot}] }
-        // haritası döner -- generateFixture ise { teamId: { pot: {home,away} } }
-        // şeklinde bir `results` bekler. buildResultsFromMatches (bkz.
-        // DrawPage.jsx'in "hızlı kura" senaryosuyla AYNI dönüşüm) bu ikisi
-        // arasındaki köprü; bunu atlamak generateFixture'a boş/eksik bir
-        // sonuç geçmek anlamına gelir (bu YÜZDEN "Fikstür haftalara
-        // bölünemedi" hatası %100 oranında oluyordu -- algoritmanın kendisi
-        // değil, burası bozuktu).
-        const drawMatches = generateFullDraw(enrichedTeams);
-        const drawResults = buildResultsFromMatches(enrichedTeams, drawMatches);
-        fixture = generateFixture(drawResults, enrichedTeams);
-      } catch (e) {
-        lastError = e;
+    // UCL için ARTIK rastgele bir kura/fikstür üretilmiyor -- 27 Ağustos
+    // 2026'da yapılan GERÇEK lig fazı çekiliminin eşleşmeleri (bkz.
+    // src/data/realDraw2026.js) VE UEFA'nın 29 Ağustos 2026'da açıkladığı
+    // GERÇEK 8 haftalık maç takvimi (bkz. src/data/realFixture2026.js, hangi
+    // eşleşmenin hangi haftada oynanacağı -- bu artık rastgele bir
+    // "haftalara bölme" değil, UEFA'nın kendi takvimi) kullanılıyor. Böylece
+    // Tahmin Ligi'ndeki haftalık maçlar da gerçekte kimin ne zaman kiminle
+    // oynayacağını birebir yansıtır -- sadece skorlar (henüz oynanmadığı
+    // için) model tahminidir. Avrupa Ligi/Süper Lig için gerçek çekiliş/
+    // takvim verisi henüz olmadığından onlar hâlâ headless/rastgele üretiliyor.
+    if (competitionKey === "ucl") {
+      fixture = deserializeFixture(REAL_FIXTURE_2026, enrichedTeams);
+    } else {
+      let lastError = null;
+      for (let attempt = 0; attempt < 5 && !fixture; attempt++) {
+        try {
+          // generateFullDraw ham bir { teamId: [{opponentId, home, viaPot}] }
+          // haritası döner -- generateFixture ise { teamId: { pot: {home,away} } }
+          // şeklinde bir `results` bekler. buildResultsFromMatches (bkz.
+          // DrawPage.jsx'in "hızlı kura" senaryosuyla AYNI dönüşüm) bu ikisi
+          // arasındaki köprü; bunu atlamak generateFixture'a boş/eksik bir
+          // sonuç geçmek anlamına gelir (bu YÜZDEN "Fikstür haftalara
+          // bölünemedi" hatası %100 oranında oluyordu -- algoritmanın kendisi
+          // değil, burası bozuktu).
+          const drawMatches = generateFullDraw(enrichedTeams);
+          const drawResults = buildResultsFromMatches(enrichedTeams, drawMatches);
+          fixture = generateFixture(drawResults, enrichedTeams);
+        } catch (e) {
+          lastError = e;
+        }
       }
+      if (!fixture) throw lastError || new Error("Fikstür oluşturulamadı.");
     }
-    if (!fixture) throw lastError || new Error("Fikstür oluşturulamadı.");
     notify("fixture");
-    serializedFixture = serializeFixture(fixture);
+    // UCL: REAL_FIXTURE_2026 zaten Firestore'a yazılabilir SERİLEŞTİRİLMİŞ
+    // biçimde (id/homeId/awayId/date) -- serializeFixture() üzerinden tekrar
+    // geçirmiyoruz çünkü o fonksiyon `date` alanını SİLER (sadece id/homeId/
+    // awayId/viaPot taşır), bu da gerçek maç tarihlerini kaybetmek demek olurdu.
+    serializedFixture = competitionKey === "ucl" ? REAL_FIXTURE_2026 : serializeFixture(fixture);
   } else {
     notify("fixture");
     fixture = generateRoundRobinFixture(enrichedTeams);
@@ -210,19 +230,10 @@ export async function buildLeaguePayload(competitionKey, onProgress) {
 // `leagues` belgesi) ve leagueId'sini döner -- bu id, paylaşılabilir linkin
 // (/{competitionKey}/tahmin-ligi/{leagueId}) parçası olur. Ayrıca oluşturan
 // kişiyi otomatik olarak o liginin bir üyesi yapar (bkz. joinLeague).
-//
-// drawGuesses (opsiyonel, sadece "swiss" formatta anlamlı): [{favoriteTeamId,
-// guesses: [teamId,...]}, ...] -- kullanıcının, lig (ve dolayısıyla gerçek
-// fikstür) oluşmadan HEMEN ÖNCE seçtiği BİRDEN FAZLA takım için yaptığı
-// "kura eşleşmesi" tahminleri. Bu tahmin SADECE lig OLUŞTURULURKEN
-// yapılabilir -- lig zaten var olduktan sonra gerçek fikstür herkese açık
-// olduğundan (bkz. dosya başındaki güvenlik notu) geriye dönük anlamsız
-// olurdu. Her takım için AYRI bir "draw" tahmini kaydedilir (matchId:
-// "draw_{teamId}").
 export function useCreateLeague() {
   const { user } = usePredictionAuth();
   return useCallback(
-    async (competitionKey, name, onProgress, drawGuesses) => {
+    async (competitionKey, name, onProgress) => {
       if (!user) throw new Error("Önce Google ile giriş yapmalısın.");
       const payload = await buildLeaguePayload(competitionKey, onProgress);
       const ref = await addDoc(collection(db, "leagues"), {
@@ -240,21 +251,6 @@ export function useCreateLeague() {
         photoURL: user.photoURL || null,
         joinedAt: serverTimestamp(),
       });
-      for (const guess of drawGuesses || []) {
-        if (!guess.favoriteTeamId || !guess.guesses?.length) continue;
-        const matchId = `draw_${guess.favoriteTeamId}`;
-        await setDoc(doc(db, "predictions", `${ref.id}_${matchId}_${user.uid}`), {
-          uid: user.uid,
-          displayName: user.displayName || "Bilinmeyen",
-          photoURL: user.photoURL || null,
-          leagueId: ref.id,
-          matchId,
-          kind: "draw",
-          favoriteTeamId: guess.favoriteTeamId,
-          guesses: guess.guesses,
-          createdAt: serverTimestamp(),
-        });
-      }
       return ref.id;
     },
     [user]
@@ -473,6 +469,20 @@ export function usePredictions(leagueId) {
     [leagueId, user]
   );
 
+  // Bir tahmini SİLER -- Firestore kuralları tahmin belgelerinin doğrudan
+  // GÜNCELLENMESİNE izin vermiyor (bkz. firestore.rules: "allow update: if
+  // false"), bu yüzden "seçimini değiştir" akışı önce eski belgeyi silip
+  // ardından submit* fonksiyonlarından biriyle YENİDEN oluşturmak şeklinde
+  // çalışır (silindikten sonra aynı deterministik id ile tekrar setDoc
+  // çağrısı kurallar tarafında "create" olarak değerlendirilir, izinlidir).
+  const deletePrediction = useCallback(
+    async (matchId) => {
+      if (!user) throw new Error("Önce Google ile giriş yapmalısın.");
+      await deleteDoc(doc(db, "predictions", `${leagueId}_${matchId}_${user.uid}`));
+    },
+    [leagueId, user]
+  );
+
   const submitScorePrediction = useCallback(
     (matchId, homeGoals, awayGoals) => submitPrediction(matchId, "score", { homeGoals, awayGoals }),
     [submitPrediction]
@@ -487,6 +497,22 @@ export function usePredictions(leagueId) {
   );
   const submitStandingsPick = useCallback(
     (order) => submitPrediction("standings", "standings", { order }),
+    [submitPrediction]
+  );
+  // Kullanıcının "sadece bunların maçlarını ben tahmin edeceğim, gerisini
+  // sistem belirlesin" dediği takımlar -- deletePrediction("teams") ile
+  // silinip yeniden gönderilerek değiştirilebilir (bkz. PredictionLeaguePage:
+  // "Takımları Değiştir").
+  const submitTeamsPick = useCallback(
+    (teamIds) => submitPrediction("teams", "teams", { teamIds }),
+    [submitPrediction]
+  );
+  // UCL/Avrupa Ligi'nde artık tam skor DEĞİL, basit bir "bu maçtan tuttuğun
+  // takım kaç puan alır" tahmini yapılıyor -- result: "win" | "draw" | "loss"
+  // (futbolun kendi 3/1/0 puan mantığıyla), teamId de İKİ taraftan HANGİSİ
+  // için tahmin edildiğini belirtir (bkz. pointsForPrediction'daki "outcome").
+  const submitOutcomePrediction = useCallback(
+    (matchId, teamId, result) => submitPrediction(matchId, "outcome", { teamId, result }),
     [submitPrediction]
   );
 
@@ -505,10 +531,13 @@ export function usePredictions(leagueId) {
     myPredictionsByMatch,
     othersPredictionsByMatch,
     loading,
+    deletePrediction,
     submitScorePrediction,
     submitChampionPick,
     submitKnockoutPick,
     submitStandingsPick,
+    submitTeamsPick,
+    submitOutcomePrediction,
     resetMyPredictions,
   };
 }
@@ -541,26 +570,61 @@ export const KNOCKOUT_TIE_POINTS = { 0: 2, 1: 3, 2: 4, 3: 5, 4: 6 }; // round in
 // yanılmak 2, 2 sıra yanılmak 1, daha fazlası 0 -- ne kadar YAKIN o kadar
 // puan, sadece "birebir tuttu/tutmadı" değil.
 const STANDINGS_MAX_POINTS_PER_TEAM = 3;
-// Kura tahmininde (bkz. PredictionLeaguePage: lig oluşturulmadan önceki
-// "kura eşleşmesi tahmini" adımı) doğru bilinen HER rakip için verilen puan
-// -- en fazla 3 tahmin edilebildiğinden takım başına en yüksek olası puan
-// 3 * 4 = 12; birden fazla takım için tahmin yapılırsa toplanır.
-export const DRAW_GUESS_POINTS_PER_HIT = 4;
+// UCL/Avrupa Ligi'nde artık tam skor değil, basit bir "tuttuğun takım bu
+// maçtan kaç puan alır" (Galibiyet=3/Beraberlik=1/Mağlubiyet=0, futbolun
+// kendi puanlama mantığı) tahmini yapılıyor -- doğru bilmek sabit bu kadar
+// puan kazandırır (yanlışsa 0).
+export const OUTCOME_CORRECT_POINTS = 3;
 
-// Bir takımın GERÇEK (serileştirilmiş) fikstürdeki tüm rakiplerinin id
-// kümesini çıkarır -- kura tahmininin (kind:"draw") puanlanması için.
-function realOpponentsOf(league, teamId) {
-  const opponents = new Set();
+// Bir maçın gerçek (serileştirilmiş) fikstürdeki ev sahibi/deplasman
+// takım id'lerini bulur -- "outcome" tahmininin (bkz. submitOutcomePrediction)
+// hangi takımın GERÇEKTE ev sahibi/deplasman olduğunu bilmesi gerekiyor.
+function matchTeamsOf(league, matchId) {
   for (const md of league?.fixture || []) {
-    for (const m of md.matches) {
-      if (m.homeId === teamId) opponents.add(m.awayId);
-      else if (m.awayId === teamId) opponents.add(m.homeId);
-    }
+    const m = md.matches.find((x) => x.id === matchId);
+    if (m) return { homeId: m.homeId, awayId: m.awayId };
   }
-  return opponents;
+  return null;
 }
 
-function standingsPoints(predictedOrder, actualOrder) {
+// Bir maçın GERÇEK (serileştirilmiş) fikstürdeki tarihini bulur -- UCL için
+// bu, UEFA'nın gerçek takvimindeki (REAL_FIXTURE_2026) tarih; Avrupa Ligi/
+// Süper Lig'de henüz gerçek bir takvim olmadığından `undefined` döner.
+function matchDateOf(league, matchId) {
+  for (const md of league?.fixture || []) {
+    const m = md.matches.find((x) => x.id === matchId);
+    if (m) return m.date || null;
+  }
+  return null;
+}
+
+// Bir maçın sonucu kullanıcıya GÖSTERİLEBİLİR mi -- yani maçın gerçek tarihi
+// geçti mi? Tahmin Ligi'nin bütün amacı "sonucu görmeden tahmin et" olduğundan,
+// simüle edilmiş sonuç Firestore'da baştan hazır olsa bile arayüz bunu maçın
+// GERÇEK tarihine kadar saklar. Gerçek bir tarihi olmayan maçlar (henüz
+// tarihlendirilmemiş Avrupa Ligi/Süper Lig fikstürleri) her zaman açık kabul
+// edilir -- onlar için zaten bekleyecek gerçek bir takvim yok.
+export function isMatchRevealed(league, matchId) {
+  const date = matchDateOf(league, matchId);
+  if (!date) return true;
+  return new Date(date) <= new Date();
+}
+
+// Sezonun TAMAMI (fikstürdeki her maç) açığa çıktı mı -- "Lig Sıralaması"
+// tahmininin puan bonusu (bkz. buildLeaderboard) sadece sezon gerçekten
+// bittiğinde anlamlı olduğundan (aksi halde `league.standings` -- baştan
+// hazır simülasyon sonucu -- anında sızdırılmış olurdu) bu kontrolle
+// korunur.
+export function isSeasonFullyRevealed(league) {
+  for (const md of league?.fixture || []) {
+    for (const m of md.matches) {
+      if (!isMatchRevealed(league, m.id)) return false;
+    }
+  }
+  return true;
+}
+
+export function standingsPoints(predictedOrder, actualOrder) {
   if (!Array.isArray(predictedOrder) || !Array.isArray(actualOrder) || actualOrder.length === 0) return 0;
   const actualRank = new Map(actualOrder.map((teamId, i) => [teamId, i]));
   let total = 0;
@@ -578,11 +642,6 @@ function standingsPoints(predictedOrder, actualOrder) {
 // (ör. knockout hiç üretilmemişse) 0 döner.
 export function pointsForPrediction(prediction, league) {
   if (!prediction || !league) return 0;
-  if (prediction.kind === "draw") {
-    const real = realOpponentsOf(league, prediction.favoriteTeamId);
-    const hits = (prediction.guesses || []).filter((teamId) => real.has(teamId)).length;
-    return hits * DRAW_GUESS_POINTS_PER_HIT;
-  }
   if (prediction.kind === "champion") {
     return league.knockout?.champion && league.knockout.champion === prediction.pickedTeamId
       ? CHAMPION_PICK_POINTS
@@ -591,20 +650,86 @@ export function pointsForPrediction(prediction, league) {
   if (prediction.kind === "knockout") {
     const [roundIdxStr] = String(prediction.matchId).split("-");
     const roundIdx = Number(roundIdxStr) || 0;
-    const tie = league.knockout?.rounds?.flatMap((r) => r.ties).find((t) => t.id === prediction.matchId);
-    if (!tie) return 0;
-    return tie.winnerId === prediction.pickedTeamId ? KNOCKOUT_TIE_POINTS[roundIdx] ?? 2 : 0;
+    const round = league.knockout?.rounds?.[roundIdx];
+    const tie = round?.ties?.find((t) => t.id === prediction.matchId);
+    if (!tie || tie.winnerId !== prediction.pickedTeamId) return 0;
+    const base = KNOCKOUT_TIE_POINTS[roundIdx] ?? 2;
+    // Final turunun eşleşmesini doğru bilmek, aynı zamanda şampiyonu doğru
+    // bilmek demektir -- ayrı bir "şampiyon tahmini" adımına gerek kalmadan
+    // (bkz. BracketTree/PredictionLeaguePage'in eleme turu sekmesi) bunun
+    // için ekstra bir bonus verilir.
+    return round?.name === "Final" ? base + CHAMPION_PICK_POINTS : base;
+  }
+  if (prediction.kind === "outcome") {
+    if (!isMatchRevealed(league, prediction.matchId)) return 0;
+    const actual = league.results?.[prediction.matchId];
+    const teams = matchTeamsOf(league, prediction.matchId);
+    if (!actual || !teams) return 0;
+    const isHome = teams.homeId === prediction.teamId;
+    const isAway = teams.awayId === prediction.teamId;
+    if (!isHome && !isAway) return 0;
+    const diff = isHome ? actual.homeGoals - actual.awayGoals : actual.awayGoals - actual.homeGoals;
+    const actualResult = diff > 0 ? "win" : diff < 0 ? "loss" : "draw";
+    return actualResult === prediction.result ? OUTCOME_CORRECT_POINTS : 0;
   }
   if (prediction.kind === "standings") {
     return standingsPoints(prediction.order, league.standings);
   }
+  if (prediction.kind === "score" && !isMatchRevealed(league, prediction.matchId)) return 0;
   return scorePrediction(prediction, league.results?.[prediction.matchId]);
+}
+
+// "Lig Sıralaması" artık elle sürüklenerek tahmin edilmiyor -- kullanıcının
+// SEÇTİĞİ takımlar için girdiği skor tahminleri + geri kalan TÜM maçlar için
+// sistemin kendi (simüle edilmiş) sonucu birleştirilip GERÇEK fikstür
+// üzerinden tam bir puan durumu hesaplanır. computeStandingsFromUserScores
+// (predictionEngine.js) bu hesabı zaten yapıyor -- burada sadece hibrit
+// "userScores" haritasını kuruyoruz.
+// fixture: useLeague()'in DESERIALIZE ettiği (homeTeam/awayTeam nesneli) hali.
+export function computeDerivedStandings(fixture, myScorePredictionsByMatch, league, teams, zones) {
+  if (!fixture || !league?.results) return [];
+  const userScores = {};
+  for (const md of fixture) {
+    for (const m of md.matches) {
+      const mine = myScorePredictionsByMatch[m.id];
+      if (mine?.kind === "score") {
+        userScores[m.id] = { home: mine.homeGoals, away: mine.awayGoals };
+        continue;
+      }
+      if (mine?.kind === "outcome") {
+        // W/D/L tahminini basit bir skor karşılığına çevirir (1-0 / 0-0 /
+        // 0-1) -- gerçek gol farkını değil, sadece puan durumu hesabı için
+        // yeterli bir temsili sonucu yansıtır.
+        const isHome = mine.teamId === m.homeTeam.id;
+        let home = 0;
+        let away = 0;
+        if (mine.result === "win") {
+          if (isHome) home = 1;
+          else away = 1;
+        } else if (mine.result === "loss") {
+          if (isHome) away = 1;
+          else home = 1;
+        }
+        userScores[m.id] = { home, away };
+        continue;
+      }
+      const real = league.results[m.id];
+      if (real) userScores[m.id] = { home: real.homeGoals, away: real.awayGoals };
+    }
+  }
+  return computeStandingsFromUserScores(fixture, userScores, { teams, zones });
 }
 
 // Bir lig odasının tam sıralama tablosunu (kullanıcı başına toplam puan +
 // tahmin sayısı) üretir -- predictions ve league'den türetilir, Firestore'da
 // AYRICA saklanmaz (her zaman kaynağından yeniden hesaplanır).
-export function buildLeaderboard(predictions, league) {
+//
+// standingsCtx (opsiyonel): { fixture, teams, zones } verilirse, her
+// kullanıcının KENDİ skor tahminlerinden türetilen "Lig Sıralaması" puanı da
+// (bkz. computeDerivedStandings) toplam puana eklenir -- bu artık ayrı bir
+// "standings" tahmin belgesi OLARAK saklanmıyor, her zaman skor
+// tahminlerinden anlık hesaplanıyor.
+export function buildLeaderboard(predictions, league, standingsCtx) {
   const byUser = {};
   for (const p of predictions) {
     if (!byUser[p.uid]) {
@@ -615,5 +740,20 @@ export function buildLeaderboard(predictions, league) {
     entry.points += pointsForPrediction(p, league);
     entry.scored++;
   }
+
+  if (standingsCtx?.fixture && league && isSeasonFullyRevealed(league)) {
+    const byUserScorePredictions = {};
+    for (const p of predictions) {
+      if (p.kind !== "score" && p.kind !== "outcome") continue;
+      if (!byUserScorePredictions[p.uid]) byUserScorePredictions[p.uid] = {};
+      byUserScorePredictions[p.uid][p.matchId] = p;
+    }
+    for (const uid of Object.keys(byUser)) {
+      const mine = byUserScorePredictions[uid] || {};
+      const derived = computeDerivedStandings(standingsCtx.fixture, mine, league, standingsCtx.teams, standingsCtx.zones);
+      byUser[uid].points += standingsPoints(derived.map((s) => s.teamId), league.standings);
+    }
+  }
+
   return Object.values(byUser).sort((a, b) => b.points - a.points || b.scored - a.scored);
 }

@@ -3,6 +3,23 @@ import { NavLink, useLocation } from "react-router-dom";
 import { COMPETITION_LIST } from "../data/competitions.js";
 import { useOnboarding } from "../state/OnboardingContext.jsx";
 import NavSearch from "./NavSearch.jsx";
+import NavMoreMenu from "./NavMoreMenu.jsx";
+
+// Sitenin birincil işi 3 ligden birini oynamak -- bu yüzden navbar'ın
+// birincil satırı SADECE Ana Sayfa + 3 lig + Canlı Skorlar'dan oluşur.
+// Geri kalan ikincil araçlar (Transfer/Rüya Takım/Arşiv/Başarılar/Ayarlar/
+// Yenilikler) "Diğer" menüsüne toplanır (bkz. NavMoreMenu.jsx) -- hepsi eşit
+// ağırlıkta 10+ link göstermek yerine, kullanıcının asıl karar vermesi
+// gereken "hangi ligi oynayacağım" sorusu görsel olarak öne çıkar.
+const MORE_ITEMS = [
+  { to: "/transferler", label: "Transfer Merkezi", icon: "🔁" },
+  { to: "/ruya-takim", label: "Rüya Takım", icon: "⭐" },
+  { to: "/arsiv", label: "Arşiv", icon: "🗂️" },
+  { to: "/basarilar", label: "Başarılar", icon: "🏅" },
+  { to: "/ayarlar", label: "Ayarlar", icon: "⚙️" },
+];
+
+const COMPETITION_KEYS = COMPETITION_LIST.map((c) => c.key);
 
 export default function NavBar() {
   const { openTour } = useOnboarding();
@@ -13,6 +30,13 @@ export default function NavBar() {
   useEffect(() => {
     setMenuOpen(false);
   }, [location.pathname]);
+
+  // NavBar, <Routes>'un DIŞINDA (üstünde) render edildiğinden useParams()
+  // ile competitionKey'i okuyamıyor -- Tahmin Ligi linkinin "şu an
+  // gezindiğin lig" ile açılması için yolu elle ayrıştırıyoruz (ör.
+  // /europa/fikstur -> "europa"); eşleşme yoksa (ör. ana sayfa) UCL'e döner.
+  const activeCompetitionKey =
+    COMPETITION_KEYS.find((key) => location.pathname.startsWith(`/${key}`)) || "ucl";
 
   return (
     <nav className="site-nav">
@@ -31,65 +55,28 @@ export default function NavBar() {
           {menuOpen ? "✕" : "☰"}
         </button>
         <div className={`site-nav-links ${menuOpen ? "is-open" : ""}`}>
-          <NavLink to="/" end className={({ isActive }) => `site-nav-link${isActive ? " active" : ""}`}>
-            Ana Sayfa
-          </NavLink>
           {COMPETITION_LIST.map((comp) => (
             <NavLink
               key={comp.key}
               to={`/${comp.key}`}
-              className={({ isActive }) => `site-nav-link${isActive ? " active" : ""}`}
+              className={({ isActive }) => `site-nav-link site-nav-link-league${isActive ? " active" : ""}`}
             >
               {comp.shortName}
             </NavLink>
           ))}
           <NavLink
             to="/canli"
-            className={({ isActive }) => `site-nav-link site-nav-link-transfer${isActive ? " active" : ""}`}
+            className={({ isActive }) => `site-nav-link${isActive ? " active" : ""}`}
           >
             📡 Canlı Skorlar
           </NavLink>
           <NavLink
-            to="/transferler"
-            className={({ isActive }) => `site-nav-link site-nav-link-transfer${isActive ? " active" : ""}`}
+            to={`/${activeCompetitionKey}/tahmin-ligi`}
+            className={({ isActive }) => `site-nav-link site-nav-link-prediction${isActive ? " active" : ""}`}
           >
-            🔁 Transfer Merkezi
+            🏆 Tahmin Ligi
           </NavLink>
-          <NavLink
-            to="/ruya-takim"
-            className={({ isActive }) => `site-nav-link site-nav-link-transfer${isActive ? " active" : ""}`}
-          >
-            ⭐ Rüya Takım
-          </NavLink>
-          <NavLink
-            to="/arsiv"
-            className={({ isActive }) => `site-nav-link site-nav-link-transfer${isActive ? " active" : ""}`}
-          >
-            🗂️ Arşiv
-          </NavLink>
-          <NavLink
-            to="/basarilar"
-            className={({ isActive }) => `site-nav-link site-nav-link-transfer${isActive ? " active" : ""}`}
-          >
-            🏅 Başarılar
-          </NavLink>
-          <NavLink
-            to="/ayarlar"
-            className={({ isActive }) => `site-nav-link site-nav-link-icon${isActive ? " active" : ""}`}
-            title="Gelişmiş Ayarlar"
-            aria-label="Gelişmiş Ayarlar"
-          >
-            ⚙️ <span className="site-nav-icon-label">Ayarlar</span>
-          </NavLink>
-          <button
-            type="button"
-            className="site-nav-link site-nav-link-icon"
-            onClick={openTour}
-            title="Yenilikler"
-            aria-label="Yenilikler turu"
-          >
-            ✨ <span className="site-nav-icon-label">Yenilikler</span>
-          </button>
+          <NavMoreMenu items={MORE_ITEMS} onTourClick={openTour} />
         </div>
       </div>
     </nav>

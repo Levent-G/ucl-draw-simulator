@@ -6,7 +6,7 @@ import Crest from "../Crest.jsx";
 // defaultVisible: kısaltılmış görünümde gösterilecek satır sayısı (uzun
 // tabloları kısaltıp "Tümünü Göster" ile açmak için).
 // competitionKey verilirse takım adları takım profil sayfasına link olur.
-export default function StandingsTable({ standings, title, teams, defaultVisible = 10, competitionKey }) {
+export default function StandingsTable({ standings, title, teams, defaultVisible = 10, competitionKey, favoriteTeamId = null }) {
   const [expanded, setExpanded] = useState(false);
 
   if (!standings || standings.length === 0) {
@@ -47,19 +47,26 @@ export default function StandingsTable({ standings, title, teams, defaultVisible
             {visibleStandings.map((s) => {
               const team = teamById[s.teamId];
               if (!team) return null;
+              const isFavorite = favoriteTeamId && team.id === favoriteTeamId;
               return (
-                <tr key={s.teamId} className={`standings-row status-tone-${s.statusTone}`}>
+                <tr key={s.teamId} className={`standings-row status-tone-${s.statusTone} ${isFavorite ? "standings-row-favorite" : ""}`}>
                   <td>{s.rank}</td>
                   <td className="standings-team-cell">
                     {competitionKey ? (
                       <Link to={`/${competitionKey}/takim/${team.id}`} className="standings-team-link">
                         <Crest team={team} size={18} />
-                        <span>{team.name}</span>
+                        <span>
+                          {team.name}
+                          {isFavorite && <span className="favorite-star" title="Tuttuğun takım">⭐</span>}
+                        </span>
                       </Link>
                     ) : (
                       <>
                         <Crest team={team} size={18} />
-                        <span>{team.name}</span>
+                        <span>
+                          {team.name}
+                          {isFavorite && <span className="favorite-star" title="Tuttuğun takım">⭐</span>}
+                        </span>
                       </>
                     )}
                   </td>
