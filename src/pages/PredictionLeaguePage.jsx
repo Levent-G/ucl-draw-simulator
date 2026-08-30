@@ -21,6 +21,7 @@ import Crest from "../components/Crest.jsx";
 import TeamFilterSelect from "../components/stats/TeamFilterSelect.jsx";
 
 const OUTCOME_LABEL = { win: "Galibiyet", draw: "Beraberlik", loss: "Mağlubiyet" };
+const OUTCOME_VERB = { win: "Kazanır", draw: "Berabere", loss: "Kaybeder" };
 
 const START_STAGE_LABEL = {
   draw: "Kura çekiliyor…",
@@ -332,6 +333,7 @@ function PredictionLeagueRoom() {
   const [teamsPickerValue, setTeamsPickerValue] = useState("");
   const [teamsSubmitting, setTeamsSubmitting] = useState(false);
   const [teamsError, setTeamsError] = useState(null);
+  const [editingTeams, setEditingTeams] = useState(false);
   const pickableTeamsForDraft = useMemo(
     () => sortedTeams.filter((t) => !teamsDraft.includes(t.id)),
     [sortedTeams, teamsDraft]
@@ -344,12 +346,18 @@ function PredictionLeagueRoom() {
   const removeTeamDraft = (teamId) => {
     setTeamsDraft((prev) => prev.filter((id) => id !== teamId));
   };
+  // Zaten bir takım seçimi (teamsPrediction) varsa, eski tahmin YENİ seçim
+  // gerçekten gönderilene kadar silinmez -- "Tahmin Sayısı" (bkz.
+  // buildLeaderboard) formu açık tutarken anlık düşmesin diye (bkz. maç
+  // tahminlerindeki aynı desen: editingMatchIds/handleChangePrediction).
   const handleTeamsSubmit = async () => {
     if (teamsDraft.length === 0) return;
     setTeamsSubmitting(true);
     setTeamsError(null);
     try {
+      if (teamsPrediction) await deletePrediction("teams");
       await submitTeamsPick(teamsDraft);
+      setEditingTeams(false);
       setTab("lig");
     } catch (e) {
       setTeamsError(describeFirestoreError(e));
@@ -357,20 +365,16 @@ function PredictionLeagueRoom() {
       setTeamsSubmitting(false);
     }
   };
-  // Zaten seçilmiş takımları değiştirmek istediğinde: eski seçimi siler,
-  // taslağı mevcut seçimle doldurur ki kullanıcı sıfırdan başlamak zorunda
-  // kalmasın (istersen tek tek çıkarıp yenisini ekleyebilir).
-  const handleChangeTeams = async () => {
-    setTeamsSubmitting(true);
+  // Zaten seçilmiş takımları değiştirmek istediğinde: taslağı mevcut
+  // seçimle doldurup formu tekrar açar -- eski seçime HENÜZ dokunmaz (bkz.
+  // handleTeamsSubmit).
+  const handleChangeTeams = () => {
+    setTeamsDraft(teamsPrediction?.teamIds || []);
+    setEditingTeams(true);
+  };
+  const handleCancelChangeTeams = () => {
+    setEditingTeams(false);
     setTeamsError(null);
-    try {
-      await deletePrediction("teams");
-      setTeamsDraft(teamsPrediction?.teamIds || []);
-    } catch (e) {
-      setTeamsError(describeFirestoreError(e));
-    } finally {
-      setTeamsSubmitting(false);
-    }
   };
 
   const leaderboard = useMemo(
@@ -465,13 +469,35 @@ function PredictionLeagueRoom() {
     setDrafts((prev) => ({ ...prev, [matchId]: { ...prev[matchId], [field]: value } }));
   };
 
+  // "Değiştir"e basınca eski tahmin Firestore'dan HEMEN silinmez -- sadece bu
+  // maç için formu tekrar açarız (editingMatchIds). Eski tahmin, kullanıcı
+  // YENİ değeri gerçekten gönderene kadar yerinde kalır -- böylece "Tahmin
+  // Sayısı" (bkz. buildLeaderboard) formu açık tutarken anlık düşüp
+  // yükselmez, sadece submit anında (eski silinip yenisi yazılırken) bir an
+  // için değişir.
+  const [editingMatchIds, setEditingMatchIds] = useState({});
+  const handleChangePrediction = (matchId, currentPrediction) => {
+    if (currentPrediction?.kind === "score") {
+      setDrafts((prev) => ({
+        ...prev,
+        [matchId]: { home: String(currentPrediction.homeGoals), away: String(currentPrediction.awayGoals) },
+      }));
+    }
+    setEditingMatchIds((prev) => ({ ...prev, [matchId]: true }));
+  };
+  const handleCancelChange = (matchId) => {
+    setEditingMatchIds((prev) => ({ ...prev, [matchId]: false }));
+  };
+
   const handleSubmit = async (matchId) => {
     const draft = drafts[matchId];
     if (!draft || draft.home === "" || draft.away === "" || draft.home == null || draft.away == null) return;
     setSubmitting((prev) => ({ ...prev, [matchId]: true }));
     setSubmitErrors((prev) => ({ ...prev, [matchId]: null }));
     try {
+      if (myPredictionsByMatch[matchId]) await deletePrediction(matchId);
       await submitScorePrediction(matchId, Number(draft.home), Number(draft.away));
+      setEditingMatchIds((prev) => ({ ...prev, [matchId]: false }));
     } catch (e) {
       setSubmitErrors((prev) => ({ ...prev, [matchId]: describeFirestoreError(e) }));
     } finally {
@@ -485,27 +511,13 @@ function PredictionLeagueRoom() {
     setOutcomeSubmitting((prev) => ({ ...prev, [matchId]: true }));
     setOutcomeErrors((prev) => ({ ...prev, [matchId]: null }));
     try {
+      if (myPredictionsByMatch[matchId]) await deletePrediction(matchId);
       await submitOutcomePrediction(matchId, teamId, result);
+      setEditingMatchIds((prev) => ({ ...prev, [matchId]: false }));
     } catch (e) {
       setOutcomeErrors((prev) => ({ ...prev, [matchId]: describeFirestoreError(e) }));
     } finally {
       setOutcomeSubmitting((prev) => ({ ...prev, [matchId]: false }));
-    }
-  };
-
-  // Bir maç tahminini SİLİP tekrar seçilebilir hale getirir -- "fikrini
-  // değiştirdim" senaryosu için (bkz. deletePrediction'ın PredictionLeagueContext
-  // üzerindeki notu). Silme başarılı olur olmaz canlı Firestore aboneliği
-  // myPredictionsByMatch[matchId]'yi otomatik günceller, form yeniden açılır.
-  const [changingMatchId, setChangingMatchId] = useState(null);
-  const handleChangePrediction = async (matchId) => {
-    setChangingMatchId(matchId);
-    try {
-      await deletePrediction(matchId);
-    } catch (e) {
-      setOutcomeErrors((prev) => ({ ...prev, [matchId]: describeFirestoreError(e) }));
-    } finally {
-      setChangingMatchId(null);
     }
   };
 
@@ -591,7 +603,7 @@ function PredictionLeagueRoom() {
 
           {tab === "takimlar" && (
             <div className="chart-card chart-card-wide">
-              {teamsPrediction ? (
+              {teamsPrediction && !editingTeams ? (
                 <>
                   <h3>✅ Takımların Belli</h3>
                   <p className="footnote">
@@ -660,17 +672,24 @@ function PredictionLeagueRoom() {
                     <p className="prediction-teams-count prediction-teams-count-empty">Henüz takım seçmedin.</p>
                   )}
 
-                  <button
-                    className="btn-primary prediction-teams-submit"
-                    onClick={handleTeamsSubmit}
-                    disabled={teamsDraft.length === 0 || teamsSubmitting}
-                  >
-                    {teamsSubmitting
-                      ? "Kaydediliyor…"
-                      : teamsDraft.length === 0
-                        ? "Önce en az 1 takım seç"
-                        : `${teamsDraft.length} Takımla Devam Et →`}
-                  </button>
+                  <div className="prediction-teams-done-actions">
+                    <button
+                      className="btn-primary prediction-teams-submit"
+                      onClick={handleTeamsSubmit}
+                      disabled={teamsDraft.length === 0 || teamsSubmitting}
+                    >
+                      {teamsSubmitting
+                        ? "Kaydediliyor…"
+                        : teamsDraft.length === 0
+                          ? "Önce en az 1 takım seç"
+                          : `${teamsDraft.length} Takımla Devam Et →`}
+                    </button>
+                    {editingTeams && (
+                      <button className="btn-ghost btn-small" onClick={handleCancelChangeTeams} disabled={teamsSubmitting}>
+                        Vazgeç
+                      </button>
+                    )}
+                  </div>
                   {teamsError && <p style={{ color: "#f87171" }}>{teamsError}</p>}
                 </div>
               )}
@@ -717,6 +736,7 @@ function PredictionLeagueRoom() {
                   const actual = revealed ? league.results[m.id] : null;
                   const draft = drafts[m.id] || {};
                   const others = mine ? othersPredictionsByMatch[m.id] || [] : [];
+                  const otherPredictorCount = (othersPredictionsByMatch[m.id] || []).length;
                   // hasDraw (swiss, UCL/Avrupa Ligi): basit Galibiyet/Beraberlik/
                   // Mağlubiyet tahmini, tuttuğun takımın perspektifinden.
                   // Değilse (Süper Lig, çift devreli): eskisi gibi tam skor.
@@ -724,53 +744,51 @@ function PredictionLeagueRoom() {
                   const outcomePoints = mine?.kind === "outcome" && actual ? pointsForPrediction(mine, league) : null;
                   const scorePoints = mine?.kind === "score" && actual ? scorePrediction(mine, actual) : null;
                   const points = outcomePoints ?? scorePoints;
+                  const isEditing = !!mine && !!editingMatchIds[m.id] && !revealed;
+                  const showPicker = !mine || isEditing;
                   const stateClass = !mine
                     ? "needs-action"
-                    : !revealed
-                      ? "is-pending"
-                      : points > 0
-                        ? "is-correct"
-                        : "is-wrong";
+                    : isEditing
+                      ? "needs-action"
+                      : !revealed
+                        ? "is-pending"
+                        : points > 0
+                          ? "is-correct"
+                          : "is-wrong";
                   return (
                     <div key={m.id} className={`prediction-match ${stateClass}`}>
-                      <div className="prediction-match-teams">
-                        <div className="prediction-match-team-row">
-                          <Crest team={m.homeTeam} size={22} />
-                          <span>{m.homeTeam.name}</span>
-                        </div>
-                        <div className="prediction-match-team-row">
-                          <Crest team={m.awayTeam} size={22} />
-                          <span>{m.awayTeam.name}</span>
-                        </div>
+                      <div className="prediction-match-team-row home">
+                        <Crest team={m.homeTeam} size={22} />
+                        <span>{m.homeTeam.name}</span>
+                        {revealed && actual && <b className="team-score">{actual.homeGoals}</b>}
                       </div>
 
                       <div className="prediction-match-mid">
-                        {mine ? (
-                          <>
-                            <div className="prediction-pick-chip">
-                              <span className="tag">Tahminin</span>
-                              <b>{mine.kind === "outcome" ? OUTCOME_LABEL[mine.result] : `${mine.homeGoals} - ${mine.awayGoals}`}</b>
-                              {revealed && points != null && (
-                                <span className={points > 0 ? "status ok" : "status no"}>
-                                  {points > 0 ? `✓ +${points}` : "✗ 0"}
-                                </span>
-                              )}
-                            </div>
+                        {!showPicker ? (
+                          <div className="prediction-pick-line">
+                            <span className="pick-text">
+                              <span className="pick-text-tag">Tahminin</span>
+                              {mine.kind === "outcome"
+                                ? mine.result === "draw"
+                                  ? "Berabere"
+                                  : `${favTeam.short} ${OUTCOME_VERB[mine.result]}`
+                                : `${mine.homeGoals} - ${mine.awayGoals}`}
+                            </span>
                             {revealed ? (
-                              <div className="prediction-result-line">
-                                Sonuç: <b>{actual.homeGoals} - {actual.awayGoals}</b>
-                              </div>
+                              <span className={`pick-badge ${points > 0 ? "ok" : "no"}`}>
+                                {points > 0 ? `✅ Doğru bildin +${points}` : "❌ Tutmadı"}
+                              </span>
                             ) : (
                               <button
                                 type="button"
                                 className="prediction-change-link"
-                                onClick={() => handleChangePrediction(m.id)}
-                                disabled={changingMatchId === m.id}
+                                onClick={() => handleChangePrediction(m.id, mine)}
+                                aria-label="Tahminini değiştir"
                               >
-                                {changingMatchId === m.id ? "…" : "Değiştir"}
+                                ✏️ Değiştir
                               </button>
                             )}
-                          </>
+                          </div>
                         ) : hasDraw ? (
                           <div className="prediction-pick-row">
                             <button
@@ -794,6 +812,15 @@ function PredictionLeagueRoom() {
                             >
                               {favTeam.short} Kaybeder
                             </button>
+                            {isEditing && (
+                              <button
+                                type="button"
+                                className="prediction-change-link"
+                                onClick={() => handleCancelChange(m.id)}
+                              >
+                                ✕
+                              </button>
+                            )}
                             {outcomeErrors[m.id] && (
                               <span className="footnote" style={{ color: "#f87171" }}>
                                 {outcomeErrors[m.id]}
@@ -828,6 +855,15 @@ function PredictionLeagueRoom() {
                             >
                               {submitting[m.id] ? "…" : "Tahmin Et"}
                             </button>
+                            {isEditing && (
+                              <button
+                                type="button"
+                                className="prediction-change-link"
+                                onClick={() => handleCancelChange(m.id)}
+                              >
+                                ✕
+                              </button>
+                            )}
                             {submitErrors[m.id] && (
                               <span className="footnote" style={{ color: "#f87171" }}>
                                 {submitErrors[m.id]}
@@ -837,7 +873,13 @@ function PredictionLeagueRoom() {
                         )}
                       </div>
 
-                      {others.length > 0 && (
+                      <div className="prediction-match-team-row away">
+                        <Crest team={m.awayTeam} size={22} />
+                        <span>{m.awayTeam.name}</span>
+                        {revealed && actual && <b className="team-score">{actual.awayGoals}</b>}
+                      </div>
+
+                      {others.length > 0 ? (
                         <div className="prediction-others-row prediction-match-others">
                           {others.map((o) => (
                             <span key={o.uid} className="prediction-others-chip">
@@ -845,6 +887,16 @@ function PredictionLeagueRoom() {
                               {o.kind === "outcome" ? OUTCOME_LABEL[o.result] : `${o.homeGoals}-${o.awayGoals}`}
                             </span>
                           ))}
+                        </div>
+                      ) : (
+                        <div className="prediction-match-others prediction-match-participants">
+                          {mine
+                            ? otherPredictorCount === 0
+                              ? "👥 Bu maça henüz başka kimse tahmin girmedi."
+                              : `👥 ${otherPredictorCount} kişi daha bu maça tahmin girdi.`
+                            : otherPredictorCount === 0
+                              ? "👥 Bu maça henüz kimse tahmin girmedi."
+                              : `👥 ${otherPredictorCount} kişi bu maça tahmin girdi -- sen de tahmin edince tahminlerini görürsün.`}
                         </div>
                       )}
                     </div>

@@ -3561,13 +3561,17 @@ a.team-profile-match-row:hover {
 }
 .prediction-match {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
   background: var(--bg-panel);
   border: 1px solid var(--line);
   border-left: 3px solid var(--line-strong);
   border-radius: var(--radius-md);
   padding: 12px 14px;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
 }
 .prediction-match.needs-action {
   border-left-color: var(--ucl-blue-2);
@@ -3582,14 +3586,6 @@ a.team-profile-match-row:hover {
   border-left-color: var(--line-strong);
   opacity: 0.82;
 }
-.prediction-match-teams {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-  flex-shrink: 0;
-  width: 132px;
-}
 .prediction-match-team-row {
   display: flex;
   align-items: center;
@@ -3600,13 +3596,86 @@ a.team-profile-match-row:hover {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+.prediction-match-team-row.home {
+  order: 1;
+}
+.prediction-match-team-row.away {
+  order: 2;
+}
 .prediction-match-mid {
-  flex: 1;
+  order: 3;
   min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
+}
+
+/* Masaüstünde (bkz. aşağıdaki min-width sorgusu) sol takım/orta tahmin/sağ
+   takım şeklinde YATAY, gerçek bir fikstür satırı gibi dizilir -- "nereye
+   basacağın belli olsun" isteği: aksiyon (3 buton ya da Değiştir) her zaman
+   ORTADA, iki takım arasında. Mobilde (bu sorgunun dışında, DEĞİŞMEDİ) hep
+   dikey: ev sahibi, deplasman, sonra tahmin. */
+@media (min-width: 760px) {
+  .prediction-match {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    max-width: 760px;
+    padding: 14px 22px;
+    gap: 14px;
+  }
+  .prediction-match:hover {
+    background: var(--bg-panel-alt);
+    transform: translateY(-1px);
+  }
+  .prediction-match-team-row {
+    order: unset;
+    flex: 1 1 0;
+    min-width: 0;
+    font-size: 13.5px;
+  }
+  .prediction-match-team-row.home {
+    order: 1;
+  }
+  .prediction-match-team-row.away {
+    order: 3;
+    justify-content: flex-end;
+  }
+  .prediction-match-team-row.away .team-score {
+    margin-left: 0;
+  }
+  .prediction-match-mid {
+    order: 2;
+    flex: 0 0 auto;
+    min-width: 300px;
+    gap: 8px;
+  }
+  .prediction-match-others {
+    order: 4;
+    flex-basis: 100%;
+  }
+  .prediction-pick-line .pick-text {
+    font-size: 15px;
+  }
+  .prediction-pick-btn {
+    font-size: 12px;
+    padding: 9px 10px;
+  }
+  .pick-text-tag {
+    font-size: 10.5px;
+  }
+  .pick-badge {
+    font-size: 12.5px;
+    padding: 6px 14px;
+  }
+  .team-score {
+    font-size: 16px;
+  }
+  .prediction-change-link {
+    font-size: 12.5px;
+    padding: 7px 14px;
+  }
 }
 .prediction-pick-row {
   display: flex;
@@ -3638,76 +3707,84 @@ a.team-profile-match-row:hover {
   opacity: 0.5;
   cursor: default;
 }
-.prediction-pick-chip {
+.prediction-pick-line {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12.5px;
-  flex-wrap: wrap;
   justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  width: 100%;
+  font-size: 13px;
 }
-.prediction-pick-chip .tag {
+.prediction-pick-line .pick-text {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  color: var(--text-primary);
+}
+.pick-text-tag {
   font-family: var(--font-mono);
   font-size: 9.5px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-faint);
 }
-.prediction-pick-chip b {
-  color: var(--text-primary);
-  font-family: var(--font-display);
-  font-size: 13px;
-}
-.prediction-pick-chip .status {
+.pick-badge {
+  font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
-  font-family: var(--font-mono);
+  white-space: nowrap;
+  padding: 4px 10px;
+  border-radius: 999px;
 }
-.prediction-pick-chip .status.ok {
+.pick-badge.ok {
   color: #22c55e;
+  background: rgba(34, 197, 94, 0.14);
 }
-.prediction-pick-chip .status.no {
+.pick-badge.no {
   color: var(--text-faint);
+  background: rgba(255, 255, 255, 0.06);
+}
+.team-score {
+  margin-left: auto;
+  padding-left: 8px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--text-primary);
 }
 .prediction-change-link {
-  background: none;
-  border: none;
-  color: var(--ucl-blue-2);
-  font-size: 11px;
-  font-family: var(--font-body);
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-.prediction-result-line {
-  font-size: 11px;
-  color: var(--text-faint);
-}
-.prediction-result-line b {
+  background: var(--bg-panel-alt);
+  border: 1px solid var(--line);
   color: var(--text-dim);
-  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+.prediction-change-link:hover:not(:disabled) {
+  border-color: var(--ucl-blue-2);
+  color: var(--text-primary);
+}
+.prediction-change-link:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 .prediction-match-others {
+  order: 4;
   width: 100%;
   margin-top: 8px;
   padding-top: 8px;
   border-top: 1px solid var(--line);
 }
+.prediction-match-participants {
+  font-size: 11px;
+  color: var(--text-faint);
+}
 @media (max-width: 480px) {
-  .prediction-match {
-    flex-wrap: wrap;
-    row-gap: 10px;
-  }
-  .prediction-match-teams {
-    flex: 0 0 auto;
-    width: auto;
-  }
-  .prediction-match-mid {
-    flex: 1 1 100%;
-    width: 100%;
-  }
   .prediction-pick-btn {
     flex: 1 1 calc(50% - 3px);
   }
@@ -3717,10 +3794,19 @@ a.team-profile-match-row:hover {
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: 10px;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
   background: var(--bg-panel);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   padding: 10px 14px;
+}
+@media (min-width: 760px) {
+  .prediction-row {
+    max-width: 760px;
+    padding: 12px 22px;
+  }
 }
 .prediction-row-team {
   display: flex;
@@ -3782,6 +3868,9 @@ a.team-profile-match-row:hover {
 .prediction-points-0 { color: var(--text-faint); }
 .prediction-week-group {
   margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 .prediction-week-label {
   font-family: var(--font-mono);
