@@ -11,9 +11,12 @@
 // Erzurumspor FK eklendi). Coeff değerleri yine kurgusal/gösterim amaçlıdır.
 //
 // logo: projede zaten bulunan (kullanıcının sağladığı) amblem dosyalarından
-// eşleşenler içe aktarılır. Eşleşme bulunamayan takımlar (ör. yeni yükselen
-// kulüpler) için alan atlanır -- Crest.jsx bu durumda otomatik olarak kendi
-// oluşturduğu SVG rozete geri döner.
+// eşleşenler içe aktarılır. Çorum FK ve Erzurumspor FK'nın logoları
+// TheSportsDB'den (thesportsdb.com, ücretsiz "123" test anahtarı) indirilip
+// eklendi. Amed SFK için TheSportsDB'de eşleşme bulunamadı (yeni yükselen
+// bir kulüp) -- alan kasıtlı olarak boş bırakıldı, uydurma bir logo
+// eklenmedi; Crest.jsx bu durumda otomatik olarak kendi oluşturduğu SVG
+// rozete geri döner.
 import GalatasarayLogo from "../assets/logos/Türkiye - Süper Lig/Galatasaray.png";
 import FenerbahceLogo from "../assets/logos/Türkiye - Süper Lig/Fenerbahce.png";
 import BesiktasLogo from "../assets/logos/Türkiye - Süper Lig/Besiktas JK.png";
@@ -29,6 +32,8 @@ import GaziantepFKLogo from "../assets/logos/Türkiye - Süper Lig/Gaziantep FK.
 import EyupsporLogo from "../assets/logos/Türkiye - Süper Lig/Eyüpspor.png";
 import KocaelisporLogo from "../assets/logos/Türkiye - Süper Lig/Kocaelispor.png";
 import GenclerbirligiLogo from "../assets/logos/Türkiye - Süper Lig/Genclerbirligi Ankara.png";
+import CorumFKLogo from "../assets/logos/Türkiye - Süper Lig/Corum FK.png";
+import ErzurumsporFKLogo from "../assets/logos/Türkiye - Süper Lig/Erzurumspor FK.png";
 
 export const SUPER_LIG_COUNTRY_NAMES = {
   TUR: "Türkiye",
@@ -71,8 +76,8 @@ const RAW_SUPER_LIG_TEAMS = [
   { name: "Alanyaspor", short: "ALN", country: "TUR", pot: null, coeff: 53.0, pedigree: 0, logo: AlanyasporLogo },
   { name: "Amed SFK", short: "AMD", country: "TUR", pot: null, coeff: 52.0, pedigree: 0 },
   { name: "Çaykur Rizespor", short: "RIZ", country: "TUR", pot: null, coeff: 50.0, pedigree: 0, logo: CaykurRizesporLogo },
-  { name: "Çorum FK", short: "COR", country: "TUR", pot: null, coeff: 44.0, pedigree: 0 },
-  { name: "Erzurumspor FK", short: "ERZ", country: "TUR", pot: null, coeff: 43.0, pedigree: 0 },
+  { name: "Çorum FK", short: "COR", country: "TUR", pot: null, coeff: 44.0, pedigree: 0, logo: CorumFKLogo },
+  { name: "Erzurumspor FK", short: "ERZ", country: "TUR", pot: null, coeff: 43.0, pedigree: 0, logo: ErzurumsporFKLogo },
   { name: "Gaziantep FK", short: "GAZ", country: "TUR", pot: null, coeff: 46.0, pedigree: 0, logo: GaziantepFKLogo },
   { name: "Eyüpspor", short: "EYU", country: "TUR", pot: null, coeff: 45.0, pedigree: 0, logo: EyupsporLogo },
   { name: "Kocaelispor", short: "KOC", country: "TUR", pot: null, coeff: 40.0, pedigree: 1, logo: KocaelisporLogo },

@@ -1,13 +1,14 @@
 import React, { useMemo, useState } from 'react'
 import { POT_COLORS } from '../data/teams.js'
+import { toSearchKey } from '../utils/text.js'
 import Crest from './Crest.jsx'
 
 export default function FinalResultsGrid({ teams, results }) {
   const [query, setQuery] = useState('')
   const filteredTeams = useMemo(() => {
-    const q = query.trim().toLowerCase()
+    const q = toSearchKey(query)
     if (!q) return teams
-    return teams.filter((t) => t.name.toLowerCase().includes(q))
+    return teams.filter((t) => toSearchKey(t.name).includes(q))
   }, [teams, query])
 
   return (

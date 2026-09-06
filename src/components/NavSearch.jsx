@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { COMPETITION_LIST } from "../data/competitions.js";
 import { getAllPlayersEverywhere } from "../utils/crossCompetitionPlayers.js";
+import { toSearchKey } from "../utils/text.js";
 import { useAchievements } from "../state/AchievementsContext.jsx";
 import Crest from "./Crest.jsx";
 import PlayerAvatar from "./PlayerAvatar.jsx";
@@ -29,11 +30,11 @@ export default function NavSearch() {
   const allPlayers = useMemo(() => getAllPlayersEverywhere(), []);
 
   const { teamResults, playerResults } = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = toSearchKey(query);
     if (q.length < 2) return { teamResults: [], playerResults: [] };
     return {
-      teamResults: allTeams.filter((t) => t.name.toLowerCase().includes(q)).slice(0, MAX_TEAMS),
-      playerResults: allPlayers.filter((p) => p.name.toLowerCase().includes(q)).slice(0, MAX_PLAYERS),
+      teamResults: allTeams.filter((t) => toSearchKey(t.name).includes(q)).slice(0, MAX_TEAMS),
+      playerResults: allPlayers.filter((p) => toSearchKey(p.name).includes(q)).slice(0, MAX_PLAYERS),
     };
   }, [query, allTeams, allPlayers]);
 

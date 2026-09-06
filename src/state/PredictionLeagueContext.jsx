@@ -20,23 +20,12 @@ import {
 } from "firebase/firestore";
 import { auth, db, googleProvider } from "../lib/firebase.js";
 import { COMPETITIONS } from "../data/competitions.js";
-import { generateFullDraw } from "../utils/drawEngine.js";
-import { buildResultsFromMatches } from "../utils/resultsHelpers.js";
-import { REAL_DRAW_2026_MATCHES } from "../data/realDraw2026.js";
 import { REAL_FIXTURE_2026 } from "../data/realFixture2026.js";
-import {
-  generateFixture,
-  serializeFixture,
-  deserializeFixture,
-} from "../utils/fixtureEngine.js";
-import {
-  generateRoundRobinFixture,
-  serializeRoundRobinFixture,
-  deserializeRoundRobinFixture,
-} from "../utils/roundRobinEngine.js";
-import { enrichTeamsWithAttackDefense, computeStandingsFromUserScores } from "../utils/predictionEngine.js";
-import { simulateSeasonAsync } from "../utils/simulateSeasonAsync.js";
-import { generateKnockoutBracket } from "../utils/knockoutEngine.js";
+import { REAL_FIXTURE_SUPERLIG_2026 } from "../data/realFixtureSuperLig2026.js";
+import { deserializeFixture } from "../utils/fixtureEngine.js";
+import { deserializeRoundRobinFixture } from "../utils/roundRobinEngine.js";
+import { computeStandingsFromUserScores } from "../utils/predictionEngine.js";
+import { hasRealDataSupport, getRealMatchResult, getRealStandings } from "../utils/realStandingsSelectors.js";
 
 // generateKnockoutBracket takım NESNELERİ (logo import'ları dahil) içeren bir
 // bracket döner -- Firestore'a sadece id'leri yazıyoruz. Her eşleşmeye,
@@ -118,134 +107,59 @@ export function usePredictionAuth() {
   return ctx;
 }
 
-// Bir yarışma (competitionKey) için fikstür/simülasyon üretip Firestore'un
-// anlayacağı (sadece takım id'leri + düz sonuç haritası içeren)
-// SIKIŞTIRILMIŞ bir biçime çevirir -- takım nesnelerinin kendisi (logo
+// Bir ya da BİRDEN FAZLA yarışma (competitionKeys -- ör. ["ucl"],
+// ["superlig"] ya da ["ucl","superlig"]) için gerçek, tarihli fikstürleri
+// Firestore'un anlayacağı SIKIŞTIRILMIŞ bir biçime (fixtures: { [key]:
+// serializedFixture }) çevirir -- takım nesnelerinin kendisi (logo
 // import'ları dahil) hiçbir zaman Firestore'a yazılmaz, sadece id'ler.
 //
-// Kura çekimi ekranından TAMAMEN BAĞIMSIZ çalışır -- kullanıcı hiçbir
-// animasyon izlemeden, doğrudan burada arka planda (headless) bir kura +
-// fikstür + simülasyon üretilir. Puanlama şu an bu şekilde üretilen
-// kurgusal simülasyona göre hesaplanıyor; gerçek/canlı sonuçlara göre
-// puanlama ayrı bir iyileştirme olarak ileride eklenecek.
+// ARTIK BURADA SAHTE BİR SEZON SİMÜLASYONU HİÇ ÇALIŞTIRILMAZ/SAKLANMAZ --
+// "results"/"standings" BOŞ kaydedilir çünkü gerçek sonuçlar OKUMA anında
+// her zaman realStandingsSelectors'tan (bkz. getLeagueMatchResult aşağıda)
+// taze çekilir -- gerçek bir maç oynandıkça (src/data/realResultsUcl2026.js
+// güncellendikçe) TÜM mevcut Tahmin Ligi odaları otomatik günceli
+// gösterir, hiçbir migration gerekmez. Bu fonksiyon SADECE gerçek veri
+// desteği olan yarışmaları (ucl/superlig) kabul eder -- Tahmin Ligi artık
+// başka bir yarışma sunmuyor.
 //
-// onProgress(stage): "draw" | "fixture" | "simulate" | "knockout" | "save"
-// aşamalarını sırayla bildirir -- arayüz hepsi bitene kadar (tek bir opak
-// "Oluşturuluyor…" yerine) hangi adımda olduğunu gösterir.
-export async function buildLeaguePayload(competitionKey, onProgress) {
+// onProgress(stage): "fixture" | "save" aşamalarını bildirir.
+export async function buildLeaguePayload(competitionKeys, onProgress) {
   const notify = onProgress || (() => {});
-  const comp = COMPETITIONS[competitionKey];
-  if (!comp) throw new Error("Bilinmeyen yarışma.");
-  const allPlayers = comp.getAllPlayers();
-  const enrichedTeams = enrichTeamsWithAttackDefense(comp.teams, allPlayers);
-
-  let fixture;
-  let serializedFixture;
-  if (comp.format === "swiss") {
-    notify("draw");
-    // generateFixture (haftalara bölme) matematiksel olarak her zaman
-    // çözülebilir bir problemdir (bkz. fixtureEngine.js) ama sınırlı adımlı
-    // backtracking arayışı NADİREN tıkanıp "Fikstür haftalara bölünemedi"
-    // hatası fırlatabilir -- TAMAMEN YENİ bir kura (farklı eşleşme grafiği)
-    // çekmek neredeyse her zaman çözer, o yüzden burada birkaç kez otomatik
-    // deniyoruz.
-    // UCL için ARTIK rastgele bir kura/fikstür üretilmiyor -- 27 Ağustos
-    // 2026'da yapılan GERÇEK lig fazı çekiliminin eşleşmeleri (bkz.
-    // src/data/realDraw2026.js) VE UEFA'nın 29 Ağustos 2026'da açıkladığı
-    // GERÇEK 8 haftalık maç takvimi (bkz. src/data/realFixture2026.js, hangi
-    // eşleşmenin hangi haftada oynanacağı -- bu artık rastgele bir
-    // "haftalara bölme" değil, UEFA'nın kendi takvimi) kullanılıyor. Böylece
-    // Tahmin Ligi'ndeki haftalık maçlar da gerçekte kimin ne zaman kiminle
-    // oynayacağını birebir yansıtır -- sadece skorlar (henüz oynanmadığı
-    // için) model tahminidir. Avrupa Ligi/Süper Lig için gerçek çekiliş/
-    // takvim verisi henüz olmadığından onlar hâlâ headless/rastgele üretiliyor.
-    if (competitionKey === "ucl") {
-      fixture = deserializeFixture(REAL_FIXTURE_2026, enrichedTeams);
-    } else {
-      let lastError = null;
-      for (let attempt = 0; attempt < 5 && !fixture; attempt++) {
-        try {
-          // generateFullDraw ham bir { teamId: [{opponentId, home, viaPot}] }
-          // haritası döner -- generateFixture ise { teamId: { pot: {home,away} } }
-          // şeklinde bir `results` bekler. buildResultsFromMatches (bkz.
-          // DrawPage.jsx'in "hızlı kura" senaryosuyla AYNI dönüşüm) bu ikisi
-          // arasındaki köprü; bunu atlamak generateFixture'a boş/eksik bir
-          // sonuç geçmek anlamına gelir (bu YÜZDEN "Fikstür haftalara
-          // bölünemedi" hatası %100 oranında oluyordu -- algoritmanın kendisi
-          // değil, burası bozuktu).
-          const drawMatches = generateFullDraw(enrichedTeams);
-          const drawResults = buildResultsFromMatches(enrichedTeams, drawMatches);
-          fixture = generateFixture(drawResults, enrichedTeams);
-        } catch (e) {
-          lastError = e;
-        }
-      }
-      if (!fixture) throw lastError || new Error("Fikstür oluşturulamadı.");
-    }
+  const keys = (Array.isArray(competitionKeys) ? competitionKeys : [competitionKeys]).filter(Boolean);
+  if (keys.length === 0) throw new Error("En az bir yarışma seçmelisin.");
+  const fixtures = {};
+  for (const key of keys) {
+    const comp = COMPETITIONS[key];
+    if (!comp) throw new Error(`Bilinmeyen yarışma: ${key}`);
+    if (!hasRealDataSupport(key)) throw new Error(`${comp.shortName} için henüz gerçek veri desteği yok.`);
     notify("fixture");
-    // UCL: REAL_FIXTURE_2026 zaten Firestore'a yazılabilir SERİLEŞTİRİLMİŞ
-    // biçimde (id/homeId/awayId/date) -- serializeFixture() üzerinden tekrar
-    // geçirmiyoruz çünkü o fonksiyon `date` alanını SİLER (sadece id/homeId/
-    // awayId/viaPot taşır), bu da gerçek maç tarihlerini kaybetmek demek olurdu.
-    serializedFixture = competitionKey === "ucl" ? REAL_FIXTURE_2026 : serializeFixture(fixture);
-  } else {
-    notify("fixture");
-    fixture = generateRoundRobinFixture(enrichedTeams);
-    serializedFixture = serializeRoundRobinFixture(fixture);
+    fixtures[key] = key === "ucl" ? REAL_FIXTURE_2026 : REAL_FIXTURE_SUPERLIG_2026;
   }
-
-  notify("simulate");
-  const sim = await simulateSeasonAsync(fixture, {
-    teams: enrichedTeams,
-    allPlayers,
-    zones: comp.zones,
-  });
-
-  const results = {};
-  for (const m of sim.matchResults) {
-    results[m.id] = { homeGoals: m.homeGoals, awayGoals: m.awayGoals };
-  }
-  // Lig aşaması SIRALAMA tahmini (sürükle-bırak) burada puanlanır -- final
-  // sıra listesi (en iyi -> en kötü) sadece takım id'leri olarak saklanır.
-  const standings = sim.standings.map((s) => s.teamId);
-
-  // Lig fazı bittiği anda eleme turu bracket'i de (varsa) hemen üretilip
-  // sezonun bir PARÇASI olarak kaydediliyor -- "adım adım" Tahmin Ligi akışı
-  // bunu KADEMELİ olarak açığa çıkarır (arayüz her aşamanın gerçek sonucunu
-  // kullanıcı tahmin edene kadar gizler), ama VERİNİN kendisi -- diğer her
-  // şey gibi -- baştan tek seferde, tutarlı bir şekilde üretilir.
-  let knockout = null;
-  if (comp.hasKnockout) {
-    notify("knockout");
-    const teamById = Object.fromEntries(enrichedTeams.map((t) => [t.id, t]));
-    const bracket = generateKnockoutBracket(sim.standings, teamById, null);
-    knockout = serializeKnockout(bracket);
-  }
-
   notify("save");
-  return { competitionKey, format: comp.format, fixture: serializedFixture, results, standings, knockout };
+  return { competitionKeys: keys, fixtures, results: {}, standings: [], knockout: null };
 }
 
 // Yeni bir Tahmin Ligi ODASI oluşturur (Firestore'da otomatik id'li bir
 // `leagues` belgesi) ve leagueId'sini döner -- bu id, paylaşılabilir linkin
-// (/{competitionKey}/tahmin-ligi/{leagueId}) parçası olur. Ayrıca oluşturan
-// kişiyi otomatik olarak o liginin bir üyesi yapar (bkz. joinLeague).
+// (/tahmin-ligi/{leagueId}) parçası olur. Ayrıca oluşturan kişiyi otomatik
+// olarak o liginin bir üyesi yapar (bkz. joinLeague).
 export function useCreateLeague() {
   const { user } = usePredictionAuth();
   return useCallback(
-    async (competitionKey, name, onProgress) => {
+    async (competitionKeys, name, onProgress) => {
       if (!user) throw new Error("Önce Google ile giriş yapmalısın.");
-      const payload = await buildLeaguePayload(competitionKey, onProgress);
+      const payload = await buildLeaguePayload(competitionKeys, onProgress);
+      const defaultName = payload.competitionKeys.map((k) => COMPETITIONS[k]?.shortName || k).join(" + ");
       const ref = await addDoc(collection(db, "leagues"), {
         ...payload,
-        name: name || `${COMPETITIONS[competitionKey]?.shortName || competitionKey} Tahmin Ligi`,
+        name: name || `${defaultName} Tahmin Ligi`,
         createdBy: user.uid,
         createdByName: user.displayName || "Bilinmeyen",
         createdAt: serverTimestamp(),
       });
       await setDoc(doc(db, "memberships", `${ref.id}_${user.uid}`), {
         leagueId: ref.id,
-        competitionKey,
+        competitionKeys: payload.competitionKeys,
         uid: user.uid,
         displayName: user.displayName || "Bilinmeyen",
         photoURL: user.photoURL || null,
@@ -297,7 +211,7 @@ export function useLeague(leagueId) {
           const data = snap.data();
           setDoc(doc(db, "memberships", `${leagueId}_${user.uid}`), {
             leagueId,
-            competitionKey: data.competitionKey,
+            competitionKeys: data.competitionKeys || (data.competitionKey ? [data.competitionKey] : []),
             uid: user.uid,
             displayName: user.displayName || "Bilinmeyen",
             photoURL: user.photoURL || null,
@@ -319,38 +233,66 @@ export function useLeague(leagueId) {
     };
   }, [leagueId, user, authLoading]);
 
-  const comp = state.league ? COMPETITIONS[state.league.competitionKey] : null;
-  const fixture = useMemo(() => {
-    if (!state.league || !comp) return null;
-    return comp.format === "swiss"
-      ? deserializeFixture(state.league.fixture, comp.teams)
-      : deserializeRoundRobinFixture(state.league.fixture, comp.teams);
-  }, [state.league, comp]);
+  // Bir lig BİRDEN FAZLA yarışmayı (ör. UCL + Süper Lig) kapsayabildiğinden
+  // (bkz. buildLeaguePayload) fikstür artık TEKİL değil, yarışma anahtarı
+  // başına bir harita: { ucl: [...deserialize edilmiş hafta/maç...], superlig: [...] }.
+  // Eski (tek yarışmalı) lig belgeleriyle GERİYE DÖNÜK UYUMLU: `fixtures`
+  // yoksa `competitionKey`/`fixture` tekil alanlarından TEK elemanlı bir
+  // harita türetilir.
+  const competitionKeys = useMemo(
+    () => state.league?.competitionKeys || (state.league?.competitionKey ? [state.league.competitionKey] : []),
+    [state.league]
+  );
+  const fixturesByKey = useMemo(() => {
+    if (!state.league) return {};
+    const out = {};
+    for (const key of competitionKeys) {
+      const comp = COMPETITIONS[key];
+      if (!comp) continue;
+      const raw = state.league.fixtures ? state.league.fixtures[key] : state.league.fixture;
+      if (!raw) continue;
+      out[key] = comp.format === "swiss" ? deserializeFixture(raw, comp.teams) : deserializeRoundRobinFixture(raw, comp.teams);
+    }
+    return out;
+  }, [state.league, competitionKeys]);
 
   // Ligi VE bu lige ait TÜM kullanıcıların tahminlerini/üyeliklerini kalıcı
   // olarak siler -- "kendi aramızda" güvene dayalı bir özellik olduğundan
-  // herhangi bir giriş yapmış kullanıcı çağırabilir. Geri alınamaz, bu
-  // yüzden çağıran taraf (PredictionLeaguePage) kullanıcıdan önce onay
-  // almalı.
+  // ligin herhangi bir ÜYESİ çağırabilir (bkz. firestore.rules -- silme
+  // izni artık üyelik kontrolüne dayanıyor). Geri alınamaz, bu yüzden
+  // çağıran taraf (PredictionLeaguePage) kullanıcıdan önce onay almalı.
   const deleteLeague = useCallback(async () => {
     if (!user) throw new Error("Önce Google ile giriş yapmalısın.");
     const [predSnap, memberSnap] = await Promise.all([
       getDocs(query(collection(db, "predictions"), where("leagueId", "==", leagueId))),
       getDocs(query(collection(db, "memberships"), where("leagueId", "==", leagueId))),
     ]);
+    // ÖNEMLİ SIRALAMA: kendi üyelik kaydımızı EN SON siliyoruz. Kurallar
+    // artık lig belgesini/başkasının tahminini/üyeliğini silme iznini "bu
+    // ligin bir üyesi misin" kontrolüne (memberships'te kendi kaydının VAR
+    // OLMASINA) bağlıyor -- bu yüzden kendi üyeliğimiz durmadan ÖNCE
+    // silinmesi gereken HER ŞEYİ (lig belgesi DAHİL) siliyoruz; kendi
+    // üyeliğimizi diğerleriyle AYNI adımda silseydik, henüz bitmemiş diğer
+    // silme isteklerinin kural kontrolü "artık üye değilsin" diye
+    // reddedilebilirdi.
+    const otherMemberDocs = memberSnap.docs.filter((d) => d.data().uid !== user.uid);
+    const ownMemberDoc = memberSnap.docs.find((d) => d.data().uid === user.uid);
     await Promise.all([
+      deleteDoc(doc(db, "leagues", leagueId)),
       ...predSnap.docs.map((d) => deleteDoc(d.ref)),
-      ...memberSnap.docs.map((d) => deleteDoc(d.ref)),
+      ...otherMemberDocs.map((d) => deleteDoc(d.ref)),
     ]);
-    await deleteDoc(doc(db, "leagues", leagueId));
+    if (ownMemberDoc) await deleteDoc(ownMemberDoc.ref);
   }, [leagueId, user]);
 
-  return { ...state, fixture, deleteLeague };
+  return { ...state, competitionKeys, fixturesByKey, deleteLeague };
 }
 
-// Kullanıcının (bir yarışma için) ÜYE OLDUĞU tüm Tahmin Ligi odalarını
-// listeler -- "Yeni Tahmin Ligi Oluştur"un altındaki "Liglerim" listesi için.
-export function useMyLeagues(competitionKey) {
+// Kullanıcının ÜYE OLDUĞU TÜM Tahmin Ligi odalarını listeler -- yarışmaya
+// göre ARTIK FİLTRELENMİYOR (bkz. PredictionLeaguePage: tek, yarışmadan
+// bağımsız bir "Liglerim" listesi -- her ligin hangi yarışma(lar)ı
+// kapsadığı satırında ayrıca gösterilir).
+export function useMyLeagues() {
   const { user } = usePredictionAuth();
   const [leagues, setLeagues] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -359,16 +301,12 @@ export function useMyLeagues(competitionKey) {
   useEffect(() => {
     setLeagues([]);
     setError(null);
-    if (!user || !competitionKey) {
+    if (!user) {
       setLoading(false);
       return undefined;
     }
     setLoading(true);
-    const q = query(
-      collection(db, "memberships"),
-      where("uid", "==", user.uid),
-      where("competitionKey", "==", competitionKey)
-    );
+    const q = query(collection(db, "memberships"), where("uid", "==", user.uid));
     const unsub = onSnapshot(
       q,
       async (snap) => {
@@ -392,7 +330,7 @@ export function useMyLeagues(competitionKey) {
       }
     );
     return unsub;
-  }, [user, competitionKey]);
+  }, [user]);
 
   return { leagues, loading, error };
 }
@@ -576,26 +514,98 @@ const STANDINGS_MAX_POINTS_PER_TEAM = 3;
 // puan kazandırır (yanlışsa 0).
 export const OUTCOME_CORRECT_POINTS = 3;
 
+// Bir lig belgesinin fikstürünü, {competitionKey, matchdays} çiftlerinden
+// oluşan bir listeye çevirir -- bir lig BİRDEN FAZLA yarışmayı (ör. UCL +
+// Süper Lig) kapsayabildiğinden (bkz. buildLeaguePayload'daki `fixtures`
+// haritası) aşağıdaki arama fonksiyonları TEK bir dizi yerine bu listeyi
+// tarar. Eski (tek yarışmalı, `fixture` + `competitionKey` tekil alanlı --
+// hem eski lig belgeleri hem de bu dosyanın birim testlerindeki mock'lar)
+// belgelerle GERİYE DÖNÜK UYUMLUDUR.
+function fixtureGroups(league) {
+  if (!league) return [];
+  if (league.fixtures) {
+    return Object.entries(league.fixtures).map(([competitionKey, matchdays]) => ({ competitionKey, matchdays }));
+  }
+  if (league.fixture) {
+    return [{ competitionKey: league.competitionKey, matchdays: league.fixture }];
+  }
+  return [];
+}
+
 // Bir maçın gerçek (serileştirilmiş) fikstürdeki ev sahibi/deplasman
 // takım id'lerini bulur -- "outcome" tahmininin (bkz. submitOutcomePrediction)
 // hangi takımın GERÇEKTE ev sahibi/deplasman olduğunu bilmesi gerekiyor.
 function matchTeamsOf(league, matchId) {
-  for (const md of league?.fixture || []) {
-    const m = md.matches.find((x) => x.id === matchId);
+  for (const { matchdays } of fixtureGroups(league)) {
+    const md = (matchdays || []).find((x) => x.matches.some((m) => m.id === matchId));
+    const m = md?.matches.find((x) => x.id === matchId);
     if (m) return { homeId: m.homeId, awayId: m.awayId };
   }
   return null;
 }
 
-// Bir maçın GERÇEK (serileştirilmiş) fikstürdeki tarihini bulur -- UCL için
-// bu, UEFA'nın gerçek takvimindeki (REAL_FIXTURE_2026) tarih; Avrupa Ligi/
-// Süper Lig'de henüz gerçek bir takvim olmadığından `undefined` döner.
+// Bir maçın GERÇEK (serileştirilmiş) fikstürdeki tarihini bulur.
 function matchDateOf(league, matchId) {
-  for (const md of league?.fixture || []) {
-    const m = md.matches.find((x) => x.id === matchId);
-    if (m) return m.date || null;
+  for (const { matchdays } of fixtureGroups(league)) {
+    for (const md of matchdays || []) {
+      const m = md.matches.find((x) => x.id === matchId);
+      if (m) return m.date || null;
+    }
   }
   return null;
+}
+
+// Bir matchId'nin HANGİ yarışmaya ait olduğunu bulup, gerçek veri
+// seçicilerinin (bkz. realStandingsSelectors.getRealMatchResult) beklediği
+// TAKIM NESNELERİNE (Süper Lig eşleştirmesi isim üzerinden yapıldığından
+// `name` alanı şart) çevirir.
+function resolveLeagueMatch(league, matchId) {
+  for (const { competitionKey, matchdays } of fixtureGroups(league)) {
+    const comp = COMPETITIONS[competitionKey];
+    if (!comp) continue;
+    for (const md of matchdays || []) {
+      const m = md.matches.find((x) => x.id === matchId);
+      if (!m) continue;
+      const teamById = Object.fromEntries(comp.teams.map((t) => [t.id, t]));
+      const homeTeam = teamById[m.homeId];
+      const awayTeam = teamById[m.awayId];
+      if (!homeTeam || !awayTeam) return null;
+      return { competitionKey, id: matchId, date: m.date, homeTeam, awayTeam };
+    }
+  }
+  return null;
+}
+
+// Bir maçın "gerçek" sonucunu döner. GERÇEK VERİ DESTEĞİ OLAN yarışmalarda
+// (ucl/superlig) bu ASLA ligin Firestore'da saklı (lig kurulurken üretilmiş
+// olabilecek, artık BOŞ bırakılan) `results` alanından DEĞİL, doğrudan
+// realStandingsSelectors'taki AYNI statik gerçek veri kaynağından gelir --
+// Fikstür/Maç Merkezi sayfalarıyla BİREBİR TUTARLI, ve gerçek veri
+// güncellendikçe (bir maç oynandıkça src/data/realResultsUcl2026.js'e
+// eklendiğinde) TÜM Tahmin Ligi odaları otomatik günceli gösterir. Destek
+// olmayan yarışmalarda (ör. birim testlerindeki mock'lar) eski davranış --
+// ligin kendi saklı `results` alanı -- aynen korunur.
+export function getLeagueMatchResult(league, matchId) {
+  if (!league) return null;
+  const match = resolveLeagueMatch(league, matchId);
+  if (match && hasRealDataSupport(match.competitionKey)) {
+    const real = getRealMatchResult(match.competitionKey, match);
+    return real ? { homeGoals: real.homeGoals, awayGoals: real.awayGoals } : null;
+  }
+  return league.results?.[matchId] || null;
+}
+
+// "Lig Sıralaması" tahmininin karşılaştırıldığı "gerçek" sıra -- SADECE TEK
+// yarışmalı, gerçek veri destekli liglerde anlamlıdır (iki farklı
+// yarışmanın puan durumu birleştirilemez). Diğer durumlarda ligin saklı
+// (varsa) simülasyon sıralamasına düşer.
+export function getLeagueStandingsOrder(league) {
+  if (!league) return [];
+  const keys = league.competitionKeys || (league.competitionKey ? [league.competitionKey] : []);
+  if (keys.length === 1 && hasRealDataSupport(keys[0])) {
+    return getRealStandings(keys[0]).standings.map((s) => s.teamId);
+  }
+  return league.standings || [];
 }
 
 // Bir maçın sonucu kullanıcıya GÖSTERİLEBİLİR mi -- yani maçın gerçek tarihi
@@ -662,7 +672,7 @@ export function pointsForPrediction(prediction, league) {
   }
   if (prediction.kind === "outcome") {
     if (!isMatchRevealed(league, prediction.matchId)) return 0;
-    const actual = league.results?.[prediction.matchId];
+    const actual = getLeagueMatchResult(league, prediction.matchId);
     const teams = matchTeamsOf(league, prediction.matchId);
     if (!actual || !teams) return 0;
     const isHome = teams.homeId === prediction.teamId;
@@ -673,10 +683,10 @@ export function pointsForPrediction(prediction, league) {
     return actualResult === prediction.result ? OUTCOME_CORRECT_POINTS : 0;
   }
   if (prediction.kind === "standings") {
-    return standingsPoints(prediction.order, league.standings);
+    return standingsPoints(prediction.order, getLeagueStandingsOrder(league));
   }
   if (prediction.kind === "score" && !isMatchRevealed(league, prediction.matchId)) return 0;
-  return scorePrediction(prediction, league.results?.[prediction.matchId]);
+  return scorePrediction(prediction, getLeagueMatchResult(league, prediction.matchId));
 }
 
 // "Lig Sıralaması" artık elle sürüklenerek tahmin edilmiyor -- kullanıcının
@@ -713,7 +723,7 @@ export function computeDerivedStandings(fixture, myScorePredictionsByMatch, leag
         userScores[m.id] = { home, away };
         continue;
       }
-      const real = league.results[m.id];
+      const real = getLeagueMatchResult(league, m.id);
       if (real) userScores[m.id] = { home: real.homeGoals, away: real.awayGoals };
     }
   }
@@ -751,7 +761,7 @@ export function buildLeaderboard(predictions, league, standingsCtx) {
     for (const uid of Object.keys(byUser)) {
       const mine = byUserScorePredictions[uid] || {};
       const derived = computeDerivedStandings(standingsCtx.fixture, mine, league, standingsCtx.teams, standingsCtx.zones);
-      byUser[uid].points += standingsPoints(derived.map((s) => s.teamId), league.standings);
+      byUser[uid].points += standingsPoints(derived.map((s) => s.teamId), getLeagueStandingsOrder(league));
     }
   }
 

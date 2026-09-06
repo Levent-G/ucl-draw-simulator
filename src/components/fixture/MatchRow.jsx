@@ -1,11 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import Crest from "../Crest.jsx";
+import { isMatchPlayed, formatMatchDate } from "../../utils/matchDate.js";
 
 export default function MatchRow({ match, userScore, onUserScoreChange, competitionKey, readOnly = false, favoriteTeamId = null }) {
   const { homeTeam, awayTeam } = match;
   const isFavoriteMatch = favoriteTeamId && (homeTeam.id === favoriteTeamId || awayTeam.id === favoriteTeamId);
-  const hasSim = match.homeGoals != null && match.awayGoals != null;
+  const played = isMatchPlayed(match);
+  const hasSim = played && match.homeGoals != null && match.awayGoals != null;
   const homePct = Math.round((match.homeWinProb ?? 0) * 100);
   const drawPct = Math.round((match.drawProb ?? 0) * 100);
   const awayPct = Math.max(0, 100 - homePct - drawPct);
@@ -30,22 +32,22 @@ export default function MatchRow({ match, userScore, onUserScoreChange, competit
       </div>
 
       <div className="match-row-center">
+        {formatMatchDate(match.date) && <span className="match-row-date">{formatMatchDate(match.date)}</span>}
         {hasSim && match.isDerby && <span className="match-row-derby-badge">🔥 Derbi</span>}
         <div className="match-row-score">
           {hasSim ? `${match.homeGoals} : ${match.awayGoals}` : "– : –"}
         </div>
+        {!played && <span className="match-row-pending">⏳ Bekleniyor</span>}
 
-        {hasSim && match.events && (
-          <Link to={`/${competitionKey}/mac/${match.id}`} className="match-row-details-link">
-            Maç Merkezi →
-          </Link>
-        )}
+        <Link to={`/${competitionKey}/mac/${match.id}`} className="match-row-details-link">
+          {played ? "Maç Merkezi →" : "Maç Analizi →"}
+        </Link>
 
-        {hasSim && (
+        {played && (
           <>
             <div
               className="match-row-probs"
-              title={`Ev sahibi ${homePct}% · Berabere ${drawPct}% · Deplasman ${awayPct}%`}
+              title={`Modelin tahmini -- Ev sahibi ${homePct}% · Berabere ${drawPct}% · Deplasman ${awayPct}%`}
             >
               <span className="prob-seg prob-home" style={{ width: `${homePct}%` }} />
               <span className="prob-seg prob-draw" style={{ width: `${drawPct}%` }} />

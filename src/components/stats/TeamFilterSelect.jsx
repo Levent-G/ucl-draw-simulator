@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Crest from "../Crest.jsx";
+import { toSearchKey } from "../../utils/text.js";
 
 // Native <select>/<option> takım amblemi gösteremediği için, kendi
 // oluşturduğumuz (arama kutulu, amblemli) bir açılır liste.
@@ -31,7 +32,7 @@ export default function TeamFilterSelect({ teams, value, onChange, placeholder =
 
   const sorted = [...teams].sort((a, b) => a.name.localeCompare(b.name, "tr"));
   const filtered = query.trim()
-    ? sorted.filter((t) => t.name.toLowerCase().includes(query.trim().toLowerCase()))
+    ? sorted.filter((t) => toSearchKey(t.name).includes(toSearchKey(query)))
     : sorted;
 
   function choose(teamId) {

@@ -28,7 +28,13 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow create: if request.auth != null
                     && request.resource.data.createdBy == request.auth.uid;
-      allow delete: if request.auth != null;
+      // Sadece bu ligin ÜYESİ (memberships/{leagueId}_{uid} belgesi olan)
+      // silebilir -- eskiden herhangi bir GİRİŞ YAPMIŞ kullanıcı (linki hiç
+      // açmamış, o lige hiç üye olmamış biri dahi) herhangi bir ligi
+      // silebiliyordu, bu "kendi aramızda güvene dayalı" tasarım niyetiyle
+      // (bkz. üstteki yorum) uyuşmuyordu -- düzeltildi.
+      allow delete: if request.auth != null
+                    && exists(/databases/$(database)/documents/memberships/$(leagueId + '_' + request.auth.uid));
       allow update: if false;
     }
 
@@ -42,8 +48,16 @@ service cloud.firestore {
       allow create: if request.auth != null
                     && request.resource.data.uid == request.auth.uid
                     && membershipId == request.resource.data.leagueId + '_' + request.auth.uid;
+      // Kendi üyeliğini ("ligden ayrıl") HER ZAMAN silebilirsin. Başkasının
+      // üyeliğini SADECE o ligin bir üyesiysen silebilirsin -- "Ligi Sil"
+      // özelliği, ligdeki HERKESİN üyelik kaydını temizlemek için bunu
+      // kullanır (bkz. PredictionLeagueContext.deleteLeague). Eskiden bu
+      // sadece "kendi uid'in" ile sınırlıydı, yani bir üye ligi silince
+      // DİĞER üyelerin üyelik kayıtları silinemiyor, artık silinmiş bir
+      // lige işaret eden "yetim" kayıtlar olarak kalıyordu -- düzeltildi.
       allow delete: if request.auth != null
-                    && resource.data.uid == request.auth.uid;
+                    && (resource.data.uid == request.auth.uid
+                        || exists(/databases/$(database)/documents/memberships/$(resource.data.leagueId + '_' + request.auth.uid)));
       allow update: if false;
     }
 
@@ -66,7 +80,15 @@ service cloud.firestore {
                        request.resource.data.leagueId + '_' +
                        request.resource.data.matchId + '_' +
                        request.auth.uid;
-      allow delete: if request.auth != null;
+      // Kendi tahminini ("Tahminlerimi Sıfırla") HER ZAMAN silebilirsin.
+      // Başkasının tahminini SADECE o ligin bir üyesiysen silebilirsin --
+      // "Ligi Sil" özelliği bunu kullanır (bir üye ligdeki HERKESİN
+      // tahminini siler). Eskiden herhangi bir GİRİŞ YAPMIŞ kullanıcı
+      // (o lige hiç üye olmamış biri dahi) herhangi bir tahmini
+      // silebiliyordu -- düzeltildi.
+      allow delete: if request.auth != null
+                    && (resource.data.uid == request.auth.uid
+                        || exists(/databases/$(database)/documents/memberships/$(resource.data.leagueId + '_' + request.auth.uid)));
       allow update: if false;
     }
   }

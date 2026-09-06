@@ -16,6 +16,7 @@ import {
 import Crest from "../Crest.jsx";
 import SortableTable from "./SortableTable.jsx";
 import ChartTooltip from "./ChartTooltip.jsx";
+import TeamAxisTick from "./TeamAxisTick.jsx";
 import { CHART_SERIES, CHART_GRID, CHART_AXIS } from "../../utils/chartTheme.js";
 import {
   buildFinancialPowerMap,
@@ -27,6 +28,7 @@ import {
 
 export default function FinanceTab({ competition, simulation, knockout, selectedTeam, competitionKey }) {
   const { teams, countryNames } = competition;
+  const teamByShort = useMemo(() => Object.fromEntries(teams.map((t) => [t.short, t])), [teams]);
 
   const rows = useMemo(() => {
     const powerMap = buildFinancialPowerMap(teams);
@@ -63,9 +65,9 @@ export default function FinanceTab({ competition, simulation, knockout, selected
             <YAxis
               type="category"
               dataKey="short"
-              width={54}
+              width={74}
               stroke={CHART_AXIS}
-              tick={{ fill: CHART_AXIS, fontSize: 12 }}
+              tick={(props) => <TeamAxisTick {...props} teamsByKey={teamByShort} fill={CHART_AXIS} fontSize={12} />}
             />
             <Tooltip
               content={<ChartTooltip formatter={(v) => formatMoney(v)} />}
@@ -127,9 +129,9 @@ export default function FinanceTab({ competition, simulation, knockout, selected
               <YAxis
                 type="category"
                 dataKey="short"
-                width={54}
+                width={74}
                 stroke={CHART_AXIS}
-                tick={{ fill: CHART_AXIS, fontSize: 12 }}
+                tick={(props) => <TeamAxisTick {...props} teamsByKey={teamByShort} fill={CHART_AXIS} fontSize={12} />}
               />
               <Tooltip
                 content={<ChartTooltip formatter={(v) => formatMoney(v)} />}

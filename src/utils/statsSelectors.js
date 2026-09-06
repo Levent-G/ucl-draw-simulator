@@ -107,6 +107,13 @@ export function teamsWithSimPoints(teams, standings) {
       status: null,
       statusLabel: null,
       statusTone: null,
+      played: null,
+      w: null,
+      d: null,
+      l: null,
+      gf: null,
+      ga: null,
+      gd: null,
     }));
   }
   const byId = Object.fromEntries(standings.map((s) => [s.teamId, s]));
@@ -117,5 +124,12 @@ export function teamsWithSimPoints(teams, standings) {
     status: byId[t.id]?.status ?? null,
     statusLabel: byId[t.id]?.statusLabel ?? null,
     statusTone: byId[t.id]?.statusTone ?? null,
+    played: byId[t.id]?.played ?? null,
+    w: byId[t.id]?.w ?? null,
+    d: byId[t.id]?.d ?? null,
+    l: byId[t.id]?.l ?? null,
+    gf: byId[t.id]?.gf ?? null,
+    ga: byId[t.id]?.ga ?? null,
+    gd: byId[t.id] ? (byId[t.id].gd ?? byId[t.id].gf - byId[t.id].ga) : null,
   }));
 }

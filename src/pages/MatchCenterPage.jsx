@@ -1,11 +1,15 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useCompetition } from "../state/CompetitionContext.jsx";
 import CompetitionStepper from "../components/CompetitionStepper.jsx";
 import EmptyState from "../components/EmptyState.jsx";
 import Crest from "../components/Crest.jsx";
 import { speak, unlockSpeech, cancelSpeech } from "../utils/speech.js";
 import { useAchievements } from "../state/AchievementsContext.jsx";
+import { enrichTeamsWithAttackDefense, expectedGoals, matchProbabilities } from "../utils/predictionEngine.js";
+import { isMatchPlayed } from "../utils/matchDate.js";
+import { hasRealDataSupport } from "../utils/realStandingsSelectors.js";
+import RealMatchCenterView from "./RealMatchCenterView.jsx";
 
 const EVENT_ICON = { goal: "⚽", yellow: "🟨", red: "🟥", sub: "🔄" };
 const PLAYBACK_SPEEDS = [
@@ -57,9 +61,127 @@ function EventRow({ event, homeTeamId }) {
   );
 }
 
+// Henüz OYNANMAMIŞ (gerçek tarihi gelmemiş, bkz. isMatchPlayed) bir maç için
+// -- ağır sezon simülasyonu hiç gerekmeden -- hafif, tek maçlık bir model
+// analizi gösterir: takımların kadro/katsayı gücüne göre model kazanma
+// olasılığı (expectedGoals + matchProbabilities, predictionEngine.js'ten --
+// tam sezon simülasyonundan BAĞIMSIZ, saf fonksiyonlar). Karşılıklı geçmiş
+// ve haberler için GERÇEK veri kaynağımız henüz olmadığından bunlar İÇİN
+// UYDURULMUŞ içerik göstermek yerine dürüstçe "henüz yok" notu gösterilir.
+function MatchPreview({ match, matchdayLabel, competitionKey, competition }) {
+  const { homeTeam, awayTeam } = match;
+
+  const probs = useMemo(() => {
+    const enriched = enrichTeamsWithAttackDefense(competition.teams, competition.getAllPlayers());
+    const home = enriched.find((t) => t.id === homeTeam.id) || homeTeam;
+    const away = enriched.find((t) => t.id === awayTeam.id) || awayTeam;
+    const { lambdaHome, lambdaAway } = expectedGoals(home, away);
+    return matchProbabilities(lambdaHome, lambdaAway);
+  }, [competition, homeTeam, awayTeam]);
+
+  const homePct = Math.round(probs.home * 100);
+  const drawPct = Math.round(probs.draw * 100);
+  const awayPct = Math.max(0, 100 - homePct - drawPct);
+  const dateLabel = match.date
+    ? new Date(match.date).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" })
+    : null;
+
+  return (
+    <div className="page-shell">
+      <CompetitionStepper competitionKey={competitionKey} />
+      <header className="page-header">
+        <div>
+          <div className="page-eyebrow">
+            {competition.shortName} · {matchdayLabel} · Maç Analizi
+          </div>
+          <h1>
+            {homeTeam.name} — {awayTeam.name}
+          </h1>
+          <p>
+            Bu maç henüz oynanmadı{dateLabel ? ` -- ${dateLabel} tarihinde oynanacak` : ""}. Sonuç açıklanana kadar
+            burada iki takım hakkındaki bilgileri ve modelimizin analizini görebilirsin.
+          </p>
+        </div>
+      </header>
+
+      <div className="matchpreview-teams">
+        {[homeTeam, awayTeam].map((t) => (
+          <Link key={t.id} to={`/${competitionKey}/takim/${t.id}`} className="matchpreview-team-card">
+            <Crest team={t} size={64} />
+            <span className="matchpreview-team-name">{t.name}</span>
+            <span className="matchpreview-team-meta">
+              {t.pot ? `${t.pot}. Torba · ` : ""}Katsayı {t.coeff}
+            </span>
+            <span className="matchpreview-team-link">Takım Sayfası →</span>
+          </Link>
+        ))}
+      </div>
+
+      <div className="chart-card chart-card-wide">
+        <h3>📊 Modelimizin Tahmini</h3>
+        <p className="footnote">
+          Bu gerçek bir bahis oranı değildir -- takımların katsayı/kadro gücüne dayalı istatistiksel modelimizin
+          ürettiği bir olasılık tahminidir.
+        </p>
+        <div className="match-row-probs matchpreview-probs">
+          <span className="prob-seg prob-home" style={{ width: `${homePct}%` }} />
+          <span className="prob-seg prob-draw" style={{ width: `${drawPct}%` }} />
+          <span className="prob-seg prob-away" style={{ width: `${awayPct}%` }} />
+        </div>
+        <div className="match-row-prob-labels matchpreview-prob-labels">
+          <span>{homeTeam.short} {homePct}%</span>
+          <span>Beraberlik {drawPct}%</span>
+          <span>{awayTeam.short} {awayPct}%</span>
+        </div>
+      </div>
+
+      <div className="chart-card chart-card-wide">
+        <h3>🤝 Karşılıklı Geçmiş</h3>
+        <p className="footnote">
+          Bu iki takımın geçmiş sezonlardaki gerçek karşılaşma sonuçları için henüz bir veri kaynağımız yok --
+          uydurma bir geçmiş göstermek yerine burayı boş bırakıyoruz, yakında eklenecek.
+        </p>
+      </div>
+
+      <div className="chart-card chart-card-wide">
+        <h3>📰 Güncel Haberler</h3>
+        <p className="footnote">
+          Bu maç ve lig ile ilgili gerçek haberler için henüz bir veri kaynağımız yok -- yakında eklenecek.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function MatchCenterPage() {
   const { competitionKey, matchId } = useParams();
-  const { competition, hasFixture, simulation } = useCompetition(competitionKey);
+
+  // UCL/Süper Lig'de artık Maç Merkezi de GERÇEK veriden besleniyor (bkz.
+  // RealMatchCenterView.jsx) -- sahte dakika-dakika Poisson oynatması
+  // SİLİNMEDİ, sadece bu iki yarışma için gösterilmiyor (europa ve
+  // "eğlence modu" akışları aşağıdaki eski kodla değişmeden çalışmaya
+  // devam ediyor).
+  if (hasRealDataSupport(competitionKey)) {
+    return <RealMatchCenterView />;
+  }
+
+  return <SimulatedMatchCenterView competitionKey={competitionKey} matchId={matchId} />;
+}
+
+function SimulatedMatchCenterView({ competitionKey, matchId }) {
+  const { competition, hasFixture, simulation, fixture } = useCompetition(competitionKey);
+
+  // Maçın GERÇEK fikstürdeki (tarihli) hâlini bulur -- henüz OYNANMAMIŞSA
+  // (bkz. isMatchPlayed) aşağıda ağır sezon simülasyonu hiç gerekmeden hafif
+  // bir "Maç Analizi" önizlemesi gösterilir, playback UI'ı hiç render edilmez.
+  const fixtureMatchInfo = useMemo(() => {
+    for (const md of fixture || []) {
+      const m = md.matches.find((x) => String(x.id) === matchId);
+      if (m) return { match: m, matchdayLabel: md.label };
+    }
+    return null;
+  }, [fixture, matchId]);
+  const isPending = !!fixtureMatchInfo && !isMatchPlayed(fixtureMatchInfo.match);
 
   const match = useMemo(
     () => simulation?.matchResults.find((m) => String(m.id) === matchId) || null,
@@ -147,6 +269,17 @@ export default function MatchCenterPage() {
     setCurrentMinute(90);
     setPlayMode("finished");
   };
+
+  if (isPending) {
+    return (
+      <MatchPreview
+        match={fixtureMatchInfo.match}
+        matchdayLabel={fixtureMatchInfo.matchdayLabel}
+        competitionKey={competitionKey}
+        competition={competition}
+      />
+    );
+  }
 
   if (!hasFixture || !simulation) {
     return (

@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { COMPETITIONS } from "../data/competitions.js";
-import { generateFixture } from "../utils/fixtureEngine.js";
+import { generateFixture, deserializeFixture } from "../utils/fixtureEngine.js";
+import { REAL_FIXTURE_2026 } from "../data/realFixture2026.js";
 import { generateRoundRobinFixture } from "../utils/roundRobinEngine.js";
 import { simulateSeasonAsync } from "../utils/simulateSeasonAsync.js";
 import { generateKnockoutBracket } from "../utils/knockoutEngine.js";
@@ -139,7 +140,15 @@ export function CompetitionProvider({ children }) {
       if (!slot || slot.fixture) return slot?.fixture || null;
       if (comp.format === "swiss") {
         if (!slot.results) return null;
-        const generated = generateFixture(slot.results, comp.teams);
+        // UCL: kura eşleşmeleri artık GERÇEK çekilişten geldiğinden (bkz.
+        // CompetitionHomeRoute.jsx), fikstür de rastgele haftalara
+        // bölünmez -- UEFA'nın gerçek, tarihli 8 haftalık takvimi
+        // (REAL_FIXTURE_2026) doğrudan kullanılır (Tahmin Ligi'nde de aynı
+        // veri kullanılıyor, bkz. PredictionLeagueContext.buildLeaguePayload).
+        // Avrupa Ligi'nde henüz gerçek takvim verisi olmadığından o eski
+        // rastgele algoritmada kalır.
+        const generated =
+          key === "ucl" ? deserializeFixture(REAL_FIXTURE_2026, comp.teams) : generateFixture(slot.results, comp.teams);
         patch(key, { fixture: generated });
         return generated;
       }

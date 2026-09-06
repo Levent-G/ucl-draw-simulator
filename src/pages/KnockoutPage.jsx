@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useCompetition } from "../state/CompetitionContext.jsx";
+import { useTransferMarket } from "../state/TransferContext.jsx";
 import { useSeasonArchive } from "../state/SeasonArchiveContext.jsx";
 import CompetitionStepper from "../components/CompetitionStepper.jsx";
 import Crest from "../components/Crest.jsx";
@@ -14,17 +15,40 @@ export default function KnockoutPage() {
   const { competitionKey } = useParams();
   const {
     competition,
+    hasDraw,
     hasFixture,
+    fixture,
     simulation,
     knockout,
+    ensureFixture,
+    runSimulation,
     generateKnockout,
     careerSeason,
     advanceToNextSeason,
     favoriteTeamId,
   } = useCompetition(competitionKey);
+  const { effectiveAllPlayers } = useTransferMarket(competitionKey);
   const { addEntry } = useSeasonArchive();
   const savedKnockoutRef = useRef(null);
 
+  // UCL/Süper Lig'de "eğlence modu" akışı (kura/sezon simülasyonu -> eleme
+  // turu) artık gerçek veri sayfalarından (Ana Sayfa/Fikstür) HİÇ
+  // tetiklenmiyor -- o sayfalar CompetitionContext'e hiç dokunmuyor (bkz.
+  // realStandingsSelectors.js'in başındaki not). Bu YÜZDEN eğlence modunun
+  // kendi girişi (bu sayfa) fikstür/simülasyonu KENDİSİ, sessizce
+  // tamamlıyor -- eskiden bunu FixturePage yapıyordu. BİLİNÇLİ OLARAK bunu
+  // gerçek sayfalarda YAPMIYORUZ ki gerçek veri sayfalarında (ör. Takım
+  // Profili) sahte simülasyon verisi YANLIŞLIKLA görünmesin -- kullanıcı
+  // geri bildirimi: "gerçek veri ile simülasyon net ayrılsın".
+  useEffect(() => {
+    if (!hasDraw || hasFixture) return;
+    ensureFixture();
+  }, [hasDraw, hasFixture, ensureFixture]);
+  useEffect(() => {
+    if (!fixture || simulation) return;
+    runSimulation(fixture, effectiveAllPlayers);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fixture, simulation]);
   useEffect(() => {
     if (simulation && !knockout) generateKnockout();
     // eslint-disable-next-line react-hooks/exhaustive-deps

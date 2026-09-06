@@ -1,6 +1,7 @@
 import React from "react";
 import { NavLink, Link } from "react-router-dom";
 import { useCompetition } from "../state/CompetitionContext.jsx";
+import { hasRealDataSupport } from "../utils/realStandingsSelectors.js";
 
 // Kullanıcının "şimdi ne yapacağım?" diye düşünmesine gerek kalmasın diye,
 // eskiden eşit ağırlıklı sekmeler (Kura/Fikstür/İstatistik/Eleme) yerine
@@ -15,9 +16,21 @@ const SECONDARY_VIEWS = [
   { key: "karsilikli", icon: "🤝", label: "Karşılıklı Geçmiş" },
 ];
 
+// UCL/Süper Lig'de bu bileşen ARTIK HİÇBİR ŞEY RENDER ETMİYOR -- gezinme
+// (Ana Sayfa/Fikstür/İstatistikler/Karşılıklı Geçmiş/Haberler + takım
+// seçici + Eğlence Modu linki) NavBar'ın ikinci satırına taşındı (bkz.
+// NavBar.jsx / RealCompetitionSubNav.jsx). Önceden bu sayfa BİR DE kendi
+// kutulu panelini gösteriyordu -- üstteki site menüsüyle "iç içe iki menü"
+// görünümü yaratıyordu. Sayfalar hâlâ <CompetitionStepper .../> çağırıyor
+// (kaldırılmadı, sadece bu iki yarışma için no-op) -- europa hâlâ aşağıdaki
+// eski kilitli-adım panelini kullanıyor.
 export default function CompetitionStepper({ competitionKey }) {
   const { competition, hasDraw, hasFixture } = useCompetition(competitionKey);
   const base = `/${competitionKey}`;
+
+  if (hasRealDataSupport(competitionKey)) {
+    return null;
+  }
 
   const steps = [
     {

@@ -14,10 +14,16 @@ export function TeamInjectionProvider({ children }) {
   const { unlock } = useAchievements();
 
   const sendDreamTeam = useCallback(
-    (compKey, teamTemplate, players) => {
+    (compKey, teamTemplate, players, targetTeamId) => {
       const comp = COMPETITIONS[compKey];
       if (!comp) return null;
-      const removedTeam = comp.teams[Math.floor(Math.random() * comp.teams.length)];
+      // targetTeamId verilmişse (kullanıcının elle seçtiği takım) o takımın
+      // yerine geçilir; verilmezse (mevcut çağıranlar için geriye dönük
+      // uyumluluk) rastgele bir takım seçilir.
+      const removedTeam = targetTeamId
+        ? comp.teams.find((t) => t.id === targetTeamId)
+        : comp.teams[Math.floor(Math.random() * comp.teams.length)];
+      if (!removedTeam) return null;
       // Torba/pot yerine geçtiği takımdan devralınır -- böylece kura torba
       // dengesi (UCL/Avrupa Ligi'nde 4 torba x 9 takım) bozulmaz.
       const team = { ...teamTemplate, pot: removedTeam.pot };

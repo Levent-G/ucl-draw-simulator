@@ -1,14 +1,24 @@
 import React, { useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
+import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
 import { useCompetition } from "../state/CompetitionContext.jsx";
 import { useTransferMarket } from "../state/TransferContext.jsx";
 import { useCareer } from "../state/CareerContext.jsx";
+import { useFavoriteTeam } from "../state/FavoriteTeamContext.jsx";
 import Crest from "../components/Crest.jsx";
 import PlayerAvatar from "../components/PlayerAvatar.jsx";
 import { topScorers } from "../utils/statsSelectors.js";
 import { getRivalsOf } from "../utils/derbies.js";
 import { derivePhysicalAttributes } from "../utils/playerAttributes.js";
 import { estimateFinancialPower, estimateSquadValue, estimateCompetitionEarnings, formatMoney } from "../utils/financeEngine.js";
+import {
+  hasRealDataSupport,
+  getRealStandings,
+  getDomesticForm,
+  getSuperLigTeamForm,
+  getTeamRadarProfile,
+} from "../utils/realStandingsSelectors.js";
+import { CHART_SERIES, CHART_GRID, CHART_AXIS } from "../utils/chartTheme.js";
 
 const RESULT_LABEL = { W: "G", D: "B", L: "M" };
 const POSITION_ORDER = ["GK", "DF", "MF", "FW"];
@@ -73,6 +83,8 @@ export default function TeamProfilePage() {
   const { competition, simulation, knockout, hasFixture, fixture } = useCompetition(competitionKey);
   const { getEffectivePlayersByTeam, transfers } = useTransferMarket(competitionKey);
   const { getCoeffDelta } = useCareer();
+  const { favoriteTeamId, setFavoriteTeam } = useFavoriteTeam(competitionKey);
+  const isFavorite = favoriteTeamId === teamId;
 
   const team = useMemo(() => competition.teams.find((t) => t.id === teamId), [competition, teamId]);
   const coeffDelta = teamId ? getCoeffDelta(competitionKey, teamId) : 0;
@@ -96,6 +108,20 @@ export default function TeamProfilePage() {
   const standingRow = useMemo(
     () => simulation?.standings?.find((s) => s.teamId === teamId) || null,
     [simulation, teamId]
+  );
+  const showReal = hasRealDataSupport(competitionKey);
+  const realStandingRow = useMemo(
+    () => (showReal ? getRealStandings(competitionKey).standings?.find((s) => s.teamId === teamId) || null : null),
+    [showReal, competitionKey, teamId]
+  );
+  const domesticForm = useMemo(() => (showReal && team ? getDomesticForm(team.id) : null), [showReal, team]);
+  const realCompetitionForm = useMemo(
+    () => (showReal && competitionKey === "superlig" && team ? getSuperLigTeamForm(team.name) : null),
+    [showReal, competitionKey, team]
+  );
+  const radarProfile = useMemo(
+    () => (showReal && team ? getTeamRadarProfile(competitionKey, team.id) : []),
+    [showReal, competitionKey, team]
   );
   const form = useMemo(() => computeForm(simulation?.matchResults, teamId), [simulation, teamId]);
   const allMatches = useMemo(
@@ -155,6 +181,15 @@ export default function TeamProfilePage() {
             {team.country && ` · ${competition.countryNames?.[team.country] || team.country}`}
           </div>
           <h1>{team.name}</h1>
+          {showReal && (
+            <button
+              type="button"
+              className={`favorite-toggle-btn ${isFavorite ? "is-favorite" : ""}`}
+              onClick={() => setFavoriteTeam(isFavorite ? null : team.id)}
+            >
+              {isFavorite ? "⭐ Tuttuğun Takım" : "☆ Takımım Olarak Seç"}
+            </button>
+          )}
           <div className="team-profile-meta">
             {team.coeff != null && (
               <span>
@@ -195,6 +230,69 @@ export default function TeamProfilePage() {
           <div className="team-profile-stat"><span>{standingRow.l}</span><small>Mağlubiyet</small></div>
           <div className="team-profile-stat"><span>{standingRow.gf}:{standingRow.ga}</span><small>Averaj</small></div>
           <div className="team-profile-stat"><span>{standingRow.pts}</span><small>Puan</small></div>
+        </div>
+      )}
+
+      {showReal && realStandingRow && (
+        <div className="team-profile-stat-row">
+          <div className="team-profile-stat"><span>{realStandingRow.played}</span><small>Oynadı</small></div>
+          <div className="team-profile-stat"><span>{realStandingRow.w}</span><small>Galibiyet</small></div>
+          <div className="team-profile-stat"><span>{realStandingRow.d}</span><small>Beraberlik</small></div>
+          <div className="team-profile-stat"><span>{realStandingRow.l}</span><small>Mağlubiyet</small></div>
+          <div className="team-profile-stat"><span>{realStandingRow.gf}:{realStandingRow.ga}</span><small>Averaj</small></div>
+          <div className="team-profile-stat"><span>{realStandingRow.pts}</span><small>Puan</small></div>
+        </div>
+      )}
+
+      {showReal && (domesticForm || realCompetitionForm) && (
+        <div className="chart-card">
+          <h3>📈 Form &amp; Lig Durumu</h3>
+          {realCompetitionForm && (
+            <div className="team-profile-form">
+              <span className="team-profile-form-label">Süper Lig Formu (son 5):</span>
+              <div className="team-profile-form-badges">
+                {realCompetitionForm.map((r, i) => (
+                  <span key={i} className={`form-badge form-badge-${r}`}>{r}</span>
+                ))}
+              </div>
+            </div>
+          )}
+          {domesticForm && (
+            <>
+              <p className="footnote">
+                {domesticForm.league} — {domesticForm.position ? `${domesticForm.position}. sıra` : "?"}
+                {domesticForm.played != null ? ` (${domesticForm.played} maç, ${domesticForm.pts} puan)` : ""}
+                {domesticForm.asOf ? ` · Anlık görüntü: ${domesticForm.asOf}` : ""}
+              </p>
+              <div className="team-profile-form">
+                <span className="team-profile-form-label">Son 5 maç:</span>
+                <div className="team-profile-form-badges">
+                  {(domesticForm.form || []).length === 0 && <span className="standings-empty">Form verisi yok</span>}
+                  {(domesticForm.form || []).map((r, i) => (
+                    <span key={i} className={`form-badge form-badge-${r}`}>{r}</span>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {showReal && radarProfile.length > 0 && (
+        <div className="chart-card">
+          <h3>🕸️ Takım Profili</h3>
+          <p className="footnote">
+            Gerçek girdilerden (kadro gücü, katsayı, form, lig konumu) türetilmiş, 0-100 arasında normalize edilmiş
+            karşılaştırma görünümü -- resmi bir istatistik değil, sitenin kendi karşılaştırma ölçeğidir.
+          </p>
+          <ResponsiveContainer width="100%" height={300}>
+            <RadarChart data={radarProfile} outerRadius={100}>
+              <PolarGrid stroke={CHART_GRID} />
+              <PolarAngleAxis dataKey="axis" tick={{ fill: CHART_AXIS, fontSize: 12 }} />
+              <PolarRadiusAxis stroke={CHART_GRID} tick={{ fill: CHART_AXIS, fontSize: 10 }} domain={[0, 100]} />
+              <Radar dataKey="value" name={team.name} stroke={CHART_SERIES[0]} fill={CHART_SERIES[0]} fillOpacity={0.35} />
+            </RadarChart>
+          </ResponsiveContainer>
         </div>
       )}
 
@@ -245,7 +343,7 @@ export default function TeamProfilePage() {
         </div>
       )}
 
-      {!hasFixture && (
+      {!showReal && !hasFixture && (
         <div className="stats-callout">
           Henüz bir kura/fikstür üretilmedi -- sıra/form/istatistik bilgisi için önce{" "}
           <Link to={`/${competitionKey}`}>{competition.shortName} sayfasından</Link> başla.

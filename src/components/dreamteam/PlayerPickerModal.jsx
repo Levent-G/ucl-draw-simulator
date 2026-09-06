@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { getAllPlayersEverywhere } from "../../utils/crossCompetitionPlayers.js";
+import { toSearchKey } from "../../utils/text.js";
 import PlayerAvatar from "../PlayerAvatar.jsx";
 import Crest from "../Crest.jsx";
 
@@ -13,10 +14,10 @@ export default function PlayerPickerModal({ position, excludeGlobalIds, onSelect
   const excludeSet = useMemo(() => new Set(excludeGlobalIds || []), [excludeGlobalIds]);
 
   const results = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = toSearchKey(query);
     let pool = position ? allPlayers.filter((p) => p.position === position) : allPlayers;
     if (excludeSet.size > 0) pool = pool.filter((p) => !excludeSet.has(p.globalId));
-    if (q) pool = pool.filter((p) => p.name.toLowerCase().includes(q));
+    if (q) pool = pool.filter((p) => toSearchKey(p.name).includes(q));
     return pool.slice(0, 60);
   }, [allPlayers, position, query, excludeSet]);
 

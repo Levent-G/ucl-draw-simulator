@@ -1,12 +1,26 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Crest from "../Crest.jsx";
+import ProbabilityBar from "../ProbabilityBar.jsx";
 
 // teams: o yarışmanın takım listesi (yarışmadan bağımsız bileşen).
 // defaultVisible: kısaltılmış görünümde gösterilecek satır sayısı (uzun
 // tabloları kısaltıp "Tümünü Göster" ile açmak için).
 // competitionKey verilirse takım adları takım profil sayfasına link olur.
-export default function StandingsTable({ standings, title, teams, defaultVisible = 10, competitionKey, favoriteTeamId = null }) {
+// nextMatchByTeamId (opsiyonel): {[teamId]: displayMatch} -- verilirse her
+// satırda o takımın SIRADAKİ maçının küçük model olasılığı gösterilir (bkz.
+// realStandingsSelectors.getNextMatchProbabilitiesByTeam). Verilmezse bu
+// sütun hiç render edilmez -- eski (simülasyon tabanlı) kullanım yerleri
+// etkilenmez.
+export default function StandingsTable({
+  standings,
+  title,
+  teams,
+  defaultVisible = 10,
+  competitionKey,
+  favoriteTeamId = null,
+  nextMatchByTeamId = null,
+}) {
   const [expanded, setExpanded] = useState(false);
 
   if (!standings || standings.length === 0) {
@@ -41,6 +55,7 @@ export default function StandingsTable({ standings, title, teams, defaultVisible
               <th>AV</th>
               <th>P</th>
               <th>Durum</th>
+              {nextMatchByTeamId && <th>Sıradaki Maç İhtimali</th>}
             </tr>
           </thead>
           <tbody>
@@ -48,6 +63,7 @@ export default function StandingsTable({ standings, title, teams, defaultVisible
               const team = teamById[s.teamId];
               if (!team) return null;
               const isFavorite = favoriteTeamId && team.id === favoriteTeamId;
+              const nextMatch = nextMatchByTeamId?.[s.teamId];
               return (
                 <tr key={s.teamId} className={`standings-row status-tone-${s.statusTone} ${isFavorite ? "standings-row-favorite" : ""}`}>
                   <td>{s.rank}</td>
@@ -81,6 +97,22 @@ export default function StandingsTable({ standings, title, teams, defaultVisible
                   <td>
                     <span className={`status-badge status-tone-${s.statusTone}`}>{s.statusLabel}</span>
                   </td>
+                  {nextMatchByTeamId && (
+                    <td>
+                      {nextMatch ? (
+                        <ProbabilityBar
+                          size="mini"
+                          homeTeam={nextMatch.homeTeam}
+                          awayTeam={nextMatch.awayTeam}
+                          homePct={Math.round(nextMatch.homeWinProb * 100)}
+                          drawPct={Math.round(nextMatch.drawProb * 100)}
+                          awayPct={Math.round(nextMatch.awayWinProb * 100)}
+                        />
+                      ) : (
+                        <span className="standings-empty">—</span>
+                      )}
+                    </td>
+                  )}
                 </tr>
               );
             })}

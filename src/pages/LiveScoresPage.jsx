@@ -145,6 +145,16 @@ function SuperLigLive() {
     [competition]
   );
 
+  // Tüm sonuçları tek bir uzun liste yerine hafta hafta sekmelere ayırıyoruz
+  // -- sezon ilerledikçe (her hafta ~9 maç eklendikçe) tek liste hızla
+  // okunmaz hale gelirdi. Sekme sırası SUPER_LIG_LIVE_RESULTS'taki doğal
+  // (kronolojik) sıradan türetilir, elle senkronize edilmesi gerekmez.
+  const [activeWeekLabel, setActiveWeekLabel] = useState(LATEST_PLAYED_LABEL);
+  const resultsByWeek = useMemo(() => {
+    const filtered = SUPER_LIG_LIVE_RESULTS.filter((r) => r.label === activeWeekLabel);
+    return filtered.length > 0 ? filtered : SUPER_LIG_LIVE_RESULTS.filter((r) => r.label === LATEST_PLAYED_LABEL);
+  }, [activeWeekLabel]);
+
   const byAttack = useMemo(
     () => [...SUPER_LIG_LIVE_STANDINGS].sort((a, b) => b.gf - a.gf || a.rank - b.rank),
     []
@@ -208,17 +218,25 @@ function SuperLigLive() {
       </div>
 
       <div className="chart-card chart-card-wide live-results-card">
-        <h3>{PLAYED_WEEK_RANGE_LABEL} — Tüm Sonuçlar ({SUPER_LIG_LIVE_RESULTS.length} maç)</h3>
+        <h3>{PLAYED_WEEK_RANGE_LABEL} — Sonuçlar ({SUPER_LIG_LIVE_RESULTS.length} maç)</h3>
+        <div className="matchday-tabs">
+          {PLAYED_WEEK_LABELS.map((label) => (
+            <button
+              key={label}
+              className={`matchday-tab ${activeWeekLabel === label ? "active" : ""}`}
+              onClick={() => setActiveWeekLabel(label)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
         <div className="live-results-list">
-          {SUPER_LIG_LIVE_RESULTS.map((r, i) => {
+          {resultsByWeek.map((r, i) => {
             const home = teamByName[r.home];
             const away = teamByName[r.away];
             return (
               <div key={i} className="live-result-row">
-                <span className="live-result-label">
-                  {r.label}
-                  {r.date ? ` · ${r.date}` : ""}
-                </span>
+                <span className="live-result-label">{r.date || r.label}</span>
                 <span className="live-result-team">
                   {home && <Crest team={home} size={20} />}
                   <span className="live-result-team-name">{r.home}</span>

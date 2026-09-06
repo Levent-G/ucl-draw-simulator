@@ -4,6 +4,7 @@ import { COMPETITION_LIST, getCompetition } from "../data/competitions.js";
 import { useTransferMarket } from "../state/TransferContext.jsx";
 import { useAchievements } from "../state/AchievementsContext.jsx";
 import { generateTransferHeadline } from "../utils/transferNews.js";
+import { toSearchKey } from "../utils/text.js";
 import PlayerAvatar from "../components/PlayerAvatar.jsx";
 import Crest from "../components/Crest.jsx";
 
@@ -25,8 +26,8 @@ function TransferTeamCard({
 }) {
   const [dragOver, setDragOver] = useState(false);
 
-  const q = query.trim().toLowerCase();
-  const visiblePlayers = q ? players.filter((p) => p.name.toLowerCase().includes(q)) : players;
+  const q = toSearchKey(query);
+  const visiblePlayers = q ? players.filter((p) => toSearchKey(p.name).includes(q)) : players;
   if (q && visiblePlayers.length === 0) return null;
 
   // Arama yapılırken eşleşen kartlar otomatik açık gösterilir; aksi halde

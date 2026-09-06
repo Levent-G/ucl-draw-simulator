@@ -100,6 +100,17 @@ export default function LeagueHomePage() {
     window.setTimeout(() => setShowConfetti(false), 4600);
   };
 
+  // "Sezonu Başlat" ekranı KAPANDI (silinmedi) -- sezon zaten canlı olarak
+  // devam eden gerçek bir şey, kullanıcının ayrıca bir "başlat" düğmesine
+  // basması anlamsız. Sayfaya girer girmez (banner/konfeti animasyonu
+  // OLMADAN, sessizce) sezon otomatik başlatılır.
+  const autoStartFiredRef = useRef(false);
+  useEffect(() => {
+    if (hasDraw || autoStartFiredRef.current) return;
+    autoStartFiredRef.current = true;
+    startLeagueSeason();
+  }, [hasDraw, startLeagueSeason]);
+
   // Fikstür oluşur oluşmaz (hasDraw true olur olmaz), ~1 saniye sonra
   // şampiyonu otomatik belirle -- kullanıcı sadece izlesin, ayrı bir
   // "Şampiyonu Belirle" tıklamasına gerek kalmasın. Bu 1 saniyelik
@@ -206,14 +217,11 @@ export default function LeagueHomePage() {
             </>
           ) : (
             <div className="league-start-cta">
-              <span className="draw-first-step-eyebrow">1. Adım</span>
-              <button className="btn-primary league-start-btn" onClick={handleStart} disabled={starting}>
-                <span className="league-start-btn-shine" aria-hidden="true" />
-                <span className="league-start-btn-icon" aria-hidden="true">
-                  🏆
-                </span>
-                {starting ? "Sezon Hazırlanıyor…" : "Sezonu Başlat"}
-              </button>
+              <span className="draw-first-step-eyebrow">Hazırlanıyor</span>
+              <span className="league-start-btn-icon" aria-hidden="true">
+                🏆
+              </span>
+              Sezon başlatılıyor…
             </div>
           )}
         </div>

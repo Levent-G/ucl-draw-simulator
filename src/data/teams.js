@@ -17,7 +17,10 @@
 //
 // logo: /public/logos/ altında bulunması beklenen dosya yolu (kendi lisanslı
 // logo dosyalarını bu isimlerle ekleyince Crest.jsx otomatik olarak kullanır;
-// dosya yoksa özgün SVG rozete geri döner).
+// dosya yoksa özgün SVG rozete geri döner). Sabah'ın (Azerbaycan) logosu
+// TheSportsDB'den (thesportsdb.com, ücretsiz "123" test anahtarı) indirilip
+// buraya eklendi -- "Sabah" adı Malezya'daki başka bir kulüple çakıştığından
+// arama "Sabah Baku" ile netleştirildi.
 import RealMadridLogo from "../assets/logos/Spain - LaLiga/Real Madrid.png";
 import ManchesterCityLogo from "../assets/logos/England - Premier League/Manchester City.png";
 import BayernMunihLogo from "../assets/logos/Germany - Bundesliga/Bayern Munich.png";
@@ -57,6 +60,7 @@ import BodoGlimtLogo from "../assets/logos/Norway - Eliteserien/FK BodøGlimt.pn
 import SlovanBratislavaLogo from "../assets/logos/slovakia_s-bratislava.png";
 import AEKAthensLogo from "../assets/logos/Greece - Super League 1/AEK Athens.png";
 import VikingLogo from "../assets/logos/Norway - Eliteserien/Viking FK.png";
+import SabahLogo from "../assets/logos/Azerbaijan - Premier League/Sabah.png";
 
 export const COUNTRY_NAMES = {
   ESP: "İspanya",
@@ -385,6 +389,7 @@ const RAW_TEAMS = [
     pot: 4,
     coeff: 12.0,
     pedigree: 0,
+    logo: SabahLogo,
   },
   {
     name: "Slovan Bratislava",

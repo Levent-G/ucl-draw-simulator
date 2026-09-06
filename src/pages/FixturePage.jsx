@@ -9,6 +9,8 @@ import StandingsTable from "../components/fixture/StandingsTable.jsx";
 import HighlightMatchCard from "../components/fixture/HighlightMatchCard.jsx";
 import NextStepCta from "../components/NextStepCta.jsx";
 import EmptyState from "../components/EmptyState.jsx";
+import { hasRealDataSupport } from "../utils/realStandingsSelectors.js";
+import RealFixturePage from "./RealFixturePage.jsx";
 
 // Tahmin özetini (puan durumu + tüm fikstür) düz metin olarak indirilebilir
 // bir dosyaya çevirir. Backend yok -- tamamen istemci tarafında bir Blob
@@ -52,6 +54,19 @@ function buildPredictionExport(competition, simulation, fixture) {
 
 export default function FixturePage() {
   const { competitionKey } = useParams();
+
+  // UCL/Süper Lig'de Fikstür artık GERÇEK veriden besleniyor (bkz.
+  // RealFixturePage.jsx) -- tam sezon sahte Poisson simülasyonu SİLİNMEDİ,
+  // sadece bu iki yarışma için gösterilmiyor (europa ve "eğlence modu"
+  // akışları aşağıdaki eski kodla değişmeden çalışmaya devam ediyor).
+  if (hasRealDataSupport(competitionKey)) {
+    return <RealFixturePage />;
+  }
+
+  return <SimulatedFixturePage competitionKey={competitionKey} />;
+}
+
+function SimulatedFixturePage({ competitionKey }) {
   const {
     competition,
     hasDraw,
@@ -185,12 +200,20 @@ export default function FixturePage() {
           </div>
           <h1>{competition.shortName} — Fikstür</h1>
           <p>
-            {competition.format === "swiss"
-              ? "Kura sonucuna göre oluşturulan haftalık lig fazı takvimi"
-              : "Çift devreli lig takvimi"}{" "}
-            ve takım katsayılarına dayalı istatistiksel modelle üretilen
-            tahmini skorlar. Kendi tahminini (sıralamayı sürükleme, skor
-            girme, gol kralı seçme) Canlı Skorlar sayfasından yapabilirsin.
+            {competition.format === "swiss" ? (
+              <>
+                Gerçek kura sonucuna göre oluşan haftalık lig fazı takvimi. Henüz oynanmamış maçlarda skor yerine{" "}
+                <b>"⏳ Bekleniyor"</b> görürsün -- maçın gerçek tarihi gelene kadar sahte bir sonuç göstermeyiz,
+                bunun yerine "Maç Analizi"nde modelimizin tahminini/olasılıklarını inceleyebilirsin. Oynanan
+                maçlarda sonuçlar burada otomatik güncellenir.
+              </>
+            ) : (
+              <>
+                Çift devreli lig takvimi ve takım katsayılarına dayalı istatistiksel modelle üretilen tahmini
+                skorlar. Kendi tahminini (sıralamayı sürükleme, skor girme, gol kralı seçme) Canlı Skorlar
+                sayfasından yapabilirsin.
+              </>
+            )}
           </p>
           {hasTransfers && (
             <p className="fixture-transfer-note">
@@ -233,10 +256,18 @@ export default function FixturePage() {
         <div className="next-step-cta-row">
           {competition.hasKnockout && (
             <NextStepCta
-              title="Lig fazı tamam, sırada eleme turu var"
-              description="1-8. sıradakiler doğrudan Son 16'ya, 9-24. sıradakiler play-off oynayarak yükselir. Şampiyona kadar tüm turları simüle et."
+              title={
+                competition.format === "swiss"
+                  ? "Lig fazı sonuçlandığında eleme turu başlayacak"
+                  : "Lig fazı tamam, sırada eleme turu var"
+              }
+              description={
+                competition.format === "swiss"
+                  ? "Şimdiden modelimizin projeksiyonuna göre 1-8. sıradakiler doğrudan Son 16'ya, 9-24. sıradakiler play-off oynayarak yükselir -- bu tahmini bracket'ı önceden inceleyebilirsin."
+                  : "1-8. sıradakiler doğrudan Son 16'ya, 9-24. sıradakiler play-off oynayarak yükselir. Şampiyona kadar tüm turları simüle et."
+              }
               to={`/${competitionKey}/eleme-turu`}
-              label="Eleme Turlarını Gör"
+              label={competition.format === "swiss" ? "Tahmini Eleme Turunu Gör" : "Eleme Turlarını Gör"}
               icon="🏆"
             />
           )}

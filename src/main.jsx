@@ -11,6 +11,7 @@ import { AchievementsProvider } from './state/AchievementsContext.jsx'
 import { SettingsProvider } from './state/SettingsContext.jsx'
 import { CareerProvider } from './state/CareerContext.jsx'
 import { OnboardingProvider } from './state/OnboardingContext.jsx'
+import { FavoriteTeamProvider } from './state/FavoriteTeamContext.jsx'
 import NavBar from './components/NavBar.jsx'
 import AchievementToasts from './components/AchievementToasts.jsx'
 import WhatsNewModal from './components/WhatsNewModal.jsx'
@@ -24,6 +25,9 @@ import './styles/pages.css'
 // ziyaret edilen rotanın kodu indirilir.
 const HomePage = lazy(() => import('./pages/HomePage.jsx'))
 const CompetitionHomeRoute = lazy(() => import('./pages/CompetitionHomeRoute.jsx'))
+const NewsPage = lazy(() => import('./pages/NewsPage.jsx'))
+const DrawPage = lazy(() => import('./pages/DrawPage.jsx'))
+const LeagueHomePage = lazy(() => import('./pages/LeagueHomePage.jsx'))
 const FixturePage = lazy(() => import('./pages/FixturePage.jsx'))
 const StatsPage = lazy(() => import('./pages/StatsPage.jsx'))
 const KnockoutPage = lazy(() => import('./pages/KnockoutPage.jsx'))
@@ -38,10 +42,12 @@ const SettingsPage = lazy(() => import('./pages/SettingsPage.jsx'))
 const TeamProfilePage = lazy(() => import('./pages/TeamProfilePage.jsx'))
 const PlayerProfilePage = lazy(() => import('./pages/PlayerProfilePage.jsx'))
 const PredictionLeaguePage = lazy(() => import('./pages/PredictionLeaguePage.jsx'))
+const FunModeLandingPage = lazy(() => import('./pages/FunModeLandingPage.jsx'))
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <HashRouter>
+      <FavoriteTeamProvider>
       <OnboardingProvider>
       <AchievementsProvider>
         <SettingsProvider>
@@ -64,7 +70,13 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                             <Route path="/arsiv" element={<ArchivePage />} />
                             <Route path="/basarilar" element={<AchievementsPage />} />
                             <Route path="/ayarlar" element={<SettingsPage />} />
+                            <Route path="/tahmin-ligi" element={<PredictionLeaguePage />} />
+                            <Route path="/tahmin-ligi/:leagueId" element={<PredictionLeaguePage />} />
+                            <Route path="/eglence-modu" element={<FunModeLandingPage />} />
                             <Route path="/:competitionKey" element={<CompetitionHomeRoute />} />
+                            <Route path="/:competitionKey/haberler" element={<NewsPage />} />
+                            <Route path="/:competitionKey/kura-simulasyonu" element={<DrawPage />} />
+                            <Route path="/:competitionKey/sezon-simulasyonu" element={<LeagueHomePage />} />
                             <Route path="/:competitionKey/fikstur" element={<FixturePage />} />
                             <Route path="/:competitionKey/mac/:matchId" element={<MatchCenterPage />} />
                             <Route path="/:competitionKey/karsilikli" element={<HeadToHeadPage />} />
@@ -72,8 +84,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                             <Route path="/:competitionKey/eleme-turu" element={<KnockoutPage />} />
                             <Route path="/:competitionKey/takim/:teamId" element={<TeamProfilePage />} />
                             <Route path="/:competitionKey/oyuncu/:playerId" element={<PlayerProfilePage />} />
-                            <Route path="/:competitionKey/tahmin-ligi" element={<PredictionLeaguePage />} />
-                            <Route path="/:competitionKey/tahmin-ligi/:leagueId" element={<PredictionLeaguePage />} />
                           </Routes>
                         </Suspense>
                       </SeasonArchiveProvider>
@@ -86,6 +96,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         </SettingsProvider>
       </AchievementsProvider>
       </OnboardingProvider>
+      </FavoriteTeamProvider>
     </HashRouter>
   </React.StrictMode>
 )

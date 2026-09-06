@@ -5,6 +5,9 @@ import CompetitionStepper from "../components/CompetitionStepper.jsx";
 import EmptyState from "../components/EmptyState.jsx";
 import TeamFilterSelect from "../components/stats/TeamFilterSelect.jsx";
 import Crest from "../components/Crest.jsx";
+import { formatMatchDate } from "../utils/matchDate.js";
+import { useFavoriteTeam } from "../state/FavoriteTeamContext.jsx";
+import { hasRealDataSupport, getHeadToHead } from "../utils/realStandingsSelectors.js";
 
 // İki takım arasındaki TÜM geçmiş simülasyon sonuçlarını (her "tahminleri
 // yenile" birikerek matchHistory'ye eklenir -- bkz. CompetitionContext)
@@ -43,12 +46,18 @@ function computeHeadToHead(matchHistory, teamAId, teamBId) {
 export default function HeadToHeadPage() {
   const { competitionKey } = useParams();
   const { competition, matchHistory, hasSimulation } = useCompetition(competitionKey);
-  const [teamAId, setTeamAId] = useState("");
+  const { favoriteTeamId } = useFavoriteTeam(competitionKey);
+  const [teamAId, setTeamAId] = useState(() => favoriteTeamId || "");
   const [teamBId, setTeamBId] = useState("");
 
   const teamA = competition.teams.find((t) => t.id === teamAId) || null;
   const teamB = competition.teams.find((t) => t.id === teamBId) || null;
   const sameTeam = teamAId && teamBId && teamAId === teamBId;
+  const showReal = hasRealDataSupport(competitionKey);
+  const realH2H = useMemo(() => {
+    if (!showReal || !teamA || !teamB || sameTeam) return null;
+    return getHeadToHead(teamA.id, teamB.id);
+  }, [showReal, teamA, teamB, sameTeam]);
 
   const { meetings, stats } = useMemo(() => {
     if (!teamAId || !teamBId || sameTeam) return { meetings: [], stats: null };
@@ -60,17 +69,17 @@ export default function HeadToHeadPage() {
       <CompetitionStepper competitionKey={competitionKey} />
       <header className="page-header">
         <div>
-          <div className="page-eyebrow">İki Takım · Tüm Simülasyonlar</div>
+          <div className="page-eyebrow">{showReal ? "İki Takım · Gerçek Geçmiş" : "İki Takım · Tüm Simülasyonlar"}</div>
           <h1>{competition.shortName} — Karşılıklı Geçmiş</h1>
           <p>
-            İki takım seç; bu oturumda çalıştırdığın TÜM simülasyonlarda (ilk model
-            tahmini + her "Model Tahminlerini Yenile") bu iki takımın karşılaştığı
-            maçları ve toplu istatistiği burada birikimli olarak görürsün.
+            {showReal
+              ? "İki takım seç; aralarındaki gerçek geçmiş Avrupa/derbi karşılaşmalarını görürsün."
+              : 'İki takım seç; bu oturumda çalıştırdığın TÜM simülasyonlarda (ilk model tahmini + her "Model Tahminlerini Yenile") bu iki takımın karşılaştığı maçları ve toplu istatistiği burada birikimli olarak görürsün.'}
           </p>
         </div>
       </header>
 
-      {!hasSimulation && (
+      {!showReal && !hasSimulation && (
         <EmptyState
           variant="inline"
           description="Henüz bir model tahmini üretilmedi."
@@ -86,7 +95,38 @@ export default function HeadToHeadPage() {
 
       {sameTeam && <p className="stats-callout">Aynı takımı iki kez seçemezsin.</p>}
 
-      {teamA && teamB && !sameTeam && (
+      {showReal && teamA && teamB && !sameTeam && (
+        <div className="chart-card chart-card-wide">
+          <h3>🤝 Gerçek Karşılıklı Geçmiş</h3>
+          {realH2H ? (
+            <>
+              <p className="footnote">
+                {realH2H.summary?.played ?? realH2H.meetings.length} karşılaşma · {teamA.short}{" "}
+                {realH2H.summary?.homeTeamWins ?? "?"} G · {realH2H.summary?.draws ?? "?"} B · {teamB.short}{" "}
+                {realH2H.summary?.awayTeamWins ?? "?"} G
+              </p>
+              <ul className="h2h-meeting-list">
+                {realH2H.meetings.map((m, i) => (
+                  <li key={i}>
+                    <span className="h2h-meeting-date">{formatMatchDate(m.date, { day: "numeric", month: "short", year: "numeric" })}</span>
+                    <span className="h2h-meeting-comp">{m.competition}</span>
+                    <span className="h2h-meeting-score">
+                      {m.homeTeam} {m.homeGoals}-{m.awayGoals} {m.awayTeam}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <p className="footnote">
+              Bu iki takım için henüz araştırılmış bir gerçek karşılaşma geçmişi yok -- muhtemelen daha önce hiç (ya
+              da çok az) karşılaştılar. Uydurma bir geçmiş göstermek yerine burayı dürüstçe boş bırakıyoruz.
+            </p>
+          )}
+        </div>
+      )}
+
+      {!showReal && teamA && teamB && !sameTeam && (
         <>
           {stats && stats.played > 0 ? (
             <>

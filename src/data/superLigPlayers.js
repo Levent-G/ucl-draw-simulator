@@ -40,8 +40,9 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Lesley Ugochukwu", "MF", "FRA", 78],
     ["Barış Alper Yılmaz", "MF", "TUR", 78],
     ["Yunus Akgün", "MF", "TUR", 76],
+    ["Aleksey Batrakov", "MF", "RUS", 77],
     ["Victor Osimhen", "FW", "NGA", 89],
-
+    ["Rafael Leão", "FW", "POR", 86],
   ],
   s2: [
     // Fenerbahçe
@@ -84,9 +85,13 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Orkun Kökçü", "MF", "TUR", 82],
     ["Václav Černý", "MF", "CZE", 77],
     ["Leandro Trossard", "MF", "BEL", 82],
+    ["Fabio Miretti", "MF", "ITA", 74],
+    ["Kristjan Asllani", "MF", "ALB", 75],
+    ["Dušan Tadić", "MF", "SRB", 76],
     ["Hyeon-gyu Oh", "FW", "KOR", 71],
     ["Dušan Vlahović", "FW", "SRB", 84],
     ["Semih Kılıçsoy", "FW", "TUR", 77],
+    ["Ernest Poku", "FW", "NED", 75],
     ["Mustafa Hekimoğlu", "FW", "TUR", 68],
   ],
   s4: [
@@ -106,6 +111,7 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Ozan Tufan", "MF", "TUR", 77],
     ["Ernest Muçi", "MF", "ALB", 74],
     ["Ruslan Malinovskyi", "MF", "UKR", 76],
+    ["Fabinho", "MF", "BRA", 79],
     ["Mohamed Salah", "FW", "EGY", 90],
     ["Paul Onuachu", "FW", "NGA", 78],
     ["Umut Nayir", "FW", "TUR", 71],

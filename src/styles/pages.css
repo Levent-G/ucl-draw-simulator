@@ -35,6 +35,15 @@
   gap: 6px;
   flex-wrap: wrap;
 }
+/* Mobil menüdeki grup başlıkları/2 sütunlu lig ızgarası -- masaüstünde
+   görünmez/etkisiz olmalı (linkler doğrudan .site-nav-links'in normal yatay
+   akışında kalmaya devam eder). */
+.site-nav-group-label {
+  display: none;
+}
+.site-nav-league-grid {
+  display: contents;
+}
 .site-nav-burger {
   display: none;
 }
@@ -197,18 +206,69 @@ button.site-nav-more-trigger {
     cursor: pointer;
     flex-shrink: 0;
   }
+  /* Mobil menü, eskiden ANİDEN açılıp kapanan bir display:none/flex
+     anahtarıydı -- artık yumuşak bir "çekmece" (drawer) gibi max-height/
+     opacity ile kayarak açılıyor, ayrıca bir karartma katmanı (bkz.
+     .site-nav-backdrop) arkasındaki sayfa içeriğinden görsel olarak
+     ayrıştırıyor ve dışına tıklayınca kapanıyor (bkz. NavBar.jsx). */
   .site-nav-links {
-    display: none;
+    visibility: hidden;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
     width: 100%;
     order: 4;
     flex-direction: column;
-    gap: 4px;
-    padding-top: 10px;
+    gap: 6px;
     margin-top: 4px;
-    border-top: 1px solid var(--line);
+    border-top: 1px solid transparent;
+    background: linear-gradient(180deg, rgba(20, 28, 64, 0.6), rgba(10, 15, 38, 0.4));
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    transition: max-height 0.28s ease, opacity 0.2s ease, border-color 0.2s ease;
   }
   .site-nav-links.is-open {
-    display: flex;
+    visibility: visible;
+    max-height: 720px;
+    opacity: 1;
+    padding: 12px 0 16px;
+    border-top-color: var(--line);
+  }
+  .site-nav.menu-open {
+    box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.75);
+  }
+  .site-nav-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 15;
+    background: rgba(4, 8, 22, 0.6);
+    backdrop-filter: blur(2px);
+    animation: siteNavBackdropIn 0.2s ease;
+  }
+  @keyframes siteNavBackdropIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .site-nav-group-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    padding: 6px 14px 4px;
+  }
+  .site-nav-league-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 0 14px;
+    margin-bottom: 2px;
+  }
+  .site-nav-league-grid .site-nav-link {
+    width: auto;
+    text-align: center;
+    padding: 16px 10px;
+    font-size: 13px;
   }
   .site-nav-link {
     width: 100%;
@@ -248,6 +308,11 @@ button.site-nav-more-trigger {
     text-transform: uppercase;
     font-size: 12px;
     letter-spacing: 0.04em;
+  }
+}
+@media (min-width: 1401px) {
+  .site-nav-backdrop {
+    display: none;
   }
 }
 
@@ -969,6 +1034,18 @@ a.btn-secondary:hover {
   letter-spacing: 0.04em;
   color: #fbbf24;
 }
+.match-row-date {
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.03em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+}
+.match-row-pending {
+  font-size: 10.5px;
+  color: var(--ucl-blue-3);
+  font-style: italic;
+}
 .knockout-tie-derby {
   display: block;
   margin-bottom: 6px;
@@ -995,6 +1072,60 @@ a.btn-secondary:hover {
   border-radius: var(--radius-lg);
   padding: 20px 24px;
   margin: 20px 0;
+}
+.matchpreview-teams {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+.matchpreview-team-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 24px 16px;
+  text-decoration: none;
+  color: var(--text-primary);
+  text-align: center;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.matchpreview-team-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+.matchpreview-team-name {
+  font-family: var(--font-display);
+  font-size: 16px;
+  text-transform: uppercase;
+}
+.matchpreview-team-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+.matchpreview-team-link {
+  font-size: 11.5px;
+  color: var(--ucl-blue-2);
+  margin-top: 4px;
+}
+.matchpreview-probs {
+  width: 100%;
+  height: 10px;
+  margin-top: 10px;
+}
+.matchpreview-prob-labels {
+  font-size: 13px;
+  margin-top: 8px;
+  font-weight: 600;
+}
+@media (max-width: 640px) {
+  .matchpreview-teams {
+    grid-template-columns: 1fr;
+  }
 }
 .matchcenter-team {
   display: flex;
@@ -1263,6 +1394,11 @@ a.btn-secondary:hover {
   font-size: 26px;
   font-weight: 700;
   color: var(--text-primary);
+}
+.highlight-match-score-pending {
+  font-size: 15px;
+  font-style: italic;
+  color: var(--ucl-blue-3);
 }
 .highlight-match-probs {
   display: flex;
@@ -2169,6 +2305,9 @@ a.team-profile-match-row:hover {
 .team-profile-match-venue {
   color: var(--text-faint);
   font-size: 11.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .team-profile-match-opp {
   display: flex;
@@ -2184,6 +2323,20 @@ a.team-profile-match-row:hover {
   font-weight: 700;
   text-align: right;
   color: var(--text-primary);
+}
+/* Dar ekranlarda 70px+80px+60px sabit sütun -- hafta/saha/skor -- rakip
+   isminin sığacağı yeri boğuyordu; sütunları daraltıp yazı boyutunu
+   küçültüyoruz (hafta/saha zaten kısa, sabit metinler). */
+@media (max-width: 640px) {
+  .team-profile-match-row {
+    grid-template-columns: 44px 30px 1fr auto 46px;
+    gap: 6px;
+    font-size: 11.5px;
+  }
+  .team-profile-match-md,
+  .team-profile-match-venue {
+    font-size: 10px;
+  }
 }
 
 .stats-tabs {
@@ -2656,6 +2809,123 @@ a.team-profile-match-row:hover {
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+/* Gerçek veri yarışmaları (UCL/Süper Lig) için NavBar'ın İKİNCİ satırı --
+   ayrı bir kutu/panel DEĞİL, üst satırla (site-nav-inner) AYNI çubuğun bir
+   parçası gibi görünsün diye sadece ince bir üst çizgiyle ayrılır (bkz.
+   RealCompetitionSubNav.jsx -- "iki iç içe menü" yerine TEK menü, iki satır). */
+/* Her yarışma sayfasında GERÇEK VERİ ile SİMÜLASYON'u birbirinden net
+   ayıran, gözden kaçmayacak şerit (bkz. NavBar.jsx). Kullanıcı geri
+   bildirimi: "gerçek veri ile simülasyon verilerinin net ayrıldığını
+   görmem lazım" -- bu yüzden BİLİNÇLİ OLARAK göze çarpan, dolu renkli bir
+   şerit (küçük/soluk bir rozet değil). */
+.data-mode-banner {
+  padding: 7px 18px;
+  text-align: center;
+}
+.data-mode-banner-inner {
+  font-size: 12px;
+  letter-spacing: 0.01em;
+}
+.data-mode-sim {
+  background: #7c3aed;
+  color: #fff;
+}
+.data-mode-sim b {
+  color: #fff;
+}
+
+.site-nav-subrow {
+  border-top: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+}
+.site-nav-subrow-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 8px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.site-nav-subrow-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.favorite-team-picker .team-filter-select {
+  min-width: 180px;
+}
+.favorite-team-picker .team-filter-trigger {
+  padding: 8px 12px;
+  font-size: 12px;
+}
+@media (max-width: 720px) {
+  .site-nav-subrow-inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .site-nav-subrow-right {
+    justify-content: space-between;
+  }
+  /* 5 sekme ("Karşılıklı Geçmiş" gibi uzun etiketler dahil) mobilde
+     flex-wrap ile 2-3 satıra dağılıp dağınık duruyordu -- matchday-tabs'taki
+     gibi tek satırda yatay kaydırmaya çeviriyoruz. */
+  .real-data-nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+  .real-data-nav-link {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+}
+
+.real-data-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.real-data-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 9px 14px;
+  border-radius: 999px;
+  color: var(--text-dim);
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+.real-data-nav-link:hover {
+  color: var(--text-primary);
+  border-color: var(--line-strong);
+}
+.real-data-nav-link.active {
+  background: linear-gradient(180deg, var(--accent-bright), var(--accent));
+  color: #fff;
+  box-shadow: 0 8px 20px -10px rgba(84, 104, 255, 0.8);
+}
+.real-data-nav-fun-link {
+  font-size: 11.5px;
+  color: var(--text-faint);
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 6px 10px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 999px;
+}
+.real-data-nav-fun-link:hover {
+  color: var(--text-primary);
+  border-color: var(--text-dim);
 }
 
 /* ==========================================================================
@@ -3564,8 +3834,6 @@ a.team-profile-match-row:hover {
   flex-direction: column;
   gap: 8px;
   width: 100%;
-  max-width: 640px;
-  margin: 0 auto;
   background: var(--bg-panel);
   border: 1px solid var(--line);
   border-left: 3px solid var(--line-strong);
@@ -3621,7 +3889,7 @@ a.team-profile-match-row:hover {
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    max-width: 760px;
+    width: 100%;
     padding: 14px 22px;
     gap: 14px;
   }
@@ -3676,6 +3944,13 @@ a.team-profile-match-row:hover {
     font-size: 12.5px;
     padding: 7px 14px;
   }
+}
+.prediction-outcome-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
 }
 .prediction-pick-row {
   display: flex;
@@ -3882,6 +4157,96 @@ a.team-profile-match-row:hover {
   padding-bottom: 6px;
   border-bottom: 1px solid var(--line);
 }
+/* Haftalık lig "açık/kapandı" akordeon başlığı (bkz. PredictionLeaguePage.jsx
+   myMatchesByWeek) -- her hafta net bir durumla (🟢 açık/tahmin edilebilir,
+   🔴 kapandı/sonuçlar belli) gösterilir, geçmiş haftalar varsayılan olarak
+   katlanır. */
+.prediction-week-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  padding: 8px 4px 8px 0;
+  margin-bottom: 8px;
+  cursor: pointer;
+  text-align: left;
+}
+.prediction-week-header .prediction-week-label {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+.prediction-week-toggle {
+  color: var(--text-faint);
+  font-size: 11px;
+  width: 12px;
+}
+.prediction-week-current-tag {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(84, 104, 255, 0.2);
+  color: var(--ucl-blue-2);
+}
+.prediction-week-status {
+  font-size: 11.5px;
+  margin-left: auto;
+}
+.prediction-week-status-open {
+  color: #4ade80;
+}
+.prediction-week-status-closed {
+  color: var(--text-faint);
+}
+.prediction-week-count {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+.prediction-week-group.prediction-week-closed {
+  opacity: 0.75;
+}
+
+.prediction-season-champion-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  background: linear-gradient(135deg, rgba(250, 204, 21, 0.16), rgba(250, 204, 21, 0.03));
+  border: 1px solid rgba(250, 204, 21, 0.5);
+  border-radius: var(--radius-lg);
+  padding: 14px 20px;
+  margin-bottom: 16px;
+}
+.prediction-season-champion-label {
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fbbf24;
+}
+.prediction-season-champion-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+.prediction-season-champion-points {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: #fbbf24;
+}
+
 .prediction-teams-step {
   text-align: center;
   padding: 8px 4px 4px;
@@ -3969,9 +4334,23 @@ a.team-profile-match-row:hover {
   flex-wrap: wrap;
 }
 .prediction-league-name-input {
-  width: 260px;
-  max-width: 100%;
+  width: 100%;
+  max-width: 420px;
   text-align: left;
+  padding: 10px 14px;
+  background: var(--bg-panel-alt);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 13px;
+}
+.prediction-league-name-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.prediction-league-name-input::placeholder {
+  color: var(--text-faint);
 }
 .prediction-team-add-row {
   margin-top: 10px;
@@ -4000,6 +4379,240 @@ a.team-profile-match-row:hover {
 .prediction-league-list-name {
   font-weight: 600;
 }
+.prediction-league-list-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.prediction-league-list-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(84, 104, 255, 0.16);
+  color: var(--ucl-blue-2);
+  white-space: nowrap;
+}
+.prediction-room-comp-badges {
+  display: flex;
+  gap: 6px;
+}
+
+/* Tahmin Ligi giriş sayfasındaki açıklama kartı -- "puanların neye göre
+   verildiğini bilsin" geri bildirimi için, giriş yapmadan önce bile görünür. */
+.prediction-intro-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  margin-bottom: 18px;
+}
+.prediction-intro-card h2 {
+  margin-bottom: 8px;
+}
+.prediction-intro-card > p {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+.prediction-intro-points {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+}
+.prediction-intro-point {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.prediction-intro-point-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.prediction-create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: flex-start;
+}
+.prediction-create-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+.prediction-create-field label {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.prediction-league-choice-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+.prediction-league-choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--line-strong);
+  background: var(--bg-panel);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.prediction-league-choice:hover {
+  border-color: var(--text-dim);
+}
+.prediction-league-choice.selected {
+  border-color: var(--accent);
+  background: rgba(84, 104, 255, 0.14);
+  color: var(--text-primary);
+}
+.prediction-league-choice-check {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--line-strong);
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+}
+.prediction-league-choice.selected .prediction-league-choice-check {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.prediction-league-choice-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.prediction-league-choice-name {
+  font-family: var(--font-display);
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  color: var(--text-primary);
+}
+.prediction-league-choice-tagline {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+.prediction-league-choice-warning {
+  color: #fbbf24;
+}
+
+.prediction-create-submit {
+  align-self: stretch;
+  width: 100%;
+  max-width: 420px;
+  padding: 14px 24px;
+  font-size: 15px;
+  text-align: center;
+}
+
+.prediction-week-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.prediction-week-nav-label {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  text-align: center;
+}
+.prediction-team-search {
+  width: 100%;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  background: var(--bg-panel-alt);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+/* Fikstür sayfasındaki takım aramasının sonuçları -- her maçın hangi
+   haftaya ait olduğunu küçük bir etiketle gösterir (bkz. RealFixturePage). */
+.fixture-search-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.fixture-search-week-label {
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(84, 104, 255, 0.16);
+  color: var(--ucl-blue-2);
+}
+.prediction-match-meta {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.prediction-match-comp-badge {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(84, 104, 255, 0.16);
+  color: var(--ucl-blue-2);
+}
+.prediction-match-date {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-faint);
+}
+@media (max-width: 640px) {
+  .prediction-create-form {
+    width: 100%;
+  }
+  .prediction-league-choice-row {
+    width: 100%;
+  }
+  .prediction-league-choice {
+    flex: 1;
+    text-align: center;
+  }
+  .prediction-week-nav {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .prediction-week-nav button {
+    width: 100%;
+  }
+}
+
 .prediction-league-toolbar {
   display: flex;
   align-items: center;
@@ -4129,43 +4742,16 @@ a.team-profile-match-row:hover {
   color: #fff;
   border-color: transparent;
 }
-.dreamteam-tactic-picker {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 14px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid var(--line);
-}
 .dreamteam-tactic-label {
   font-size: 12px;
   color: var(--text-faint);
   margin-right: 4px;
 }
-.dreamteam-tactic-picker button {
-  font-size: 12px;
-  padding: 7px 13px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--line-strong);
-  background: var(--bg-panel);
-  color: var(--text-dim);
-  cursor: pointer;
-}
-.dreamteam-tactic-picker button.active {
-  background: linear-gradient(180deg, var(--accent-bright), var(--accent));
-  color: #fff;
-  border-color: transparent;
-}
 .dreamteam-send-buttons {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
   gap: 14px;
-}
-.dreamteam-send-item {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
 }
 .dreamteam-send-status {
   display: flex;
@@ -4177,6 +4763,25 @@ a.team-profile-match-row:hover {
 .dreamteam-send-status .btn-ghost {
   font-size: 10.5px;
   padding: 3px 8px;
+}
+.dreamteam-team-start {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.dreamteam-team-start-select {
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line-strong);
+  background: var(--bg-panel);
+  color: var(--text-primary);
+  min-width: 220px;
 }
 
 .pitch-drag-hint {
@@ -4470,6 +5075,17 @@ a.team-profile-match-row:hover {
   font-size: 13px;
   text-transform: uppercase;
   margin-bottom: 10px;
+}
+/* 60px'lik üst boşluk küçük telefonlarda (özellikle klavye açıkken) modalı
+   gereksiz sıkıştırıyordu -- mobilde daha yukarıdan başlayıp daha fazla
+   yükseklik bırakıyoruz. */
+@media (max-width: 640px) {
+  .player-picker-overlay {
+    padding: 20px 10px;
+  }
+  .player-picker-modal {
+    max-height: 85vh;
+  }
 }
 .player-picker-results {
   overflow-y: auto;
@@ -6067,5 +6683,859 @@ a.team-profile-match-row:hover {
   }
   .whatsnew-item-desc {
     font-size: 11px;
+  }
+}
+
+/* ==========================================================================
+   Gerçek veri sayfaları (CompetitionHomePage / NewsPage) -- UCL & Süper Lig
+   ========================================================================== */
+.fun-mode-link {
+  white-space: nowrap;
+}
+
+.news-preview-card .news-preview-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.news-preview-card .news-preview-head h3 {
+  margin-bottom: 0;
+}
+.news-preview-head a {
+  font-size: 12px;
+  color: var(--ucl-blue-2);
+  white-space: nowrap;
+}
+.news-preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.news-preview-item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 12.5px;
+}
+.news-preview-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.news-preview-date {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+.news-preview-title {
+  color: var(--text-primary);
+}
+
+.news-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.news-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.news-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+}
+.news-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.news-card-date {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+.news-card-teams {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.news-card-team-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px 10px 3px 6px;
+  font-size: 11px;
+  color: var(--text-dim);
+  text-decoration: none;
+}
+.news-card-team-chip:hover {
+  color: var(--text-primary);
+  border-color: var(--text-dim);
+}
+.news-card-title {
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+.news-card-summary {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+.news-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11.5px;
+}
+.news-card-source {
+  color: var(--text-faint);
+}
+.news-card-link {
+  color: var(--ucl-blue-2);
+}
+
+.competition-home-fun-note {
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.footnote-note {
+  color: var(--text-faint);
+  font-size: 11px;
+}
+
+.form-badge-row {
+  display: flex;
+  gap: 6px;
+}
+
+.real-team-form-grid,
+.real-squad-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 640px) {
+  .real-team-form-grid,
+  .real-squad-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.real-team-form-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  margin-bottom: 10px;
+}
+.real-team-form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+.real-team-form-asof {
+  display: block;
+  font-size: 10.5px;
+  color: var(--text-faint);
+}
+.real-squad-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.real-squad-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12.5px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--line);
+}
+.real-squad-list li a {
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.real-squad-list li a:hover {
+  color: var(--ucl-blue-2);
+}
+.real-squad-pos {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-faint);
+}
+
+.h2h-meeting-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.h2h-meeting-list li {
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  font-size: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+.h2h-meeting-date {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-faint);
+}
+.h2h-meeting-comp {
+  color: var(--text-dim);
+}
+.h2h-meeting-score {
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.zone-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.zone-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.zone-legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.zone-legend-item.status-tone-good {
+  color: #4ade80;
+}
+.zone-legend-item.status-tone-neutral {
+  color: #fbbf24;
+}
+.zone-legend-item.status-tone-bad {
+  color: #f87171;
+}
+
+.streaks-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+@media (max-width: 640px) {
+  .streaks-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.streaks-subtitle {
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+.streaks-subtitle-hot {
+  color: #f87171;
+}
+.streaks-subtitle-cold {
+  color: var(--ucl-blue-2);
+}
+.streaks-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.streaks-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+.streaks-list-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.streaks-list-team:hover {
+  color: var(--ucl-blue-2);
+}
+.streaks-badge {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.streaks-badge-hot {
+  background: rgba(248, 113, 113, 0.16);
+  color: #f87171;
+}
+.streaks-badge-cold {
+  background: rgba(84, 104, 255, 0.16);
+  color: var(--ucl-blue-2);
+}
+
+.upset-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.upset-row {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr) auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  background: var(--bg-panel);
+  text-decoration: none;
+  color: var(--text-primary);
+}
+.upset-row:hover {
+  background: var(--bg-panel-alt);
+}
+.upset-row-week {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-faint);
+}
+.upset-row-team {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.upset-row-team-away {
+  flex-direction: row-reverse;
+}
+.upset-row-score {
+  font-family: var(--font-mono);
+  font-size: 14px;
+}
+.upset-row-surprise {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: #fbbf24;
+  white-space: nowrap;
+}
+/* 5 sütun (hafta + 2 takım + skor + sürpriz %) 90px sabit hafta sütunuyla
+   dar ekranlarda taşabiliyordu -- sütunu daraltıp yazıları küçültüyoruz. */
+@media (max-width: 640px) {
+  .upset-row {
+    grid-template-columns: 62px minmax(0, 1fr) auto minmax(0, 1fr) auto;
+    gap: 6px;
+    padding: 8px;
+  }
+  .upset-row-week {
+    font-size: 9px;
+  }
+  .upset-row-team {
+    font-size: 11.5px;
+  }
+  .upset-row-score {
+    font-size: 12.5px;
+  }
+  .upset-row-surprise {
+    font-size: 9.5px;
+  }
+}
+
+.form-guide-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.form-guide-row {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  background: var(--bg-panel);
+  border: 1px solid transparent;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+.form-guide-row:hover {
+  border-color: var(--line-strong);
+}
+.form-guide-row.is-favorite {
+  border-color: rgba(250, 204, 21, 0.5);
+  background: rgba(250, 204, 21, 0.06);
+}
+.form-guide-rank {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+.form-guide-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.form-guide-badges {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.form-guide-badges .form-badge {
+  width: 20px;
+  height: 20px;
+  font-size: 10px;
+}
+
+/* "Kalan Fikstür Zorluğu" -- 36 takıma kadar tek uzun bir grafik yerine,
+   her takımın kendi mini kazanma-olasılığı ölçeğini gösteren kompakt,
+   çok sütunlu bir kart ızgarası (bkz. RealAnalysisTab.jsx). */
+.fixture-difficulty-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 8px;
+}
+.fixture-difficulty-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  background: var(--bg-panel);
+  border: 1px solid transparent;
+  text-decoration: none;
+  color: var(--text-primary);
+  min-width: 0;
+}
+.fixture-difficulty-row:hover {
+  border-color: var(--line-strong);
+}
+.fixture-difficulty-row.is-favorite {
+  border-color: rgba(250, 204, 21, 0.5);
+  background: rgba(250, 204, 21, 0.06);
+}
+.fixture-difficulty-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  width: 44px;
+  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fixture-difficulty-track {
+  flex: 1 1 auto;
+  min-width: 40px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bg-panel-alt);
+  overflow: hidden;
+}
+.fixture-difficulty-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.2s ease;
+}
+.fixture-difficulty-pct {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.fixture-difficulty-coeff {
+  margin-left: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--text-faint);
+}
+
+/* Ortak kazanma olasılığı gösterimi (bkz. ProbabilityBar.jsx) -- eski
+   match-row-probs/matchpreview-probs'un YERİNE (bar genişliğiyle etiketlerin
+   hizası tutarsız kalabiliyordu); "full" (Maç Analizi) ve "mini" (Puan
+   Durumu satırı) iki boyutu var. */
+.prob-home-text {
+  color: var(--ucl-blue-2);
+}
+.prob-draw-text {
+  color: var(--text-dim);
+}
+.prob-away-text {
+  color: var(--pink);
+}
+
+.prob-full {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.prob-full-track {
+  display: flex;
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--bg-panel);
+}
+.prob-full-legend {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.prob-full-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.prob-full-legend-draw {
+  flex-direction: column;
+  gap: 2px;
+  text-align: center;
+}
+.prob-full-legend-away {
+  flex-direction: row-reverse;
+}
+.prob-full-legend-name {
+  color: var(--text-dim);
+  font-size: 12px;
+}
+.prob-full-legend-pct {
+  font-family: var(--font-mono);
+  font-size: 15px;
+}
+
+.prob-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 90px;
+}
+.prob-mini-track {
+  display: flex;
+  width: 100%;
+  height: 5px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--bg-panel);
+}
+.prob-mini-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.pagination-btn {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+.pagination-btn:hover:not(:disabled) {
+  color: var(--text-primary);
+  border-color: var(--ucl-blue-2);
+}
+.pagination-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.pagination-status {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.favorite-toggle-btn {
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+.favorite-toggle-btn:hover {
+  color: var(--text-primary);
+  border-color: #fbbf24;
+}
+.favorite-toggle-btn.is-favorite {
+  background: rgba(250, 204, 21, 0.16);
+  border-color: rgba(250, 204, 21, 0.6);
+  color: #fbbf24;
+}
+
+.fun-mode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.fun-mode-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  padding: 26px 18px;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: border-color 0.15s, transform 0.15s;
+}
+.fun-mode-card:hover {
+  border-color: #7c3aed;
+  transform: translateY(-2px);
+}
+.fun-mode-card-icon {
+  font-size: 34px;
+}
+.fun-mode-card-name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 0.02em;
+}
+.fun-mode-card-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.fun-mode-card-cta {
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #a78bfa;
+}
+
+.hero-stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.hero-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 14px 10px;
+  text-align: center;
+}
+.hero-stat-value {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--text-primary);
+}
+.hero-stat-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+.hero-stat-team {
+  flex-direction: row;
+  text-align: left;
+  gap: 8px;
+}
+.hero-stat-team > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.analysis-teaser-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: linear-gradient(135deg, rgba(84, 104, 255, 0.14), rgba(84, 104, 255, 0.02));
+  border: 1px solid rgba(84, 104, 255, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 16px 22px;
+  margin-bottom: 22px;
+  text-decoration: none;
+  color: inherit;
+}
+.analysis-teaser-card:hover {
+  border-color: var(--ucl-blue-2);
+}
+.analysis-teaser-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ucl-blue-2);
+}
+.analysis-teaser-card h3 {
+  margin: 4px 0 6px;
+}
+.analysis-teaser-card p {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  margin: 0;
+  max-width: 640px;
+}
+.analysis-teaser-arrow {
+  font-size: 26px;
+  color: var(--ucl-blue-2);
+  flex-shrink: 0;
+}
+@media (max-width: 640px) {
+  .analysis-teaser-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Ana sayfadaki "tuttuğun takım" spotlight kartı (bkz. CompetitionHomePage.jsx) */
+.favorite-spotlight-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: linear-gradient(135deg, rgba(250, 204, 21, 0.12), rgba(250, 204, 21, 0.02));
+  border: 1px solid rgba(250, 204, 21, 0.4);
+  border-radius: var(--radius-lg);
+  padding: 14px 20px;
+  margin-bottom: 18px;
+}
+.favorite-spotlight-crest {
+  flex-shrink: 0;
+}
+.favorite-spotlight-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-right: auto;
+}
+.favorite-spotlight-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fbbf24;
+}
+.favorite-spotlight-name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.favorite-spotlight-name:hover {
+  color: #fbbf24;
+}
+.favorite-spotlight-meta {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.favorite-spotlight-next {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+.favorite-spotlight-next-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.favorite-spotlight-next-match {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+.favorite-spotlight-next-match:hover {
+  color: #fbbf24;
+}
+.favorite-spotlight-next-date {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+@media (max-width: 640px) {
+  .favorite-spotlight-card {
+    justify-content: center;
+    text-align: center;
+  }
+  .favorite-spotlight-info {
+    margin-right: 0;
+  }
+  .favorite-spotlight-next {
+    align-items: center;
+    width: 100%;
   }
 }

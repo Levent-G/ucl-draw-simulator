@@ -2,3 +2,6 @@ node_modules
 dist
 .DS_Store
 .highlightly-cache
+.env
+.env.local
+.env.*.local

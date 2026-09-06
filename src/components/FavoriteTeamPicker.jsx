@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Crest from './Crest.jsx'
+import { toSearchKey } from '../utils/text.js'
 
 export default function FavoriteTeamPicker({
   teams,
@@ -21,7 +22,7 @@ export default function FavoriteTeamPicker({
     ? teams.filter((t) => t.id !== favoriteTeamId && t.country !== favoriteTeam.country)
     : []
   const filtered = query
-    ? otherTeams.filter((t) => t.name.toLowerCase().includes(query.toLowerCase()))
+    ? otherTeams.filter((t) => toSearchKey(t.name).includes(toSearchKey(query)))
     : otherTeams
 
   return (

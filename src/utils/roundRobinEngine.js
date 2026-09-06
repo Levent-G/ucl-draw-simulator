@@ -74,10 +74,14 @@ export function serializeRoundRobinFixture(matchdays) {
   return matchdays.map((md) => ({
     number: md.number,
     label: md.label,
-    matches: md.matches.map((m) => ({ id: m.id, homeId: m.homeTeam.id, awayId: m.awayTeam.id })),
+    matches: md.matches.map((m) => ({ id: m.id, homeId: m.homeTeam.id, awayId: m.awayTeam.id, date: m.date })),
   }));
 }
 
+// date alanı opsiyoneldir -- eski (rastgele üretilmiş, tarihsiz) fikstürler
+// için undefined kalır, gerçek tarihli bir fikstür (bkz.
+// realFixtureSuperLig2026.js) için matchDate.isMatchPlayed'in kullandığı
+// gerçek tarihi taşır.
 export function deserializeRoundRobinFixture(raw, teams) {
   const teamById = {};
   for (const t of teams) teamById[t.id] = t;
@@ -85,7 +89,7 @@ export function deserializeRoundRobinFixture(raw, teams) {
     number: md.number,
     label: md.label,
     matches: md.matches
-      .map((m) => ({ id: m.id, homeTeam: teamById[m.homeId], awayTeam: teamById[m.awayId] }))
+      .map((m) => ({ id: m.id, homeTeam: teamById[m.homeId], awayTeam: teamById[m.awayId], date: m.date }))
       .filter((m) => m.homeTeam && m.awayTeam),
   }));
 }

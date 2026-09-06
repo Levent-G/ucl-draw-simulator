@@ -17,6 +17,7 @@ import {
 import Crest from "../Crest.jsx";
 import SortableTable from "./SortableTable.jsx";
 import ChartTooltip from "./ChartTooltip.jsx";
+import TeamAxisTick from "./TeamAxisTick.jsx";
 import { CHART_SERIES, CHART_GRID, CHART_AXIS } from "../../utils/chartTheme.js";
 import { teamsByCoeffDesc, teamsWithSimPoints } from "../../utils/statsSelectors.js";
 
@@ -37,13 +38,29 @@ function potAverages(teams) {
   }));
 }
 
-export default function TeamsTab({ competition, simulation, selectedTeam, competitionKey }) {
+export default function TeamsTab({
+  competition,
+  simulation,
+  selectedTeam,
+  competitionKey,
+  pointsLabel = "Sim. Puan",
+  rankLabel = "Sim. Sıra",
+}) {
   const { teams, countryNames } = competition;
+  const teamByShort = useMemo(() => Object.fromEntries(teams.map((t) => [t.short, t])), [teams]);
   const allByCoeff = useMemo(() => teamsByCoeffDesc(teams), [teams]);
   const topByCoeff = useMemo(() => allByCoeff.slice(0, 15), [allByCoeff]);
   const pots = useMemo(() => potAverages(teams), [teams]);
   const teamsWithSim = useMemo(() => teamsWithSimPoints(teams, simulation?.standings), [teams, simulation]);
   const hasPots = pots.length > 0;
+  const byGoalDiff = useMemo(
+    () =>
+      teamsWithSim
+        .filter((t) => t.played != null && t.played > 0)
+        .sort((a, b) => b.gd - a.gd)
+        .slice(0, 15),
+    [teamsWithSim]
+  );
 
   const selectedInfo = useMemo(() => {
     if (!selectedTeam) return null;
@@ -75,11 +92,11 @@ export default function TeamsTab({ competition, simulation, selectedTeam, compet
             </div>
             <div>
               <span className="team-profile-stat-value">{selectedInfo.simPoints ?? "–"}</span>
-              <span className="team-profile-stat-label">Sim. Puan</span>
+              <span className="team-profile-stat-label">{pointsLabel}</span>
             </div>
             <div>
               <span className="team-profile-stat-value">{selectedInfo.simRank ?? "–"}</span>
-              <span className="team-profile-stat-label">Sim. Sıra</span>
+              <span className="team-profile-stat-label">{rankLabel}</span>
             </div>
             {selectedInfo.statusLabel && (
               <span className={`status-badge status-tone-${selectedInfo.statusTone}`}>
@@ -99,9 +116,9 @@ export default function TeamsTab({ competition, simulation, selectedTeam, compet
             <YAxis
               type="category"
               dataKey="short"
-              width={54}
+              width={74}
               stroke={CHART_AXIS}
-              tick={{ fill: CHART_AXIS, fontSize: 12 }}
+              tick={(props) => <TeamAxisTick {...props} teamsByKey={teamByShort} fill={CHART_AXIS} fontSize={12} />}
             />
             <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
             <Bar dataKey="coeff" name="Katsayı" radius={[0, 4, 4, 0]} maxBarSize={18}>
@@ -135,9 +152,37 @@ export default function TeamsTab({ competition, simulation, selectedTeam, compet
         </div>
       )}
 
+      {byGoalDiff.length > 0 && (
+        <div className="chart-card">
+          <h3>🥅 Gol Farkı (Averaj)</h3>
+          <ResponsiveContainer width="100%" height={420}>
+            <BarChart data={byGoalDiff} layout="vertical" margin={{ left: 16, right: 24 }}>
+              <CartesianGrid stroke={CHART_GRID} horizontal={false} />
+              <XAxis type="number" allowDecimals={false} stroke={CHART_AXIS} tick={{ fill: CHART_AXIS, fontSize: 12 }} />
+              <YAxis
+                type="category"
+                dataKey="short"
+                width={74}
+                stroke={CHART_AXIS}
+                tick={(props) => <TeamAxisTick {...props} teamsByKey={teamByShort} fill={CHART_AXIS} fontSize={12} />}
+              />
+              <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
+              <Bar dataKey="gd" name="Averaj" radius={[0, 4, 4, 0]} maxBarSize={18}>
+                {byGoalDiff.map((t) => (
+                  <Cell
+                    key={t.id}
+                    fill={selectedTeam && t.id === selectedTeam.id ? "#fbbf24" : t.gd >= 0 ? "#4ade80" : "#f87171"}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
       {simulation && (
         <div className={`chart-card ${hasPots ? "chart-card-wide" : ""}`}>
-          <h3>Katsayı vs. Simüle Edilmiş Puan</h3>
+          <h3>Katsayı vs. {pointsLabel}</h3>
           <ResponsiveContainer width="100%" height={420}>
             <ScatterChart margin={{ top: 12, right: 24, bottom: 12, left: 0 }}>
               <CartesianGrid stroke={CHART_GRID} />
@@ -151,7 +196,7 @@ export default function TeamsTab({ competition, simulation, selectedTeam, compet
               <YAxis
                 type="number"
                 dataKey="simPoints"
-                name="Simüle Puan"
+                name={pointsLabel}
                 stroke={CHART_AXIS}
                 tick={{ fill: CHART_AXIS, fontSize: 12 }}
               />
@@ -208,14 +253,56 @@ export default function TeamsTab({ competition, simulation, selectedTeam, compet
             ...(hasPots ? [{ key: "pot", label: "Torba" }] : []),
             { key: "coeff", label: "Katsayı" },
             {
+              key: "played",
+              label: "O",
+              sortAccessor: (t) => t.played ?? -1,
+              render: (t) => t.played ?? "–",
+            },
+            {
+              key: "w",
+              label: "G",
+              sortAccessor: (t) => t.w ?? -1,
+              render: (t) => t.w ?? "–",
+            },
+            {
+              key: "d",
+              label: "B",
+              sortAccessor: (t) => t.d ?? -1,
+              render: (t) => t.d ?? "–",
+            },
+            {
+              key: "l",
+              label: "M",
+              sortAccessor: (t) => t.l ?? -1,
+              render: (t) => t.l ?? "–",
+            },
+            {
+              key: "gf",
+              label: "AG",
+              sortAccessor: (t) => t.gf ?? -1,
+              render: (t) => t.gf ?? "–",
+            },
+            {
+              key: "ga",
+              label: "YG",
+              sortAccessor: (t) => t.ga ?? -1,
+              render: (t) => t.ga ?? "–",
+            },
+            {
+              key: "gd",
+              label: "AV",
+              sortAccessor: (t) => t.gd ?? -999,
+              render: (t) => (t.gd == null ? "–" : t.gd > 0 ? `+${t.gd}` : t.gd),
+            },
+            {
               key: "simPoints",
-              label: "Sim. Puan",
+              label: pointsLabel,
               sortAccessor: (t) => t.simPoints ?? -1,
               render: (t) => t.simPoints ?? "–",
             },
             {
               key: "simRank",
-              label: "Sim. Sıra",
+              label: rankLabel,
               sortAccessor: (t) => (t.simRank == null ? 999 : t.simRank),
               render: (t) => t.simRank ?? "–",
             },

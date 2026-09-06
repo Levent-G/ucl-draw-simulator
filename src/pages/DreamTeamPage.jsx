@@ -11,15 +11,15 @@ import {
 } from "recharts";
 import { useDreamTeam, FORMATIONS, ZONES, zoneForY } from "../state/DreamTeamContext.jsx";
 import { useTeamInjection } from "../state/TeamInjectionContext.jsx";
-import { useTacticsContext } from "../state/TacticsContext.jsx";
+import { useTransferMarket } from "../state/TransferContext.jsx";
 import { useAchievements } from "../state/AchievementsContext.jsx";
-import { COMPETITION_LIST } from "../data/competitions.js";
 import { findPlayerByGlobalId } from "../utils/crossCompetitionPlayers.js";
+import { buildXiFromTeamRoster } from "../utils/dreamTeamAutoFill.js";
 import PlayerPickerModal from "../components/dreamteam/PlayerPickerModal.jsx";
+import TeamStartPicker from "../components/dreamteam/TeamStartPicker.jsx";
 import PlayerAvatar from "../components/PlayerAvatar.jsx";
 import Crest from "../components/Crest.jsx";
 import { CHART_SERIES, CHART_GRID, CHART_AXIS } from "../utils/chartTheme.js";
-import { TACTICS } from "../utils/predictionEngine.js";
 import { encodeShareData, decodeShareData, copyToClipboard } from "../utils/shareLink.js";
 
 const DREAM_TEAM_ID = "dream-team";
@@ -75,18 +75,24 @@ function PitchSlot({ slot, coords, player, isDragging, onPick, onClear, onDragSt
   );
 }
 
-// Rüya Takım kadrosunu, seçilen yarışmadaki rastgele bir takımın yerine
-// koyup, o yarışmanın normal kura/sezon sayfasına yönlendirir. Enjeksiyon
-// bir kez yapıldıktan sonra kalıcıdır (bu sekmeden ayrılınca sıfırlanmaz) --
+// Rüya Takım kadrosunu Süper Lig'e gönderip Süper Lig sayfasına yönlendirir.
+// Hangi takımın yerine geçileceği İSTENMEZ/SEÇTİRİLMEZ -- otomatik olarak
+// kadronun "Bir takımdan başla" ile geldiği Süper Lig takımıdır
+// (autoDetectedTeamId). Kadro tek bir Süper Lig takımından gelmiyorsa (elle
+// karıştırılmış/başka ligden başlanmış) gönderim tamamen devre dışı kalır --
+// manuel bir "hangi takımın yerine" seçimi yoktur. Enjeksiyon bir kez
+// yapıldıktan sonra kalıcıdır (bu sekmeden ayrılınca sıfırlanmaz) --
 // kullanıcı istediği zaman "Geri Çek" ile eski takımı iade edebilir.
-function SendToCompetition({ filledPlayers, isFull }) {
+function SendToSuperLig({ filledPlayers, isFull, autoDetectedTeamId }) {
   const navigate = useNavigate();
   const { injections, sendDreamTeam, clearInjection } = useTeamInjection();
-  const { setTeamTactic } = useTacticsContext();
-  const [selectedTactic, setSelectedTactic] = useState("balanced");
 
-  const handleSend = (compKey) => {
-    if (!isFull) return;
+  const injection = injections.superlig;
+  const isSent = injection?.team?.id === DREAM_TEAM_ID;
+  const canSend = isFull && !!autoDetectedTeamId;
+
+  const handleSend = () => {
+    if (!canSend) return;
     const avgRating = Math.round(
       filledPlayers.reduce((s, p) => s + p.rating, 0) / filledPlayers.length
     );
@@ -105,60 +111,39 @@ function SendToCompetition({ filledPlayers, isFull }) {
       rating: p.rating,
       teamId: team.id,
     }));
-    sendDreamTeam(compKey, team, players);
-    setTeamTactic(compKey, DREAM_TEAM_ID, selectedTactic);
-    navigate(`/${compKey}`);
+    sendDreamTeam("superlig", team, players, autoDetectedTeamId);
+    navigate("/superlig");
   };
 
   return (
     <div className="dreamteam-send">
       <div className="dreamteam-send-head">
-        <span className="dreamteam-send-title">Kadroyu Bir Yarışmaya Gönder</span>
+        <span className="dreamteam-send-title">Kadroyu Süper Lig'e Gönder</span>
         {!isFull && (
           <span className="dreamteam-send-hint">
             Gönderebilmek için önce kadroyu tamamlamalısın (11/11).
           </span>
         )}
-      </div>
-
-      <div className="dreamteam-tactic-picker">
-        <span className="dreamteam-tactic-label">Oyun tarzı:</span>
-        {Object.values(TACTICS).map((t) => (
-          <button
-            key={t.key}
-            type="button"
-            className={selectedTactic === t.key ? "active" : ""}
-            onClick={() => setSelectedTactic(t.key)}
-          >
-            {t.icon} {t.label}
-          </button>
-        ))}
+        {isFull && !autoDetectedTeamId && (
+          <span className="dreamteam-send-hint">
+            Bu kadro tek bir Süper Lig takımından gelmiyor -- gönderebilmek için önce "Bir takımdan başla" ile bir
+            Süper Lig takımı seç.
+          </span>
+        )}
       </div>
 
       <div className="dreamteam-send-buttons">
-        {COMPETITION_LIST.map((c) => {
-          const injection = injections[c.key];
-          const isSent = injection?.team?.id === DREAM_TEAM_ID;
-          return (
-            <div className="dreamteam-send-item" key={c.key}>
-              <button
-                className="btn-secondary"
-                disabled={!isFull}
-                onClick={() => handleSend(c.key)}
-              >
-                {c.shortName}'e Gönder
-              </button>
-              {isSent && (
-                <span className="dreamteam-send-status">
-                  {injection.removedTeam.name} yerine gönderildi
-                  <button className="btn-ghost" onClick={() => clearInjection(c.key)}>
-                    Geri Çek
-                  </button>
-                </span>
-              )}
-            </div>
-          );
-        })}
+        <button className="btn-secondary" disabled={!canSend} onClick={handleSend}>
+          Süper Lig'e Gönder
+        </button>
+        {isSent && (
+          <span className="dreamteam-send-status">
+            {injection.removedTeam.name} yerine gönderildi
+            <button className="btn-ghost" onClick={() => clearInjection("superlig")}>
+              Geri Çek
+            </button>
+          </span>
+        )}
       </div>
     </div>
   );
@@ -205,6 +190,27 @@ function SquadBuilder() {
     setShareStatus(copied ? "copied" : "manual");
     window.setTimeout(() => setShareStatus("idle"), 3000);
     if (!copied) window.prompt("Linki kopyala:", url);
+  };
+
+  // "Bir takımdan başla": her üç yarışma için de sabit hook çağrıları (Hooks
+  // kuralları gereği competitionKey'e göre KOŞULLU çağrılamaz) -- seçilen
+  // takımın güncel (transfer merkezindeki değişiklikleri yansıtan) kadrosu
+  // buildXiFromTeamRoster ile mevcut formasyona yerleştirilir.
+  const marketByCompetition = {
+    ucl: useTransferMarket("ucl"),
+    europa: useTransferMarket("europa"),
+    superlig: useTransferMarket("superlig"),
+  };
+  const handleTeamStart = (teamId, competitionKey) => {
+    if (
+      Object.keys(squad).length > 0 &&
+      !window.confirm("Mevcut kadron silinip seçtiğin takımla değiştirilecek. Devam edilsin mi?")
+    ) {
+      return;
+    }
+    const roster = marketByCompetition[competitionKey].getEffectivePlayersByTeam(teamId);
+    const squadMap = buildXiFromTeamRoster(roster, competitionKey, formationSlots);
+    loadSquad(formation, squadMap);
   };
 
   const coordsOf = useCallback(
@@ -316,8 +322,20 @@ function SquadBuilder() {
   // listede çıkmasın diye tüm mevcut seçimleri dışarıda tutuyoruz.
   const excludeGlobalIds = useMemo(() => Object.values(squad), [squad]);
 
+  // Kadronun TAMAMI (11/11) tek bir Süper Lig takımından geliyorsa ("Bir
+  // takımdan başla" hiç değiştirilmemişse) Süper Lig'e gönderim formunda o
+  // takımı kolaylık olsun diye ön-seçili gösterir -- yine de gönder butonu
+  // seçim yapılmadan aktif olmaz (bkz. SendToSuperLig).
+  const autoDetectedSuperLigTeamId = useMemo(() => {
+    if (filledCount !== SQUAD_SIZE) return "";
+    const teamIds = new Set(filledPlayers.map((p) => (p.competitionKey === "superlig" ? p.teamId : null)));
+    return teamIds.size === 1 && !teamIds.has(null) ? [...teamIds][0] : "";
+  }, [filledPlayers, filledCount]);
+
   return (
     <>
+      <TeamStartPicker onPick={handleTeamStart} />
+
       <div className="dreamteam-toolbar">
         <div className="dreamteam-summary">
           <span>
@@ -362,7 +380,11 @@ function SquadBuilder() {
         )}
       </div>
 
-      <SendToCompetition filledPlayers={filledPlayers} isFull={filledCount === SQUAD_SIZE} />
+      <SendToSuperLig
+        filledPlayers={filledPlayers}
+        isFull={filledCount === SQUAD_SIZE}
+        autoDetectedTeamId={autoDetectedSuperLigTeamId}
+      />
 
       <p className="pitch-drag-hint">
         🖐️ Kadrodaki bir oyuncuyu tutup sahanın istediğin noktasına sürükle —
