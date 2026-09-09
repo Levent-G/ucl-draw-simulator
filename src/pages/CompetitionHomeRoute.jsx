@@ -7,7 +7,7 @@ import { REAL_DRAW_2026_MATCHES } from "../data/realDraw2026.js";
 import { hasRealDataSupport } from "../utils/realStandingsSelectors.js";
 import DrawPage from "./DrawPage.jsx";
 import LeagueHomePage from "./LeagueHomePage.jsx";
-import CompetitionHomePage from "./CompetitionHomePage.jsx";
+import RealFixturePage from "./RealFixturePage.jsx";
 
 // /:competitionKey rotasının ortak girişi.
 //
@@ -48,8 +48,12 @@ export default function CompetitionHomeRoute() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRealUcl, hasDraw]);
 
+  // Kullanıcı geri bildirimi: "ana sayfa kısmını kaldır direkt fikstürden
+  // başlasın" -- UCL/Süper Lig'de artık ayrı bir "giriş" sayfası yok, kök
+  // rota doğrudan gerçek fikstürü (puan durumu + takvim + haftalık maçlar
+  // dahil) gösteriyor.
   if (hasRealDataSupport(competitionKey)) {
-    return <CompetitionHomePage key={competitionKey} />;
+    return <RealFixturePage key={competitionKey} />;
   }
 
   return competition.format === "swiss" ? (

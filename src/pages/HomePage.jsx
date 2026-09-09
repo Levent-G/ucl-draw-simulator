@@ -2,7 +2,9 @@ import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { TEAMS } from "../data/teams.js";
 import { COMPETITION_LIST } from "../data/competitions.js";
-import { hasRealDataSupport, getRealStandings } from "../utils/realStandingsSelectors.js";
+import { hasRealDataSupport, getRealStandings, getRealFixture } from "../utils/realStandingsSelectors.js";
+import { isMatchPlayed, formatMatchDate } from "../utils/matchDate.js";
+import { getCompetition } from "../data/competitions.js";
 import Crest from "../components/Crest.jsx";
 
 // Site artık BİRİNCİL olarak gerçek UCL/Süper Lig verisi sunuyor (kura
@@ -143,28 +145,65 @@ function CrestMarquee() {
 // Gerçek veri destekli bir yarışma (UCL/Süper Lig) için ana sayfa kartı --
 // eski sürüm buraya kura çekimi/sezon simülasyonu durumuna göre ("kura
 // çekildi mi, fikstür hazır mı...") bir CTA üretiyordu; bu yarışmalar için
-// artık böyle bir durum makinesi YOK (sezon zaten gerçek ve sürüyor) --
-// doğrudan yarışmanın gerçek ana sayfasına gider.
+// artık böyle bir durum makinesi YOK (sezon zaten gerçek ve sürüyor). Kart
+// artık sadece bir link değil -- lider takım ve sıradaki gerçek maç gibi
+// CANLI verilerle "hemen bir şey gösteren" bir önizleme kartı (kullanıcı
+// geri bildirimi: sayfaya girince "vay be" dedirtecek kadar veri dolu olsun).
 function RealCompetitionCard({ comp }) {
-  const { started } = getRealStandings(comp.key);
+  const { standings, started } = getRealStandings(comp.key);
+  const teamById = useMemo(
+    () => Object.fromEntries(getCompetition(comp.key).teams.map((t) => [t.id, t])),
+    [comp.key]
+  );
+  const leader = started && standings?.length > 0 ? [...standings].sort((a, b) => a.rank - b.rank)[0] : null;
+  const leaderTeam = leader ? teamById[leader.teamId] : null;
+
+  const nextMatch = useMemo(() => {
+    const fixture = getRealFixture(comp.key);
+    for (const md of fixture || []) {
+      const m = md.matches.find((x) => !isMatchPlayed(x));
+      if (m) return m;
+    }
+    return null;
+  }, [comp.key]);
+
   return (
-    <div className="home-comp-card">
+    <Link to={`/${comp.key}`} className="home-comp-card">
       <div className="home-comp-card-top">
         <span className="home-comp-card-icon" aria-hidden="true">
           {COMPETITION_ICONS[comp.key] || "⚽"}
         </span>
-        <span className="home-comp-card-status is-active">Gerçek Veri · 2026-27</span>
+        <span className="home-comp-card-status is-active">📡 Gerçek Veri · 2026-27</span>
       </div>
       <div className="home-comp-card-name">{comp.shortName}</div>
-      <p className="home-comp-card-tagline">
-        {started
-          ? "Sezon sürüyor -- güncel puan durumu, fikstür ve analiz."
-          : "Gerçek fikstür ve kadrolarla sezona hazır, ilk maçlar yakında."}
-      </p>
-      <Link to={`/${comp.key}`} className="btn-primary home-comp-card-btn">
-        {comp.shortName}'e Git →
-      </Link>
-    </div>
+
+      {leaderTeam ? (
+        <div className="home-comp-card-live">
+          <span className="home-comp-card-live-label">Zirvede</span>
+          <span className="home-comp-card-live-team">
+            <Crest team={leaderTeam} size={24} />
+            {leaderTeam.name}
+          </span>
+          <span className="home-comp-card-live-pts">{leader.pts} puan</span>
+        </div>
+      ) : (
+        <p className="home-comp-card-tagline">Gerçek fikstür ve kadrolarla sezona hazır, ilk maçlar yakında.</p>
+      )}
+
+      {nextMatch && (
+        <div className="home-comp-card-live home-comp-card-next">
+          <span className="home-comp-card-live-label">Sıradaki Maç</span>
+          <span className="home-comp-card-next-teams">
+            <Crest team={nextMatch.homeTeam} size={20} /> {nextMatch.homeTeam.short}
+            <span className="home-comp-card-next-vs">–</span>
+            {nextMatch.awayTeam.short} <Crest team={nextMatch.awayTeam} size={20} />
+          </span>
+          {formatMatchDate(nextMatch.date) && <span className="home-comp-card-live-pts">{formatMatchDate(nextMatch.date)}</span>}
+        </div>
+      )}
+
+      <span className="home-comp-card-btn">{comp.shortName}'e Git →</span>
+    </Link>
   );
 }
 

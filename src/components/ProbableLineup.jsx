@@ -2,8 +2,27 @@ import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { FORMATIONS } from "../state/DreamTeamContext.jsx";
 import PlayerAvatar from "./PlayerAvatar.jsx";
+import { CURRENT_INJURIES } from "../data/injuries.js";
 
 const FORMATION_KEY = "4-3-3";
+
+// teamId -> Set(oyuncu adı, sadeleştirilmiş) -- CURRENT_INJURIES'teki
+// güncel sakat/cezalı oyuncuları hızlı arama için önceden indeksler.
+const INJURED_NAMES_BY_TEAM = CURRENT_INJURIES.reduce((acc, entry) => {
+  const key = entry.teamId;
+  const normalized = entry.playerName.trim().toLowerCase();
+  if (!acc[key]) acc[key] = new Set();
+  acc[key].add(normalized);
+  return acc;
+}, {});
+
+// Bir takımın kadrosundan, hâlihazırda sakat/cezalı olduğu bilinen (bkz.
+// src/data/injuries.js) oyuncuları çıkarır.
+function excludeCurrentlyInjured(players, teamId) {
+  const injuredNames = INJURED_NAMES_BY_TEAM[teamId];
+  if (!injuredNames || injuredNames.size === 0) return players;
+  return players.filter((p) => !injuredNames.has((p.name || "").trim().toLowerCase()));
+}
 
 // Takımın kayıtlı oyuncularından, mevkiine göre en yüksek reytingli
 // olanları formasyon slotlarına atar -- bu GERÇEK/doğrulanmış bir ilk 11
@@ -31,7 +50,14 @@ function buildProbableLineup(players, slots) {
 // gerçek kulübün kayıtlı kadrosundan besleniyor.
 export default function ProbableLineup({ team, players, competitionKey }) {
   const slots = FORMATIONS[FORMATION_KEY].slots;
-  const assigned = useMemo(() => buildProbableLineup(players || [], slots), [players, slots]);
+  const availablePlayers = useMemo(
+    () => excludeCurrentlyInjured(players || [], team.id),
+    [players, team.id]
+  );
+  const assigned = useMemo(
+    () => buildProbableLineup(availablePlayers, slots),
+    [availablePlayers, slots]
+  );
 
   return (
     <div className="probable-lineup">
@@ -39,7 +65,8 @@ export default function ProbableLineup({ team, players, competitionKey }) {
         <h4>🔮 Olası Kadro — {team.short} ({FORMATION_KEY})</h4>
         <p className="footnote">
           Resmi/doğrulanmış bir ilk 11 DEĞİLDİR -- kulübün kayıtlı oyuncularından, reytinge göre otomatik
-          oluşturulan örnek bir diziliş.
+          oluşturulan örnek bir diziliş. Hâlihazırda sakat/cezalı olduğu bilinen oyuncular (bkz.
+          src/data/injuries.js) bu öneriden hariç tutulmuştur.
         </p>
       </div>
       <div className="pitch pitch-readonly pitch-compact">

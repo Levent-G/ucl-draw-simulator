@@ -8,7 +8,6 @@ import MatchRow from "../components/fixture/MatchRow.jsx";
 import HighlightMatchCard from "../components/fixture/HighlightMatchCard.jsx";
 import StandingsTable from "../components/fixture/StandingsTable.jsx";
 import ZoneLegend from "../components/fixture/ZoneLegend.jsx";
-import Pagination from "../components/Pagination.jsx";
 import { useFavoriteTeam } from "../state/FavoriteTeamContext.jsx";
 import { isMatchPlayed, formatMatchDate } from "../utils/matchDate.js";
 import { toSearchKey } from "../utils/text.js";
@@ -161,46 +160,38 @@ export default function RealFixturePage() {
                 ? "Bu isimde bir takımın maçı bulunamadı."
                 : `${searchResults.length} maç bulundu.`}
             </p>
-            <Pagination key="search" items={searchResults} pageSize={8} topRef={matchListRef}>
-              {(pageItems) => (
-                <div className="match-list">
-                  {pageItems.map((m) => (
-                    <div key={m.id} className="fixture-search-row">
-                      <span className="fixture-search-week-label">{m.matchdayLabel}</span>
-                      <MatchRow match={m} competitionKey={competitionKey} readOnly favoriteTeamId={favoriteTeamId} />
-                    </div>
-                  ))}
+            <div className="match-list">
+              {searchResults.map((m) => (
+                <div key={m.id} className="fixture-search-row">
+                  <span className="fixture-search-week-label">{m.matchdayLabel}</span>
+                  <MatchRow match={m} competitionKey={competitionKey} readOnly favoriteTeamId={favoriteTeamId} />
                 </div>
-              )}
-            </Pagination>
+              ))}
+            </div>
           </>
         ) : (
           <>
             <MatchdayTabs matchdays={fixture} active={activeMatchday?.number} onSelect={setActiveNumber} />
             <HighlightMatchCard match={highlightMatch} competitionKey={competitionKey} />
-            <Pagination key={activeMatchday?.number} items={displayMatches} pageSize={8} topRef={matchListRef}>
-              {(pageItems) => {
+            <div className="match-list">
+              {(() => {
                 let lastDate = null;
-                return (
-                  <div className="match-list">
-                    {pageItems.map((m) => {
-                      const showDateDivider = m.date && m.date !== lastDate;
-                      lastDate = m.date || lastDate;
-                      return (
-                        <React.Fragment key={m.id}>
-                          {showDateDivider && (
-                            <div className="fixture-date-divider">
-                              <span>{formatMatchDate(m.date, { day: "numeric", month: "long", weekday: "long" })}</span>
-                            </div>
-                          )}
-                          <MatchRow match={m} competitionKey={competitionKey} readOnly favoriteTeamId={favoriteTeamId} />
-                        </React.Fragment>
-                      );
-                    })}
-                  </div>
-                );
-              }}
-            </Pagination>
+                return displayMatches.map((m) => {
+                  const showDateDivider = m.date && m.date !== lastDate;
+                  lastDate = m.date || lastDate;
+                  return (
+                    <React.Fragment key={m.id}>
+                      {showDateDivider && (
+                        <div className="fixture-date-divider">
+                          <span>{formatMatchDate(m.date, { day: "numeric", month: "long", weekday: "long" })}</span>
+                        </div>
+                      )}
+                      <MatchRow match={m} competitionKey={competitionKey} readOnly favoriteTeamId={favoriteTeamId} />
+                    </React.Fragment>
+                  );
+                });
+              })()}
+            </div>
           </>
         )}
       </section>
@@ -216,6 +207,7 @@ export default function RealFixturePage() {
           fixture={fixture}
           competitionKey={competitionKey}
           favoriteTeamId={favoriteTeamId}
+          searchKey={searchKey}
           onSelectDay={(number) => {
             setTeamQuery("");
             setActiveNumber(number);

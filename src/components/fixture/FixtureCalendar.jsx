@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Crest from "../Crest.jsx";
 import { formatMatchDate } from "../../utils/matchDate.js";
 import { getRealMatchResult } from "../../utils/realStandingsSelectors.js";
+import { toSearchKey } from "../../utils/text.js";
 
 const WEEKDAY_LABELS = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"];
 
@@ -57,7 +58,7 @@ function DayPreviewModal({ dateKey, matches, competitionKey, onGoToWeek, onClose
 // Favori takım varsa, o takımın maçının olduğu günde nokta yerine takımın
 // logosu gösterilir. Bir güne tıklamak o günün maç(lar)ını küçük bir
 // modal'da önizler; "Bu Haftaya Git" asıl listeye atlar.
-export default function FixtureCalendar({ fixture, competitionKey, favoriteTeamId, onSelectDay }) {
+export default function FixtureCalendar({ fixture, competitionKey, favoriteTeamId, searchKey = "", onSelectDay }) {
   const matchesByDate = useMemo(() => {
     const map = {};
     for (const md of fixture || []) {
@@ -75,7 +76,25 @@ export default function FixtureCalendar({ fixture, competitionKey, favoriteTeamI
     return map;
   }, [fixture, competitionKey]);
 
-  const allDateKeys = useMemo(() => Object.keys(matchesByDate).sort(), [matchesByDate]);
+  // Fikstürdeki takım araması aktifse takvim de aynı takıma göre
+  // filtrelenir -- sadece o takımın maçının olduğu günler işaretli kalır.
+  const visibleMatchesByDate = useMemo(() => {
+    if (!searchKey) return matchesByDate;
+    const out = {};
+    for (const [date, matches] of Object.entries(matchesByDate)) {
+      const filtered = matches.filter(
+        (m) =>
+          toSearchKey(m.homeTeam.name).includes(searchKey) ||
+          toSearchKey(m.awayTeam.name).includes(searchKey) ||
+          toSearchKey(m.homeTeam.short).includes(searchKey) ||
+          toSearchKey(m.awayTeam.short).includes(searchKey)
+      );
+      if (filtered.length > 0) out[date] = filtered;
+    }
+    return out;
+  }, [matchesByDate, searchKey]);
+
+  const allDateKeys = useMemo(() => Object.keys(visibleMatchesByDate).sort(), [visibleMatchesByDate]);
 
   const [monthCursor, setMonthCursor] = useState(() => {
     const todayKey = toDateKey(new Date());
@@ -84,6 +103,15 @@ export default function FixtureCalendar({ fixture, competitionKey, favoriteTeamI
     return new Date(base.getFullYear(), base.getMonth(), 1);
   });
   const [openDayKey, setOpenDayKey] = useState(null);
+
+  // Arama değiştiğinde, filtrelenmiş ilk maçın olduğu aya otomatik atla --
+  // aksi halde kullanıcı takvimde ay ay gezinip aramak zorunda kalırdı.
+  useEffect(() => {
+    if (!searchKey || allDateKeys.length === 0) return;
+    const first = new Date(allDateKeys[0]);
+    setMonthCursor(new Date(first.getFullYear(), first.getMonth(), 1));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchKey]);
 
   const monthLabel = monthCursor.toLocaleDateString("tr-TR", { month: "long", year: "numeric" });
   const minMonthKey = allDateKeys[0]?.slice(0, 7);
@@ -106,7 +134,7 @@ export default function FixtureCalendar({ fixture, competitionKey, favoriteTeamI
   }, [monthCursor]);
 
   const todayKey = toDateKey(new Date());
-  const openDayMatches = openDayKey ? matchesByDate[openDayKey] : null;
+  const openDayMatches = openDayKey ? visibleMatchesByDate[openDayKey] : null;
 
   return (
     <div className="fixture-calendar">
@@ -141,7 +169,7 @@ export default function FixtureCalendar({ fixture, competitionKey, favoriteTeamI
           row.map((date, ci) => {
             if (!date) return <span key={`${ri}-${ci}`} className="fixture-calendar-cell is-empty" aria-hidden="true" />;
             const key = toDateKey(date);
-            const matches = matchesByDate[key] || [];
+            const matches = visibleMatchesByDate[key] || [];
             const favMatch = favoriteTeamId
               ? matches.find((m) => m.homeTeam.id === favoriteTeamId || m.awayTeam.id === favoriteTeamId)
               : null;

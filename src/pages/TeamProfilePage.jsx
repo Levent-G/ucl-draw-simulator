@@ -1,19 +1,25 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from "recharts";
 import { useCompetition } from "../state/CompetitionContext.jsx";
 import { useTransferMarket } from "../state/TransferContext.jsx";
 import { useCareer } from "../state/CareerContext.jsx";
 import { useFavoriteTeam } from "../state/FavoriteTeamContext.jsx";
+import { FORMATIONS } from "../state/DreamTeamContext.jsx";
 import Crest from "../components/Crest.jsx";
 import PlayerAvatar from "../components/PlayerAvatar.jsx";
 import { topScorers } from "../utils/statsSelectors.js";
 import { getRivalsOf } from "../utils/derbies.js";
 import { derivePhysicalAttributes } from "../utils/playerAttributes.js";
 import { estimateFinancialPower, estimateSquadValue, estimateCompetitionEarnings, formatMoney } from "../utils/financeEngine.js";
+import { getCompetition } from "../data/competitions.js";
+import { isMatchPlayed, formatMatchDate } from "../utils/matchDate.js";
+import { CURRENT_INJURIES } from "../data/injuries.js";
 import {
   hasRealDataSupport,
   getRealStandings,
+  getRealFixture,
+  getRealMatchResult,
   getDomesticForm,
   getSuperLigTeamForm,
   getTeamRadarProfile,
@@ -23,6 +29,85 @@ import { CHART_SERIES, CHART_GRID, CHART_AXIS } from "../utils/chartTheme.js";
 const RESULT_LABEL = { W: "G", D: "B", L: "M" };
 const POSITION_ORDER = ["GK", "DF", "MF", "FW"];
 const POSITION_LABEL_TR = { GK: "Kaleci", DF: "Defans", MF: "Orta Saha", FW: "Forvet" };
+const PITCH_FORMATION_KEY = "4-3-3";
+
+const INJURED_NAMES_BY_TEAM = CURRENT_INJURIES.reduce((acc, entry) => {
+  const normalized = entry.playerName.trim().toLowerCase();
+  if (!acc[entry.teamId]) acc[entry.teamId] = new Set();
+  acc[entry.teamId].add(normalized);
+  return acc;
+}, {});
+
+// Kadroyu Rüya Takım'daki gibi bir sahada gösterir -- mevkiine göre en
+// yüksek reytingli (ve hâlihazırda sakat/cezalı OLMAYAN, bkz.
+// src/data/injuries.js) oyuncular ilk 11 slotlarına atanır, geri kalanlar
+// (kadro derinliği + sakatlar) "Yedekler" listesine düşer. Bu GERÇEK/
+// doğrulanmış bir ilk 11 DEĞİLDİR, sadece kadro gücüne dayalı bir
+// görselleştirmedir.
+function buildPitchSquad(players, teamId) {
+  const injuredNames = INJURED_NAMES_BY_TEAM[teamId];
+  const isInjured = (p) => injuredNames?.has((p.name || "").trim().toLowerCase()) || false;
+  const slots = FORMATIONS[PITCH_FORMATION_KEY].slots;
+  const byPosition = { GK: [], DF: [], MF: [], FW: [] };
+  for (const p of players) {
+    if (byPosition[p.position] && !isInjured(p)) byPosition[p.position].push(p);
+  }
+  for (const pos in byPosition) byPosition[pos].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  const used = new Set();
+  const starters = slots.map((slot) => {
+    const pool = byPosition[slot.position] || [];
+    const player = pool.find((p) => !used.has(p.id)) || null;
+    if (player) used.add(player.id);
+    return { slot, player };
+  });
+  const bench = players
+    .filter((p) => !used.has(p.id))
+    .map((p) => ({ ...p, injured: isInjured(p) }))
+    .sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  return { starters, bench };
+}
+
+// Bir gerçek kulübün (isim eşleşmesiyle) hangi GERÇEK VERİ yarışmalarında
+// (UCL/Süper Lig) yer aldığını bulur -- ör. Galatasaray/Fenerbahçe hem UCL
+// (t-id) hem Süper Lig'de (s-id) ayrı bir kayıt olarak var. "Avrupa Ligi"
+// hiç dahil edilmez (gerçek veri kaynağı yok) -- bu yüzden orada olmayan bir
+// takım için asla "Avrupa fikstürü" seçeneği ÖNERİLMEZ.
+function findRealCompetitionEntries(teamName) {
+  const entries = [];
+  for (const key of ["ucl", "superlig"]) {
+    const comp = getCompetition(key);
+    const match = comp.teams.find((t) => t.name === teamName);
+    if (match) entries.push({ competitionKey: key, competitionLabel: comp.shortName, team: match });
+  }
+  return entries;
+}
+
+// Bir gerçek yarışmadaki (UCL/Süper Lig) TÜM sezonu, sadece bu takımın
+// maçlarına indirgeyerek döner -- kronolojik, tarihli, gerçek sonuçlu
+// (varsa) satırlar.
+function buildRealTeamFixtureRows(competitionKey, teamId) {
+  const fixture = getRealFixture(competitionKey);
+  if (!fixture) return [];
+  const rows = [];
+  for (const md of fixture) {
+    for (const m of md.matches) {
+      if (m.homeTeam.id !== teamId && m.awayTeam.id !== teamId) continue;
+      const real = getRealMatchResult(competitionKey, m);
+      rows.push({
+        id: m.id,
+        matchdayLabel: md.label,
+        date: m.date,
+        homeTeam: m.homeTeam,
+        awayTeam: m.awayTeam,
+        homeGoals: real?.homeGoals ?? null,
+        awayGoals: real?.awayGoals ?? null,
+        hasResult: real != null,
+        pending: !isMatchPlayed(m) && real == null,
+      });
+    }
+  }
+  return rows;
+}
 
 // Bir takımın "form"unu (son N maçtaki galibiyet/beraberlik/mağlubiyet
 // harfleri) simulation.matchResults'tan çıkarır -- en yeniye en sağda.
@@ -144,6 +229,29 @@ export default function TeamProfilePage() {
   const rivalTeamByShort = useMemo(
     () => Object.fromEntries(competition.teams.map((t) => [t.short, t])),
     [competition]
+  );
+
+  // Kadroyu Rüya Takım'daki gibi bir sahada göster -- ilk 11 solda/ortada,
+  // yedekler sağda bir panelde (bkz. buildPitchSquad).
+  const pitchSquad = useMemo(() => buildPitchSquad(rosterWithAttrs, teamId), [rosterWithAttrs, teamId]);
+
+  // Bu gerçek kulüp hangi GERÇEK VERİ yarışmalarında oynuyor (UCL/Süper
+  // Lig, isim eşleşmesiyle) -- Galatasaray/Fenerbahçe gibi ikisinde birden
+  // oynayan kulüpler için AYRI sekmeler, sadece birinde oynayanlar için tek
+  // (sekmesiz) bir bölüm gösterilir. Avrupa Ligi'nin gerçek verisi olmadığı
+  // için hiçbir zaman bir seçenek olarak önerilmez.
+  const realCompetitionEntries = useMemo(() => (team ? findRealCompetitionEntries(team.name) : []), [team]);
+  const [activeFixtureCompKey, setActiveFixtureCompKey] = useState(null);
+  const effectiveFixtureCompKey =
+    activeFixtureCompKey && realCompetitionEntries.some((e) => e.competitionKey === activeFixtureCompKey)
+      ? activeFixtureCompKey
+      : realCompetitionEntries.find((e) => e.competitionKey === competitionKey)?.competitionKey ||
+        realCompetitionEntries[0]?.competitionKey ||
+        null;
+  const activeFixtureEntry = realCompetitionEntries.find((e) => e.competitionKey === effectiveFixtureCompKey) || null;
+  const realFixtureRows = useMemo(
+    () => (activeFixtureEntry ? buildRealTeamFixtureRows(activeFixtureEntry.competitionKey, activeFixtureEntry.team.id) : []),
+    [activeFixtureEntry]
   );
 
   const squadSummary = useMemo(() => {
@@ -378,32 +486,104 @@ export default function TeamProfilePage() {
         </div>
       )}
 
-      <div className="chart-card">
-        <h3>Kadro ({rosterWithAttrs.length} oyuncu)</h3>
-        <div className="team-profile-roster">
-          {rosterWithAttrs.map((p) => {
-            const fromTeam = transferInByPlayerId[p.id];
-            return (
-              <Link key={p.id} to={`/${competitionKey}/oyuncu/${p.id}`} className="team-profile-roster-row">
-                <PlayerAvatar player={p} size={32} />
-                <span className="team-profile-roster-name">
-                  {p.name}
-                  {fromTeam && (
-                    <span className="team-profile-roster-transfer-tag" title={`${fromTeam.name} takımından transfer edildi`}>
-                      🔁 {fromTeam.short}'dan geldi
+      <div className="chart-card chart-card-wide">
+        <h3>🏟️ Kadro ({rosterWithAttrs.length} oyuncu)</h3>
+        <p className="footnote">
+          İlk 11, mevkiine göre en yüksek reytingli oyunculardan otomatik oluşturulmuştur -- resmi bir dizilim
+          değildir. {showReal && "Hâlihazırda sakat/cezalı bilinen oyuncular sahaya değil yedek listesine düşer."}
+        </p>
+        <div className="team-profile-pitch-layout">
+          <div className="pitch pitch-readonly pitch-compact">
+            <div className="pitch-lines" aria-hidden="true">
+              <span className="pitch-center-circle" />
+              <span className="pitch-center-line" />
+            </div>
+            {pitchSquad.starters.map(({ slot, player }) => (
+              <div className="pitch-slot" style={{ left: `${slot.x}%`, top: `${slot.y}%` }} key={slot.id}>
+                {player ? (
+                  <Link to={`/${competitionKey}/oyuncu/${player.id}`} className="pitch-slot-filled">
+                    <PlayerAvatar player={player} size={30} />
+                    <span className="pitch-slot-name">{player.name}</span>
+                    <span className="pitch-slot-meta">{player.rating}</span>
+                  </Link>
+                ) : (
+                  <div className="pitch-slot-empty">
+                    <span className="pitch-slot-pos">{slot.position}</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="team-profile-bench">
+            <h4>Yedekler ({pitchSquad.bench.length})</h4>
+            <div className="team-profile-bench-list">
+              {pitchSquad.bench.map((p) => {
+                const fromTeam = transferInByPlayerId[p.id];
+                return (
+                  <Link key={p.id} to={`/${competitionKey}/oyuncu/${p.id}`} className={`team-profile-bench-row ${p.injured ? "is-injured" : ""}`}>
+                    <PlayerAvatar player={p} size={26} />
+                    <span className="team-profile-bench-name">
+                      {p.name}
+                      {p.injured && <span title="Sakat/cezalı">🩹</span>}
+                      {fromTeam && (
+                        <span className="team-profile-roster-transfer-tag" title={`${fromTeam.name} takımından transfer edildi`}>
+                          🔁 {fromTeam.short}
+                        </span>
+                      )}
                     </span>
-                  )}
-                </span>
-                <span className="team-profile-roster-age">{p.age}y</span>
-                <span className="team-profile-roster-pos">{p.position}</span>
-                <span className="team-profile-roster-rating">{p.rating}</span>
-              </Link>
-            );
-          })}
+                    <span className="team-profile-bench-pos">{p.position}</span>
+                    <span className="team-profile-bench-rating">{p.rating}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
 
-      {allMatches.length > 0 && (
+      {realCompetitionEntries.length > 0 && (
+        <div className="chart-card chart-card-wide">
+          <h3>🗓️ Fikstür</h3>
+          {realCompetitionEntries.length > 1 && (
+            <div className="stats-tabs team-profile-fixture-tabs">
+              {realCompetitionEntries.map((e) => (
+                <button
+                  key={e.competitionKey}
+                  className={effectiveFixtureCompKey === e.competitionKey ? "active" : ""}
+                  onClick={() => setActiveFixtureCompKey(e.competitionKey)}
+                >
+                  {e.competitionLabel}
+                </button>
+              ))}
+            </div>
+          )}
+          <div className="team-profile-matches">
+            {realFixtureRows.map((m) => {
+              const isHome = m.homeTeam.id === activeFixtureEntry.team.id;
+              const opponent = isHome ? m.awayTeam : m.homeTeam;
+              const row = (
+                <>
+                  <span className="team-profile-match-md">{formatMatchDate(m.date) || m.matchdayLabel}</span>
+                  <span className="team-profile-match-venue">{isHome ? "İç Saha" : "Deplasman"}</span>
+                  <span className="team-profile-match-opp">
+                    <Crest team={opponent} size={18} /> {opponent.name}
+                  </span>
+                  <span className="team-profile-match-score">
+                    {m.hasResult ? `${m.homeGoals} : ${m.awayGoals}` : m.pending ? "⏳" : "vs"}
+                  </span>
+                </>
+              );
+              return (
+                <Link key={m.id} to={`/${activeFixtureEntry.competitionKey}/mac/${m.id}`} className="team-profile-match-row">
+                  {row}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {!showReal && allMatches.length > 0 && (
         <div className="chart-card chart-card-wide">
           <h3>Tüm Maçlar ({allMatches.length})</h3>
           <div className="team-profile-matches">

@@ -4,9 +4,12 @@ import { getCompetition } from "../data/competitions.js";
 import { useFavoriteTeam } from "../state/FavoriteTeamContext.jsx";
 import TeamFilterSelect from "./stats/TeamFilterSelect.jsx";
 
+// Artık ayrı bir "Ana Sayfa" yok -- kök rota (/ucl, /superlig) doğrudan
+// Fikstür'ü gösteriyor (bkz. CompetitionHomeRoute.jsx), bu yüzden "Fikstür"
+// sekmesi kök yola işaret eder (end:true ile SADECE tam eşleşmede aktif
+// olur, /ucl/istatistik gibi alt yollarda yanlışlıkla aktif görünmez).
 const VIEWS = [
-  { key: "", icon: "🏠", label: "Ana Sayfa", end: true },
-  { key: "fikstur", icon: "📅", label: "Fikstür" },
+  { key: "", icon: "📅", label: "Fikstür", end: true },
   { key: "istatistik", icon: "📊", label: "İstatistikler" },
   { key: "karsilikli", icon: "🤝", label: "Karşılıklı Geçmiş" },
   { key: "haberler", icon: "📰", label: "Haberler" },

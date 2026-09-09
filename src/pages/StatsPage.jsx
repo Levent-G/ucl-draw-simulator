@@ -26,11 +26,13 @@ const SIM_TABS = [
 // tutarlı. Sekmeler SİLİNMEDİ, sadece bu iki yarışma için gizlendi (europa
 // ve eğlence modu simülasyonu için hâlâ tüm sekmeler mevcut). Bunun yerine
 // gerçek veriden (puan durumu + form + model) beslenen "📈 Analiz" sekmesi
-// eklendi (bkz. RealAnalysisTab.jsx).
+// eklendi (bkz. RealAnalysisTab.jsx). "Takımlar" (düz katsayı/averaj tablosu)
+// da kaldırıldı -- kullanıcı geri bildirimi: gerçek veri sayfalarında bu
+// artık ayrı bir sekmeyi hak edecek kadar farklı bir şey katmıyor, Analiz
+// zaten aynı takımları çok daha zengin şekilde kapsıyor.
 const REAL_DATA_TABS = [
-  { key: "teams", label: "Takımlar" },
-  { key: "countries", label: "Ülkeler" },
   { key: "analiz", label: "📈 Analiz" },
+  { key: "countries", label: "Ülkeler" },
 ];
 
 export default function StatsPage() {
@@ -39,7 +41,7 @@ export default function StatsPage() {
   const { favoriteTeamId } = useFavoriteTeam(competitionKey);
   const showReal = hasRealDataSupport(competitionKey);
   const TABS = showReal ? REAL_DATA_TABS : SIM_TABS;
-  const [tab, setTab] = useState("teams");
+  const [tab, setTab] = useState(() => (showReal ? "analiz" : "teams"));
   // Takım filtresi -- her sekmede tutarlı kalsın diye tuttuğun takımla
   // önceden dolduruluyor (kullanıcı isterse değiştirebilir/temizleyebilir).
   const [selectedTeamId, setSelectedTeamId] = useState(() => favoriteTeamId || "");
@@ -73,11 +75,11 @@ export default function StatsPage() {
       <CompetitionStepper competitionKey={competitionKey} />
       <header className="page-header">
         <div>
-          <div className="page-eyebrow">{showReal ? "Takımlar · Ülkeler · Analiz" : "Takımlar · Oyuncular · Ülkeler"}</div>
+          <div className="page-eyebrow">{showReal ? "Analiz · Ülkeler" : "Takımlar · Oyuncular · Ülkeler"}</div>
           <h1>{competition.shortName} — İstatistikler</h1>
           <p>
             {showReal
-              ? "Katsayı, ülke, gerçek puan durumu ve modelin analiz/projeksiyonları. Gol/asist/kart gibi oyuncu istatistikleri için gerçek bir veri kaynağımız olmadığından bu sekmeler burada gösterilmiyor (eğlence modunda hâlâ mevcutlar)."
+              ? "Gerçek puan durumundan türetilen derinlemesine analiz/grafikler ve katsayı bazlı ülke dağılımı. Gol/asist/kart gibi oyuncu istatistikleri için gerçek bir veri kaynağımız olmadığından bu sekmeler burada gösterilmiyor (eğlence modunda hâlâ mevcutlar)."
               : "Katsayı, kadro ve ülke bazlı gelişmiş grafikler. Gol/asist/kart ve simüle edilmiş puan durumu gibi bölümler için önce Fikstür & Tahmin sayfasından bir model tahmini üretilmesi gerekir."}
           </p>
         </div>

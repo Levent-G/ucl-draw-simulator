@@ -848,7 +848,7 @@ a.btn-secondary:hover {
    kalır, dar ekranlarda alt alta düşer (bkz. RealFixturePage.jsx). */
 .fixture-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 300px;
+  grid-template-columns: minmax(0, 1fr) 360px;
   align-items: start;
   gap: 20px;
 }
@@ -873,8 +873,8 @@ a.btn-secondary:hover {
   margin-bottom: 10px;
 }
 .fixture-calendar-nav {
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -883,7 +883,7 @@ a.btn-secondary:hover {
   background: var(--bg-panel);
   color: var(--text-primary);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
   transition: border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 .fixture-calendar-nav:hover:not(:disabled) {
@@ -897,19 +897,19 @@ a.btn-secondary:hover {
 }
 .fixture-calendar-month {
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: 15px;
   letter-spacing: 0.02em;
   text-transform: capitalize;
 }
 .fixture-calendar-weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 .fixture-calendar-weekdays span {
   text-align: center;
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-faint);
@@ -917,7 +917,7 @@ a.btn-secondary:hover {
 .fixture-calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 3px;
+  gap: 5px;
 }
 .fixture-calendar-cell {
   position: relative;
@@ -926,8 +926,8 @@ a.btn-secondary:hover {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1px;
-  border-radius: var(--radius-sm);
+  gap: 2px;
+  border-radius: var(--radius-md);
   border: 1px solid transparent;
   background: var(--bg-panel-alt);
   color: var(--text-dim);
@@ -962,13 +962,18 @@ a.btn-secondary:hover {
 }
 .fixture-calendar-daynum {
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11.5px;
 }
 .fixture-calendar-dot {
-  width: 4px;
-  height: 4px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: var(--accent-bright);
+}
+@media (max-width: 480px) {
+  .fixture-calendar-daynum {
+    font-size: 13px;
+  }
 }
 
 /* Bir takvim gününe tıklayınca açılan küçük maç önizleme modal'ı -- dışına
@@ -2356,6 +2361,81 @@ a.btn-secondary:hover {
   text-align: right;
 }
 
+/* Takım Profili "Kadro" -- Rüya Takım'daki gibi saha + sağda yedekler
+   paneli (bkz. TeamProfilePage.jsx buildPitchSquad). */
+.team-profile-pitch-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 760px) {
+  .team-profile-pitch-layout {
+    grid-template-columns: 1fr;
+  }
+}
+.team-profile-bench {
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  max-height: 420px;
+  overflow-y: auto;
+}
+.team-profile-bench h4 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.team-profile-bench-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.team-profile-bench-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  border-radius: var(--radius-sm, 8px);
+  color: inherit;
+  text-decoration: none;
+}
+.team-profile-bench-row:hover {
+  background: var(--bg-panel-alt);
+}
+.team-profile-bench-row.is-injured {
+  opacity: 0.6;
+}
+.team-profile-bench-name {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.team-profile-bench-pos {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+.team-profile-bench-rating {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-dim);
+  width: 22px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.team-profile-fixture-tabs {
+  margin-bottom: 10px;
+}
+
 /* --- Oyuncu Profili sayfası (/:competitionKey/oyuncu/:playerId) --- */
 .player-profile-header {
   display: flex;
@@ -3062,9 +3142,14 @@ a.team-profile-match-row:hover {
   color: #fff;
 }
 
+/* Bilinçli olarak AYRI bir kutu/arka plan renginden KAÇINIYORUZ -- eskiden
+   .site-nav'dan farklı bir arka plan + kalın üst kenarlık kullanıyordu, bu
+   da "üst üste iki menü" gibi dağınık bir görünüm veriyordu. Artık üst
+   navbar'la AYNI (saydam, üst .site-nav'ın kendi arka planından/blur'undan
+   miras alan) yüzeyde, sadece ince bir ayırıcı çizgiyle tek bir bütün
+   gezinme bloğu gibi görünür. */
 .site-nav-subrow {
-  border-top: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 .site-nav-subrow-inner {
   max-width: 1400px;
@@ -6206,16 +6291,69 @@ a.team-profile-match-row:hover {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background: var(--bg-card);
+  background: linear-gradient(165deg, var(--bg-card), var(--bg-panel));
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-lg);
   padding: 24px 22px;
+  text-decoration: none;
+  color: inherit;
   transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 .home-comp-card:hover {
   border-color: var(--ucl-blue-2);
   transform: translateY(-3px);
   box-shadow: 0 16px 34px -18px rgba(0, 0, 0, 0.6);
+}
+.home-comp-card-live {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+.home-comp-card-live-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+.home-comp-card-live-team {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.home-comp-card-live-pts {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent-bright);
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.home-comp-card-next-teams {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 0;
+}
+.home-comp-card-next-vs {
+  color: var(--text-faint);
+  font-weight: 400;
 }
 .home-comp-card-top {
   display: flex;
@@ -6252,9 +6390,25 @@ a.team-profile-match-row:hover {
   flex: 1;
 }
 .home-comp-card-btn {
+  display: flex;
   width: 100%;
   justify-content: center;
+  align-items: center;
   text-align: center;
+  margin-top: auto;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 13px;
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, var(--accent-bright), var(--accent));
+  color: #fff;
+  box-shadow: 0 8px 24px -8px rgba(84, 104, 255, 0.7);
+  transition: box-shadow 0.15s ease;
+}
+.home-comp-card:hover .home-comp-card-btn {
+  box-shadow: 0 10px 30px -6px rgba(84, 104, 255, 0.9);
 }
 
 .home-cat {
@@ -7513,7 +7667,31 @@ a.team-profile-match-row:hover {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  min-width: 100px;
+  min-width: 130px;
+}
+.prob-mini-teams {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.prob-mini-team {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.prob-mini-team-away {
+  flex-direction: row-reverse;
+}
+.prob-mini-draw-pct {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--text-faint);
+  flex-shrink: 0;
 }
 .prob-mini-track {
   display: flex;
@@ -7522,16 +7700,6 @@ a.team-profile-match-row:hover {
   border-radius: 999px;
   overflow: hidden;
   background: var(--bg-panel);
-}
-.prob-mini-label {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 600;
-  color: var(--text-dim);
-  white-space: nowrap;
 }
 
 .pagination-bar {
