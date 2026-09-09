@@ -7,7 +7,7 @@
 // eşleşmeler için kısa önizleme notları.
 //
 // Yöntem: WebSearch ile araştırılmış, tarihli, kaynağı belirtilmiş haberler.
-// Bu bir STATİK ENSTANTANE'dir -- 2026-09-06 tarihi itibarıyla araştırılan
+// Bu bir STATİK ENSTANTANE'dir -- 2026-09-09 tarihi itibarıyla araştırılan
 // haberleri yansıtır, canlı/otomatik güncellenmez. Bazı öğelerin tam gün
 // bilgisi (ör. yaz transfer dönemi içindeki bir imza) kaynaklarda net
 // belirtilmediği için ay/dönem bazında en olası güne yuvarlanmıştır; kulüp,
@@ -105,7 +105,7 @@ export const NEWS_ITEMS = [
     date: "2026-08-27",
     title: "Real Madrid'in Şampiyonlar Ligi rakipleri belli oldu",
     summary:
-      "27 Ağustos'ta yapılan çekilişte Real Madrid'in lig fazı rakipleri açıklandı: Inter, PSV Eindhoven, RB Leipzig, LASK, Arsenal, Roma, Shakhtar Donetsk ve AEK Athens. Arsenal ile 9. hafta (9 Aralık) randevusu, geçen sezonki çeyrek final rövanşını akıllara getiriyor.",
+      "27 Ağustos'ta yapılan çekilişte Real Madrid'in lig fazı rakipleri açıklandı: Inter, PSV Eindhoven, RB Leipzig, LASK, Arsenal, Roma, Shakhtar Donetsk ve AEK Athens. Arsenal ile 6. hafta (9 Aralık) randevusu, geçen sezonki çeyrek final rövanşını akıllara getiriyor.",
     source: "realmadrid.com",
     url: "https://www.realmadrid.com/en-US/news/football/first-team/latest-news/el-real-madrid-se-medira-en-la-primera-fase-de-la-champions-a-27-08-2026",
     competitionKey: "ucl",
@@ -173,15 +173,22 @@ export const NEWS_ITEMS = [
     relatedTeamIds: ["t11"],
   },
   {
+    // DÜZELTME (2026-09-07): Bu öğe önceden yanlışlıkla Galatasaray'ın lig
+    // fazı açılışının 15 Eylül'de RAMS Park'ta Barcelona karşısında
+    // olacağını belirtiyordu. UEFA.com'un resmi "fixtures by team" sayfası
+    // ve çoklu bağımsız kaynaklarla (Sportskeeda, whoscored.com) doğrulandı:
+    // Galatasaray'ın GERÇEK açılış maçı 9 Eylül'de Lizbon'da Sporting CP
+    // deplasmanıdır; Barcelona ile RAMS Park'taki maç ise 13 Ekim'deki 2.
+    // haftaya ait. Metin buna göre düzeltildi.
     id: "news-ucl-16",
-    date: "2026-09-15",
-    title: "Galatasaray, lig fazı açılışında Barcelona'yı ağırlıyor",
+    date: "2026-09-09",
+    title: "Galatasaray'ın lig fazı açılışı: Sporting CP deplasmanı",
     summary:
-      "Galatasaray, 2026-27 Şampiyonlar Ligi lig fazındaki ilk maçında 15 Eylül'de RAMS Park'ta Barcelona'yı konuk edecek. Sarı-kırmızılılar 4 maçını evinde (Barcelona, Aston Villa, Feyenoord, Stuttgart), 4 maçını deplasmanda (PSG, Sporting CP, Lille, AEK Athens) oynayacak.",
-    source: "Euronews Türkçe / GALATASARAY.ORG",
-    url: "https://tr.euronews.com/2026/08/29/galatasaray-ve-fenerbahcenin-sampiyonlar-ligi-fiksturu-belli-oldu",
+      "Galatasaray, 2026-27 Şampiyonlar Ligi lig fazındaki ilk maçını 9 Eylül'de Lizbon'da Sporting CP deplasmanında oynuyor. Sarı-kırmızılılar 4 maçını evinde (Barcelona, Aston Villa, Feyenoord, Stuttgart), 4 maçını deplasmanda (Sporting CP, PSG, Lille, AEK Athens) oynayacak; Barcelona ile RAMS Park randevusu ise 13 Ekim'deki 2. haftada.",
+    source: "UEFA.com / Sportskeeda / Euronews Türkçe",
+    url: "https://www.uefa.com/uefachampionsleague/news/02a8-2176fa83582b-d99f0b27f405-1000--champions-league-league-phase-fixtures-by-team/",
     competitionKey: "ucl",
-    relatedTeamIds: ["t35", "t7"],
+    relatedTeamIds: ["t35", "t23", "t7"],
   },
   {
     id: "news-ucl-17",
@@ -257,6 +264,122 @@ export const NEWS_ITEMS = [
     source: "CNN Türk / Milliyet / NTV",
     competitionKey: "ucl",
     relatedTeamIds: ["t25"],
+  },
+  {
+    id: "news-ucl-24",
+    date: "2026-09-08",
+    title: "Real Madrid, Mourinho'nun UCL'deki ilk maçında çok sayıda eksikle Inter'i ağırlıyor",
+    summary:
+      "Mourinho yönetimindeki Real Madrid, 8 Eylül'de Bernabéu'da lig fazı açılışında Inter'i ağırlarken Éder Militão, Raúl Asencio, Ferland Mendy ve Rodrygo'yu sakatlık; Eduardo Camavinga, Arda Güler ve Bernardo Silva'yı ise cezalı olarak kadro dışı bıraktı. Kaleci Andriy Lunin gripten dolayı kadroda yer alamadı; Aurélien Tchouaméni, Thiago Pitarch ve Endrick ise sakatlıklarının ardından kadroya geri döndü.",
+    source: "AS / okdiario.com / Sports Mole",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t1", "t6"],
+  },
+  {
+    id: "news-ucl-25",
+    date: "2026-09-09",
+    title: "Arsenal, Napoli deplasmanına Saliba'sız çıkıyor",
+    summary:
+      "Arsenal'ın savunma oyuncusu William Saliba, sırt sakatlığı nedeniyle Napoli deplasmanında forma giyemeyecek. Jurrien Timber sakatlığının ardından takım antrenmanlarına dönerken, Cristhian Mosquera kas sakatlığı şüphesiyle şüpheli durumda; Arteta maç öncesi basın toplantısında oyuncunun durumunun önümüzdeki günlerde netleşeceğini söyledi.",
+    source: "Sports Mole / Yahoo Sports",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t11", "t9"],
+  },
+  {
+    id: "news-ucl-26",
+    date: "2026-09-08",
+    title: "Manchester City, Porto deplasmanına Doku ve O'Reilly'siz gidiyor",
+    summary:
+      "Maresca yönetimindeki Manchester City, lig fazı açılışında Porto deplasmanına kanat oyuncusu Jeremy Doku ile Nico O'Reilly'yi sakatlık nedeniyle götüremedi. Ev sahibi Porto ise Jan Bednarek, Victor Froholdt ve Samu Aghehowa başta olmak üzere çok sayıda eksikle sahaya çıkacak; teknik direktör Francesco Farioli, Porto'nun son 14-15 Avrupa maçında sadece bir kez kaybettiğini hatırlattı.",
+    source: "Sports Mole / Yahoo Sports",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t28", "t2"],
+  },
+  {
+    id: "news-ucl-27",
+    date: "2026-09-06",
+    title: "Galatasaray'da Osimhen ve Lemina'nın yokluğu netleşti: 2-3 hafta kayıp",
+    summary:
+      "Sağ adduktor (kasık) kas grubunda orta-ileri düzeyde zorlanma tespit edilen Victor Osimhen'in yaklaşık 3, Mario Lemina'nın ise 2-3 hafta sahalardan uzak kalması bekleniyor; ikili 9 Eylül'deki Sporting CP (UCL) deplasmanının yanı sıra 13 Eylül'deki Kocaelispor ve 20 Eylül'deki Trabzonspor Süper Lig maçlarını da kaçıracak. Antrenmanda dizine sert darbe alan Wilfried Singo'nun sağ uyluk biceps femoris kasındaki tendon hasarı da MR ile doğrulandı.",
+    source: "gzt.com / Cumhuriyet / KARAR",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t35"],
+  },
+  {
+    id: "news-ucl-28",
+    date: "2026-09-08",
+    title: "Fenerbahçe'de Roma maçı öncesi eksikler: Guendouzi cezalı, Asensio hazır değil",
+    summary:
+      "UEFA, Lyon play-off maçı sonrası yaşanan olaylar nedeniyle Fenerbahçe'nin orta sahası Matteo Guendouzi'ye 4 maç (2'si bu sezon, 2'si 1 yıl ertelemeli) ceza verdi; Guendouzi bu cezayla 10 Eylül'deki Roma ve 14 Ekim'deki Aston Villa maçlarını kaçıracak. Mason Greenwood ise aynı olaylar nedeniyle 30 bin euro para cezasına çarptırıldı. Marco Asensio ise hâlâ takımla normal antrenmanlara başlayamadı; teknik direktör İsmail Kartal, Guendouzi'nin yerine İsmail Yüksek'i düşünüyor.",
+    source: "Takvim / Fotomaç / Hürriyet",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t25", "t13"],
+  },
+  {
+    id: "news-ucl-29",
+    date: "2026-09-08",
+    title: "Mourinho, Real Madrid başında ilk UCL maçını kazandı: Inter'e 2-1",
+    summary:
+      "Bernabéu'da oynanan lig fazı açılış maçında Kylian Mbappé'nin ilk yarıdaki golü ve Federico Valverde'nin 24. dakikadaki golüyle 2-0 öne geçen Real Madrid, Inter'i 2-1 mağlup etti; konuk ekibin golünü 77. dakikada Carlos Augusto kaydetti. Mourinho maç sonrası İspanyol televizyonuna 'İyi oynayıp kaybetmektense kötü oynayıp kazanmayı tercih ederim' dedi.",
+    source: "ESPN / Al Jazeera",
+    url: "https://www.espn.com/soccer/report/_/gameId/401915451",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t1", "t6"],
+  },
+  {
+    id: "news-ucl-30",
+    date: "2026-09-08",
+    title: "Haaland'ın çifte golüyle Manchester City, Porto deplasmanından 3 puanla döndü",
+    summary:
+      "Manchester City, Estádio do Dragão'da oynanan lig fazı açılışında Porto'yu 2-0 mağlup etti; Erling Haaland 47. ve uzatmaların 1. dakikasında (90+1') iki gol kaydetti. Bu galibiyet, Enzo Maresca'ya City başındaki ilk Şampiyonlar Ligi galibiyetini yaşattı; Maresca maç sonrası ilk yarıda daha fazla gol atabileceklerini ama genel olarak galibiyeti hak ettiklerini söyledi.",
+    source: "Sky Sports / ESPN",
+    url: "https://www.skysports.com/football/fc-porto-vs-manchester-city/577600",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t28", "t2"],
+  },
+  {
+    id: "news-ucl-31",
+    date: "2026-09-08",
+    title: "Borussia Dortmund'da Guirassy'nin çılgın gecesi: brace + kendi kalesine gol, yine de galibiyet",
+    summary:
+      "Signal Iduna Park'ta oynanan açılış maçında Renato Veiga'nın 53. dakikada kendi kalesine attığı golle öne geçen Borussia Dortmund'a Villarreal'den Santiago Mouriño 66. dakikada eşitliği getirdi. Serhou Guirassy 80. dakikada ve penaltıdan 85. dakikada iki gol daha kaydederek Dortmund'u 3-1 öne geçirdi, ancak uzatmalarda (90+3') kendi kalesine gönderdiği golle maç 3-2 ile Dortmund lehine sonuçlandı.",
+    source: "ESPN / Yahoo Sports",
+    url: "https://www.espn.com/soccer/match/_/gameId/401915449/villarreal-borussia-dortmund",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t12", "t14"],
+  },
+  {
+    id: "news-ucl-32",
+    date: "2026-09-08",
+    title: "Aston Villa, Club Brugge deplasmanında golcü sıkıntısını 3 golle aştı",
+    summary:
+      "Aston Villa, Club Brugge deplasmanında John McGinn (11'), Emiliano Buendía (22') ve Nicolas Jackson'ın (43') golleriyle ilk yarıda 3-1 öne geçti; ev sahibinin gollerini Hugo Vetlesen (19') ve penaltıdan Nicolo Tresoldi (61') kaydetti, maç 3-2 Aston Villa galibiyetiyle bitti. Teknik direktör Unai Emery maç sonrası 'Bugün bir adım daha attık, 90 dakika boyunca çok eksiksiz bir maç çıkardık' dedi.",
+    source: "Sky Sports / ESPN",
+    url: "https://www.skysports.com/football/club-brugge-vs-aston-villa/report/577599",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t17", "t20"],
+  },
+  {
+    id: "news-ucl-33",
+    date: "2026-09-08",
+    title: "Real Betis, Lille deplasmanında Bartra'nın golleriyle geriden gelip kazandı",
+    summary:
+      "Lille'de Ayase Ueda'nın 12. dakikadaki golüyle öne geçen ev sahibine karşı Real Betis, Marc Bartra'nın 33. ve 49. dakikalardaki golleri ile Troy Parrott'ın 53. dakikadaki golüyle 3-1 öne geçti. Lille'in son golünü 56. dakikada Ethan Mbappé kaydetti; maç 3-2 Real Betis galibiyetiyle sonuçlandı.",
+    source: "ESPN / Yahoo Sports",
+    url: "https://www.espn.com/soccer/match/_/gameId/401915450",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t26", "t19"],
+  },
+  {
+    id: "news-ucl-34",
+    date: "2026-09-08",
+    title: "AEK Athens, LASK'ı Marin'in frikik goluyle 1-0 mağlup etti",
+    summary:
+      "AEK Athens, lig fazı açılışında sahasında LASK'ı, yaklaşık 20 metreden kullanılan bir frikikle atılan tek golle 1-0 mağlup etti; VAR incelemesi sonrası ofsayt gerekçesiyle iptal edilen bir gol de vardı. LASK, maçın son anlarında beraberlik için bulduğu kafa vuruşunu kaleyi bulamadan auta yolladı.",
+    source: "ESPN",
+    url: "https://www.espn.com/soccer/match/_/gameId/401915452/lask-linz-aek-athens",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t27", "t33"],
   },
 
   // ---- Trendyol Süper Lig 2026-27 ----
@@ -514,6 +637,49 @@ export const NEWS_ITEMS = [
     competitionKey: "superlig",
     relatedTeamIds: ["s3"],
   },
+  {
+    id: "news-sl-25",
+    date: "2026-09-06",
+    title: "Trabzonspor'da Mohamed Salah'tan ilk gol: Gençlerbirliği'ni 5-0 dağıttılar",
+    summary:
+      "Trabzonspor, 4. hafta maçında Papara Park'ta Gençlerbirliği'ni 5-0 mağlup etti. Paul Onuachu 5. ve 22. dakikalarda iki gol kaydederken, yaz transferi Mohamed Salah 14. dakikada penaltıdan Süper Lig'deki ilk golünü attı; diğer goller Ernest Muçi (59') ve Franculino Dju'dan (78') geldi.",
+    source: "Hürriyet / Fanatik / Star",
+    url: "https://www.hurriyet.com.tr/sporarena/trabzonspor-5-0-genclerbirligi-super-lig-maci-ozeti-43298027",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s4", "s18"],
+  },
+  {
+    id: "news-sl-26",
+    date: "2026-09-06",
+    title: "Süper Lig 4. hafta: Çorum FK ve Kocaelispor 3 puanı aldı, Kasımpaşa-Amed'de gol düellosu",
+    summary:
+      "4. haftanın diğer maçlarında Çorum FK; Alexandros Kyziridis, Andrei Borza ve Ermin Mahmić'in golleriyle Eyüpspor'u 3-0 mağlup etti, Kocaelispor ise Samsunspor'u 1-0 geçti. Kasımpaşa ile Amed SFK arasındaki maçta Güven Yalçın ve Adrian Benedyczak'ın gollerine Gift Orban'ın iki golüyle karşılık veren konuk ekip, sahadan 2-2'lik beraberlikle ayrıldı.",
+    source: "Hürriyet / gzt.com / Fanatik",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s13", "s16", "s17", "s6", "s8", "s11"],
+  },
+  {
+    id: "news-sl-27",
+    date: "2026-09-07",
+    title: "Gaziantep FK, Kozlowski'nin iki golüyle Göztepe deplasmanından 4-2 galip ayrıldı",
+    summary:
+      "Kacper Kozlowski'nin 34. ve 45. dakikalardaki golleriyle öne geçen Gaziantep FK, Halil Dervişoğlu ve Myenty Abena'nın katkısıyla Göztepe deplasmanını 4-2 kazandı. Ev sahibi Göztepe'nin gollerini Juan (51', 90') kaydetti; 72. dakikada Göztepeli Ogün Bayrak kırmızı kart gördü.",
+    source: "beIN Sports",
+    url: "https://beinsports.com.tr/mac-ozetleri-goller/super-lig/ozet/2026-2027/4/goztepe-2-4-gaziantep-fk-mac-ozeti",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s7", "s15"],
+  },
+  {
+    id: "news-sl-28",
+    date: "2026-09-07",
+    title: "Alanyaspor, Rizespor'dan kendi kalesine giren golle 3 puanla döndü",
+    summary:
+      "Çaykur Rizespor - Alanyaspor maçının tek golü, 71. dakikada Florent Hadergjonaj'ın ceza sahasına gönderdiği ortada Rizespor'lu Ariss'in kendi kalesine gönderdiği topla geldi; konuk Alanyaspor sahadan 1-0 galip ayrıldı.",
+    source: "Hürriyet",
+    url: "https://www.hurriyet.com.tr/sporarena/caykur-rizespor-0-1-alanyaspor-super-lig-maci-ozeti-43298813",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s12", "s10"],
+  },
 
   // ---- 2026-27 UCL lig fazı: dikkat çekici eşleşme önizlemeleri ----
   {
@@ -537,12 +703,15 @@ export const NEWS_ITEMS = [
     relatedTeamIds: ["t9", "t11"],
   },
   {
+    // DÜZELTME (2026-09-07): Tarih 15 Eylül'den, doğrulanmış gerçek maç
+    // tarihi olan 13 Ekim'e (lig fazı 2. haftası) düzeltildi -- bkz.
+    // news-ucl-16'daki not.
     id: "news-preview-3",
-    date: "2026-09-15",
-    title: "Önizleme: Galatasaray - Barcelona",
+    date: "2026-10-13",
+    title: "Önizleme: Galatasaray - Barcelona (2. hafta)",
     summary:
-      "Galatasaray'ın RAMS Park'taki lig fazı açılışı, kulübün 1993-94 ve 1994-95 sezonlarındaki Barcelona ile geçen unutulmaz grup maçlarının (iki sezonda da birer galibiyet, birer beraberlik) hatırasını tazeliyor.",
-    source: "Euronews Türkçe",
+      "Galatasaray'ın lig fazı 2. haftasında RAMS Park'ta ağırlayacağı Barcelona ile randevusu, kulübün 1993-94 ve 1994-95 sezonlarındaki Barcelona ile geçen unutulmaz grup maçlarının (iki sezonda da birer galibiyet, birer beraberlik) hatırasını tazeliyor.",
+    source: "Euronews Türkçe / UEFA.com",
     competitionKey: "ucl",
     relatedTeamIds: ["t35", "t7"],
   },

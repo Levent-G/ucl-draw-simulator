@@ -22,6 +22,7 @@ import MatchRow from "../fixture/MatchRow.jsx";
 import Pagination from "../Pagination.jsx";
 import ChartTooltip from "./ChartTooltip.jsx";
 import TeamAxisTick from "./TeamAxisTick.jsx";
+import TeamScatterShape from "./TeamScatterShape.jsx";
 import { CHART_SERIES, CHART_GRID, CHART_AXIS } from "../../utils/chartTheme.js";
 import { isMatchPlayed } from "../../utils/matchDate.js";
 import {
@@ -490,12 +491,10 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
               <ReferenceLine x={matrixAverages.avgGf} stroke={CHART_AXIS} strokeDasharray="4 4" />
               <ReferenceLine y={matrixAverages.avgGa} stroke={CHART_AXIS} strokeDasharray="4 4" />
               <Tooltip content={<ChartTooltip />} cursor={{ strokeDasharray: "3 3" }} />
-              <Scatter data={attackDefenseMatrix} fill={CHART_SERIES[0]}>
-                {attackDefenseMatrix.map((row) => (
-                  <Cell key={row.teamId} fill={row.teamId === favoriteTeamId ? "#fbbf24" : CHART_SERIES[0]} />
-                ))}
-                <LabelList dataKey="short" position="top" style={{ fill: CHART_AXIS, fontSize: 10 }} />
-              </Scatter>
+              <Scatter
+                data={attackDefenseMatrix}
+                shape={(props) => <TeamScatterShape {...props} size={26} highlightTeamId={favoriteTeamId} />}
+              />
             </ScatterChart>
           </ResponsiveContainer>
         </div>

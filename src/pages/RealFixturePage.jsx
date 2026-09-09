@@ -3,13 +3,14 @@ import { useParams } from "react-router-dom";
 import { getCompetition } from "../data/competitions.js";
 import CompetitionStepper from "../components/CompetitionStepper.jsx";
 import MatchdayTabs from "../components/fixture/MatchdayTabs.jsx";
+import FixtureCalendar from "../components/fixture/FixtureCalendar.jsx";
 import MatchRow from "../components/fixture/MatchRow.jsx";
 import HighlightMatchCard from "../components/fixture/HighlightMatchCard.jsx";
 import StandingsTable from "../components/fixture/StandingsTable.jsx";
 import ZoneLegend from "../components/fixture/ZoneLegend.jsx";
 import Pagination from "../components/Pagination.jsx";
 import { useFavoriteTeam } from "../state/FavoriteTeamContext.jsx";
-import { isMatchPlayed } from "../utils/matchDate.js";
+import { isMatchPlayed, formatMatchDate } from "../utils/matchDate.js";
 import { toSearchKey } from "../utils/text.js";
 import {
   getRealFixture,
@@ -136,6 +137,24 @@ export default function RealFixturePage() {
         <ZoneLegend zones={competition.zones} />
       </section>
 
+      <section className="chart-card fixture-calendar-section">
+        <h3>📅 Maç Takvimi</h3>
+        <p className="footnote">
+          {favoriteTeamId
+            ? "Tuttuğun takımın maçları kendi logosuyla, diğer maç günleri noktayla işaretlidir. Bir güne tıklayarak o haftaya atlayabilirsin."
+            : "Maç günleri noktayla işaretlidir. Bir güne tıklayarak o haftaya atlayabilirsin."}
+        </p>
+        <FixtureCalendar
+          fixture={fixture}
+          favoriteTeamId={favoriteTeamId}
+          onSelectDay={(number) => {
+            setTeamQuery("");
+            setActiveNumber(number);
+            matchListRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }}
+        />
+      </section>
+
       <section className="fixture-matches-section" ref={matchListRef}>
         <input
           type="text"
@@ -169,13 +188,27 @@ export default function RealFixturePage() {
             <MatchdayTabs matchdays={fixture} active={activeMatchday?.number} onSelect={setActiveNumber} />
             <HighlightMatchCard match={highlightMatch} competitionKey={competitionKey} />
             <Pagination key={activeMatchday?.number} items={displayMatches} pageSize={8} topRef={matchListRef}>
-              {(pageItems) => (
-                <div className="match-list">
-                  {pageItems.map((m) => (
-                    <MatchRow key={m.id} match={m} competitionKey={competitionKey} readOnly favoriteTeamId={favoriteTeamId} />
-                  ))}
-                </div>
-              )}
+              {(pageItems) => {
+                let lastDate = null;
+                return (
+                  <div className="match-list">
+                    {pageItems.map((m) => {
+                      const showDateDivider = m.date && m.date !== lastDate;
+                      lastDate = m.date || lastDate;
+                      return (
+                        <React.Fragment key={m.id}>
+                          {showDateDivider && (
+                            <div className="fixture-date-divider">
+                              <span>{formatMatchDate(m.date, { day: "numeric", month: "long", weekday: "long" })}</span>
+                            </div>
+                          )}
+                          <MatchRow match={m} competitionKey={competitionKey} readOnly favoriteTeamId={favoriteTeamId} />
+                        </React.Fragment>
+                      );
+                    })}
+                  </div>
+                );
+              }}
             </Pagination>
           </>
         )}

@@ -25,6 +25,7 @@ import {
 import Crest from "../components/Crest.jsx";
 import PlayerAvatar from "../components/PlayerAvatar.jsx";
 import ChartTooltip from "../components/stats/ChartTooltip.jsx";
+import TeamAxisTick from "../components/stats/TeamAxisTick.jsx";
 import StandingsTable from "../components/fixture/StandingsTable.jsx";
 import InteractivePrediction from "../components/live/InteractivePrediction.jsx";
 import { CHART_SERIES, CHART_GRID, CHART_AXIS } from "../utils/chartTheme.js";
@@ -266,9 +267,9 @@ function SuperLigLive() {
               <YAxis
                 type="category"
                 dataKey="teamName"
-                width={110}
+                width={140}
                 stroke={CHART_AXIS}
-                tick={{ fill: CHART_AXIS, fontSize: 11 }}
+                tick={(props) => <TeamAxisTick {...props} teamsByKey={teamByName} fill={CHART_AXIS} />}
               />
               <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
               <Bar dataKey="gf" name="Attığı Gol" fill={CHART_SERIES[1]} radius={[0, 4, 4, 0]} maxBarSize={16} />
@@ -285,9 +286,9 @@ function SuperLigLive() {
               <YAxis
                 type="category"
                 dataKey="teamName"
-                width={110}
+                width={140}
                 stroke={CHART_AXIS}
-                tick={{ fill: CHART_AXIS, fontSize: 11 }}
+                tick={(props) => <TeamAxisTick {...props} teamsByKey={teamByName} fill={CHART_AXIS} />}
               />
               <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
               <Bar dataKey="ga" name="Yediği Gol" radius={[0, 4, 4, 0]} maxBarSize={16}>

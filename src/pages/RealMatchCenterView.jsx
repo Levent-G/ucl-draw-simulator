@@ -5,6 +5,7 @@ import CompetitionStepper from "../components/CompetitionStepper.jsx";
 import EmptyState from "../components/EmptyState.jsx";
 import Crest from "../components/Crest.jsx";
 import ProbabilityBar from "../components/ProbabilityBar.jsx";
+import ProbableLineup from "../components/ProbableLineup.jsx";
 import { useFavoriteTeam } from "../state/FavoriteTeamContext.jsx";
 import { isMatchPlayed, formatMatchDate } from "../utils/matchDate.js";
 import {
@@ -68,29 +69,6 @@ function TeamFormCard({ competitionKey, team }) {
   );
 }
 
-function SquadPreview({ competitionKey, team, competition }) {
-  const players = useMemo(() => {
-    const all = competition.getPlayersByTeam(team.id) || [];
-    return [...all].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 6);
-  }, [competition, team.id]);
-  if (players.length === 0) return null;
-  return (
-    <div className="real-squad-block">
-      <div className="real-team-form-head">
-        <Crest team={team} size={28} />
-        <span>{team.name}</span>
-      </div>
-      <ul className="real-squad-list">
-        {players.map((p) => (
-          <li key={p.id}>
-            <Link to={`/${competitionKey}/oyuncu/${p.id}`}>{p.name}</Link>
-            <span className="real-squad-pos">{p.position}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
 
 // UCL/Süper Lig'de bir maçın "Maç Merkezi" görünümü -- sahte dakika-dakika
 // Poisson oynatması YERİNE: oynanmadıysa model tahmini + karşılıklı geçmiş +
@@ -234,10 +212,18 @@ export default function RealMatchCenterView() {
       </div>
 
       <div className="chart-card chart-card-wide">
-        <h3>🧾 Kadrolar</h3>
-        <div className="real-squad-grid">
-          <SquadPreview competitionKey={competitionKey} team={homeTeam} competition={competition} />
-          <SquadPreview competitionKey={competitionKey} team={awayTeam} competition={competition} />
+        <h3>🔮 Olası Kadro</h3>
+        <div className="probable-lineup-grid">
+          <ProbableLineup
+            competitionKey={competitionKey}
+            team={homeTeam}
+            players={competition.getPlayersByTeam(homeTeam.id)}
+          />
+          <ProbableLineup
+            competitionKey={competitionKey}
+            team={awayTeam}
+            players={competition.getPlayersByTeam(awayTeam.id)}
+          />
         </div>
       </div>
 
