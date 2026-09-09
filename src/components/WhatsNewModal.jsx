@@ -28,7 +28,7 @@ export default function WhatsNewModal() {
         <div className="whatsnew-head">
           <div>
             <span className="whatsnew-eyebrow">✨ Yenilikler</span>
-            <h2>Futbol Simülatör'de Neler Var?</h2>
+            <h2>Futbol Analiz'de Neler Var?</h2>
             <p>Uygulama epey büyüdü -- işte kısa bir tur.</p>
           </div>
           <button type="button" className="whatsnew-x" onClick={closeTour} aria-label="Kapat">

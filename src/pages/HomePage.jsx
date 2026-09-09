@@ -2,182 +2,121 @@ import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { TEAMS } from "../data/teams.js";
 import { COMPETITION_LIST } from "../data/competitions.js";
-import { useCompetition } from "../state/CompetitionContext.jsx";
+import { hasRealDataSupport, getRealStandings } from "../utils/realStandingsSelectors.js";
 import Crest from "../components/Crest.jsx";
+
+// Site artık BİRİNCİL olarak gerçek UCL/Süper Lig verisi sunuyor (kura
+// çekimi/sezon simülasyonu ikinci plana alındı, bkz. Eğlence Modu) --
+// kullanıcı geri bildirimi: "bizimki kura çekimi uygulaması değil futbol
+// uygulaması, ana sayfa direkt UCL/Süper Lig'e yollamalı". Bu yüzden ana
+// sayfanın birincil akışı SADECE gerçek veri destekli yarışmaları (bkz.
+// hasRealDataSupport) gösterir; kura çekimi/simülasyon isteyenler için ayrı,
+// açıkça etiketli bir "🎮 Eğlence Modu" bölümü var.
+const REAL_COMPETITIONS = COMPETITION_LIST.filter((c) => hasRealDataSupport(c.key));
+
+const COMPETITION_ICONS = { ucl: "🏆", europa: "🌟", superlig: "🇹🇷" };
 
 const CATEGORIES = [
   {
-    key: "play",
-    title: "Simülasyonu Oyna",
-    desc: "Kura çekiminden şampiyona giden tüm yolu buradan yönet.",
+    key: "follow",
+    title: "Takip Et & Tahmin Et",
+    desc: "Gerçek fikstür, canlı skorlar ve arkadaşlarınla tahmin yarışı.",
     features: [
       {
-        icon: "🏆",
-        title: "Kura Çekimi",
-        desc: "UCL, Avrupa Ligi ve Trendyol Süper Lig -- gerçek İsviçre modeli/lig kurallarına sadık, sesli anlatımlı, animasyonlu bir çekiliş töreni.",
-        to: "/ucl",
-        cta: "Çekilişi Başlat",
-        stat: "3 Lig",
+        icon: "📅",
+        title: "Gerçek Fikstür",
+        desc: "UCL ve Süper Lig'in gerçek, tarihli fikstürü -- hafta hafta, takım aramalı, takvim görünümlü.",
+        to: "/ucl/fikstur",
+        cta: "Fikstürü Gör",
+        stat: "Haftalık",
       },
       {
         icon: "📡",
-        title: "Canlı Skorlar & Tahmin",
-        desc: "Gerçek sonuçların yanında kendi tahminini yap: sıralamayı sürükle, skorları kendin gir, gol kralını seç -- eleme turu buna göre anında güncellenir.",
+        title: "Canlı Skorlar",
+        desc: "Gerçek puan durumu ve oynanan haftaların gerçek sonuçları -- kurgusal değil.",
         to: "/canli",
-        cta: "Tahminini Yap",
-        stat: "Anlık",
+        cta: "Skorları Gör",
+        stat: "Güncel",
       },
       {
-        icon: "⚽",
-        title: "Maç Merkezi",
-        desc: "Herhangi bir maçı seç, ▶ Canlı İzle ile dakika dakika gol/kart/sakatlık akışını gerçek zamanlı gibi takip et -- istersen sesli anlatımı da aç.",
-        to: "/ucl/fikstur",
-        cta: "Bir Maç İzle",
-        stat: "Sesli Anlatım",
+        icon: "🏆",
+        title: "Tahmin Ligi",
+        desc: "Arkadaşlarınla bir lig odası kur, her hafta gerçek maçların skorunu tahmin et, en çok puanı toplayan kazansın.",
+        to: "/tahmin-ligi",
+        cta: "Lig Kur",
+        stat: "Arkadaşlarla",
       },
       {
-        icon: "🎯",
-        title: "Taktik Ayarları",
-        desc: "Takımlara hücum ağırlıklı ya da defansif bir oyun tarzı ver -- sonuçlar seçimine göre anında yeniden hesaplanır.",
-        to: "/ucl/fikstur",
-        cta: "Taktik Ver",
-        stat: "3 Stil",
+        icon: "📊",
+        title: "İstatistik & Analiz",
+        desc: "Puan durumu gelişimi, xPTS, form serileri, hücum-savunma matrisi ve daha fazlası -- gerçek sonuçlardan.",
+        to: "/ucl/istatistik",
+        cta: "Analizi Gör",
+        stat: "Grafikler",
       },
     ],
   },
   {
     key: "analyze",
     title: "İncele & Karşılaştır",
-    desc: "Sayılar, grafikler ve geçmişin izini sür.",
+    desc: "Takımların geçmişini ve birbirleriyle olan hikayesini keşfet.",
     features: [
-      {
-        icon: "📊",
-        title: "İstatistikler",
-        desc: "Gol kralı, ısı haritası, takım/ülke grafikleri -- tüm kadro ve simülasyon verisi görselleştirilmiş halde.",
-        to: "/ucl/istatistik",
-        cta: "İstatistiklere Bak",
-        stat: "Isı Haritası",
-      },
       {
         icon: "🤝",
         title: "Karşılıklı Geçmiş",
-        desc: "İki takım seç, bu oturumdaki tüm simülasyonlarda aralarında geçen maçları ve toplu istatistiği gör.",
+        desc: "İki takım seç, gerçek Avrupa/derbi geçmişlerini ve model kazanma olasılığını gör.",
         to: "/ucl/karsilikli",
         cta: "Takımları Karşılaştır",
         stat: "H2H",
       },
-    ],
-  },
-  {
-    key: "build",
-    title: "Kendi Takımını Kur",
-    desc: "Kadroyu şekillendir, transferleri sen yap.",
-    features: [
-      {
-        icon: "🔁",
-        title: "Transfer Merkezi",
-        desc: "Animasyonlu transfer haberleri akışını izle, istediğin oyuncuyu istediğin takıma sürükleyerek transfer et.",
-        to: "/transferler",
-        cta: "Transfer Yap",
-        stat: "Sürükle-Bırak",
-      },
-      {
-        icon: "⭐",
-        title: "Rüya Takım",
-        desc: "5 dizilişten birini seç, oyuncuları sahada istediğin noktaya serbestçe sürükle, hangi banda bıraktığını canlı gör ve bir lige gönder.",
-        to: "/ruya-takim",
-        cta: "Kadromu Kur",
-        stat: "Serbest Sürükle",
-      },
-    ],
-  },
-  {
-    key: "track",
-    title: "Keşfet & Takip Et",
-    desc: "Takım/oyuncu profillerinden sezon geçmişine, rozetlere kadar her şey.",
-    features: [
       {
         icon: "🔎",
         title: "Takım & Oyuncu Profilleri",
-        desc: "Navbar'daki arama kutusundan istediğin takım/oyuncuyu bul -- kadro, form, ezeli rakip, transfer geçmişi ve sezon olayları tek sayfada.",
+        desc: "Navbar'daki arama kutusundan istediğin takımı bul -- gerçek kadro, form ve lig durumu tek sayfada.",
         to: "/ucl",
         cta: "Profillere Göz At",
         stat: "Arama",
       },
       {
-        icon: "🌠",
-        title: "Sezonun 11'i",
-        desc: "O simülasyondaki gol/asist/reyting performansına göre otomatik seçilen en iyi kadro, sahada 4-3-3 diziliminde.",
-        to: "/ucl/istatistik",
-        cta: "Kadroyu Gör",
-        stat: "Otomatik XI",
-      },
-      {
-        icon: "🗂️",
-        title: "Sezon Arşivi",
-        desc: "Şampiyon belirlendiğinde sezon özeti otomatik kaydedilir -- tarayıcında kalıcı, fotoğraf olarak da indirebilirsin.",
-        to: "/arsiv",
-        cta: "Arşive Git",
-        stat: "Kalıcı",
-      },
-      {
         icon: "🏅",
         title: "Başarılar",
-        desc: "Kura çekmekten kadro kurmaya, doğru tahmin tutturmaya kadar 26 rozet -- uygulamayı kullandıkça otomatik açılır.",
+        desc: "Siteyi kullandıkça açılan rozetler.",
         to: "/basarilar",
         cta: "Rozetleri Gör",
         stat: "26 Rozet",
       },
     ],
   },
+  {
+    key: "fun",
+    title: "🎮 Eğlence Modu",
+    desc: "Gerçek verilerden tamamen ayrı, kurgusal bir simülasyon alanı.",
+    features: [
+      {
+        icon: "🎲",
+        title: "Kura Çekimi & Sezon Simülasyonu",
+        desc: "UCL, Avrupa Ligi ve Süper Lig için kendi kurani çek, kendi sezonunu simüle et -- hiçbir sonuç gerçek değildir.",
+        to: "/eglence-modu",
+        cta: "Eğlence Moduna Git",
+        stat: "Simülasyon",
+      },
+      {
+        icon: "⭐",
+        title: "Rüya Takım",
+        desc: "5 dizilişten birini seç, oyuncuları sahada serbestçe sürükle ve kurgusal bir lige gönder.",
+        to: "/ruya-takim",
+        cta: "Kadromu Kur",
+        stat: "Serbest Sürükle",
+      },
+    ],
+  },
 ];
 
-const COMPETITION_ICONS = { ucl: "🏆", europa: "🌟", superlig: "🇹🇷" };
-
-// Kullanıcının "hangi ligi nereden oynayacağım" sorusunu tek bakışta
-// cevaplaması için: her ligin GERÇEK ilerleme durumunu okuyup (kura çekildi
-// mi, fikstür hazır mı, eleme turu başladı mı...) tek, net bir sıradaki adım
-// CTA'sı üretir -- aynı kural seti CompetitionStepper'da da kullanılıyor.
-function nextStepFor(competitionKey, comp, status) {
-  const base = `/${competitionKey}`;
-  if (comp.format !== "swiss") {
-    if (!status.hasDraw) return { label: "Henüz başlamadı", cta: "Sezonu Başlat", to: base };
-    if (!status.hasSimulation) return { label: "Sezon başladı", cta: "Sezona Git", to: base };
-    return { label: "Şampiyon belli oldu", cta: "İstatistiklere Git", to: `${base}/istatistik` };
-  }
-  if (!status.hasDraw) return { label: "Henüz başlamadı", cta: "Kura Çekimini Başlat", to: base };
-  if (!status.hasFixture) return { label: "Kura çekildi", cta: "Fikstürü Oluştur", to: `${base}/fikstur` };
-  if (!status.hasKnockout) return { label: "Fikstür hazır", cta: "Fikstürü Görüntüle", to: `${base}/fikstur` };
-  return { label: "Eleme turu başladı", cta: "Eleme Turunu Gör", to: `${base}/eleme-turu` };
-}
-
-function CompetitionEntryCard({ competitionKey }) {
-  const status = useCompetition(competitionKey);
-  const { competition } = status;
-  const step = nextStepFor(competitionKey, competition, status);
-  return (
-    <div className="home-comp-card">
-      <div className="home-comp-card-top">
-        <span className="home-comp-card-icon" aria-hidden="true">
-          {COMPETITION_ICONS[competitionKey] || "⚽"}
-        </span>
-        <span className={`home-comp-card-status ${status.hasDraw ? "is-active" : ""}`}>{step.label}</span>
-      </div>
-      <div className="home-comp-card-name">{competition.shortName}</div>
-      <p className="home-comp-card-tagline">{competition.tagline}</p>
-      <Link to={step.to} className="btn-primary home-comp-card-btn">
-        {step.cta} →
-      </Link>
-    </div>
-  );
-}
-
 const STATS = [
-  { n: "3", label: "Lig" },
-  { n: "100+", label: "Takım" },
-  { n: "2000+", label: "Oyuncu" },
-  { n: "∞", label: "Simülasyon" },
-  { n: "26", label: "Rozet" },
+  { n: "2", label: "Gerçek Lig" },
+  { n: "50+", label: "Takım" },
+  { n: "📡", label: "Canlı Puan Durumu" },
+  { n: "🏆", label: "Tahmin Ligi" },
 ];
 
 // Hero arka planındaki amblem şeridi -- her açılışta rastgele bir dilim
@@ -201,6 +140,34 @@ function CrestMarquee() {
   );
 }
 
+// Gerçek veri destekli bir yarışma (UCL/Süper Lig) için ana sayfa kartı --
+// eski sürüm buraya kura çekimi/sezon simülasyonu durumuna göre ("kura
+// çekildi mi, fikstür hazır mı...") bir CTA üretiyordu; bu yarışmalar için
+// artık böyle bir durum makinesi YOK (sezon zaten gerçek ve sürüyor) --
+// doğrudan yarışmanın gerçek ana sayfasına gider.
+function RealCompetitionCard({ comp }) {
+  const { started } = getRealStandings(comp.key);
+  return (
+    <div className="home-comp-card">
+      <div className="home-comp-card-top">
+        <span className="home-comp-card-icon" aria-hidden="true">
+          {COMPETITION_ICONS[comp.key] || "⚽"}
+        </span>
+        <span className="home-comp-card-status is-active">Gerçek Veri · 2026-27</span>
+      </div>
+      <div className="home-comp-card-name">{comp.shortName}</div>
+      <p className="home-comp-card-tagline">
+        {started
+          ? "Sezon sürüyor -- güncel puan durumu, fikstür ve analiz."
+          : "Gerçek fikstür ve kadrolarla sezona hazır, ilk maçlar yakında."}
+      </p>
+      <Link to={`/${comp.key}`} className="btn-primary home-comp-card-btn">
+        {comp.shortName}'e Git →
+      </Link>
+    </div>
+  );
+}
+
 export default function HomePage() {
   return (
     <div className="page-shell home-page">
@@ -210,23 +177,22 @@ export default function HomePage() {
         <CrestMarquee />
         <div className="home-hero-content">
           <div className="page-eyebrow home-hero-in" style={{ animationDelay: "0ms" }}>
-            UCL · Avrupa Ligi · Trendyol Süper Lig
+            UEFA Şampiyonlar Ligi · Trendyol Süper Lig
           </div>
           <h1 className="home-hero-title home-hero-in" style={{ animationDelay: "80ms" }}>
-            Futbol Simülatör
+            Futbol Analiz
           </h1>
           <p className="home-hero-sub home-hero-in" style={{ animationDelay: "160ms" }}>
-            Kura çek, fikstürünü kur, maçları dakika dakika izle, kendi Rüya
-            Takımını oluştur. Gerçek kurallara sadık, eğlenceli ve gerçeğe
-            yakın bir istatistiksel model -- hepsi tek bir sitede.
+            Gerçek fikstür, güncel puan durumu, canlı skorlar, derinlemesine istatistiksel analiz ve
+            arkadaşlarınla oynayabileceğin bir Tahmin Ligi -- hepsi tek bir sitede.
           </p>
           <div className="home-hero-actions home-hero-in" style={{ animationDelay: "240ms" }}>
             <Link to="/ucl" className="btn-primary home-hero-btn home-hero-btn-shine">
               <span className="home-hero-btn-shine-sweep" aria-hidden="true" />
-              Hemen Başla →
+              🏆 UCL'ye Git →
             </Link>
-            <Link to="/ruya-takim" className="btn-secondary home-hero-btn">
-              ⭐ Rüya Takımını Kur
+            <Link to="/superlig" className="btn-secondary home-hero-btn">
+              🇹🇷 Süper Lig'e Git →
             </Link>
           </div>
           <div className="home-hero-stats home-hero-in" style={{ animationDelay: "320ms" }}>
@@ -242,26 +208,26 @@ export default function HomePage() {
 
       <section className="home-competitions">
         <div className="home-competitions-head">
-          <h2 className="home-section-title">Hangi Ligi Oynamak İstiyorsun?</h2>
+          <h2 className="home-section-title">Hangi Ligi İncelemek İstiyorsun?</h2>
           <p className="home-cat-desc">
-            Bir lig seç -- durumuna göre (henüz başlamadı / kura çekildi /
-            fikstür hazır / eleme turu) buton seni doğrudan sıradaki adıma
-            götürür.
+            Gerçek, güncel veri -- kura çekimi ya da kurgusal bir simülasyon değil.
           </p>
         </div>
         <div className="home-comp-grid">
-          {COMPETITION_LIST.map((comp) => (
-            <CompetitionEntryCard key={comp.key} competitionKey={comp.key} />
+          {REAL_COMPETITIONS.map((comp) => (
+            <RealCompetitionCard key={comp.key} comp={comp} />
           ))}
         </div>
+        <p className="footnote home-fun-mode-note">
+          Kura çekimi ya da kendi sezonunu simüle etmek mi istiyorsun? <Link to="/eglence-modu">🎮 Eğlence Modu'na göz at →</Link>
+        </p>
       </section>
 
       <section className="home-secondary-tools">
         <div className="home-secondary-head">
           <h2 className="home-section-title">Diğer Araçlar</h2>
           <p className="home-cat-desc">
-            Kadro kur, tahmin yap, sezonları arşivle, rozet topla -- ligini
-            seçtikten sonra keşfedebileceğin ek özellikler.
+            Ligini seçtikten sonra keşfedebileceğin ek özellikler.
           </p>
         </div>
         {CATEGORIES.map((cat) => (
@@ -298,11 +264,10 @@ export default function HomePage() {
       </section>
 
       <p className="footnote home-footnote">
-        Bu site bir simülasyon/eğlence projesidir. Skorlar, oyuncu istatistikleri
-        ve turnuva sonuçları gerçek bir spor verisi değildir -- takım
-        katsayılarına dayalı Poisson tabanlı bir model tarafından üretilir.
-        Sadece "Canlı Skorlar" sayfasındaki gerçek veri etiketli bölümler
-        gerçek dünya verisi içerir.
+        UCL ve Süper Lig sayfalarındaki fikstür, puan durumu, sonuçlar, haberler ve analizler GERÇEK veridir
+        (statik bir anlık görüntü -- bkz. her sayfadaki güncelleme notu). Sadece "🎮 Eğlence Modu" (kura çekimi,
+        sezon simülasyonu, Avrupa Ligi, Rüya Takım, oyuncu istatistikleri) kurgusaldır ve bir Poisson tabanlı
+        model tarafından üretilir.
       </p>
     </div>
   );

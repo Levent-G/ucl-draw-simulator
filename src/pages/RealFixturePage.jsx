@@ -69,16 +69,24 @@ export default function RealFixturePage() {
     return rows;
   }, [fixture, competitionKey, searchKey]);
 
+  // Favori takım varsa ve bu hafta oynayacaksa, "haftanın öne çıkan maçı"
+  // olarak model tahmini en dengeli maç yerine DOĞRUDAN o takımın maçı
+  // gösterilir -- kullanıcı için en alakalı maç zaten kendi tuttuğu takımın
+  // maçıdır.
   const highlightMatch = useMemo(() => {
     const pending = displayMatches.filter((m) => !isMatchPlayed(m));
     if (!pending.length) return null;
+    if (favoriteTeamId) {
+      const favMatch = pending.find((m) => m.homeTeam.id === favoriteTeamId || m.awayTeam.id === favoriteTeamId);
+      if (favMatch) return favMatch;
+    }
     return pending.reduce((best, m) => {
       const margin = Math.abs((m.homeWinProb ?? 0) - (m.awayWinProb ?? 0));
       if (!best) return m;
       const bestMargin = Math.abs((best.homeWinProb ?? 0) - (best.awayWinProb ?? 0));
       return margin < bestMargin ? m : best;
     }, null);
-  }, [displayMatches]);
+  }, [displayMatches, favoriteTeamId]);
 
   if (!fixture) {
     return (
@@ -137,24 +145,7 @@ export default function RealFixturePage() {
         <ZoneLegend zones={competition.zones} />
       </section>
 
-      <section className="chart-card fixture-calendar-section">
-        <h3>📅 Maç Takvimi</h3>
-        <p className="footnote">
-          {favoriteTeamId
-            ? "Tuttuğun takımın maçları kendi logosuyla, diğer maç günleri noktayla işaretlidir. Bir güne tıklayarak o haftaya atlayabilirsin."
-            : "Maç günleri noktayla işaretlidir. Bir güne tıklayarak o haftaya atlayabilirsin."}
-        </p>
-        <FixtureCalendar
-          fixture={fixture}
-          favoriteTeamId={favoriteTeamId}
-          onSelectDay={(number) => {
-            setTeamQuery("");
-            setActiveNumber(number);
-            matchListRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-          }}
-        />
-      </section>
-
+      <div className="fixture-layout">
       <section className="fixture-matches-section" ref={matchListRef}>
         <input
           type="text"
@@ -213,6 +204,26 @@ export default function RealFixturePage() {
           </>
         )}
       </section>
+
+      <section className="chart-card fixture-calendar-section">
+        <h3>📅 Maç Takvimi</h3>
+        <p className="footnote">
+          {favoriteTeamId
+            ? "Tuttuğun takımın maçları kendi logosuyla işaretlidir. Bir güne tıkla, o günün maçını gör."
+            : "Maç günleri noktayla işaretlidir. Bir güne tıkla, o günün maçını gör."}
+        </p>
+        <FixtureCalendar
+          fixture={fixture}
+          competitionKey={competitionKey}
+          favoriteTeamId={favoriteTeamId}
+          onSelectDay={(number) => {
+            setTeamQuery("");
+            setActiveNumber(number);
+            matchListRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }}
+        />
+      </section>
+      </div>
     </div>
   );
 }

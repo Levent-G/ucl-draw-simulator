@@ -6,8 +6,13 @@ import { isMatchPlayed, formatMatchDate } from "../../utils/matchDate.js";
 export default function MatchRow({ match, userScore, onUserScoreChange, competitionKey, readOnly = false, favoriteTeamId = null }) {
   const { homeTeam, awayTeam } = match;
   const isFavoriteMatch = favoriteTeamId && (homeTeam.id === favoriteTeamId || awayTeam.id === favoriteTeamId);
-  const played = isMatchPlayed(match);
-  const hasSim = played && match.homeGoals != null && match.awayGoals != null;
+  // Gerçek bir sonuç ZATEN elimizdeyse (bkz. buildDisplayMatches --
+  // homeGoals/awayGoals SADECE gerçek bir sonuç bulunduysa doldurulur), bunu
+  // tarih bazlı isMatchPlayed kontrolünden BAĞIMSIZ olarak "oynanmış" say --
+  // aksi halde bugün erken saatte biten bir maç, gün henüz "kesin geçmiş"
+  // sayılmadığı için yanlışlıkla "⏳ Bekleniyor" gösterirdi.
+  const hasSim = match.homeGoals != null && match.awayGoals != null;
+  const played = isMatchPlayed(match) || hasSim;
   const homePct = Math.round((match.homeWinProb ?? 0) * 100);
   const drawPct = Math.round((match.drawProb ?? 0) * 100);
   const awayPct = Math.max(0, 100 - homePct - drawPct);

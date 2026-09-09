@@ -9,9 +9,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icons/icon-192.png', 'icons/icon-512.png'],
       manifest: {
-        name: 'Futbol Simülatör — UCL / Avrupa Ligi / Süper Lig',
-        short_name: 'Futbol Simülatör',
-        description: 'UCL, Avrupa Ligi ve Trendyol Süper Lig kura/fikstür/tahmin simülatörü',
+        name: 'Futbol Analiz — UCL / Süper Lig',
+        short_name: 'Futbol Analiz',
+        description: 'UEFA Şampiyonlar Ligi ve Trendyol Süper Lig için gerçek fikstür, puan durumu ve istatistiksel analiz',
         theme_color: '#0e1d4a',
         background_color: '#0a1636',
         display: 'standalone',

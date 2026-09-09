@@ -703,7 +703,7 @@ export function getAttackDefenseMatrix(competitionKey) {
       stats[m.awayTeam.id].ga += real.homeGoals;
     }
   }
-  return competition.teams
+  const rows = competition.teams
     .map((t) => {
       const s = stats[t.id];
       if (!s || s.played === 0) return null;
@@ -717,6 +717,30 @@ export function getAttackDefenseMatrix(competitionKey) {
       };
     })
     .filter(Boolean);
+
+  // Sezon başında az maç oynanmışken birden fazla takım TAM AYNI (gf, ga)
+  // çiftine düşebiliyor (ör. hepsi "1.00 / 1.00") -- bu durumda scatter
+  // grafikte amblemleri tam üst üste binerdi. Veriyi UYDURMADAN, sadece
+  // görsel çakışmayı önlemek için aynı noktaya düşen takımları küçük bir
+  // daire üzerinde hafifçe ayırıyoruz (gerçek gf/ga'dan sapma en fazla
+  // ±0.06 -- ihmal edilebilir, sadece okunurluk için).
+  const groups = new Map();
+  for (const r of rows) {
+    const key = `${r.gfPerGame}|${r.gaPerGame}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(r);
+  }
+  const JITTER_RADIUS = 0.06;
+  for (const group of groups.values()) {
+    if (group.length <= 1) continue;
+    group.forEach((r, i) => {
+      const angle = (2 * Math.PI * i) / group.length;
+      r.gfPerGame = Math.round((r.gfPerGame + Math.cos(angle) * JITTER_RADIUS) * 100) / 100;
+      r.gaPerGame = Math.round((r.gaPerGame + Math.sin(angle) * JITTER_RADIUS) * 100) / 100;
+    });
+  }
+
+  return rows;
 }
 
 // En çok gol atılan gerçek maçlar (toplam gol sırasına göre) -- "🎉 En Golcü

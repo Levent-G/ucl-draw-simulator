@@ -45,16 +45,24 @@ export default function CompetitionHomePage() {
     [competitionKey, activeMatchday]
   );
 
+  // Favori takım varsa ve bu hafta oynayacaksa, "haftanın öne çıkan maçı"
+  // olarak model tahmini en dengeli maç yerine DOĞRUDAN o takımın maçı
+  // gösterilir -- kullanıcı için en alakalı maç zaten kendi tuttuğu takımın
+  // maçıdır.
   const highlightMatch = useMemo(() => {
     const pending = displayMatches.filter((m) => !isMatchPlayed(m));
     if (!pending.length) return null;
+    if (favoriteTeamId) {
+      const favMatch = pending.find((m) => m.homeTeam.id === favoriteTeamId || m.awayTeam.id === favoriteTeamId);
+      if (favMatch) return favMatch;
+    }
     return pending.reduce((best, m) => {
       const margin = Math.abs((m.homeWinProb ?? 0) - (m.awayWinProb ?? 0));
       if (!best) return m;
       const bestMargin = Math.abs((best.homeWinProb ?? 0) - (best.awayWinProb ?? 0));
       return margin < bestMargin ? m : best;
     }, null);
-  }, [displayMatches]);
+  }, [displayMatches, favoriteTeamId]);
 
   const recentResults = useMemo(() => {
     if (!fixture) return [];

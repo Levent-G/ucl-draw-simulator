@@ -9,6 +9,7 @@ import {
   ScatterChart,
   Scatter,
   ReferenceLine,
+  ReferenceArea,
   LabelList,
   XAxis,
   YAxis,
@@ -133,7 +134,16 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
     if (attackDefenseMatrix.length === 0) return null;
     const avgGf = attackDefenseMatrix.reduce((sum, r) => sum + r.gfPerGame, 0) / attackDefenseMatrix.length;
     const avgGa = attackDefenseMatrix.reduce((sum, r) => sum + r.gaPerGame, 0) / attackDefenseMatrix.length;
-    return { avgGf, avgGa };
+    const gfs = attackDefenseMatrix.map((r) => r.gfPerGame);
+    const gas = attackDefenseMatrix.map((r) => r.gaPerGame);
+    return {
+      avgGf,
+      avgGa,
+      gfMin: Math.min(...gfs, avgGf) - 0.4,
+      gfMax: Math.max(...gfs, avgGf) + 0.4,
+      gaMin: Math.min(...gas, avgGa) - 0.4,
+      gaMax: Math.max(...gas, avgGa) + 0.4,
+    };
   }, [attackDefenseMatrix]);
   const goalsTrend = useMemo(() => getGoalsPerMatchdayTrend(competitionKey), [competitionKey]);
 
@@ -465,17 +475,19 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
         <div className="chart-card chart-card-wide">
           <h3>🎯 Hücum-Savunma Matrisi</h3>
           <p className="footnote">
-            Her nokta bir takım -- yatay eksen maç başına attığı gol, dikey eksen maç başına yediği gol. Sağ-alt
-            kadran (çok atan, az yiyen) en güçlü takımları, sol-üst kadran (az atan, çok yiyen) en zayıf takımları
-            işaret eder. Kesikli çizgiler ligin ortalamasıdır -- gerçek sonuçlardan.
+            Her nokta bir takım -- yatay eksen maç başına attığı gol, dikey eksen maç başına yediği gol. Yeşil
+            bölge (çok atan, az yiyen) en güçlü takımları, kırmızı bölge (az atan, çok yiyen) en zayıf takımları,
+            sarı bölgeler ise karışık (biri iyi biri kötü) profilleri işaret eder. Kesikli çizgiler ligin
+            ortalamasıdır -- gerçek sonuçlardan.
           </p>
-          <ResponsiveContainer width="100%" height={420}>
+          <ResponsiveContainer width="100%" height={460}>
             <ScatterChart margin={{ top: 20, right: 30, bottom: 20, left: 10 }}>
               <CartesianGrid stroke={CHART_GRID} />
               <XAxis
                 type="number"
                 dataKey="gfPerGame"
                 name="Maç Başına Gol (Attığı)"
+                domain={[matrixAverages.gfMin, matrixAverages.gfMax]}
                 stroke={CHART_AXIS}
                 tick={{ fill: CHART_AXIS, fontSize: 11 }}
                 label={{ value: "Maç başına attığı gol →", position: "insideBottom", offset: -8, fill: CHART_AXIS, fontSize: 11 }}
@@ -484,10 +496,18 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
                 type="number"
                 dataKey="gaPerGame"
                 name="Maç Başına Gol (Yediği)"
+                domain={[matrixAverages.gaMin, matrixAverages.gaMax]}
                 stroke={CHART_AXIS}
                 tick={{ fill: CHART_AXIS, fontSize: 11 }}
                 label={{ value: "← Maç başına yediği gol", angle: -90, position: "insideLeft", fill: CHART_AXIS, fontSize: 11 }}
               />
+              {/* İyi (sağ-alt: çok atan/az yiyen) yeşil, kötü (sol-üst: az
+                  atan/çok yiyen) kırmızı, karışık iki kadran sarı -- kadranlar
+                  net ayırt edilsin diye (bkz. kullanıcı isteği). */}
+              <ReferenceArea x1={matrixAverages.avgGf} x2={matrixAverages.gfMax} y1={matrixAverages.gaMin} y2={matrixAverages.avgGa} fill="#4ade80" fillOpacity={0.1} strokeOpacity={0} />
+              <ReferenceArea x1={matrixAverages.gfMin} x2={matrixAverages.avgGf} y1={matrixAverages.avgGa} y2={matrixAverages.gaMax} fill="#f87171" fillOpacity={0.1} strokeOpacity={0} />
+              <ReferenceArea x1={matrixAverages.avgGf} x2={matrixAverages.gfMax} y1={matrixAverages.avgGa} y2={matrixAverages.gaMax} fill="#fbbf24" fillOpacity={0.06} strokeOpacity={0} />
+              <ReferenceArea x1={matrixAverages.gfMin} x2={matrixAverages.avgGf} y1={matrixAverages.gaMin} y2={matrixAverages.avgGa} fill="#fbbf24" fillOpacity={0.06} strokeOpacity={0} />
               <ReferenceLine x={matrixAverages.avgGf} stroke={CHART_AXIS} strokeDasharray="4 4" />
               <ReferenceLine y={matrixAverages.avgGa} stroke={CHART_AXIS} strokeDasharray="4 4" />
               <Tooltip content={<ChartTooltip />} cursor={{ strokeDasharray: "3 3" }} />

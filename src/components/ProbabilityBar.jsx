@@ -21,7 +21,8 @@ export default function ProbabilityBar({ homeTeam, awayTeam, homePct, drawPct, a
   if (size === "mini") {
     const favIsHome = homePct >= awayPct && homePct >= drawPct;
     const favIsDraw = drawPct > homePct && drawPct >= awayPct;
-    const favLabel = favIsDraw ? "Berabere" : favIsHome ? homeTeam?.short : awayTeam?.short;
+    const favTeam = favIsDraw ? null : favIsHome ? homeTeam : awayTeam;
+    const favLabel = favIsDraw ? "Berabere" : favTeam?.short;
     const favPct = favIsDraw ? drawPct : favIsHome ? homePct : awayPct;
     return (
       <div className="prob-mini" title={`${homeTeam?.short} ${homePct}% · Berabere ${drawPct}% · ${awayTeam?.short} ${awayPct}%`}>
@@ -30,7 +31,10 @@ export default function ProbabilityBar({ homeTeam, awayTeam, homePct, drawPct, a
           <span className="prob-seg prob-draw" style={{ width: `${adj.draw}%` }} />
           <span className="prob-seg prob-away" style={{ width: `${adj.away}%` }} />
         </div>
-        <span className="prob-mini-label">{favLabel} {favPct}%</span>
+        <span className="prob-mini-label">
+          {favTeam && <Crest team={favTeam} size={15} />}
+          {favLabel} {favPct}%
+        </span>
       </div>
     );
   }

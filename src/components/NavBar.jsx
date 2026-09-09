@@ -70,7 +70,7 @@ export default function NavBar() {
     <nav className={`site-nav ${menuOpen ? "menu-open" : ""}`}>
       <div className="site-nav-inner">
         <NavLink to="/" end className="site-nav-brand-link">
-          <span className="site-nav-brand">FUTBOL SİMÜLATÖR</span>
+          <span className="site-nav-brand">FUTBOL ANALİZ</span>
         </NavLink>
         <NavSearch />
         <button
