@@ -9,13 +9,20 @@
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
 }
+/* "En üstte arama olsun" -- arama kutusu artık ayrı, ince bir üst şerit,
+   asıl menü satırının bir parçası değil. */
+.site-nav-search-row {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 8px 18px 0;
+}
 .site-nav-inner {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 12px 18px;
+  padding: 10px 18px 12px;
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 .site-nav-brand-link {
@@ -32,8 +39,10 @@
 }
 .site-nav-links {
   display: flex;
+  align-items: center;
   gap: 6px;
   flex-wrap: wrap;
+  flex: 1;
 }
 /* Mobil menüdeki grup başlıkları/2 sütunlu lig ızgarası -- masaüstünde
    görünmez/etkisiz olmalı (linkler doğrudan .site-nav-links'in normal yatay
@@ -109,31 +118,35 @@ button.site-nav-link-icon {
   border-color: transparent;
 }
 
-/* "Diğer" menüsü (NavMoreMenu.jsx) -- Transfer/Rüya Takım/Arşiv/Başarılar/
-   Ayarlar/Yenilikler gibi ikincil araçları tek bir açılır panelde toplar. */
-.site-nav-more {
+/* Navbar dropdown'ları (bkz. NavDropdown.jsx) -- "Diğer" VE UCL/Süper Lig'in
+   kendi alt sayfalarına (Fikstür/İstatistik/Karşılıklı Geçmiş/Haberler)
+   açılan menüler dahil TÜMÜ bunu paylaşır. Eskiden UCL/Süper Lig için AYRI,
+   navbar'ın altında ikinci bir satır (RealCompetitionSubNav) vardı --
+   kullanıcı geri bildirimi ("üstte menü, altında da menü, çok yanlış")
+   üzerine tek satırlı, açılır-kapanır dropdown'lara birleştirildi. */
+.site-nav-dropdown {
   position: relative;
 }
-button.site-nav-more-trigger {
+button.site-nav-dropdown-trigger {
   background: transparent;
   cursor: pointer;
 }
-.site-nav-more-caret {
+.site-nav-dropdown-caret {
   display: inline-block;
   margin-left: 4px;
   font-size: 10px;
   transition: transform 0.15s ease;
 }
-.site-nav-more.open .site-nav-more-caret {
+.site-nav-dropdown.open .site-nav-dropdown-caret {
   transform: rotate(180deg);
 }
-.site-nav-more-mobile-label {
+.site-nav-dropdown-mobile-label {
   display: none;
 }
-.site-nav-more-panel {
+.site-nav-dropdown-panel {
   position: absolute;
   top: calc(100% + 8px);
-  right: 0;
+  left: 0;
   min-width: 220px;
   display: none;
   flex-direction: column;
@@ -145,10 +158,10 @@ button.site-nav-more-trigger {
   padding: 8px;
   z-index: 50;
 }
-.site-nav-more.open .site-nav-more-panel {
+.site-nav-dropdown.open .site-nav-dropdown-panel {
   display: flex;
 }
-.site-nav-more-item {
+.site-nav-dropdown-item {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -164,13 +177,21 @@ button.site-nav-more-trigger {
   cursor: pointer;
   width: 100%;
 }
-.site-nav-more-item:hover {
+.site-nav-dropdown-item:hover {
   background: var(--bg-panel-alt);
   color: var(--text-primary);
 }
-.site-nav-more-item.active {
+.site-nav-dropdown-item.active {
   color: var(--text-primary);
   background: var(--bg-panel-alt);
+}
+/* Ana menüdeki sağ uç: favori takım seçici + Eğlence Modu -- sadece bir
+   UCL/Süper Lig sayfasındayken görünür (bkz. NavBar.jsx showRealSubNav). */
+.site-nav-util {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
 }
 
 /* 11 nav linki + arama kutusu, 700px'in ÇOK üzerindeki "normal" masaüstü
@@ -185,11 +206,6 @@ button.site-nav-more-trigger {
   .site-nav-inner {
     padding: 10px 14px;
     gap: 10px;
-  }
-  .nav-search {
-    order: 3;
-    flex: 1 1 100%;
-    max-width: none;
   }
   .site-nav-burger {
     display: flex;
@@ -258,17 +274,7 @@ button.site-nav-more-trigger {
     padding: 6px 14px 4px;
   }
   .site-nav-league-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    padding: 0 14px;
-    margin-bottom: 2px;
-  }
-  .site-nav-league-grid .site-nav-link {
-    width: auto;
-    text-align: center;
-    padding: 16px 10px;
-    font-size: 13px;
+    display: contents;
   }
   .site-nav-link {
     width: 100%;
@@ -281,11 +287,12 @@ button.site-nav-more-trigger {
   }
 
   /* Mobilde burger menüsü zaten her şeyi tek sütuna indiriyor -- ayrı bir
-     açılır panel yerine "Diğer" grubu düz, etiketli bir alt bölüm olur. */
-  .site-nav-more-trigger {
+     açılır panel yerine her dropdown ("Diğer", UCL, Süper Lig) kendi düz,
+     etiketli alt bölümüne dönüşür (bkz. NavDropdown.jsx). */
+  .site-nav-dropdown-trigger {
     display: none;
   }
-  .site-nav-more-mobile-label {
+  .site-nav-dropdown-mobile-label {
     display: block;
     font-family: var(--font-mono);
     font-size: 10px;
@@ -294,7 +301,7 @@ button.site-nav-more-trigger {
     color: var(--text-faint);
     padding: 10px 14px 2px;
   }
-  .site-nav-more-panel {
+  .site-nav-dropdown-panel {
     position: static;
     display: flex;
     background: transparent;
@@ -302,7 +309,15 @@ button.site-nav-more-trigger {
     box-shadow: none;
     padding: 0;
   }
-  .site-nav-more-item {
+  .site-nav-util {
+    margin-left: 0;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 10px 14px 2px;
+  }
+  .site-nav-dropdown-item {
     padding: 11px 14px;
     font-family: var(--font-display);
     text-transform: uppercase;
@@ -318,9 +333,8 @@ button.site-nav-more-trigger {
 
 .nav-search {
   position: relative;
-  flex: 1;
-  min-width: 160px;
-  max-width: 280px;
+  width: 100%;
+  max-width: 420px;
 }
 .nav-search-input {
   width: 100%;

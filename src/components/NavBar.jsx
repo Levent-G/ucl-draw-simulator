@@ -1,24 +1,34 @@
 import React, { useEffect, useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
-import { COMPETITION_LIST } from "../data/competitions.js";
+import { NavLink, Link, useLocation } from "react-router-dom";
+import { COMPETITION_LIST, getCompetition } from "../data/competitions.js";
 import { useOnboarding } from "../state/OnboardingContext.jsx";
+import { useFavoriteTeam } from "../state/FavoriteTeamContext.jsx";
 import { hasRealDataSupport } from "../utils/realStandingsSelectors.js";
 import NavSearch from "./NavSearch.jsx";
-import NavMoreMenu from "./NavMoreMenu.jsx";
-import RealCompetitionSubNav from "./RealCompetitionSubNav.jsx";
+import NavDropdown from "./NavDropdown.jsx";
+import TeamFilterSelect from "./stats/TeamFilterSelect.jsx";
 
-// Sitenin birincil işi 2 gerçek veri ligini (UCL/Süper Lig) takip etmek --
-// bu yüzden navbar'ın birincil satırı SADECE Ana Sayfa + bu ligler + Canlı
-// Skorlar'dan oluşur. Avrupa Ligi'nin gerçek veri desteği yok (henüz kaynağı
-// yok, bkz. hasRealDataSupport) -- tamamen simülasyon, bu yüzden üst
-// menüden KALDIRILDI (rota/sayfa SİLİNMEDİ, hâlâ "🎮 Eğlence Modu"
-// üzerinden erişilebilir). Geri kalan ikincil araçlar (Rüya Takım/
-// Başarılar/Ayarlar/Yenilikler) "Diğer" menüsüne toplanır (bkz.
-// NavMoreMenu.jsx). Transfer Merkezi ve Arşiv de (tamamen kurgusal
-// simülasyon verisine dayandıkları için) menüden kaldırıldı -- sayfaları
-// SİLİNMEDİ, sadece artık ana menüden erişilemiyorlar.
+// Kullanıcı geri bildirimi: eskiden UCL/Süper Lig'in Fikstür/İstatistik/
+// Karşılıklı Geçmiş/Haberler linkleri navbar'ın AYRI bir ikinci satırında
+// (bkz. RealCompetitionSubNav.jsx, artık kullanılmıyor) duruyordu -- "üstte
+// menü, altında da menü, çok yanlış" tepkisi aldı. Artık TEK satırlı bir
+// menüde, UCL/Süper Lig kendi açılır (dropdown) menüsü -- bkz. NavDropdown.
+function realDropdownItems(competitionKey) {
+  return [
+    { to: `/${competitionKey}`, end: true, icon: "📅", label: "Fikstür" },
+    { to: `/${competitionKey}/istatistik`, icon: "📊", label: "İstatistikler" },
+    { to: `/${competitionKey}/karsilikli`, icon: "🤝", label: "Karşılıklı Geçmiş" },
+    { to: `/${competitionKey}/haberler`, icon: "📰", label: "Haberler" },
+  ];
+}
+
+// "🎮 Eğlence Modu" bir UCL/Süper Lig sayfasındayken sağ üstte (bkz.
+// site-nav-util, o yarışmaya özel kısayol) ayrıca gösteriliyor, ama /canli,
+// /tahmin-ligi gibi yarışmadan bağımsız sayfalarda oraya erişim yok -- bu
+// yüzden genel giriş noktası (bkz. FunModeLandingPage) olarak burada da
+// (her sayfada erişilebilir "Diğer" menüsünde) duruyor.
 const MORE_ITEMS = [
-  { to: "/eglence-modu", label: "Eğlence Modu (Simülasyon)", icon: "🎮" },
+  { to: "/eglence-modu", label: "Eğlence Modu", icon: "🎮" },
   { to: "/ruya-takim", label: "Rüya Takım", icon: "⭐" },
   { to: "/basarilar", label: "Başarılar", icon: "🏅" },
   { to: "/ayarlar", label: "Ayarlar", icon: "⚙️" },
@@ -26,6 +36,7 @@ const MORE_ITEMS = [
 
 const COMPETITION_KEYS = COMPETITION_LIST.map((c) => c.key);
 const NAV_COMPETITIONS = COMPETITION_LIST.filter((c) => hasRealDataSupport(c.key));
+const COMPETITION_ICONS = { ucl: "🏆", superlig: "🇹🇷" };
 // Bir yarışma gerçek veri desteklese bile (ucl/superlig), bu alt yollar HÂLÂ
 // tamamen eski simülasyon motorunu kullanır (kura töreni, sahte sezon
 // simülasyonu, eleme turu tahmini) -- "gerçek veri" rozeti YANLIŞLIKLA
@@ -50,6 +61,7 @@ export default function NavBar() {
   // /europa/fikstur -> "europa").
   const matchedCompetitionKey = COMPETITION_KEYS.find((key) => location.pathname.startsWith(`/${key}`));
   const showRealSubNav = matchedCompetitionKey && hasRealDataSupport(matchedCompetitionKey);
+  const { favoriteTeamId, setFavoriteTeam } = useFavoriteTeam(showRealSubNav ? matchedCompetitionKey : undefined);
 
   // Kullanıcı "gerçek veri mi simülasyon mu?" karışıklığı yaşadığını, sonra
   // da "sayfalarda gezerken hep gerçek veri olsun -- ayrıca bir GERÇEK VERİ
@@ -68,11 +80,13 @@ export default function NavBar() {
   return (
     <>
     <nav className={`site-nav ${menuOpen ? "menu-open" : ""}`}>
+      <div className="site-nav-search-row">
+        <NavSearch />
+      </div>
       <div className="site-nav-inner">
         <NavLink to="/" end className="site-nav-brand-link">
           <span className="site-nav-brand">FUTBOL ANALİZ</span>
         </NavLink>
-        <NavSearch />
         <button
           type="button"
           className="site-nav-burger"
@@ -86,13 +100,12 @@ export default function NavBar() {
           <span className="site-nav-group-label">Ligler</span>
           <div className="site-nav-league-grid">
             {NAV_COMPETITIONS.map((comp) => (
-              <NavLink
+              <NavDropdown
                 key={comp.key}
-                to={`/${comp.key}`}
-                className={({ isActive }) => `site-nav-link site-nav-link-league${isActive ? " active" : ""}`}
-              >
-                {comp.shortName}
-              </NavLink>
+                label={comp.shortName}
+                icon={COMPETITION_ICONS[comp.key] || "⚽"}
+                items={realDropdownItems(comp.key)}
+              />
             ))}
           </div>
           <span className="site-nav-group-label">Keşfet</span>
@@ -108,7 +121,28 @@ export default function NavBar() {
           >
             🏆 Tahmin Ligi
           </NavLink>
-          <NavMoreMenu items={MORE_ITEMS} onTourClick={openTour} />
+          <NavDropdown
+            label="Diğer"
+            items={[...MORE_ITEMS, { label: "Yenilikler", icon: "✨", onClick: openTour }]}
+          />
+          {showRealSubNav && (
+            <div className="site-nav-util">
+              <div className="favorite-team-picker">
+                <TeamFilterSelect
+                  teams={getCompetition(matchedCompetitionKey).teams}
+                  value={favoriteTeamId}
+                  onChange={setFavoriteTeam}
+                  placeholder="⭐ Takımını Seç"
+                />
+              </div>
+              <Link
+                to={`/${matchedCompetitionKey}/${getCompetition(matchedCompetitionKey).format === "swiss" ? "kura-simulasyonu" : "sezon-simulasyonu"}`}
+                className="real-data-nav-fun-link"
+              >
+                🎮 Eğlence Modu
+              </Link>
+            </div>
+          )}
         </div>
       </div>
       {showSimBanner && (
@@ -118,7 +152,6 @@ export default function NavBar() {
           </span>
         </div>
       )}
-      {showRealSubNav && <RealCompetitionSubNav competitionKey={matchedCompetitionKey} />}
     </nav>
     {menuOpen && <div className="site-nav-backdrop" onClick={() => setMenuOpen(false)} aria-hidden="true" />}
     </>
