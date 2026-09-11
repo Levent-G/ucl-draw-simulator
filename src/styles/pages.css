@@ -1,5 +1,290 @@
 /* ==========================================================================
-   NAV BAR
+   APP SHELL -- SOL MENÜ (Sidebar.jsx) + ÜST ÇUBUK (TopBar.jsx)
+   ========================================================================== */
+/* Kullanıcı geri bildirimi: menü artık üstte yatay bir çubuk değil, SOL
+   tarafta dikey bir menü -- arama en üstte, menü onun altında. Favori takım
+   ve Eğlence Modu ayrı, ince bir üst çubukta, en sağda (bkz. AppShell.jsx). */
+/* Sidebar BİLEREK position:fixed -- flex/sticky kombinasyonu (bir önceki
+   sürüm) bazı tarayıcılarda sol menünün kenara tam yaslanmaması ve sayfa
+   içeriğinin aşağı kaymasına yol açan ince bir hizalama hatasına neden
+   oluyordu. Sabit konumlu bir menü + içerik tarafında eşit bir sol boşluk
+   (margin-left) çok daha güvenilir, klasik bir desen. */
+/* KENDİ sınıf adı -- kasıtlı olarak "app-shell" DEĞİL. O isim src/index.css'te
+   (eski, tek sayfalık simülasyon ekranlarının -- DrawPage.jsx vb. -- sarmalayıcısı,
+   14px/18px padding veren) hâlâ tanımlı ve KULLANILIYOR; aynı adı kullansaydık
+   o padding buraya da (sessizce, override edilmeden) sızıp sol menüde/üst
+   çubukta "boşluk" bugı yaratırdı -- tam da [[feedback-dead-css-collisions]]'da
+   kayıtlı olan class-adı çakışması, bu kez index.css ile pages.css arasında. */
+.app-root-shell {
+  min-height: 100vh;
+}
+.app-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 250px;
+  overflow-y: auto;
+  background: rgba(5, 11, 34, 0.92);
+  backdrop-filter: blur(10px);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 14px;
+  z-index: 30;
+}
+.sidebar-brand-link {
+  text-decoration: none;
+  padding: 0 4px;
+}
+.sidebar-brand {
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+.sidebar-search {
+  padding: 0 2px;
+}
+.sidebar-search .nav-search {
+  max-width: none;
+  width: 100%;
+}
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  color: var(--text-dim);
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.sidebar-link:hover {
+  color: var(--text-primary);
+  background: var(--bg-panel-alt);
+}
+.sidebar-link.active {
+  color: #fff;
+  background: linear-gradient(180deg, var(--accent-bright), var(--accent));
+  box-shadow: 0 6px 18px -8px rgba(84, 104, 255, 0.7);
+}
+.sidebar-link-icon {
+  flex-shrink: 0;
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+}
+.sidebar-link-label {
+  flex: 1;
+}
+.sidebar-link-prediction:not(.active) {
+  color: #fbbf24;
+}
+
+.sidebar-dropdown-caret {
+  margin-left: auto;
+  font-size: 10px;
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+.sidebar-dropdown.open .sidebar-dropdown-caret {
+  transform: rotate(180deg);
+}
+.sidebar-dropdown-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0 4px 26px;
+}
+.sidebar-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--text-faint);
+  text-decoration: none;
+  font-size: 12.5px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+.sidebar-dropdown-item:hover {
+  color: var(--text-primary);
+  background: var(--bg-panel-alt);
+}
+.sidebar-dropdown-item.active {
+  color: var(--accent-bright);
+  font-weight: 600;
+}
+
+.app-sidebar-backdrop {
+  display: none;
+}
+
+.app-content {
+  margin-left: 250px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+/* Üst çubuk, sol menüyle BİRLEŞİK tek bir panel gibi görünsün diye AYNI
+   arka plan/blur değerini kullanır (bkz. .app-sidebar) -- iki farklı ton
+   iki ayrı kutu gibi göründüğü için kullanıcı geri bildirimiyle eşitlendi.
+   Genişlik/margin/padding'de "boşluk" bırakmayacak şekilde tam .app-content
+   genişliğini (görüntü kenarına kadar) ve tam y=0'ı kaplar. */
+.app-topbar-wrap {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  margin: 0;
+  z-index: 20;
+  background: rgba(5, 11, 34, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.app-topbar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  padding: 10px 24px;
+  margin: 0;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+.app-topbar-burger {
+  display: none;
+}
+.app-topbar-spacer {
+  flex: 1;
+}
+/* KENDİ sınıf adları -- kasıtlı olarak "site-nav-util"/"favorite-team-picker"/
+   "real-data-nav-fun-link" DEĞİL. O isimler aşağıdaki "ESKİ ÜST NAVBAR" ölü
+   bloğunda hâlâ tanımlı; aynı adı kullanırsak (dosyada bu noktadan SONRA
+   geldiği için) o ölü kurallar cascade'i kazanıp burayı sessizce eziyordu --
+   üç ayrı düzeltme turunun hiçbirinin kalıcı olmamasının asıl sebebi buydu. */
+.app-topbar-util {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.app-favorite-team-picker .team-filter-select {
+  min-width: 180px;
+}
+.app-fun-link {
+  font-size: 11.5px;
+  color: var(--text-faint);
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 7px 14px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 999px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.app-fun-link:hover {
+  color: var(--text-primary);
+  border-color: var(--text-dim);
+}
+
+@media (max-width: 960px) {
+  /* Mobilde sol menü ekran dışında (soldan kayan bir çekmece) durduğundan
+     içerik için ayrılan sol boşluğa artık gerek yok. */
+  .app-content {
+    margin-left: 0;
+  }
+  .app-sidebar {
+    inset: 0 auto 0 0;
+    width: 270px;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 50;
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.5);
+  }
+  .app-sidebar.is-open {
+    transform: translateX(0);
+  }
+  .app-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    background: rgba(4, 8, 22, 0.6);
+    backdrop-filter: blur(2px);
+  }
+  .app-topbar-burger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--bg-panel);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 16px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .app-topbar {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+  /* "Tuttuğun takım" ve "Eğlence Modu" mobilde de YAN YANA kalsın diye
+     (alt alta değil) her ikisi de küçültülüp esnetildi -- dar ekranda ikisi
+     birden sığsın diye. */
+  .app-topbar-util {
+    flex-wrap: nowrap;
+    margin-left: 0;
+    gap: 6px;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .app-favorite-team-picker {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .app-favorite-team-picker .team-filter-select {
+    min-width: 0;
+    width: 100%;
+  }
+  .app-favorite-team-picker .team-filter-trigger {
+    padding: 6px 8px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .app-fun-link {
+    flex-shrink: 0;
+    padding: 6px 8px;
+    font-size: 10.5px;
+  }
+}
+
+/* ==========================================================================
+   ESKİ ÜST NAVBAR (site-nav*) -- ARTIK KULLANILMIYOR, AppShell/Sidebar/
+   TopBar'a taşındı. NavBar.jsx dosyası da artık hiçbir yerde import
+   edilmiyor. Bilinçli olarak SİLİNMEDİ (bu projede kod tabanının genel
+   kuralı) -- referans/geri dönüş amaçlı burada kalıyor.
    ========================================================================== */
 .site-nav {
   position: sticky;
@@ -425,6 +710,17 @@ button.site-nav-dropdown-trigger {
   padding: 22px 18px 40px;
   display: flex;
   flex-direction: column;
+  /* .app-content'in (display:flex; flex-direction:column) flex çocuğu:
+     normalde align-items:stretch bunu 390px'e (kapsayıcının genişliğine)
+     zorlardı, ama "margin: 0 auto" (yatay auto kenar boşlukları) flexbox
+     spesifikasyonuna göre stretch'i DEVRE DIŞI bırakıyor -- bunun yerine
+     kutu içeriğine göre (shrink-to-fit) boyutlanıyordu. İçinde geniş bir
+     tablo (bkz. .standings-scroll, white-space:nowrap) olduğunda bu da
+     kutuyu 390px yerine 820px yapıp mobilde TÜM sayfayı (fikstür
+     satırlarındaki sağdaki takım dahil) yatayda taşırıyordu. width:100%
+     ile stretch'e ihtiyaç kalmadan doğrudan kapsayıcı genişliğine sabitlenir. */
+  width: 100%;
+  min-width: 0;
 }
 
 .page-header {
@@ -753,6 +1049,15 @@ a.btn-secondary:hover {
 }
 .standings-scroll {
   overflow-x: auto;
+  /* width:100%+min-width:0 OLMADAN bu sarmalayıcı, içindeki (white-space:nowrap
+     olduğu için doğal olarak geniş) tabloya göre kendi boyunu büyütüyordu --
+     overflow-x:auto'nun kaydıracağı bir taşma hiç oluşmuyor, bunun yerine
+     .page-shell'den başlayıp tüm sayfa genişliğini zorluyordu (mobilde
+     fikstür satırlarının/soldaki-sağdaki takımların ekran dışına taşmasının
+     asıl sebebi buydu -- .match-row'un kendi CSS'i doğruydu, sorun hep bu
+     üstteki tablo sarmalayıcısındaydı). */
+  width: 100%;
+  min-width: 0;
 }
 .standings-table {
   width: 100%;
@@ -870,6 +1175,14 @@ a.btn-secondary:hover {
   .fixture-layout {
     grid-template-columns: 1fr;
   }
+}
+/* Grid öğelerinin varsayılan otomatik min-genişliği (min-width:auto) içeriğe
+   göredir -- .fixture-matches-section'ın kendi CSS'i yoktu (salt anlamsal bir
+   <section>), bu yüzden içindeki geniş .match-row'lar onu (ve dolayısıyla
+   tek sütuna inen .fixture-layout'un o sütununu) mobilde kendi min-content
+   genişliğine göre büyütüp sayfayı yatayda taşırıyordu. */
+.fixture-matches-section {
+  min-width: 0;
 }
 
 /* Fikstür sayfasındaki maç takvimi -- gerçek fikstürden türetilen ay
@@ -1944,17 +2257,48 @@ a.btn-secondary:hover {
   }
 }
 @media (max-width: 640px) {
+  /* Kullanıcı geri bildirimi: mobilde de ev sahibi solda / deplasman sağda
+     kalsın (üst-alt istiflenmiş bir görünüm DEĞİL) -- sadece her şey daha
+     küçük olsun. Eskiden burada grid-template-columns:1fr ile tek sütuna
+     istifleniyordu; onun yerine aynı 3 sütunlu (sol-orta-sağ) yerleşim
+     korunuyor, sadece ölçüler küçültülüyor. */
   .match-row {
-    grid-template-columns: 1fr;
-    text-align: center;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 6px;
+    padding: 10px 8px;
   }
-  .match-row-away {
-    flex-direction: row;
-    justify-content: center;
-    text-align: center;
+  .match-row-team {
+    font-size: 10.5px;
+    gap: 5px;
+  }
+  .match-row-team img,
+  .match-row-team svg {
+    width: 18px;
+    height: 18px;
   }
   .match-row-center {
-    margin: 0 auto;
+    min-width: 0;
+    gap: 3px;
+  }
+  .match-row-score {
+    font-size: 13px;
+  }
+  .match-row-date {
+    font-size: 8.5px;
+  }
+  .match-row-pending {
+    font-size: 8.5px;
+  }
+  .match-row-details-link {
+    font-size: 9px;
+  }
+  .match-row-probs {
+    width: 78px;
+    height: 4px;
+  }
+  .match-row-prob-labels {
+    width: 78px;
+    font-size: 7.5px;
   }
 }
 
@@ -4202,6 +4546,18 @@ a.team-profile-match-row:hover {
   flex-direction: column;
   align-items: center;
   gap: 6px;
+}
+/* Gerçek sonuç -- ESKİDEN her takım satırının kendi ucuna (birinde
+   margin-left:auto, diğerinde margin-left:0) ayrı ayrı ekleniyordu, bu da
+   ev sahibinin skorunun ortaya yakın, deplasmanınkinin ise kartın en sağ
+   kenarına düşmesine ("saçma yerlerde" görünmesine) yol açıyordu. Artık
+   MatchRow.jsx'teki .match-row-score ile aynı deseni izleyip TEK, birleşik
+   bir "3 : 1" olarak ORTA sütunda gösteriliyor. */
+.prediction-match-score {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 /* Masaüstünde (bkz. aşağıdaki min-width sorgusu) sol takım/orta tahmin/sağ
@@ -7552,6 +7908,79 @@ a.team-profile-match-row:hover {
   width: 20px;
   height: 20px;
   font-size: 10px;
+}
+
+/* Gol Kralları (RealAnalysisTab) -- form-guide-row ile aynı görsel dilde,
+   ama 4 sütunlu (sıra + oyuncu/takım + gol + maç). */
+.scorer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.scorer-row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  background: var(--bg-panel);
+  border: 1px solid transparent;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+.scorer-row:hover {
+  border-color: var(--line-strong);
+}
+.scorer-row.is-favorite {
+  border-color: rgba(250, 204, 21, 0.5);
+  background: rgba(250, 204, 21, 0.06);
+}
+.scorer-row-rank {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+.scorer-row-player {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 13px;
+}
+.scorer-row-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.scorer-row-team {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+.scorer-row-goals {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: #fbbf24;
+  white-space: nowrap;
+}
+.scorer-row-matches {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+@media (max-width: 640px) {
+  .scorer-row {
+    grid-template-columns: 24px minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 8px;
+  }
+  .scorer-row-matches {
+    display: none;
+  }
 }
 
 /* "Kalan Fikstür Zorluğu" -- 36 takıma kadar tek uzun bir grafik yerine,

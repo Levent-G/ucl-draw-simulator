@@ -6,6 +6,8 @@ import EmptyState from "../components/EmptyState.jsx";
 import Crest from "../components/Crest.jsx";
 import ProbabilityBar from "../components/ProbabilityBar.jsx";
 import ProbableLineup from "../components/ProbableLineup.jsx";
+import ActualLineup from "../components/ActualLineup.jsx";
+import { ACTUAL_LINEUPS } from "../data/actualLineups.js";
 import { useFavoriteTeam } from "../state/FavoriteTeamContext.jsx";
 import { isMatchPlayed, formatMatchDate } from "../utils/matchDate.js";
 import {
@@ -117,6 +119,15 @@ export default function RealMatchCenterView() {
   const dateLabel = match.date
     ? formatMatchDate(match.date, { day: "numeric", month: "long", year: "numeric" })
     : null;
+  const actualLineupEntry = ACTUAL_LINEUPS.find((l) => l.matchId === match.id) || null;
+  const hasHomeActualXI = played && !!actualLineupEntry?.homeXI?.length;
+  const hasAwayActualXI = played && !!actualLineupEntry?.awayXI?.length;
+  const lineupHeading =
+    hasHomeActualXI && hasAwayActualXI
+      ? "✅ Sahaya Çıkan Kadro"
+      : hasHomeActualXI || hasAwayActualXI
+      ? "✅ Sahaya Çıkan Kadro / 🔮 Olası Kadro"
+      : "🔮 Olası Kadro";
 
   return (
     <div className="page-shell">
@@ -212,18 +223,38 @@ export default function RealMatchCenterView() {
       </div>
 
       <div className="chart-card chart-card-wide">
-        <h3>🔮 Olası Kadro</h3>
+        <h3>{lineupHeading}</h3>
         <div className="probable-lineup-grid">
-          <ProbableLineup
-            competitionKey={competitionKey}
-            team={homeTeam}
-            players={competition.getPlayersByTeam(homeTeam.id)}
-          />
-          <ProbableLineup
-            competitionKey={competitionKey}
-            team={awayTeam}
-            players={competition.getPlayersByTeam(awayTeam.id)}
-          />
+          {hasHomeActualXI ? (
+            <ActualLineup
+              competitionKey={competitionKey}
+              team={homeTeam}
+              players={competition.getPlayersByTeam(homeTeam.id)}
+              xiNames={actualLineupEntry.homeXI}
+              source={actualLineupEntry.source}
+            />
+          ) : (
+            <ProbableLineup
+              competitionKey={competitionKey}
+              team={homeTeam}
+              players={competition.getPlayersByTeam(homeTeam.id)}
+            />
+          )}
+          {hasAwayActualXI ? (
+            <ActualLineup
+              competitionKey={competitionKey}
+              team={awayTeam}
+              players={competition.getPlayersByTeam(awayTeam.id)}
+              xiNames={actualLineupEntry.awayXI}
+              source={actualLineupEntry.source}
+            />
+          ) : (
+            <ProbableLineup
+              competitionKey={competitionKey}
+              team={awayTeam}
+              players={competition.getPlayersByTeam(awayTeam.id)}
+            />
+          )}
         </div>
       </div>
 

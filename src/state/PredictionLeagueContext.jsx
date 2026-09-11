@@ -26,6 +26,7 @@ import { deserializeFixture } from "../utils/fixtureEngine.js";
 import { deserializeRoundRobinFixture } from "../utils/roundRobinEngine.js";
 import { computeStandingsFromUserScores } from "../utils/predictionEngine.js";
 import { hasRealDataSupport, getRealMatchResult, getRealStandings } from "../utils/realStandingsSelectors.js";
+import { isMatchPlayed } from "../utils/matchDate.js";
 
 // generateKnockoutBracket takım NESNELERİ (logo import'ları dahil) içeren bir
 // bracket döner -- Firestore'a sadece id'leri yazıyoruz. Her eşleşmeye,
@@ -617,7 +618,19 @@ export function getLeagueStandingsOrder(league) {
 export function isMatchRevealed(league, matchId) {
   const date = matchDateOf(league, matchId);
   if (!date) return true;
-  return new Date(date) <= new Date();
+  // ESKİDEN burada saat hassasiyetiyle "new Date(date) <= new Date()"
+  // kıyaslanıyordu -- bugüne tarihli (henüz saati gelmemiş) bir maç, gün
+  // döner dönmez (o günün maçı henüz oynanmadan) "açığa çıktı" sayılıyor,
+  // "1. Hafta"nın son maçları henüz oynanmamışken bile o haftanın TAMAMEN
+  // bittiğini (currentWeekIndex bir sonraki haftaya atlayıp) gösteriyordu.
+  // src/utils/matchDate.js'teki isMatchPlayed zaten bu tam hatayı düzeltmek
+  // için gün bazlı (saatsiz) kıyaslıyor -- burada onu tekrar yazmak yerine
+  // aynı fonksiyonu kullanıyoruz.
+  if (isMatchPlayed({ date })) return true;
+  // MatchRow.jsx'teki "hasSim" mantığıyla aynı: tarih henüz "kesin geçmiş"
+  // sayılmasa bile (bugüne tarihli erken bir maç gibi), gerçek sonuç ZATEN
+  // elle girildiyse maçı gizlemenin bir anlamı yok.
+  return !!getLeagueMatchResult(league, matchId);
 }
 
 // Sezonun TAMAMI (fikstürdeki her maç) açığa çıktı mı -- "Lig Sıralaması"

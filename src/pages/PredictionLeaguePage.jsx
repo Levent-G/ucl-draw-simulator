@@ -682,10 +682,14 @@ function PredictionLeagueRoom() {
                           <div className="prediction-match-team-row home">
                             <Crest team={m.homeTeam} size={22} />
                             <span>{m.homeTeam.name}</span>
-                            {revealed && actual && <b className="team-score">{actual.homeGoals}</b>}
                           </div>
 
                           <div className="prediction-match-mid">
+                            {revealed && actual && (
+                              <div className="prediction-match-score">
+                                {actual.homeGoals} : {actual.awayGoals}
+                              </div>
+                            )}
                             {!showPicker ? (
                               <div className="prediction-pick-line">
                                 <span className="pick-text">
@@ -797,7 +801,6 @@ function PredictionLeagueRoom() {
                           <div className="prediction-match-team-row away">
                             <Crest team={m.awayTeam} size={22} />
                             <span>{m.awayTeam.name}</span>
-                            {revealed && actual && <b className="team-score">{actual.awayGoals}</b>}
                           </div>
 
                           {others.length > 0 ? (

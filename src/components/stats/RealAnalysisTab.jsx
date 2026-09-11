@@ -26,6 +26,7 @@ import TeamAxisTick from "./TeamAxisTick.jsx";
 import TeamScatterShape from "./TeamScatterShape.jsx";
 import { CHART_SERIES, CHART_GRID, CHART_AXIS } from "../../utils/chartTheme.js";
 import { isMatchPlayed } from "../../utils/matchDate.js";
+import { TOP_SCORERS } from "../../data/topScorers.js";
 import {
   getDomesticForm,
   getSuperLigTeamForm,
@@ -146,6 +147,20 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
     };
   }, [attackDefenseMatrix]);
   const goalsTrend = useMemo(() => getGoalsPerMatchdayTrend(competitionKey), [competitionKey]);
+
+  // Gol Kralları -- gerçek, kaynağı belirtilmiş oyuncu bazlı gol verisi (bkz.
+  // src/data/topScorers.js). Simülasyon motorunun ürettiği bir şey DEĞİL;
+  // sadece o ana kadar GERÇEKTEN oynanmış maçlardaki doğrulanmış golleri
+  // yansıtır -- bu yüzden site genelindeki diğer "gerçek veri" bölümleriyle
+  // aynı disiplinde: kaynaksız/doğrulanamayan hiçbir gol eklenmez.
+  const topScorers = useMemo(
+    () =>
+      TOP_SCORERS.filter((s) => s.competitionKey === competitionKey)
+        .map((s) => ({ ...s, team: teamById[s.teamId] }))
+        .filter((s) => s.team)
+        .sort((a, b) => b.goals - a.goals),
+    [competitionKey, teamById]
+  );
 
   return (
     <div className="stats-grid" ref={topRef}>
@@ -465,6 +480,35 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
                   <Crest team={m.awayTeam} size={20} />
                 </span>
                 <span className="upset-row-surprise">{m.totalGoals} gol</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {topScorers.length > 0 && (
+        <div className="chart-card chart-card-wide">
+          <h3>🥅 Gol Kralları</h3>
+          <p className="footnote">
+            Gerçek, kaynağı belirtilmiş sezon gol verisi -- simülasyon motorunun ürettiği bir tahmin DEĞİLDİR. Sadece
+            o ana kadar GERÇEKTEN oynanmış maçlardaki, en az bir güvenilir kaynaktan doğrulanmış goller listelenir;
+            bu yüzden liste henüz oynanmamış maçları veya doğrulanamayan gol iddialarını kapsamaz.
+          </p>
+          <div className="scorer-list">
+            {topScorers.map((s, i) => (
+              <Link
+                key={`${s.playerName}-${s.teamId}`}
+                to={`/${competitionKey}/takim/${s.teamId}`}
+                className={`scorer-row ${s.teamId === favoriteTeamId ? "is-favorite" : ""}`}
+              >
+                <span className="scorer-row-rank">#{i + 1}</span>
+                <span className="scorer-row-player">
+                  <Crest team={s.team} size={20} />
+                  <span className="scorer-row-name">{s.playerName}</span>
+                  <span className="scorer-row-team">{s.team.short}</span>
+                </span>
+                <span className="scorer-row-goals">{s.goals} gol</span>
+                <span className="scorer-row-matches">{s.matchesPlayed} maç</span>
               </Link>
             ))}
           </div>

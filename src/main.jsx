@@ -12,9 +12,7 @@ import { SettingsProvider } from './state/SettingsContext.jsx'
 import { CareerProvider } from './state/CareerContext.jsx'
 import { OnboardingProvider } from './state/OnboardingContext.jsx'
 import { FavoriteTeamProvider } from './state/FavoriteTeamContext.jsx'
-import NavBar from './components/NavBar.jsx'
-import AchievementToasts from './components/AchievementToasts.jsx'
-import WhatsNewModal from './components/WhatsNewModal.jsx'
+import AppShell from './AppShell.jsx'
 import RouteLoading from './components/RouteLoading.jsx'
 import './index.css'
 import './styles/pages.css'
@@ -58,34 +56,33 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                   <TransferProvider>
                     <DreamTeamProvider>
                       <SeasonArchiveProvider>
-                        <NavBar />
-                        <AchievementToasts />
-                        <WhatsNewModal />
-                        <Suspense fallback={<RouteLoading />}>
-                          <Routes>
-                            <Route path="/" element={<HomePage />} />
-                            <Route path="/canli" element={<LiveScoresPage />} />
-                            <Route path="/transferler" element={<TransferMarketPage />} />
-                            <Route path="/ruya-takim" element={<DreamTeamPage />} />
-                            <Route path="/arsiv" element={<ArchivePage />} />
-                            <Route path="/basarilar" element={<AchievementsPage />} />
-                            <Route path="/ayarlar" element={<SettingsPage />} />
-                            <Route path="/tahmin-ligi" element={<PredictionLeaguePage />} />
-                            <Route path="/tahmin-ligi/:leagueId" element={<PredictionLeaguePage />} />
-                            <Route path="/eglence-modu" element={<FunModeLandingPage />} />
-                            <Route path="/:competitionKey" element={<CompetitionHomeRoute />} />
-                            <Route path="/:competitionKey/haberler" element={<NewsPage />} />
-                            <Route path="/:competitionKey/kura-simulasyonu" element={<DrawPage />} />
-                            <Route path="/:competitionKey/sezon-simulasyonu" element={<LeagueHomePage />} />
-                            <Route path="/:competitionKey/fikstur" element={<FixturePage />} />
-                            <Route path="/:competitionKey/mac/:matchId" element={<MatchCenterPage />} />
-                            <Route path="/:competitionKey/karsilikli" element={<HeadToHeadPage />} />
-                            <Route path="/:competitionKey/istatistik" element={<StatsPage />} />
-                            <Route path="/:competitionKey/eleme-turu" element={<KnockoutPage />} />
-                            <Route path="/:competitionKey/takim/:teamId" element={<TeamProfilePage />} />
-                            <Route path="/:competitionKey/oyuncu/:playerId" element={<PlayerProfilePage />} />
-                          </Routes>
-                        </Suspense>
+                        <AppShell>
+                          <Suspense fallback={<RouteLoading />}>
+                            <Routes>
+                              <Route path="/" element={<HomePage />} />
+                              <Route path="/canli" element={<LiveScoresPage />} />
+                              <Route path="/transferler" element={<TransferMarketPage />} />
+                              <Route path="/ruya-takim" element={<DreamTeamPage />} />
+                              <Route path="/arsiv" element={<ArchivePage />} />
+                              <Route path="/basarilar" element={<AchievementsPage />} />
+                              <Route path="/ayarlar" element={<SettingsPage />} />
+                              <Route path="/tahmin-ligi" element={<PredictionLeaguePage />} />
+                              <Route path="/tahmin-ligi/:leagueId" element={<PredictionLeaguePage />} />
+                              <Route path="/eglence-modu" element={<FunModeLandingPage />} />
+                              <Route path="/:competitionKey" element={<CompetitionHomeRoute />} />
+                              <Route path="/:competitionKey/haberler" element={<NewsPage />} />
+                              <Route path="/:competitionKey/kura-simulasyonu" element={<DrawPage />} />
+                              <Route path="/:competitionKey/sezon-simulasyonu" element={<LeagueHomePage />} />
+                              <Route path="/:competitionKey/fikstur" element={<FixturePage />} />
+                              <Route path="/:competitionKey/mac/:matchId" element={<MatchCenterPage />} />
+                              <Route path="/:competitionKey/karsilikli" element={<HeadToHeadPage />} />
+                              <Route path="/:competitionKey/istatistik" element={<StatsPage />} />
+                              <Route path="/:competitionKey/eleme-turu" element={<KnockoutPage />} />
+                              <Route path="/:competitionKey/takim/:teamId" element={<TeamProfilePage />} />
+                              <Route path="/:competitionKey/oyuncu/:playerId" element={<PlayerProfilePage />} />
+                            </Routes>
+                          </Suspense>
+                        </AppShell>
                       </SeasonArchiveProvider>
                     </DreamTeamProvider>
                   </TransferProvider>
