@@ -626,11 +626,7 @@ export function isMatchRevealed(league, matchId) {
   // src/utils/matchDate.js'teki isMatchPlayed zaten bu tam hatayı düzeltmek
   // için gün bazlı (saatsiz) kıyaslıyor -- burada onu tekrar yazmak yerine
   // aynı fonksiyonu kullanıyoruz.
-  if (isMatchPlayed({ date })) return true;
-  // MatchRow.jsx'teki "hasSim" mantığıyla aynı: tarih henüz "kesin geçmiş"
-  // sayılmasa bile (bugüne tarihli erken bir maç gibi), gerçek sonuç ZATEN
-  // elle girildiyse maçı gizlemenin bir anlamı yok.
-  return !!getLeagueMatchResult(league, matchId);
+  return isMatchPlayed({ date });
 }
 
 // Sezonun TAMAMI (fikstürdeki her maç) açığa çıktı mı -- "Lig Sıralaması"

@@ -7,8 +7,12 @@
 // eşleşmeler için kısa önizleme notları.
 //
 // Yöntem: WebSearch ile araştırılmış, tarihli, kaynağı belirtilmiş haberler.
-// Bu bir STATİK ENSTANTANE'dir -- 2026-09-09 tarihi itibarıyla araştırılan
-// haberleri yansıtır, canlı/otomatik güncellenmez. Bazı öğelerin tam gün
+// Bu bir STATİK ENSTANTANE'dir -- ilk sürümü 2026-09-09 tarihi itibarıyla
+// araştırılan haberleri yansıtıyordu; 2026-09-16'da yapılan bir tazelemeyle
+// 2026-09-10 - 2026-09-16 arasındaki (Süper Lig 5. hafta ve UCL lig fazı
+// açılışı sonrası dönem) hakem tartışması, sakatlık/dönüş, teknik direktör
+// açıklaması ve maç sonrası tepki haberleri eklendi (news-ucl-35..38,
+// news-sl-29..32) -- canlı/otomatik güncellenmez. Bazı öğelerin tam gün
 // bilgisi (ör. yaz transfer dönemi içindeki bir imza) kaynaklarda net
 // belirtilmediği için ay/dönem bazında en olası güne yuvarlanmıştır; kulüp,
 // oyuncu, olay ve sonuç bilgileri ise doğrulanmış gerçek bilgilerdir. Skor,
@@ -381,6 +385,48 @@ export const NEWS_ITEMS = [
     competitionKey: "ucl",
     relatedTeamIds: ["t27", "t33"],
   },
+  {
+    id: "news-ucl-35",
+    date: "2026-09-10",
+    title: "Galatasaray'da Sporting yenilgisi sonrası hakem tartışması: Okan Buruk'tan sert tepki",
+    summary:
+      "Şampiyonlar Ligi lig fazı açılışında Sporting CP'ye deplasmanda 3-1 mağlup olan Galatasaray'da teknik direktör Okan Buruk, maçtaki kırmızı kart ve penaltı kararlarını eleştirerek VAR yönetiminin hiçbir pozisyona müdahale etmediğini söyledi; Norveçli hakem Espen Eskas'ın yönetimi Türk basınında geniş yankı buldu.",
+    source: "ahaber.com.tr / Milliyet / TRT Haber / Referans Türk",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t35", "t23"],
+  },
+  {
+    id: "news-ucl-36",
+    date: "2026-09-13",
+    title: "Osimhen'in Şampiyonlar Ligi'ne dönüş hedefi netleşti: Barcelona maçı",
+    summary:
+      "Sağ adduktor kas grubundaki zorlanma nedeniyle Kocaelispor ve Trabzonspor Süper Lig maçlarını da kaçıracak olan Victor Osimhen'in, milli takım arasının ardından oynanacak 13 Ekim'deki Barcelona (UCL lig fazı 2. hafta) maçıyla birlikte kadroya dönmesi hedefleniyor.",
+    source: "Fotomaç / Hürriyet / Fanatik",
+    url: "https://www.fotomac.com.tr/galatasaray/2026/09/13/galatasarayda-flas-osimhen-gelismesi-donus-maci-ortaya-cikti",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t35", "t7"],
+  },
+  {
+    id: "news-ucl-37",
+    date: "2026-09-14",
+    title: "Mourinho'dan Arda Güler'e övgü: 'Gerçek bir üst düzey oyuncu'",
+    summary:
+      "Real Madrid teknik direktörü José Mourinho, Elche maçı öncesi basın toplantısında Arda Güler için 'maçlara inanılmaz etkisi olan, çok yaratıcı, harika oyun vizyonuna sahip, gerçek bir üst düzey oyuncu' değerlendirmesinde bulundu.",
+    source: "Sporx",
+    url: "https://www.sporx.com/jose-mourinho-dan-arda-guler-e-buyuk-ovgu-SXHBQ1176031SXQ",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t1"],
+  },
+  {
+    id: "news-ucl-38",
+    date: "2026-09-14",
+    title: "Arsenal'da Saliba'nın yokluğu uzuyor, Timber sahalara döndü",
+    summary:
+      "Sırt sakatlığı yaşayan William Saliba'nın dönüş tarihi hâlâ belirsiz; teknik direktör Mikel Arteta iyileşme sürecinin kaç hafta süreceğini bilemediklerini söyledi. Kas sakatlığından dönen Jurrien Timber ise takıma katılarak Sunderland deplasmanı kadrosunda yer aldı.",
+    source: "Yahoo Sports / AFTV / NowArsenal",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t11"],
+  },
 
   // ---- Trendyol Süper Lig 2026-27 ----
   {
@@ -679,6 +725,47 @@ export const NEWS_ITEMS = [
     url: "https://www.hurriyet.com.tr/sporarena/caykur-rizespor-0-1-alanyaspor-super-lig-maci-ozeti-43298813",
     competitionKey: "superlig",
     relatedTeamIds: ["s12", "s10"],
+  },
+  {
+    id: "news-sl-29",
+    date: "2026-09-11",
+    title: "Beşiktaş'ta Italiano etkisi: resmi maçlarda 11'de 9 galibiyet",
+    summary:
+      "Vincenzo Italiano yönetimindeki Beşiktaş, Süper Lig 5. hafta maçında Erzurumspor FK'yı 3-0 mağlup ederek resmi maçlardaki 11. karşılaşmasında 9. galibiyetini aldı (2 mağlubiyet, hiç beraberlik yok); Avrupa play-off turlarındaki 5 galibiyetle birlikte takım bu seride 20 gol atıp sadece 5 gol yedi.",
+    source: "Takvim / Sporx / Sabah",
+    url: "https://www.takvim.com.tr/spor/besiktas/2026/09/11/vincenzo-italiano-besiktas-ile-11-macta-9-galibiyet-aldi",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s3", "s14"],
+  },
+  {
+    id: "news-sl-30",
+    date: "2026-09-14",
+    title: "Fenerbahçe, Gaziantep deplasmanında golsüz kaldı: İsmail Kartal'dan zemin eleştirisi",
+    summary:
+      "Fenerbahçe'nin deplasmanda Gaziantep FK ile 0-0 berabere kaldığı 5. hafta maçının ardından teknik direktör İsmail Kartal, Gaziantep Büyükşehir Stadyumu'nun zemin kalitesini eleştirerek oyuncuların ısınma sırasında sağlıklı pas dahi yapamadığını aktardı; 'Bu akşam özellikle ikinci yarı çok ürettik, sadece 1 gol atıp 3 puan alamadık' dedi.",
+    source: "Hürriyet / Karar / ASpor / TGRT Haber",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s2", "s15"],
+  },
+  {
+    id: "news-sl-31",
+    date: "2026-09-14",
+    title: "Galatasaray'da Barış Alper Yılmaz'ın performans düşüşü gündemde",
+    summary:
+      "Osimhen'in yokluğunda santrfor olarak forma giyen Barış Alper Yılmaz'ın bu sezon forma giydiği 6 maçta gol/asist katkısı verememesi Kocaelispor galibiyetinin ardından eleştiri konusu oldu; teknik direktör Okan Buruk'un oyuncuyu artık santrfor olarak değerlendirmeyi düşünmediği ve Trabzonspor derbisi öncesi kendisiyle bir moral görüşmesi yapacağı bildirildi.",
+    source: "Hürriyet / TRT Haber / Sporx",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s1"],
+  },
+  {
+    id: "news-sl-32",
+    date: "2026-09-12",
+    title: "Trabzonspor, Konyaspor deplasmanında sürpriz mağlubiyet aldı",
+    summary:
+      "Trabzonspor, 5. hafta maçında Konyaspor deplasmanında Toth'un erken golüyle 1-0 mağlup oldu; bu sonuçla Konyaspor sezonun ilk galibiyetini alırken, yaz transferi Mohamed Salah ikinci yarıda bulduğu pozisyonları değerlendiremedi.",
+    source: "Hürriyet / Habertürk / beIN Sports",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s4", "s9"],
   },
 
   // ---- 2026-27 UCL lig fazı: dikkat çekici eşleşme önizlemeleri ----

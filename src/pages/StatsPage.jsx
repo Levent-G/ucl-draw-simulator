@@ -30,17 +30,22 @@ const SIM_TABS = [
 // da kaldırıldı -- kullanıcı geri bildirimi: gerçek veri sayfalarında bu
 // artık ayrı bir sekmeyi hak edecek kadar farklı bir şey katmıyor, Analiz
 // zaten aynı takımları çok daha zengin şekilde kapsıyor.
-const REAL_DATA_TABS = [
+// "Ülkeler" sekmesi (katsayı bazlı ülke dağılımı) SADECE UCL'de anlamlı --
+// 36 kulüp onlarca farklı ülkeden. Süper Lig TEK bir ülkenin (Türkiye) ligi
+// olduğundan bu sekme orada anlamsız/boş bir "1 ülke" grafiğinden ibaret
+// kalırdı -- kullanıcı geri bildirimiyle Süper Lig'den kaldırıldı.
+const REAL_DATA_TABS_UCL = [
   { key: "analiz", label: "📈 Analiz" },
   { key: "countries", label: "Ülkeler" },
 ];
+const REAL_DATA_TABS_SUPERLIG = [{ key: "analiz", label: "📈 Analiz" }];
 
 export default function StatsPage() {
   const { competitionKey } = useParams();
   const { competition, simulation, knockout, hasFixture } = useCompetition(competitionKey);
   const { favoriteTeamId } = useFavoriteTeam(competitionKey);
   const showReal = hasRealDataSupport(competitionKey);
-  const TABS = showReal ? REAL_DATA_TABS : SIM_TABS;
+  const TABS = showReal ? (competitionKey === "superlig" ? REAL_DATA_TABS_SUPERLIG : REAL_DATA_TABS_UCL) : SIM_TABS;
   const [tab, setTab] = useState(() => (showReal ? "analiz" : "teams"));
   // Takım filtresi -- her sekmede tutarlı kalsın diye tuttuğun takımla
   // önceden dolduruluyor (kullanıcı isterse değiştirebilir/temizleyebilir).
@@ -75,11 +80,15 @@ export default function StatsPage() {
       <CompetitionStepper competitionKey={competitionKey} />
       <header className="page-header">
         <div>
-          <div className="page-eyebrow">{showReal ? "Analiz · Ülkeler" : "Takımlar · Oyuncular · Ülkeler"}</div>
+          <div className="page-eyebrow">
+            {showReal ? (competitionKey === "superlig" ? "Analiz" : "Analiz · Ülkeler") : "Takımlar · Oyuncular · Ülkeler"}
+          </div>
           <h1>{competition.shortName} — İstatistikler</h1>
           <p>
             {showReal
-              ? "Gerçek puan durumundan türetilen derinlemesine analiz/grafikler ve katsayı bazlı ülke dağılımı. Gol/asist/kart gibi oyuncu istatistikleri için gerçek bir veri kaynağımız olmadığından bu sekmeler burada gösterilmiyor (eğlence modunda hâlâ mevcutlar)."
+              ? competitionKey === "superlig"
+                ? "Gerçek puan durumundan türetilen derinlemesine analiz/grafikler. Gol/asist/kart gibi oyuncu istatistikleri için gerçek bir veri kaynağımız olmadığından bu sekmeler burada gösterilmiyor (eğlence modunda hâlâ mevcutlar)."
+                : "Gerçek puan durumundan türetilen derinlemesine analiz/grafikler ve katsayı bazlı ülke dağılımı. Gol/asist/kart gibi oyuncu istatistikleri için gerçek bir veri kaynağımız olmadığından bu sekmeler burada gösterilmiyor (eğlence modunda hâlâ mevcutlar)."
               : "Katsayı, kadro ve ülke bazlı gelişmiş grafikler. Gol/asist/kart ve simüle edilmiş puan durumu gibi bölümler için önce Fikstür & Tahmin sayfasından bir model tahmini üretilmesi gerekir."}
           </p>
         </div>

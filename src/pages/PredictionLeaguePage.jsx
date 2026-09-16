@@ -422,9 +422,13 @@ function PredictionLeagueRoom() {
   }, [weeks, league]);
   // "Sonraki hafta" YOK -- henüz gelmemiş bir haftaya bakmanın bir anlamı
   // yok (o haftanın maçlarına zaten "şu anki hafta" olduğunda sıra gelecek).
-  // Sadece GEÇMİŞ haftaları (varsa) gözden geçirmek için geri gidilebilir.
-  const [weekOffset, setWeekOffset] = useState(0);
-  const activeWeekIndex = Math.min(Math.max(currentWeekIndex + weekOffset, 0), currentWeekIndex);
+  // Kullanıcı geri bildirimi: "önceki hafta" tek butonu yerine TÜM geçmiş +
+  // şu anki haftaların "1. Hafta"/"2. Hafta" diye tek tek görülebildiği bir
+  // sekme şeridi -- kapalı (tamamen açığa çıkmış) haftalar kırmızı ama
+  // tıklanabilir, tahmin hâlâ yapılabilen (şu anki) hafta yeşil.
+  const [selectedWeekIndex, setSelectedWeekIndex] = useState(null);
+  const activeWeekIndex =
+    selectedWeekIndex == null ? currentWeekIndex : Math.min(Math.max(selectedWeekIndex, 0), currentWeekIndex);
   const activeWeek = weeks[activeWeekIndex] || null;
   const isViewingPastWeek = activeWeekIndex < currentWeekIndex;
 
@@ -612,22 +616,28 @@ function PredictionLeagueRoom() {
                 <p className="footnote">Bu ligin fikstürü henüz yüklenmedi.</p>
               ) : (
                 <>
-                  <div className="prediction-week-nav">
-                    <button
-                      className="btn-ghost btn-small"
-                      onClick={() => setWeekOffset((o) => o - 1)}
-                      disabled={activeWeekIndex === 0}
-                    >
-                      ← Önceki Hafta
-                    </button>
-                    <span className="prediction-week-nav-label">
-                      {formatWeekLabel(activeWeek.weekStart)}
-                      {!isViewingPastWeek && <span className="prediction-week-current-tag">Şu anki hafta</span>}
-                    </span>
-                    {isViewingPastWeek && (
-                      <button className="btn-ghost btn-small" onClick={() => setWeekOffset(0)}>
-                        Şu Anki Haftaya Dön →
-                      </button>
+                  <div className="prediction-week-tabs">
+                    {weeks.slice(0, currentWeekIndex + 1).map((w, i) => {
+                      const isOpen = i === currentWeekIndex;
+                      return (
+                        <button
+                          key={w.weekStart}
+                          type="button"
+                          className={`prediction-week-tab ${isOpen ? "is-open" : "is-closed"} ${i === activeWeekIndex ? "active" : ""}`}
+                          onClick={() => setSelectedWeekIndex(i)}
+                          title={isOpen ? "Tahmin yapılabilir" : "Kapandı -- artık tahmin yapılamaz"}
+                        >
+                          {i + 1}. Hafta
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="prediction-week-nav-label-row">
+                    <span className="prediction-week-nav-label">{formatWeekLabel(activeWeek.weekStart)}</span>
+                    {isViewingPastWeek ? (
+                      <span className="prediction-week-closed-tag">🔒 Kapandı</span>
+                    ) : (
+                      <span className="prediction-week-current-tag">Şu anki hafta</span>
                     )}
                   </div>
 

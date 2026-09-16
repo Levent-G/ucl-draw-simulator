@@ -24,6 +24,7 @@ export default function Crest({ team, size = 266 }) {
       <img
         src={team.logo}
         alt={`${team.name} logosu`}
+        title={team.name}
         width={effectiveSize}
         height={effectiveSize}
         style={{ objectFit: 'contain', flexShrink: 0 }}
@@ -40,6 +41,7 @@ export default function Crest({ team, size = 266 }) {
       className="crest-svg"
       aria-label={`${team.name} amblemi`}
     >
+      <title>{team.name}</title>
       <path
         d="M20 1 L38 7.5 V21 C38 33.5 30.5 41.5 20 45 C9.5 41.5 2 33.5 2 21 V7.5 Z"
         fill={color}

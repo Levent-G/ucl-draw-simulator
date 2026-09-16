@@ -6,22 +6,35 @@ import { CURRENT_INJURIES } from "../data/injuries.js";
 
 const FORMATION_KEY = "4-3-3";
 
-// teamId -> Set(oyuncu adı, sadeleştirilmiş) -- CURRENT_INJURIES'teki
-// güncel sakat/cezalı oyuncuları hızlı arama için önceden indeksler.
-const INJURED_NAMES_BY_TEAM = CURRENT_INJURIES.reduce((acc, entry) => {
+// teamId -> Map(oyuncu adı, sadeleştirilmiş -> CURRENT_INJURIES kaydı) --
+// güncel sakat/cezalı oyuncuları hızlı arama İÇİN, ama sadece dışlamak değil
+// (reason/expectedReturn'ü yanda göstermek İÇİN de) önceden indeksler.
+const INJURY_BY_TEAM = CURRENT_INJURIES.reduce((acc, entry) => {
   const key = entry.teamId;
   const normalized = entry.playerName.trim().toLowerCase();
-  if (!acc[key]) acc[key] = new Set();
-  acc[key].add(normalized);
+  if (!acc[key]) acc[key] = new Map();
+  acc[key].set(normalized, entry);
   return acc;
 }, {});
 
 // Bir takımın kadrosundan, hâlihazırda sakat/cezalı olduğu bilinen (bkz.
 // src/data/injuries.js) oyuncuları çıkarır.
 function excludeCurrentlyInjured(players, teamId) {
-  const injuredNames = INJURED_NAMES_BY_TEAM[teamId];
-  if (!injuredNames || injuredNames.size === 0) return players;
-  return players.filter((p) => !injuredNames.has((p.name || "").trim().toLowerCase()));
+  const injuryMap = INJURY_BY_TEAM[teamId];
+  if (!injuryMap || injuryMap.size === 0) return players;
+  return players.filter((p) => !injuryMap.has((p.name || "").trim().toLowerCase()));
+}
+
+// Kadrodan çıkarılan oyuncuların KENDİLERİ -- kullanıcı geri bildirimi:
+// "sakatlar sadece yok olmasın, yanda sakat işaretiyle görünsün" -- bu
+// yüzden artık sessizce filtrelenip kaybolmuyorlar, TeamProfilePage'in
+// yedekler listesindeki aynı "🩹 sakat" deseniyle ayrı gösteriliyorlar.
+function getCurrentlyInjured(players, teamId) {
+  const injuryMap = INJURY_BY_TEAM[teamId];
+  if (!injuryMap || injuryMap.size === 0) return [];
+  return (players || [])
+    .map((p) => ({ player: p, injury: injuryMap.get((p.name || "").trim().toLowerCase()) }))
+    .filter((x) => x.injury);
 }
 
 // Takımın kayıtlı oyuncularından, mevkiine göre en yüksek reytingli
@@ -58,6 +71,10 @@ export default function ProbableLineup({ team, players, competitionKey }) {
     () => buildProbableLineup(availablePlayers, slots),
     [availablePlayers, slots]
   );
+  const injured = useMemo(
+    () => getCurrentlyInjured(players || [], team.id),
+    [players, team.id]
+  );
 
   return (
     <div className="probable-lineup">
@@ -66,29 +83,50 @@ export default function ProbableLineup({ team, players, competitionKey }) {
         <p className="footnote">
           Resmi/doğrulanmış bir ilk 11 DEĞİLDİR -- kulübün kayıtlı oyuncularından, reytinge göre otomatik
           oluşturulan örnek bir diziliş. Hâlihazırda sakat/cezalı olduğu bilinen oyuncular (bkz.
-          src/data/injuries.js) bu öneriden hariç tutulmuştur.
+          src/data/injuries.js) bu dizilişten çıkarılıp sahanın yanında 🩹 ile ayrıca gösterilmiştir.
         </p>
       </div>
-      <div className="pitch pitch-readonly pitch-compact">
-        <div className="pitch-lines" aria-hidden="true">
-          <span className="pitch-center-circle" />
-          <span className="pitch-center-line" />
-        </div>
-        {assigned.map(({ slot, player }) => (
-          <div className="pitch-slot" style={{ left: `${slot.x}%`, top: `${slot.y}%` }} key={slot.id}>
-            {player ? (
-              <Link to={`/${competitionKey}/oyuncu/${player.id}`} className="pitch-slot-filled">
-                <PlayerAvatar player={player} size={30} />
-                <span className="pitch-slot-name">{player.name}</span>
-                <span className="pitch-slot-meta">{player.rating}</span>
-              </Link>
-            ) : (
-              <div className="pitch-slot-empty">
-                <span className="pitch-slot-pos">{slot.position}</span>
-              </div>
-            )}
+      <div className="probable-lineup-body">
+        <div className="pitch pitch-readonly pitch-compact">
+          <div className="pitch-lines" aria-hidden="true">
+            <span className="pitch-center-circle" />
+            <span className="pitch-center-line" />
           </div>
-        ))}
+          {assigned.map(({ slot, player }) => (
+            <div className="pitch-slot" style={{ left: `${slot.x}%`, top: `${slot.y}%` }} key={slot.id}>
+              {player ? (
+                <Link to={`/${competitionKey}/oyuncu/${player.id}`} className="pitch-slot-filled">
+                  <PlayerAvatar player={player} size={30} />
+                  <span className="pitch-slot-name">{player.name}</span>
+                  <span className="pitch-slot-meta">{player.rating}</span>
+                </Link>
+              ) : (
+                <div className="pitch-slot-empty">
+                  <span className="pitch-slot-pos">{slot.position}</span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        {injured.length > 0 && (
+          <div className="probable-lineup-injured">
+            <h5 className="probable-lineup-injured-title">🩹 Sakat / Cezalı</h5>
+            <div className="probable-lineup-injured-list">
+              {injured.map(({ player, injury }) => (
+                <Link
+                  key={player.id}
+                  to={`/${competitionKey}/oyuncu/${player.id}`}
+                  className="probable-lineup-injured-row"
+                  title={`${injury.reason || "Sakat/cezalı"}${injury.expectedReturn ? ` -- dönüş: ${injury.expectedReturn}` : ""}`}
+                >
+                  <PlayerAvatar player={player} size={22} />
+                  <span className="probable-lineup-injured-name">{player.name}</span>
+                  <span className="probable-lineup-injured-badge" aria-hidden="true">🩹</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

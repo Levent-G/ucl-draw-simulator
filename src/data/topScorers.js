@@ -9,14 +9,10 @@
 // genişletilmiştir. Doğrulanamayan/kaynaklar arasında ÇELİŞEN hiçbir gol
 // UYDURULMAMIŞ ya da tahmin edilmemiştir -- bkz. aşağıdaki "ATLANDI" notu.
 //
-// UCL kapsamı: Lig Fazı 1. Hafta'nın 8-9 Eylül 2026'da oynanan 12 maçının
-// TAMAMI (bkz. src/data/realResultsUcl2026.js -- r1m0..r1m11). 1. Haftanın
-// kalan 6 maçı (r1m12-r1m17, ör. Fenerbahçe-Roma; 10 Eylül 2026 tarihli) bu
-// dosyanın güncellendiği anda (10 Eylül 2026, maçlar henüz oynanmadan önce)
-// HENÜZ OYNANMADIĞI için bilinçli olarak eklenmedi -- realResultsUcl2026.js
-// ile tutarlı kalınması amaçlandı. Bu yüzden UCL listesi burada o ana kadar
-// oynanan 12 maçta atılan isimlendirilebilen HER golü kapsıyor -- "ilk 10"
-// gibi keyfi bir kesme değil, GERÇEK ve TAM tablo.
+// UCL kapsamı: Lig Fazı 1. Hafta'nın 8-10 Eylül 2026'da oynanan 18 maçının
+// TAMAMI (bkz. src/data/realResultsUcl2026.js -- r1m0..r1m17). Liste, bu 18
+// maçta atılan isimlendirilebilen HER golü kapsıyor -- "ilk 10" gibi keyfi
+// bir kesme değil, GERÇEK ve TAM tablo.
 //
 // ATLANDI (belirsiz/çelişkili veri):
 // - Lille 2-3 Real Betis maçında Lille'in 2. golünün sahibi kaynaklar
@@ -46,6 +42,13 @@
 //   şüphesine rağmen (bkz. görev talimatındaki uyarı), üç bağımsız kaynağın
 //   golün dakikası ve şeklini farklı ama tutarlı ayrıntılarla (31'/47'/57'
 //   veya 31'/47'/56') anlatması nedeniyle GERÇEK kabul edildi ve eklendi.
+// - Slavia Prague 2-3 Lens maçında Slavia'nın 2. golünün sahibi kaynaklar
+//   arasında ÇELİŞTİ: bir ESPN sayfası çekimi golü "Mikuláš Konečný"'ye
+//   yazdı, ama iki bağımsız kaynak (VAVEL ve GiveMeSport) ile ilk WebSearch
+//   özeti Danijel Šturm'ün iki golü de (51'/88' civarı) attığını -- yani
+//   bir "brace" olduğunu -- tutarlı biçimde doğruladı. 2/3 çoğunluğa
+//   uyularak Šturm'e 2 gol yazıldı, Konečný'ye gol yazılmadı (muhtemelen tek
+//   kaynaklı bir çıkarım hatası).
 //
 // Süper Lig kapsamı: 1-4. Haftaların TAMAMI (bkz. src/data/liveStatus.js).
 // Kadro eşleşmesi notları (src/data/players.js / superLigPlayers.js ile):
@@ -366,6 +369,218 @@ export const TOP_SCORERS = [
     matchesPlayed: 1,
     asOf: "2026-09-10",
     source: "ESPN / Sky Sports / Yahoo Sports",
+  },
+
+  // ---- UEFA Şampiyonlar Ligi 2026-27 -- Lig Fazı 1. Hafta, 10 Eylül 2026'da oynanan son 6 maç ----
+  {
+    playerName: "Bryan Cristante",
+    teamId: "t13", // Roma
+    competitionKey: "ucl",
+    goals: 1, // 39'
+    matchesPlayed: 1,
+    asOf: "2026-09-16",
+    source: "ESPN / FOX Sports",
+  },
+  {
+    playerName: "Archie Brown",
+    teamId: "t25", // Fenerbahçe
+    competitionKey: "ucl",
+    goals: 1, // 48', Fenerbahçe adına UCL'de gol atan ilk İngiliz oyuncu
+    matchesPlayed: 1,
+    asOf: "2026-09-16",
+    source: "ESPN / FOX Sports",
+  },
+  {
+    playerName: "Gleiker Mendoza",
+    teamId: "t18", // Shakhtar Donetsk
+    competitionKey: "ucl",
+    goals: 1, // 45+1'
+    matchesPlayed: 1,
+    asOf: "2026-09-16",
+    source: "ESPN / Shakhtar.com (resmi)",
+  },
+  {
+    playerName: "Sergiño Dest",
+    teamId: "t24", // PSV Eindhoven
+    competitionKey: "ucl",
+    goals: 1, // 48'
+    matchesPlayed: 1,
+    asOf: "2026-09-16",
+    source: "ESPN / Shakhtar.com (resmi)",
+  },
+  {
+    playerName: "Martin Baturina",
+    teamId: "t34", // Como
+    competitionKey: "ucl",
+    goals: 1, // 15'
+    matchesPlayed: 1,
+    asOf: "2026-09-16",
+    source: "ESPN / VAVEL",
+  },
+  {
+    // players.js'te Como (t34) kadrosunda YOK -- kadro dosyası eksik/kısa
+    // tutulmuş, ama gol atışı en az iki bağımsız kaynaktan (ESPN, VAVEL)
+    // doğrulandığı için yine de eklendi.
+    playerName: "Anastasios Douvikas",
+    teamId: "t34", // Como
+    competitionKey: "ucl",
+    goals: 1, // ~38'-40'
+    matchesPlayed: 1,
+    asOf: "2026-09-16",
+    source: "ESPN / VAVEL",
+  },
+  {
+    // players.js'te Como (t34) kadrosunda YOK, bkz. üstteki not.
+    playerName: "Assane Diao",
+    teamId: "t34", // Como
+    competitionKey: "ucl",
+    goals: 1, // ~54'-55'
+    matchesPlayed: 1,
+    asOf: "2026-09-16",
+    source: "ESPN / VAVEL",
+  },
+  {
+    // players.js'te Como (t34) kadrosunda YOK, bkz. üstteki not.
+    playerName: "Máximo Perrone",
+    teamId: "t34", // Como
+    competitionKey: "ucl",
+    goals: 1, // 90'
+    matchesPlayed: 1,
+    asOf: "2026-09-16",
+    source: "ESPN / VAVEL",
+  },
+  {
+    // players.js'te RB Leipzig (t15) kadrosunda YOK. Oyuncunun adı ESPN ve
+    // VAVEL çekimlerinde farklı yazıldı ("Andrija" vs "Nikolaos"
+    // Maksimović); ayrı bir WebSearch turu (Yahoo Sports/Bundesliga.com
+    // maç raporu) "Andrija Maksimovic" adını doğruladığı için o kullanıldı.
+    playerName: "Andrija Maksimović",
+    teamId: "t15", // RB Leipzig
+    competitionKey: "ucl",
+    goals: 1, // ~58'-60'
+    matchesPlayed: 1,
+    asOf: "2026-09-16",
+    source: "ESPN / VAVEL / Yahoo Sports / Bundesliga.com",
+  },
+  {
+    playerName: "Jamal Musiala",
+    teamId: "t3", // Bayern Münih
+    competitionKey: "ucl",
+    goals: 1, // 47'
+    matchesPlayed: 1,
+    asOf: "2026-09-16",
+    source: "ESPN / VAVEL",
+  },
+  {
+    playerName: "Harry Kane",
+    teamId: "t3", // Bayern Münih
+    competitionKey: "ucl",
+    goals: 1, // 61'
+    matchesPlayed: 1,
+    asOf: "2026-09-16",
+    source: "ESPN / VAVEL",
+  },
+  {
+    playerName: "Alphonso Davies",
+    teamId: "t3", // Bayern Münih
+    competitionKey: "ucl",
+    goals: 1, // 77'
+    matchesPlayed: 1,
+    asOf: "2026-09-16",
+    source: "ESPN / VAVEL",
+  },
+  {
+    playerName: "Michael Olise",
+    teamId: "t3", // Bayern Münih
+    competitionKey: "ucl",
+    goals: 2, // 83' ve 90+2'
+    matchesPlayed: 1,
+    asOf: "2026-09-16",
+    source: "ESPN / VAVEL",
+  },
+  {
+    // players.js'te Manchester United (t8) kadrosunda YOK -- kadro dosyası
+    // eksik/kısa tutulmuş, ama gol atışı en az iki bağımsız kaynaktan
+    // (ESPN, VAVEL) doğrulandığı için yine de eklendi.
+    playerName: "Matheus Cunha",
+    teamId: "t8", // Manchester United
+    competitionKey: "ucl",
+    goals: 1, // ~27'-28'
+    matchesPlayed: 1,
+    asOf: "2026-09-16",
+    source: "ESPN / VAVEL",
+  },
+  {
+    playerName: "Bruno Fernandes",
+    teamId: "t8", // Manchester United
+    competitionKey: "ucl",
+    goals: 1, // 42'
+    matchesPlayed: 1,
+    asOf: "2026-09-16",
+    source: "ESPN / Yahoo Sports",
+  },
+  {
+    // players.js'te Manchester United (t8) kadrosunda YOK, bkz. üstteki not.
+    playerName: "Benjamin Sesko",
+    teamId: "t8", // Manchester United
+    competitionKey: "ucl",
+    goals: 1, // 45'
+    matchesPlayed: 1,
+    asOf: "2026-09-16",
+    source: "ESPN / VAVEL",
+  },
+  {
+    playerName: "Lisandro Martínez",
+    teamId: "t8", // Manchester United
+    competitionKey: "ucl",
+    goals: 1, // ~68'-69'
+    matchesPlayed: 1,
+    asOf: "2026-09-16",
+    source: "ESPN / VAVEL",
+  },
+  {
+    // players.js'te SK Slavia Prague (t29) kadrosunda YOK. Bkz. dosya
+    // başındaki ATLANDI notu: kaynaklar Slavia'nın 2. golünün sahibinde
+    // çelişti (Konečný vs Šturm brace); 2/3 çoğunlukla Šturm'e 2 gol
+    // yazıldı.
+    playerName: "Danijel Šturm",
+    teamId: "t29", // SK Slavia Prague
+    competitionKey: "ucl",
+    goals: 2, // ~51' ve ~88'
+    matchesPlayed: 1,
+    asOf: "2026-09-16",
+    source: "VAVEL / GiveMeSport",
+  },
+  {
+    // players.js'te RC Lens (t22) kadrosunda YOK -- kadro dosyası
+    // eksik/kısa tutulmuş, ama gol atışı en az iki bağımsız kaynaktan
+    // doğrulandığı için yine de eklendi.
+    playerName: "Abdallah Sima",
+    teamId: "t22", // RC Lens
+    competitionKey: "ucl",
+    goals: 1, // ~73'
+    matchesPlayed: 1,
+    asOf: "2026-09-16",
+    source: "ESPN / VAVEL / GiveMeSport",
+  },
+  {
+    // players.js'te RC Lens (t22) kadrosunda YOK, bkz. üstteki not.
+    playerName: "Florian Thauvin",
+    teamId: "t22", // RC Lens
+    competitionKey: "ucl",
+    goals: 1, // 90+1'
+    matchesPlayed: 1,
+    asOf: "2026-09-16",
+    source: "ESPN / VAVEL / GiveMeSport",
+  },
+  {
+    playerName: "Ruben Aguilar",
+    teamId: "t22", // RC Lens
+    competitionKey: "ucl",
+    goals: 1, // 90+3'
+    matchesPlayed: 1,
+    asOf: "2026-09-16",
+    source: "ESPN / VAVEL / GiveMeSport",
   },
 
   // ---- Trendyol Süper Lig 2026-27 -- 1-4. Haftaların TAMAMI ----

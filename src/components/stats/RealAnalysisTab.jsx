@@ -396,11 +396,9 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
                 <span className="upset-row-week">{u.matchdayLabel}</span>
                 <span className="upset-row-team">
                   <Crest team={u.homeTeam} size={20} />
-                  {u.homeTeam.short}
                 </span>
                 <span className="upset-row-score">{u.homeGoals} - {u.awayGoals}</span>
                 <span className="upset-row-team upset-row-team-away">
-                  {u.awayTeam.short}
                   <Crest team={u.awayTeam} size={20} />
                 </span>
                 <span className="upset-row-surprise">%{Math.round(u.surprise * 100)} sürpriz</span>
@@ -472,11 +470,9 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
                 <span className="upset-row-week">{m.matchdayLabel}</span>
                 <span className="upset-row-team">
                   <Crest team={m.homeTeam} size={20} />
-                  {m.homeTeam.short}
                 </span>
                 <span className="upset-row-score">{m.homeGoals} - {m.awayGoals}</span>
                 <span className="upset-row-team upset-row-team-away">
-                  {m.awayTeam.short}
                   <Crest team={m.awayTeam} size={20} />
                 </span>
                 <span className="upset-row-surprise">{m.totalGoals} gol</span>
@@ -505,7 +501,6 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
                 <span className="scorer-row-player">
                   <Crest team={s.team} size={20} />
                   <span className="scorer-row-name">{s.playerName}</span>
-                  <span className="scorer-row-team">{s.team.short}</span>
                 </span>
                 <span className="scorer-row-goals">{s.goals} gol</span>
                 <span className="scorer-row-matches">{s.matchesPlayed} maç</span>
@@ -620,7 +615,7 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
                 className={`fixture-difficulty-row ${row.teamId === favoriteTeamId ? "is-favorite" : ""}`}
               >
                 <Crest team={row.team} size={22} />
-                <span className="fixture-difficulty-name">{row.team.short}</span>
+                <span className="fixture-difficulty-name">{row.team.name}</span>
                 <span className="fixture-difficulty-track">
                   <span
                     className="fixture-difficulty-fill"

@@ -7,7 +7,7 @@
 // arka uç yok) -- araştırıldığı ana ait bir "anlık görüntü"dür. Tarihler ve
 // skorlar ileride manuel olarak tazelenmelidir.
 
-export const SUPER_LIG_LIVE_ASOF = "7 Eylül 2026 (4. Hafta TAMAMLANDI)";
+export const SUPER_LIG_LIVE_ASOF = "14 Eylül 2026 (5. Hafta TAMAMLANDI)";
 
 // Türkçe Vikipedi'nin "2026-27 Süper Lig" maddesinin ham wikitext'i (maç
 // sonuçları) + "Şablon:2026-27 Süper Lig puan durumu" (güncel puan durumu
@@ -26,30 +26,47 @@ export const SUPER_LIG_LIVE_ASOF = "7 Eylül 2026 (4. Hafta TAMAMLANDI)";
 // Çaykur Rizespor 0-1 Alanyaspor (ikisi de 7 Eylül). Bu 6 maçtan HESAPLANAN
 // puan durumu, fotomac.com.tr'nin 7 Eylül 2026 "4. hafta tamamlandı" puan
 // durumu haberinde listelenen 18 takımın TAMAMININ puanlarıyla BİREBİR
-// örtüşüyor (bağımsız bir çapraz doğrulama). 5. Hafta'nın 11 Eylül 2026
-// Cuma günü başlayacağı (CNN Türk fikstür haberi) doğrulandığından, bugün
-// (7 Eylül) itibarıyla 5. Haftadan henüz oynanmış maç YOKTUR. teamName
-// burada superLigTeams.js'teki `name` alanıyla eşleşecek şekilde
-// yazılmıştır.
+// örtüşüyor (bağımsız bir çapraz doğrulama).
+//
+// 16 Eylül 2026'da yapılan bu tazelemede 5. Hafta'nın TAMAMI (9 maç, 11-14
+// Eylül 2026'ya yayılan) eklendi: Beşiktaş 3-0 Erzurumspor FK (11 Eylül);
+// Eyüpspor 0-2 Çaykur Rizespor, Samsunspor 1-5 Çorum FK, Alanyaspor 2-2
+// Göztepe, Konyaspor 1-0 Trabzonspor (dördü de 12 Eylül); Gençlerbirliği
+// 1-2 Kasımpaşa, Amed SFK 5-0 İstanbul Başakşehir, Galatasaray 1-0
+// Kocaelispor (üçü de 13 Eylül); Gaziantep FK 0-0 Fenerbahçe (14 Eylül).
+// Her maç için en az 2 bağımsız kaynak aynı skoru teyit etti: Hürriyet +
+// Habertürk + DHA + fotomac.com.tr + takvim.com.tr (Samsunspor 1-5 Çorum
+// FK); Hürriyet + CNN Türk + Fanatik + beIN Sports (Konyaspor 1-0
+// Trabzonspor); ayrıca star.com.tr'nin "5. hafta sona erdi" haberi ile
+// sporx.com'un "5. hafta sonrası puan durumu" haberi 9 maçın TAMAMINI ve
+// güncel puan durumunu bağımsız olarak birebir aynı şekilde listeliyor
+// (ikisi arasında hiçbir tutarsızlık yok). Bu 9 maçtan HESAPLANAN puan
+// durumu (aşağıdaki SUPER_LIG_LIVE_STANDINGS), sporx.com'un yayınladığı
+// 18 takımın TAMAMININ O/G/B/M/averaj/puan değerleriyle BİREBİR örtüşüyor
+// -- yani hem maç sonuçlarından hesaplama hem de üçüncü bir kaynaktaki
+// hazır tablo aynı sonuca varıyor (çift yönlü çapraz doğrulama). 6. Hafta
+// (18-20 Eylül 2026) bugün (16 Eylül) itibarıyla henüz OYNANMADI, bu yüzden
+// bu tazelemede eklenmedi. teamName burada superLigTeams.js'teki `name`
+// alanıyla eşleşecek şekilde yazılmıştır.
 export const SUPER_LIG_LIVE_STANDINGS = [
-  { rank: 1, teamName: "Galatasaray", played: 4, w: 3, d: 1, l: 0, gf: 12, ga: 6, pts: 10 },
-  { rank: 2, teamName: "Beşiktaş", played: 4, w: 3, d: 0, l: 1, gf: 9, ga: 4, pts: 9 },
-  { rank: 3, teamName: "Kocaelispor", played: 4, w: 3, d: 0, l: 1, gf: 5, ga: 3, pts: 9 },
-  { rank: 4, teamName: "Trabzonspor", played: 4, w: 2, d: 1, l: 1, gf: 9, ga: 4, pts: 7 },
-  { rank: 5, teamName: "Gaziantep FK", played: 4, w: 2, d: 1, l: 1, gf: 7, ga: 5, pts: 7 },
-  { rank: 6, teamName: "Amed SFK", played: 4, w: 2, d: 1, l: 1, gf: 7, ga: 5, pts: 7 },
-  { rank: 7, teamName: "Alanyaspor", played: 4, w: 2, d: 1, l: 1, gf: 4, ga: 3, pts: 7 },
-  { rank: 8, teamName: "Gençlerbirliği", played: 4, w: 2, d: 1, l: 1, gf: 4, ga: 7, pts: 7 },
-  { rank: 9, teamName: "Fenerbahçe", played: 4, w: 2, d: 0, l: 2, gf: 8, ga: 6, pts: 6 },
-  { rank: 10, teamName: "Kasımpaşa", played: 4, w: 1, d: 3, l: 0, gf: 5, ga: 4, pts: 6 },
-  { rank: 11, teamName: "Çaykur Rizespor", played: 4, w: 2, d: 0, l: 2, gf: 3, ga: 4, pts: 6 },
-  { rank: 12, teamName: "İstanbul Başakşehir", played: 4, w: 1, d: 1, l: 2, gf: 6, ga: 6, pts: 4 },
-  { rank: 13, teamName: "Samsunspor", played: 4, w: 1, d: 1, l: 2, gf: 5, ga: 6, pts: 4 },
-  { rank: 14, teamName: "Çorum FK", played: 4, w: 1, d: 1, l: 2, gf: 7, ga: 9, pts: 4 },
-  { rank: 15, teamName: "Erzurumspor FK", played: 4, w: 1, d: 1, l: 2, gf: 2, ga: 8, pts: 4 },
-  { rank: 16, teamName: "Eyüpspor", played: 4, w: 1, d: 0, l: 3, gf: 2, ga: 6, pts: 3 },
-  { rank: 17, teamName: "Göztepe", played: 4, w: 0, d: 1, l: 3, gf: 7, ga: 11, pts: 1 },
-  { rank: 18, teamName: "Konyaspor", played: 4, w: 0, d: 0, l: 4, gf: 3, ga: 8, pts: 0 },
+  { rank: 1, teamName: "Galatasaray", played: 5, w: 4, d: 1, l: 0, gf: 13, ga: 6, pts: 13 },
+  { rank: 2, teamName: "Beşiktaş", played: 5, w: 4, d: 0, l: 1, gf: 12, ga: 4, pts: 12 },
+  { rank: 3, teamName: "Amed SFK", played: 5, w: 3, d: 1, l: 1, gf: 12, ga: 5, pts: 10 },
+  { rank: 4, teamName: "Kasımpaşa", played: 5, w: 2, d: 3, l: 0, gf: 7, ga: 5, pts: 9 },
+  { rank: 5, teamName: "Çaykur Rizespor", played: 5, w: 3, d: 0, l: 2, gf: 5, ga: 4, pts: 9 },
+  { rank: 6, teamName: "Kocaelispor", played: 5, w: 3, d: 0, l: 2, gf: 5, ga: 4, pts: 9 },
+  { rank: 7, teamName: "Gaziantep FK", played: 5, w: 2, d: 2, l: 1, gf: 7, ga: 5, pts: 8 },
+  { rank: 8, teamName: "Alanyaspor", played: 5, w: 2, d: 2, l: 1, gf: 6, ga: 5, pts: 8 },
+  { rank: 9, teamName: "Trabzonspor", played: 5, w: 2, d: 1, l: 2, gf: 9, ga: 5, pts: 7 },
+  { rank: 10, teamName: "Çorum FK", played: 5, w: 2, d: 1, l: 2, gf: 12, ga: 10, pts: 7 },
+  { rank: 11, teamName: "Fenerbahçe", played: 5, w: 2, d: 1, l: 2, gf: 8, ga: 6, pts: 7 },
+  { rank: 12, teamName: "Gençlerbirliği", played: 5, w: 2, d: 1, l: 2, gf: 5, ga: 9, pts: 7 },
+  { rank: 13, teamName: "İstanbul Başakşehir", played: 5, w: 1, d: 1, l: 3, gf: 6, ga: 11, pts: 4 },
+  { rank: 14, teamName: "Samsunspor", played: 5, w: 1, d: 1, l: 3, gf: 6, ga: 11, pts: 4 },
+  { rank: 15, teamName: "Erzurumspor FK", played: 5, w: 1, d: 1, l: 3, gf: 2, ga: 11, pts: 4 },
+  { rank: 16, teamName: "Konyaspor", played: 5, w: 1, d: 0, l: 4, gf: 4, ga: 8, pts: 3 },
+  { rank: 17, teamName: "Eyüpspor", played: 5, w: 1, d: 0, l: 4, gf: 2, ga: 8, pts: 3 },
+  { rank: 18, teamName: "Göztepe", played: 5, w: 0, d: 2, l: 3, gf: 9, ga: 13, pts: 2 },
 ];
 
 // 1., 2. ve 3. Hafta'nın TAMAMI (27 maç) — Türkçe Vikipedi'nin ham
@@ -69,9 +86,10 @@ export const SUPER_LIG_LIVE_STANDINGS = [
 // fotomac.com.tr'nin 7 Eylül 2026 "4. hafta tamamlandı" haberindeki 18
 // takımın TAMAMININ puanlarıyla birebir örtüşüyor.
 //
-// NOT: 5. Hafta 11 Eylül 2026 Cuma günü başlayacak (CNN Türk fikstür
-// haberiyle doğrulandı); bu yüzden bugün (7 Eylül 2026) itibarıyla 5.
-// Haftadan eklenecek maç YOKTUR.
+// 16 Eylül 2026 tazelemesinde 5. Hafta'nın TAMAMI (9 maç, 11-14 Eylül 2026)
+// eklendi -- kaynaklar ve doğrulama yöntemi için dosyanın en üstündeki
+// açıklamaya bakınız. 6. Hafta (18-20 Eylül 2026) bugün itibarıyla henüz
+// OYNANMADI; bu yüzden bu tazelemede eklenmedi.
 export const SUPER_LIG_LIVE_RESULTS = [
   { label: "1. Hafta", date: "14 Ağu", home: "Galatasaray", homeGoals: 2, away: "Çorum FK", awayGoals: 2 },
   { label: "1. Hafta", date: "15 Ağu", home: "Gençlerbirliği", homeGoals: 2, away: "Fenerbahçe", awayGoals: 1 },
@@ -109,6 +127,15 @@ export const SUPER_LIG_LIVE_RESULTS = [
   { label: "4. Hafta", date: "6 Eyl", home: "Trabzonspor", homeGoals: 5, away: "Gençlerbirliği", awayGoals: 0 },
   { label: "4. Hafta", date: "7 Eyl", home: "Göztepe", homeGoals: 2, away: "Gaziantep FK", awayGoals: 4 },
   { label: "4. Hafta", date: "7 Eyl", home: "Çaykur Rizespor", homeGoals: 0, away: "Alanyaspor", awayGoals: 1 },
+  { label: "5. Hafta", date: "11 Eyl", home: "Beşiktaş", homeGoals: 3, away: "Erzurumspor FK", awayGoals: 0 },
+  { label: "5. Hafta", date: "12 Eyl", home: "Eyüpspor", homeGoals: 0, away: "Çaykur Rizespor", awayGoals: 2 },
+  { label: "5. Hafta", date: "12 Eyl", home: "Samsunspor", homeGoals: 1, away: "Çorum FK", awayGoals: 5 },
+  { label: "5. Hafta", date: "12 Eyl", home: "Alanyaspor", homeGoals: 2, away: "Göztepe", awayGoals: 2 },
+  { label: "5. Hafta", date: "12 Eyl", home: "Konyaspor", homeGoals: 1, away: "Trabzonspor", awayGoals: 0 },
+  { label: "5. Hafta", date: "13 Eyl", home: "Gençlerbirliği", homeGoals: 1, away: "Kasımpaşa", awayGoals: 2 },
+  { label: "5. Hafta", date: "13 Eyl", home: "Amed SFK", homeGoals: 5, away: "İstanbul Başakşehir", awayGoals: 0 },
+  { label: "5. Hafta", date: "13 Eyl", home: "Galatasaray", homeGoals: 1, away: "Kocaelispor", awayGoals: 0 },
+  { label: "5. Hafta", date: "14 Eyl", home: "Gaziantep FK", homeGoals: 0, away: "Fenerbahçe", awayGoals: 0 },
 ];
 
 // Simüle edilmiş TAM fikstürü (roundRobinEngine'den gelen, gerçek dünyayla

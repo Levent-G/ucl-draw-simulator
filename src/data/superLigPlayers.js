@@ -123,7 +123,6 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Léo Duarte", "DF", "BRA", 71],
     ["Jerome Opoku", "DF", "GHA", 70],
     ["Christopher Opéri", "DF", "CIV", 69],
-    ["Festy Ebosele", "DF", "IRL", 70],
     ["Amine Harit", "MF", "MAR", 75],
     ["Miguel Crespo", "MF", "POR", 71],
     ["Ivan Brnić", "MF", "CRO", 68],
@@ -222,7 +221,6 @@ const RAW_SUPER_LIG_ROSTERS = {
   ],
   s10: [
     // Alanyaspor
-    ["Ertuğrul Taşkıran", "GK", "TUR", 65],
     ["Paulo Victor", "GK", "BRA", 64],
     ["Nuno Lima", "DF", "POR", 65],
     ["Fidan Aliti", "DF", "KVX", 67],
@@ -293,10 +291,40 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Mame Thiam", "FW", "SEN", 64],
   ],
   s14: [
-    // Erzurumspor FK
-    ["Erkan Anapa", "GK", "TUR", 62],
-    ["Ali Ülgen", "DF", "TUR", 61],
-    ["Hüsamettin Yener", "FW", "TUR", 62],
+    // Erzurumspor FK -- Ertuğrul Taşkıran (ex-Alanyaspor, s10'da yanlışlıkla
+    // duruyordu), Festy Ebosele (Başakşehir'den kiralık, s5'te yanlışlıkla
+    // duruyordu) ve Nihad Mujakić (ex-Eyüpspor/Gaziantep FK, s16'da
+    // yanlışlıkla duruyordu) buraya taşındı -- üçü de 2026 yaz transfer
+    // döneminde Erzurumspor'a katıldı (NTVSpor/Hürriyet/Sporx, CNN Türk/
+    // Fotomaç/Sabah, Fanatik/Fotomaç/Habertürk ile çapraz doğrulandı).
+    ["Murat Cem Akpınar", "GK", "TUR", 60],
+    ["Erkan Anapa", "GK", "TUR", 61],
+    ["Matija Orbanić", "GK", "CRO", 62],
+    ["Ertuğrul Taşkıran", "GK", "TUR", 65],
+    ["Yakup Kırtay", "DF", "TUR", 59],
+    ["Amar Gërxhaliu", "DF", "KVX", 62],
+    ["Guram Giorbelidze", "DF", "GEO", 61],
+    ["Mustafa Yumlu", "DF", "TUR", 64],
+    ["Cengizhan Bayrak", "DF", "TUR", 59],
+    ["Ömer Arda Kara", "DF", "TUR", 57],
+    ["Orhan Ovacıklı", "DF", "TUR", 57],
+    ["Festy Ebosele", "DF", "IRL", 70],
+    ["Nihad Mujakić", "DF", "BIH", 65],
+    ["Brandon Baiye", "MF", "BEL", 62],
+    ["Sefa Akgün", "MF", "TUR", 59],
+    ["Fernando Andrade", "MF", "BRA", 63],
+    ["Miguel Cardoso", "MF", "POR", 64],
+    ["Furkan Özhan", "MF", "TUR", 57],
+    ["Elisha Owusu", "MF", "GHA", 67],
+    ["Mert Önal", "MF", "TUR", 56],
+    ["Martín Rodríguez", "MF", "CHI", 61],
+    ["İlkan Sever", "FW", "TUR", 59],
+    ["Gyrano Kerk", "FW", "SUR", 66],
+    ["Eren Tozlu", "FW", "TUR", 60],
+    ["Serkan Köse", "FW", "TUR", 58],
+    ["Neriman Ahundzade", "FW", "AZE", 57],
+    ["Kerem Erener", "FW", "TUR", 56],
+    ["Mustafa Fettahoğlu", "FW", "TUR", 57],
   ],
   s15: [
     // Gaziantep FK
@@ -325,7 +353,6 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Gilbert Mendy", "DF", "SEN", 62],
     ["Luccas Claro", "DF", "BRA", 63],
     ["Emir Ortakaya", "DF", "TUR", 58],
-    ["Nihad Mujakić", "DF", "BIH", 62],
     ["Umut Meraş", "DF", "TUR", 58],
     ["Samu Sáiz", "MF", "ESP", 66],
     ["Taras Stepanenko", "MF", "UKR", 64],
