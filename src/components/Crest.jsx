@@ -2,11 +2,25 @@ import React, { useState } from 'react'
 import { POT_COLORS } from '../data/teams.js'
 
 // Galatasaray'ın amblemi, resmi formadaki 5 şampiyonluk yıldızını da içeren
-// versiyonuyla kullanılıyor (bkz. assets/logos/.../Galatasaray.png) -- bu
-// yüzden diğer amblemlere göre bir tık daha büyük render edilir, yıldız
-// takımın adı görünür olsun diye kırpılmasın.
+// versiyonuyla kullanılıyor (bkz. assets/logos/.../Galatasaray.png). Kullanıcı
+// isteği ("Galatasaray logosunu diğer takımlara göre daha büyük yap -- HER
+// YERDE") üzerine, bu tek bileşenin (Crest) kullanıldığı HER yerde (sidebar,
+// puan durumu, istatistik satırları, takım profili vb.) diğer takımlardan
+// görünür şekilde daha büyük render edilir.
+//
+// NOT: İlk bumpta (1.35x, sonra 1.6x) kullanıcı "hâlâ büyük gelmiyor" dedi --
+// kök neden çarpan DEĞİL, dosyanın kendisiydi: eski Galatasaray.png kare bir
+// tuvale sığdırılırken (bkz. proje geçmişi) etrafında büyük, boşa giden
+// şeffaf bir boşluk bırakılmıştı (görünür logo, 2366x2366'lık tuvalin sadece
+// %68'i genişlik / %87'si yükseklikti) -- oysa diğer takımların dosyaları
+// kendi çerçevelerini %93-99 dolduruyor. Kare bir tuval + object-fit:contain
+// ile bu boşluk çarpanla birlikte büyütülüyor ama görünür amblem yine de
+// diğer takımlara göre orantısız KÜÇÜK kalıyordu. Asıl düzeltme: dosya, diğer
+// takımların dosyalarıyla aynı sıkı kırpma kuralına uyacak şekilde yeniden
+// kırpıldı (artık %98.5/%98.9 dolu) -- ÇARPAN bundan sonra beklendiği gibi
+// çalışıyor.
 const FIVE_STAR_TEAM_NAME = 'Galatasaray'
-const FIVE_STAR_SIZE_BUMP = 1.12
+const FIVE_STAR_SIZE_BUMP = 1.3
 
 // Önce team.logo yolundaki dosyayı dener (kendi lisanslı logolarını
 // public/logos/ altına ekleyince otomatik görünür). Dosya yoksa (404),
