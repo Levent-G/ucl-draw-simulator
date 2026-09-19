@@ -1440,15 +1440,15 @@ a.btn-secondary:hover {
   padding: 14px 18px;
 }
 .match-row-favorite {
-  border-color: rgba(250, 204, 21, 0.5);
-  background: linear-gradient(120deg, rgba(250, 204, 21, 0.08), transparent 60%), var(--bg-card);
+  border-color: rgba(217, 119, 6, 0.55);
+  background: linear-gradient(120deg, rgba(245, 158, 11, 0.18), transparent 60%), var(--bg-card);
 }
 .favorite-star {
   margin: 0 4px;
   font-size: 0.85em;
 }
 .standings-row-favorite {
-  background: rgba(250, 204, 21, 0.08);
+  background: rgba(245, 158, 11, 0.18);
 }
 .standings-row-favorite td:first-child {
   box-shadow: inset 3px 0 0 rgba(250, 204, 21, 0.7);
@@ -4942,7 +4942,7 @@ a.team-profile-match-row:hover {
   gap: 14px;
   flex-wrap: wrap;
   background: linear-gradient(135deg, rgba(250, 204, 21, 0.16), rgba(250, 204, 21, 0.03));
-  border: 1px solid rgba(250, 204, 21, 0.5);
+  border: 1px solid rgba(217, 119, 6, 0.55);
   border-radius: var(--radius-lg);
   padding: 14px 20px;
   margin-bottom: 16px;
@@ -6318,8 +6318,8 @@ a.team-profile-match-row:hover {
   padding: 12px 16px;
 }
 .knockout-tie-favorite {
-  border-color: rgba(250, 204, 21, 0.5);
-  background: linear-gradient(120deg, rgba(250, 204, 21, 0.08), transparent 60%), var(--bg-card);
+  border-color: rgba(217, 119, 6, 0.55);
+  background: linear-gradient(120deg, rgba(245, 158, 11, 0.18), transparent 60%), var(--bg-card);
 }
 
 /* ==========================================================================
@@ -7830,7 +7830,7 @@ a.team-profile-match-row:hover {
 }
 .achievement-card.is-unlocked {
   border-color: rgba(250, 204, 21, 0.4);
-  background: linear-gradient(120deg, rgba(250, 204, 21, 0.08), rgba(0, 230, 118, 0.06));
+  background: linear-gradient(120deg, rgba(245, 158, 11, 0.18), rgba(0, 230, 118, 0.06));
 }
 .achievement-card.is-locked {
   opacity: 0.55;
@@ -8637,8 +8637,8 @@ a.team-profile-match-row:hover {
   border-color: var(--line-strong);
 }
 .form-guide-row.is-favorite {
-  border-color: rgba(250, 204, 21, 0.5);
-  background: rgba(250, 204, 21, 0.06);
+  border-color: rgba(217, 119, 6, 0.55);
+  background: rgba(245, 158, 11, 0.18);
 }
 .form-guide-rank {
   font-family: var(--font-mono);
@@ -8689,8 +8689,8 @@ a.team-profile-match-row:hover {
   border-color: var(--line-strong);
 }
 .scorer-row.is-favorite {
-  border-color: rgba(250, 204, 21, 0.5);
-  background: rgba(250, 204, 21, 0.06);
+  border-color: rgba(217, 119, 6, 0.55);
+  background: rgba(245, 158, 11, 0.18);
 }
 .scorer-row-rank {
   font-family: var(--font-mono);
@@ -8763,8 +8763,8 @@ a.team-profile-match-row:hover {
   border-color: var(--line-strong);
 }
 .fixture-difficulty-row.is-favorite {
-  border-color: rgba(250, 204, 21, 0.5);
-  background: rgba(250, 204, 21, 0.06);
+  border-color: rgba(217, 119, 6, 0.55);
+  background: rgba(245, 158, 11, 0.18);
 }
 .fixture-difficulty-name {
   font-size: 12.5px;
