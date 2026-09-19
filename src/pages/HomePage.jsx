@@ -258,6 +258,9 @@ export default function HomePage() {
                 <span className="home-hero-btn-icon"><CompetitionIcon competition={getCompetition("superlig")} size={18} /></span>
                 Süper Lig'e Git →
               </Link>
+              <Link to="/tahmin-ligi" className="btn-secondary home-hero-btn">
+                🏆 Tahmin Ligi →
+              </Link>
             </div>
             <div className="broadcast-stats">
               {STATS.map((s, i) => (
