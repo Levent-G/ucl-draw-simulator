@@ -7637,7 +7637,9 @@ a.team-profile-match-row:hover {
     gap: 16px;
   }
   .broadcast-hero-logo-col {
-    justify-content: flex-start;
+    justify-content: center;
+    justify-self: center;
+    width: 100%;
   }
   .broadcast-logo-full {
     width: min(150px, 46vw);
