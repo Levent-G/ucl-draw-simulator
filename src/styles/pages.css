@@ -6715,8 +6715,13 @@ a.team-profile-match-row:hover {
   overflow: hidden;
   border: 1px solid var(--line-strong);
   background: linear-gradient(150deg, #0d2b20 0%, #103524 45%, #123a52 100%);
-  padding: 52px 32px 0;
-  margin: 20px 0 28px;
+  padding: 0;
+  /* Kullanıcı isteği (2026-09-19): "sağdan soldan yukardan boşluklarını
+     kaldır" -- eksi kenar boşluğuyla .page-shell'in kendi üst/yan
+     padding'ini (22px/24px) iptal edip kartı üstte topbar'a, yanlarda
+     sidebar/viewport kenarına kadar TAM YASLI (bleed) hale getiriyor. Alt
+     kenar normal (28px) kalıyor -- oradaki boşluktan şikayet yoktu. */
+  margin: -22px -24px 28px;
   clip-path: polygon(0 0, 100% 0, 100% 94%, 68% 100%, 0 97%);
   --text-primary: #ffffff;
   --text-dim: #c3d0ea;
@@ -6792,7 +6797,7 @@ a.team-profile-match-row:hover {
 .broadcast-hero-inner {
   position: relative;
   z-index: 1;
-  padding-bottom: 40px;
+  padding: 40px 32px 24px;
 }
 /* Kullanıcı isteği (2026-09-19, son tur): hero'yu ortadan ikiye böl -- solda
    markanın TAM logosu (amblem + "SÜPER ANALİZ" + alt yazı, HEPSİ görselin
@@ -6916,7 +6921,6 @@ a.team-profile-match-row:hover {
 .broadcast-ticker {
   position: relative;
   z-index: 1;
-  margin: 0 -32px;
   overflow: hidden;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   background: color-mix(in srgb, var(--bg-void) 60%, transparent);
@@ -7625,11 +7629,10 @@ a.team-profile-match-row:hover {
 }
 @media (max-width: 640px) {
   .broadcast-hero {
-    padding: 30px 18px 0;
     clip-path: polygon(0 0, 100% 0, 100% 97%, 60% 100%, 0 98%);
   }
   .broadcast-hero-inner {
-    padding-bottom: 30px;
+    padding: 28px 18px 20px;
   }
   .broadcast-hero-split {
     grid-template-columns: 1fr;
@@ -7643,9 +7646,6 @@ a.team-profile-match-row:hover {
   }
   .broadcast-logo-full {
     width: min(150px, 46vw);
-  }
-  .broadcast-ticker {
-    margin: 0 -18px;
   }
   .home-hero-actions {
     flex-direction: column;
