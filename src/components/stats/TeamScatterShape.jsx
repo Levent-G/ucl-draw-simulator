@@ -1,6 +1,12 @@
 import React from "react";
 import { POT_COLORS } from "../../data/teams.js";
 
+// Crest.jsx'teki Galatasaray büyütme çarpanıyla AYNI (bkz. o dosyadaki
+// açıklama) -- ama bu bileşen Crest'i kullanmıyor (SVG <image>, Recharts
+// scatter marker'ı için), bu yüzden aynı mantık burada da AYRICA uygulanıyor.
+const FIVE_STAR_TEAM_NAME = "Galatasaray";
+const FIVE_STAR_SIZE_BUMP = 1.3;
+
 // Recharts <Scatter>'ın `shape` prop'u için özel nokta çizici -- düz bir
 // renkli daire yerine takımın gerçek logosunu marker olarak kullanır (bkz.
 // TeamAxisTick.jsx -- eksen etiketleri için aynı fikrin karşılığı). Logo
@@ -8,7 +14,8 @@ import { POT_COLORS } from "../../data/teams.js";
 export default function TeamScatterShape({ cx, cy, payload, size = 26, highlightTeamId }) {
   const team = payload?.team;
   if (!team || cx == null || cy == null) return null;
-  const r = size / 2;
+  const effectiveSize = team.name === FIVE_STAR_TEAM_NAME ? size * FIVE_STAR_SIZE_BUMP : size;
+  const r = effectiveSize / 2;
   const isHighlight = highlightTeamId && team.id === highlightTeamId;
 
   return (
@@ -19,8 +26,8 @@ export default function TeamScatterShape({ cx, cy, payload, size = 26, highlight
           href={team.logo}
           x={cx - r}
           y={cy - r}
-          width={size}
-          height={size}
+          width={effectiveSize}
+          height={effectiveSize}
           preserveAspectRatio="xMidYMid meet"
         />
       ) : (
@@ -29,7 +36,7 @@ export default function TeamScatterShape({ cx, cy, payload, size = 26, highlight
             cx={cx}
             cy={cy}
             r={r}
-            fill={isHighlight ? "#fbbf24" : team.pot ? POT_COLORS[team.pot]?.main || "#5468ff" : "#5468ff"}
+            fill={isHighlight ? "#fbbf24" : team.pot ? POT_COLORS[team.pot]?.main || "#00c46a" : "#00c46a"}
           />
           <text x={cx} y={cy} dy={4} textAnchor="middle" fontSize={10} fontWeight={700} fill="#fff">
             {team.short}

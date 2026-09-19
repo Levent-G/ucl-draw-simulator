@@ -1,45 +1,80 @@
 /* ==========================================================================
-   DESIGN TOKENS
-   Tema: gerçek UEFA Şampiyonlar Ligi kura çekimi yayın grafiği -- derin
-   lacivert/mavi zemin, camgöbeği torba vurguları, mor-pembe "aktif takım"
-   vurgusu (UEFA'nın 2024 star-ball kimliğinden ilham alan, özgün bir palet).
-   ========================================================================== */
+   DESIGN TOKENS -- "SÜPER ANALİZ" MARKA YENİLEMESİ (2026-09)
+   Eski tema (UEFA kura çekimi yayın grafiği ilhamlı lacivert/mor-pembe)
+   kullanıcının kendi marka paletiyle DEĞİŞTİRİLDİ: derin lacivert zemin
+   (#0B132B), enerjik yeşil ana vurgu (#00E676), camgöbeği ikincil vurgu
+   (#00B4D8), az/seçici kullanılan pembe vurgu (#FF007F). Aynı token
+   İSİMLERİ korunuyor (yüzlerce yerde referans alınıyor) -- sadece
+   DEĞERLERİ değişti, bu yüzden bu tek dosya tüm sitede kademeli olarak
+   yansıyor.
+   GÜNCELLEME (aynı gün, ikinci tur): kullanıcı `public/stitch_futbol_
+   analiz_mobil_platformu/` altına kendi Google Stitch tasarım referansını
+   (bkz. pitch_pulse_analytics/DESIGN.md) ekledi -- AYNI temel renkleri
+   kullanıyor ama panel/metin tonlarını ve YAZI TİPLERİNİ çok daha net
+   belirtmiş. Panel/metin tonları ve fontlar o referansın "Brand & Style" /
+   "Colors" / "Typography" bölümlerindeki TAM değerlere göre güncellendi. */
 :root {
-  --bg-void: #050b22;
-  --bg-deep: #081538;
-  --bg-panel: #0d1c48;
-  --bg-panel-alt: #112153;
-  --bg-card: #0e1d4a;
-  --line: rgba(255, 255, 255, 0.09);
-  --line-strong: rgba(255, 255, 255, 0.18);
+  /* Kullanıcı isteği (2026-09-19, ÜÇÜNCÜ tur): "şuanki renk paletinden
+     tamamen farklı açık bir palet" -- koyu lacivert zemin TAMAMEN terk
+     edildi, yerine gerçek bir AÇIK (light) tema geldi: beyaz paneller, açık
+     gri-mavi zemin, koyu lacivert ("mürekkep") metin. Marka kimliği
+     (yeşil/camgöbeği/pembe) korunuyor ama vurgu renkleri BEYAZ ZEMİNDE metin
+     olarak da okunabilsin diye koyu tema versiyonlarından belirgin şekilde
+     KOYULAŞTIRILDI (WCAG AA ~4.5:1 hedeflendi) -- çok canlı/açık tonlar
+     (ör. #00E676) artık sadece dolgu/arka plan olarak (üzerinde koyu metinle)
+     kullanılan yerlerde görünür; metin olarak kullanılan her yerde bu daha
+     koyu "text-safe" karşılıkları geçerli. TEK istisna: ana sayfadaki
+     .broadcast-hero bilinçli olarak koyu bir "yayın" panosu kalıyor (bkz.
+     pages.css'teki scoped token override) -- bu yüzden marka renklerinin
+     ORİJİNAL canlı tonları hâlâ ORADA kullanılıyor, silinmedi. */
+  --bg-void: #eef1f7;
+  --bg-deep: #e3e9f3;
+  --bg-panel: #ffffff;
+  --bg-panel-alt: #f6f8fc;
+  --bg-card: #ffffff;
+  --line: rgba(11, 19, 43, 0.1);
+  --line-strong: rgba(11, 19, 43, 0.18);
 
-  --text-primary: #f4f7ff;
-  --text-dim: #9db2e6;
-  --text-faint: #8593c4;
+  --text-primary: #0b132b;
+  --text-dim: #4b5876;
+  --text-faint: #7c88a3;
 
-  /* UCL mavi/camgöbeği ölçeği (torba vurguları için) */
-  --ucl-blue-1: #5b9dff;
-  --ucl-blue-2: #38bdf8;
-  --ucl-blue-3: #22d3ee;
-  --ucl-blue-4: #2dd4bf;
+  /* Camgöbeği ölçeği -- marka rengi #00B4D8'in text-safe (koyulaştırılmış)
+     karşılığından başlayıp yeşile geçiş yapar. */
+  --ucl-blue-1: #0090ab;
+  --ucl-blue-2: #0aa3bd;
+  --ucl-blue-3: #14aebd;
+  --ucl-blue-4: #00874a;
 
-  /* Tablo başlıkları ve satırları */
-  --table-header: #2f6fb8;
-  --table-subheader: #1d4f95;
-  --table-row-a: #102a63;
-  --table-row-b: #0c2151;
-  --table-name-col: #0a1c4d;
-  --table-highlight: #d9c8f5;
-  --table-highlight-text: #1a1440;
+  /* Tablo başlıkları/satırları -- açık temada beyaz/çok açık gri satırlar,
+     camgöbeği başlık şeridi korunuyor (üzerinde beyaz metinle). */
+  --table-header: #0090ab;
+  --table-subheader: #00728a;
+  --table-row-a: #ffffff;
+  --table-row-b: #f3f6fc;
+  --table-name-col: #eef2f9;
+  --table-highlight: #d7f5e6;
+  --table-highlight-text: #063220;
 
-  --accent: #5468ff;
-  --accent-bright: #7d8cff;
-  --success: #34d399;
-  --pink: #e879c9;
+  /* Ana marka vurgusu: yeşil. Her iki tondan da beyaz zeminde metin olarak
+     okunabilecek kadar koyu (--accent-bright artık "daha PARLAK" değil
+     "daha CANLI/doygun" anlamına geliyor -- literal parlaklık/L değeri artık
+     ikisinde de benzer, aradaki fark doygunluk). */
+  --accent: #067a3f;
+  --accent-bright: #00874a;
+  --success: #067a3f;
+  --pink: #c2185b;
 
-  --font-display: "Oswald", sans-serif;
+  /* Kullanıcı geri bildirimi (2026-09-19): "fontlarımızı daha güzel
+     yapalım" -- Outfit çok yaygın/"şablon" bir geometrik sans (birçok
+     AI-üretimi sitede kullanılıyor); yerine daha karakterli, teknik/spor
+     veri paneline daha uygun Space Grotesk geçildi (başlıklar/marka). Inter
+     (gövde metni -- zaten okunaklı/nötr, değişmedi) + JetBrains Mono
+     (skorlar/istatistikler -- rakamlar zıplamasın diye tabular) korunuyor. */
+  --font-display: "Space Grotesk", sans-serif;
+  --font-hero: "Space Grotesk", sans-serif;
   --font-body: "Inter", sans-serif;
-  --font-mono: "Space Mono", monospace;
+  --font-mono: "JetBrains Mono", monospace;
 
   --radius-lg: 18px;
   --radius-md: 12px;
@@ -63,16 +98,19 @@ body {
   color: var(--text-primary);
   background: linear-gradient(
     150deg,
-    #050b22 0%,
-    #081538 35%,
-    #0c2159 65%,
-    #123a7a 100%
+    #eef1f7 0%,
+    #e7ecf5 35%,
+    #dfe7f4 65%,
+    #d5e2f2 100%
   );
   background-attachment: fixed;
   min-height: 100vh;
 }
 
-/* UCL kimliğinden ilham alan, geometrik köşegen ışık huzmeleri (dekoratif) */
+/* Marka kimliğinden ilham alan, geometrik köşegen ışık huzmeleri (dekoratif) --
+   yeşil + camgöbeği (logo renkleri). Açık temaya geçişte "yıldızlı gece"
+   nokta deseni (beyaz radial-gradient'lar) kaldırıldı -- açık zeminde
+   görünmez/anlamsız kalıyordu; sadece iki köşegen renk şeridi korundu. */
 body::before {
   content: "";
   position: fixed;
@@ -82,34 +120,14 @@ body::before {
   background: linear-gradient(
       115deg,
       transparent 40%,
-      rgba(45, 212, 191, 0.08) 42%,
+      rgba(0, 230, 118, 0.1) 42%,
       transparent 46%
     ),
     linear-gradient(
       115deg,
       transparent 55%,
-      rgba(232, 121, 201, 0.06) 57%,
+      rgba(0, 180, 216, 0.09) 57%,
       transparent 61%
-    ),
-    radial-gradient(
-      1px 1px at 20% 30%,
-      rgba(255, 255, 255, 0.35) 0,
-      transparent 60%
-    ),
-    radial-gradient(
-      1px 1px at 70% 15%,
-      rgba(255, 255, 255, 0.3) 0,
-      transparent 60%
-    ),
-    radial-gradient(
-      1px 1px at 40% 70%,
-      rgba(255, 255, 255, 0.25) 0,
-      transparent 60%
-    ),
-    radial-gradient(
-      1px 1px at 85% 60%,
-      rgba(255, 255, 255, 0.3) 0,
-      transparent 60%
     );
   opacity: 0.8;
 }
@@ -235,11 +253,16 @@ button {
 
 .btn-primary {
   background: linear-gradient(180deg, var(--accent-bright), var(--accent));
+  /* Açık temaya geçişte (2026-09-19) yeşil koyulaştırıldığı için (artık
+     neon değil, "text-safe" bir ton) beyaz metin buradaki kontrastı
+     koyu laciverttten daha iyi karşılıyor -- kullanıcı isteğiyle geri
+     beyaza çevrildi. */
   color: #fff;
-  box-shadow: 0 8px 24px -8px rgba(84, 104, 255, 0.7);
+  font-weight: 700;
+  box-shadow: 0 8px 24px -8px rgba(0, 230, 118, 0.5);
 }
 .btn-primary:not(:disabled):hover {
-  box-shadow: 0 10px 30px -6px rgba(84, 104, 255, 0.9);
+  box-shadow: 0 10px 30px -6px rgba(0, 230, 118, 0.7);
 }
 
 .btn-ghost {

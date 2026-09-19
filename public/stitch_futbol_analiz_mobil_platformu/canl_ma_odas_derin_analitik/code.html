@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="tr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;600;700&amp;family=Outfit:wght@600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: 'class', theme: { extend: { 'colors': { 'inverse-surface': '#dbe1ff', 'surface-bright': '#313852', 'tertiary': '#ffdce3', 'on-surface': '#dbe1ff', 'inverse-on-surface': '#282f49', 'error': '#ffb4ab', 'on-tertiary-fixed': '#3f001a', 'tertiary-container': '#ffb4c6', 'on-tertiary-container': '#a70051', 'secondary-fixed-dim': '#4cd6fb', 'outline-variant': '#3b4a3d', 'surface-dim': '#0a122a', 'secondary': '#4cd6fb', 'surface-variant': '#2c344d', 'surface-container': '#171e37', 'on-secondary': '#003642', 'surface-tint': '#00e475', 'tertiary-fixed-dim': '#ffb1c4', 'on-primary-container': '#00612e', 'surface': '#0a122a', 'surface-container-high': '#212942', 'tertiary-fixed': '#ffd9e1', 'on-primary-fixed': '#00210b', 'primary': '#75ff9e', 'surface-container-low': '#131a33', 'outline': '#859585', 'primary-container': '#00e676', 'on-error': '#690005', 'surface-container-highest': '#2c344d', 'surface-container-lowest': '#050d25', 'on-error-container': '#ffdad6', 'on-primary': '#003918', 'primary-fixed': '#62ff96', 'background': '#0a122a', 'primary-fixed-dim': '#00e475', 'on-surface-variant': '#bacbb9', 'on-primary-fixed-variant': '#005226', 'on-background': '#dbe1ff', 'inverse-primary': '#006d35', 'on-tertiary': '#65002e', 'error-container': '#93000a', 'secondary-container': '#00b2d6', 'on-secondary-fixed-variant': '#004e5f', 'secondary-fixed': '#b3ebff', 'on-secondary-container': '#003f4e', 'on-secondary-fixed': '#001f27', 'on-tertiary-fixed-variant': '#8f0044' }, 'borderRadius': { 'DEFAULT': '0.25rem', 'lg': '0.5rem', 'xl': '0.75rem', 'full': '9999px' }, 'spacing': { 'margin': '1rem', 'gutter': '0.75rem', 'space-sm': '0.5rem', 'space-xl': '1.5rem', 'space-lg': '1rem', 'space-xs': '0.25rem', 'space-md': '0.75rem' }, 'fontFamily': { 'body-sm': ['Inter'], 'body-lg': ['Inter'], 'headline-sm': ['Outfit'], 'data-sm': ['JetBrains Mono'], 'display': ['Outfit'], 'label-caps': ['Inter'], 'title-md': ['Inter'], 'data-md': ['JetBrains Mono'], 'headline-md': ['Outfit'], 'headline-lg': ['Outfit'], 'data-lg': ['JetBrains Mono'], 'body-md': ['Inter'] }, 'fontSize': { 'body-sm': ['12px', { 'lineHeight': '16px', 'fontWeight': '400' }], 'body-lg': ['15px', { 'lineHeight': '22px', 'fontWeight': '400' }], 'headline-sm': ['18px', { 'lineHeight': '24px', 'fontWeight': '600' }], 'data-sm': ['11px', { 'lineHeight': '14px', 'fontWeight': '500' }], 'display': ['32px', { 'lineHeight': '38px', 'fontWeight': '700' }], 'label-caps': ['10px', { 'lineHeight': '12px', 'letterSpacing': '0.08em', 'fontWeight': '700' }], 'title-md': ['16px', { 'lineHeight': '22px', 'fontWeight': '600' }], 'data-md': ['14px', { 'lineHeight': '18px', 'fontWeight': '600' }], 'headline-md': ['20px', { 'lineHeight': '26px', 'fontWeight': '600' }], 'headline-lg': ['24px', { 'lineHeight': '30px', 'fontWeight': '600' }], 'data-lg': ['22px', { 'lineHeight': '26px', 'fontWeight': '700' }], 'body-md': ['13px', { 'lineHeight': '18px', 'fontWeight': '400' }] } } } };</script></head><body class="bg-background font-body-md text-on-surface"><header class="fixed top-0 left-0 w-full z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-28 w-full flex flex-col justify-between"><div class="h-16 px-margin flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-sm"><img alt="PitchPulse Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UbwqjR9KDTJAYGg1GQHoCG4gvyAIMdKc3_B2d8GwAd7lVAgNfSF4AinUefvK04xspVCVxTCXDt3NSg5Z_owTlObhKHTq7o6RlzbOTGeRJXtRQUuTqBJGHjG4j85n_456Cn1Bi2W5Zb8VmdoZ4nzhPqP2pH1BxahayFsaHvZdUlm6BPlk9E2AcnkzQ-O5rd4vgIFa-2mdTFLF6hW-URwWEEnA-Mmeu1Z0KmTlAgTuS2g2rRfpyLIMk6N7c"/><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight">Pitch<span class="text-primary">Pulse</span></span></div><div class="flex items-center gap-space-xs bg-surface-container-high px-space-sm py-space-xs rounded-full"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span></span><span class="font-label-caps text-label-caps uppercase text-primary font-bold">Canlı Veri Hub</span></div></div><nav class="hidden xl:flex items-center gap-space-sm" data-active-classes="bg-primary-container text-on-primary-container font-bold rounded-lg px-space-md py-space-xs"><a class="text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md px-space-md py-space-xs" data-path="canli-mac-odasi" href="#">Canlı Maç Odası</a><a class="text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md px-space-md py-space-xs" data-path="analitik-ve-radar" href="#">Analitik &amp; Radar</a><a class="text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md px-space-md py-space-xs" data-path="lig-ve-fikstur-xg" href="#">Lig &amp; Fikstür xG</a><a class="text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md px-space-md py-space-xs" data-path="tahmin-ligi" href="#">Tahmin Ligi</a><a class="text-on-surface-variant hover:text-on-surface transition-colors font-body-md text-body-md px-space-md py-space-xs" data-path="taktik-kose" href="#">Taktik Köşe</a></nav><div class="flex items-center gap-space-md"><div class="relative hidden md:flex items-center"><span class="material-symbols-outlined absolute left-space-md text-on-surface-variant text-body-lg pointer-events-none">search</span><input class="w-64 lg:w-80 bg-surface-container-high text-on-surface placeholder:text-on-surface-variant font-body-sm text-body-sm pl-9 pr-space-md py-space-xs rounded-lg outline-none focus:bg-surface-container-highest transition-colors" placeholder="Takım, oyuncu veya maç ara... [⌘K]" type="text"/></div><button class="relative p-space-xs text-on-surface-variant hover:text-on-surface transition-colors rounded-lg" type="button"><span class="material-symbols-outlined">notifications</span><span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-tertiary-container"></span></button><div class="flex items-center gap-space-sm bg-surface-container px-space-sm py-space-xs rounded-xl"><img alt="Mert Vural" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1U0sK4HYIM6jxxpSlvZCPq5ZRyZLJU0Tf3V5iT5VdGKT7XEGSbD34DLCWZC5saWGzIEbO13bju4htwolM2dSWp1UzzfyXgTFKp-MaHpT9iQOMnBMpvgvm0CQP1rA87lo5kSkp7aCEY89BMzOOxBKGGNoNStirUPg_67MK-swuKvulwsPSsmFfYdVgbxM7jwzww1xEfyrsNRWANUy5hKvzBQ3nz0RkGzkznjgB0etmbsXavyrJJMq6W08UM"/><div class="hidden sm:flex flex-col text-left"><span class="font-title-md text-body-sm text-on-surface">Mert Vural</span><span class="font-label-caps text-label-caps text-primary uppercase font-bold">PRO ANALİST</span></div></div></div></div><div class="h-12 w-full bg-surface-container-low px-margin flex items-center overflow-x-auto gap-space-md"><div class="flex items-center gap-space-xs bg-surface-container px-space-sm py-1 rounded shrink-0"><span class="font-label-caps text-label-caps text-tertiary-container uppercase font-bold">CANLI TİCKER</span><span class="material-symbols-outlined text-data-sm text-tertiary-container">rss_feed</span></div><div class="flex items-center gap-space-xl text-nowrap"><div class="flex items-center gap-space-sm bg-surface-container-high px-space-md py-1 rounded"><span class="font-label-caps text-label-caps text-tertiary-container bg-surface-container-lowest px-1 rounded font-bold">72'</span><span class="font-body-sm text-body-sm text-on-surface font-semibold">Real Madrid</span><span class="font-data-md text-data-md text-primary font-bold">2 - 1</span><span class="font-body-sm text-body-sm text-on-surface font-semibold">Man City</span><span class="font-data-sm text-data-sm text-secondary font-medium">xG 1.84 - 1.62</span></div><div class="flex items-center gap-space-sm bg-surface-container-high px-space-md py-1 rounded"><span class="font-label-caps text-label-caps text-tertiary-container bg-surface-container-lowest px-1 rounded font-bold">58'</span><span class="font-body-sm text-body-sm text-on-surface font-semibold">Galatasaray</span><span class="font-data-md text-data-md text-primary font-bold">1 - 0</span><span class="font-body-sm text-body-sm text-on-surface font-semibold">Fenerbahçe</span><span class="font-data-sm text-data-sm text-secondary font-medium">xG 1.21 - 0.45</span></div><div class="flex items-center gap-space-sm bg-surface-container-high px-space-md py-1 rounded"><span class="font-label-caps text-label-caps text-tertiary-container bg-surface-container-lowest px-1 rounded font-bold">41'</span><span class="font-body-sm text-body-sm text-on-surface font-semibold">Arsenal</span><span class="font-data-md text-data-md text-primary font-bold">0 - 0</span><span class="font-body-sm text-body-sm text-on-surface font-semibold">Bayern</span><span class="font-data-sm text-data-sm text-secondary font-medium">xG 0.68 - 0.32</span></div><div class="flex items-center gap-space-sm bg-surface-container-high px-space-md py-1 rounded"><span class="font-label-caps text-label-caps text-tertiary-container bg-surface-container-lowest px-1 rounded font-bold">84'</span><span class="font-body-sm text-body-sm text-on-surface font-semibold">Inter</span><span class="font-data-md text-data-md text-primary font-bold">3 - 1</span><span class="font-body-sm text-body-sm text-on-surface font-semibold">Juventus</span><span class="font-data-sm text-data-sm text-secondary font-medium">xG 2.40 - 0.95</span></div><div class="flex items-center gap-space-sm bg-surface-container-high px-space-md py-1 rounded"><span class="font-label-caps text-label-caps text-tertiary-container bg-surface-container-lowest px-1 rounded font-bold">23'</span><span class="font-body-sm text-body-sm text-on-surface font-semibold">Beşiktaş</span><span class="font-data-md text-data-md text-primary font-bold">0 - 1</span><span class="font-body-sm text-body-sm text-on-surface font-semibold">Trabzonspor</span><span class="font-data-sm text-data-sm text-secondary font-medium">xG 0.28 - 0.76</span></div></div></div></div></header><main class="w-full pt-28 bg-surface"><div class="flex flex-col w-full">
+<!-- Live Match Broadcast Marquee Header Banner -->
+<section class="w-full px-margin pb-space-lg">
+<div class="relative overflow-hidden rounded-xl bg-surface-container p-space-lg shadow-xl">
+<!-- Background Ambient Glows -->
+<div class="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-primary/10 blur-3xl pointer-events-none"></div>
+<div class="absolute -bottom-24 -right-24 w-96 h-96 rounded-full bg-secondary/10 blur-3xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col xl:flex-row items-center justify-between gap-space-lg">
+<!-- Left: Match Context & Score -->
+<div class="flex flex-col sm:flex-row items-center gap-space-lg w-full xl:w-auto justify-between sm:justify-start">
+<div class="flex items-center gap-space-md">
+<!-- Home Team -->
+<div class="flex items-center gap-space-sm text-right">
+<div class="flex flex-col items-end">
+<span class="font-headline-sm text-headline-sm text-on-surface tracking-tight">Galatasaray</span>
+<span class="font-label-caps text-label-caps text-primary uppercase">EV SAHİBİ • 1. LİG</span>
+</div>
+<div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center p-space-xs shadow-md">
+<img class="w-9 h-9 object-contain rounded-lg" data-alt="High quality athletic crest icon emblem for Galatasaray football club with gold and red crest shield style in a modern dark ui vector graphic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3OfP6Bc1Bdcn43El040SeHpfUqIk2ClXRL2cuMVzXYvHUGypuhGHa4xX9nfHp_lsOTNUC38qLVH9433k0TMMqifnZh4kjyFXUesLUyoWyCAsOweHH8Le6i6wS3Es72DlpMBjJ2B6fxSq6pAtWZebDDgpVdgMREA7o6yLg8H7MChA7MvYxvsH4itl9VDODxm3sFhciq35NI3CU7vt8I7qIk2_sMt6iV8POmhCv9rB4rqhdWR5692Oh"/>
+</div>
+</div>
+<!-- Live Score & Minute Pill -->
+<div class="flex flex-col items-center px-space-md py-space-xs bg-surface-container-lowest rounded-xl shadow-inner min-w-[124px]">
+<div class="flex items-center gap-space-xs mb-1">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-tertiary-container opacity-90"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-tertiary-container"></span>
+</span>
+<span class="font-label-caps text-label-caps text-tertiary-container uppercase tracking-wider">68' CANLI</span>
+</div>
+<div class="font-data-lg text-display text-on-surface tracking-tight leading-none">
+                2 <span class="text-on-surface-variant font-body-sm mx-1">-</span> 1
+              </div>
+<span class="font-data-sm text-data-sm text-primary mt-1">2. Yarı • RAMS Park</span>
+</div>
+<!-- Away Team -->
+<div class="flex items-center gap-space-sm text-left">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center p-space-xs shadow-md">
+<img class="w-9 h-9 object-contain rounded-lg" data-alt="Dynamic modern crest icon emblem for Fenerbahce football club with navy blue and yellow stripes shield style in a minimalist dark ui sports vector" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDueZDM_CWAG7w1BP26nwYJfxNUzoKO0uqvfwodO9EfhuvubN9Q6mbl5zzvwOvDbxkdoPVJhLcfA2_s3eyMD1i9f9kODUzDFwytWgXiZ442hxgS8jgj454Kklp_ehTYDSU1yLMUYcjubFc_Ak1AzcFM4xQKWkZlzQtcnUxmCXMH-VM9ejsZ2DrcSOsYYWPDuAWkbQiKzgiUAlZtS-HRLTIztEjMtv8C3EFTF6hD5pN1QrIFJhGemG_B"/>
+</div>
+<div class="flex flex-col items-start">
+<span class="font-headline-sm text-headline-sm text-on-surface tracking-tight">Fenerbahçe</span>
+<span class="font-label-caps text-label-caps text-secondary uppercase">DEPLASMAN • DERBİ</span>
+</div>
+</div>
+</div>
+<!-- Quick Actions -->
+<div class="hidden md:flex items-center gap-space-xs bg-surface-container-low p-space-xs rounded-lg">
+<button class="px-space-md py-space-xs bg-primary text-on-primary rounded-lg font-title-md text-body-sm shadow-md hover:opacity-95 transition-all flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-body-lg">sensors</span>
+              Canlı Akış
+            </button>
+<button class="px-space-md py-space-xs text-on-surface-variant hover:text-on-surface font-title-md text-body-sm rounded-lg hover:bg-surface-container-high transition-colors flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-body-lg">tune</span>
+              Filtreler
+            </button>
+</div>
+</div>
+<!-- Center / Right Telemetry Matrix -->
+<div class="grid grid-cols-2 md:grid-cols-3 gap-space-md w-full xl:w-7/12 items-center">
+<!-- xG Comparative Indicator -->
+<div class="flex flex-col bg-surface-container-low p-space-md rounded-xl col-span-2 md:col-span-1 shadow-sm">
+<div class="flex justify-between items-center mb-1">
+<span class="font-data-md text-data-md text-primary font-bold">1.84</span>
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">BEKLENEN GOL (xG)</span>
+<span class="font-data-md text-data-md text-secondary font-bold">1.12</span>
+</div>
+<div class="w-full h-2 rounded-full bg-surface-container-high overflow-hidden flex gap-1">
+<div class="h-full bg-primary rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(117,255,158,0.6)]" style="width: 62%;"></div>
+<div class="h-full bg-secondary rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(76,214,251,0.6)] ml-auto" style="width: 38%;"></div>
+</div>
+<div class="flex justify-between items-center mt-1 text-on-surface-variant font-data-sm text-data-sm">
+<span>%62 verim</span>
+<span>%38 verim</span>
+</div>
+</div>
+<!-- Possession Comparative -->
+<div class="flex flex-col bg-surface-container-low p-space-md rounded-xl shadow-sm">
+<div class="flex justify-between items-center mb-1">
+<span class="font-data-md text-data-md text-primary font-bold">%58</span>
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">TOPLA OYNAMA</span>
+<span class="font-data-md text-data-md text-secondary font-bold">%42</span>
+</div>
+<div class="w-full h-2 rounded-full bg-surface-container-high overflow-hidden flex gap-1">
+<div class="h-full bg-primary rounded-full" style="width: 58%;"></div>
+<div class="h-full bg-secondary rounded-full ml-auto" style="width: 42%;"></div>
+</div>
+<span class="text-center font-data-sm text-data-sm text-on-surface-variant mt-1">Son 10 dk: %64 - %36</span>
+</div>
+<!-- Dangerous Attacks & Real-time Momentum Wave mini -->
+<div class="flex flex-col bg-surface-container-low p-space-md rounded-xl shadow-sm">
+<div class="flex justify-between items-center mb-1">
+<span class="font-data-md text-data-md text-primary font-bold">48</span>
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">TEHLİKELİ ATAK</span>
+<span class="font-data-md text-data-md text-secondary font-bold">31</span>
+</div>
+<div class="h-6 w-full flex items-end gap-1 pt-1">
+<div class="flex-1 bg-primary/30 h-3 rounded-t"></div>
+<div class="flex-1 bg-primary/60 h-4 rounded-t"></div>
+<div class="flex-1 bg-primary h-6 rounded-t"></div>
+<div class="flex-1 bg-primary/80 h-5 rounded-t"></div>
+<div class="flex-1 bg-surface-container-high h-2 rounded-t"></div>
+<div class="flex-1 bg-secondary/50 h-3 rounded-t"></div>
+<div class="flex-1 bg-secondary/80 h-5 rounded-t"></div>
+<div class="flex-1 bg-secondary h-4 rounded-t"></div>
+<div class="flex-1 bg-primary h-6 rounded-t animate-pulse"></div>
+</div>
+<div class="flex justify-between items-center font-data-sm text-data-sm text-primary mt-1">
+<span class="flex items-center gap-0.5"><span class="material-symbols-outlined text-[13px]">bolt</span>GS Baskı Evresi</span>
+<span class="text-on-surface-variant font-label-caps">+14 Momentum</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 3-Column Dense Analytics Grid -->
+<section class="w-full px-margin grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start pb-space-xl">
+<!-- LEFT COLUMN (Approx 30% / 4 Cols on 12-col grid) -->
+<div class="lg:col-span-4 xl:col-span-3 flex flex-col gap-space-lg">
+<!-- Live Match Timeline & Event Feed -->
+<div class="bg-surface-container rounded-xl p-space-lg shadow-lg flex flex-col">
+<div class="flex items-center justify-between pb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-body-lg">format_list_bulleted</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Canlı Olay Akışı</h2>
+</div>
+<span class="font-label-caps text-label-caps bg-surface-container-high px-space-sm py-space-xs rounded-full text-on-surface-variant">Otomatik Senkron</span>
+</div>
+<!-- Live Win Probability Gauge Shift -->
+<div class="mt-space-sm mb-space-md p-space-md bg-surface-container-low rounded-lg">
+<div class="flex justify-between items-center mb-1">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">CANLI GALİBİYET OLASILIĞI</span>
+<span class="font-data-sm text-data-sm text-primary font-bold">+%14 Son 10'</span>
+</div>
+<div class="w-full h-3 bg-surface-container-high rounded-full overflow-hidden flex">
+<div class="h-full bg-primary flex items-center justify-center font-label-caps text-on-primary font-bold" style="width: 71%;">%71</div>
+<div class="h-full bg-surface-bright flex items-center justify-center font-label-caps text-on-surface text-[9px]" style="width: 19%;">%19</div>
+<div class="h-full bg-secondary flex items-center justify-center font-label-caps text-on-secondary font-bold" style="width: 10%;">%10</div>
+</div>
+<div class="flex justify-between text-on-surface-variant font-data-sm text-data-sm mt-1">
+<span class="text-primary font-semibold">GS %71</span>
+<span class="text-on-surface-variant">Beraberlik %19</span>
+<span class="text-secondary font-semibold">FB %10</span>
+</div>
+</div>
+<!-- Timeline Items -->
+<div class="space-y-space-md relative before:absolute before:inset-0 before:left-3 before:w-0.5 before:bg-surface-container-high">
+<!-- Event 1: Recent substitution -->
+<div class="relative flex items-start gap-space-md pl-1">
+<div class="z-10 w-5 h-5 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant shadow-sm">
+<span class="material-symbols-outlined text-[12px]">swap_horiz</span>
+</div>
+<div class="flex-1 bg-surface-container-low p-space-sm rounded-lg">
+<div class="flex items-center justify-between">
+<span class="font-data-md text-data-md text-primary font-bold">66'</span>
+<span class="font-label-caps text-label-caps uppercase text-secondary font-bold">FENERBAHÇE DEĞİŞİKLİK</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface mt-1">İrfan Can Kahveci ➔ Cengiz Ünder</p>
+<span class="font-data-sm text-data-sm text-on-surface-variant">Taktik: Sağ kanat hücum genişletmesi</span>
+</div>
+</div>
+<!-- Event 2: GOAL ALERT with Neon Pink -->
+<div class="relative flex items-start gap-space-md pl-1">
+<div class="z-10 w-5 h-5 rounded-full bg-tertiary-container flex items-center justify-center text-on-tertiary-container shadow-[0_0_10px_rgba(255,0,127,0.7)] animate-bounce">
+<span class="material-symbols-outlined text-[13px]">sports_soccer</span>
+</div>
+<div class="flex-1 bg-tertiary-container/10 p-space-md rounded-lg shadow-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="font-data-md text-data-md text-tertiary-container font-bold">61' GOL!</span>
+<span class="font-label-caps text-label-caps bg-tertiary-container text-on-tertiary-container px-1 rounded font-bold">CANLI TEKRAR</span>
+</div>
+<span class="font-data-sm text-data-sm text-tertiary-container font-bold">xG 0.44</span>
+</div>
+<p class="font-headline-sm text-body-lg text-on-surface font-semibold mt-1">Mauro Icardi</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Asist: Barış Alper Yılmaz (Ceza sahası yerden kesme)</p>
+<div class="mt-2 flex items-center gap-2">
+<span class="font-label-caps text-label-caps text-primary bg-surface-container px-space-xs py-0.5 rounded">Şut Hızı: 98.4 km/s</span>
+<span class="font-label-caps text-label-caps text-secondary bg-surface-container px-space-xs py-0.5 rounded">Mesafe: 10.2m</span>
+</div>
+</div>
+</div>
+<!-- Event 3: Yellow Card -->
+<div class="relative flex items-start gap-space-md pl-1">
+<div class="z-10 w-5 h-5 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant">
+<span class="w-2.5 h-3.5 bg-amber-400 rounded-xs"></span>
+</div>
+<div class="flex-1 bg-surface-container-low p-space-sm rounded-lg">
+<div class="flex items-center justify-between">
+<span class="font-data-md text-data-md text-on-surface-variant font-bold">54'</span>
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant">SARI KART</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface mt-1">Alexander Djiku (Fenerbahçe)</p>
+<span class="font-data-sm text-data-sm text-on-surface-variant">Taktik faul • Kontra atak engelleme</span>
+</div>
+</div>
+<!-- Event 4: Goal Fenerbahçe -->
+<div class="relative flex items-start gap-space-md pl-1">
+<div class="z-10 w-5 h-5 rounded-full bg-secondary flex items-center justify-center text-on-secondary shadow-[0_0_8px_rgba(76,214,251,0.5)]">
+<span class="material-symbols-outlined text-[13px]">sports_soccer</span>
+</div>
+<div class="flex-1 bg-surface-container-low p-space-sm rounded-lg">
+<div class="flex items-center justify-between">
+<span class="font-data-md text-data-md text-secondary font-bold">39' GOL</span>
+<span class="font-data-sm text-data-sm text-secondary font-bold">xG 0.28</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface font-semibold mt-1">Sebastian Szymański</p>
+<p class="font-data-sm text-data-sm text-on-surface-variant">Ceza sahası dışından sol ayak plase</p>
+</div>
+</div>
+<!-- Event 5: Goal Galatasaray -->
+<div class="relative flex items-start gap-space-md pl-1">
+<div class="z-10 w-5 h-5 rounded-full bg-primary flex items-center justify-center text-on-primary shadow-[0_0_8px_rgba(117,255,158,0.5)]">
+<span class="material-symbols-outlined text-[13px]">sports_soccer</span>
+</div>
+<div class="flex-1 bg-surface-container-low p-space-sm rounded-lg">
+<div class="flex items-center justify-between">
+<span class="font-data-md text-data-md text-primary font-bold">18' GOL</span>
+<span class="font-data-sm text-data-sm text-primary font-bold">xG 0.62</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface font-semibold mt-1">Dries Mertens</p>
+<p class="font-data-sm text-data-sm text-on-surface-variant">Dönen top tamamlandı • Direk dibi</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick League Switcher / Active Live Matches -->
+<div class="bg-surface-container rounded-xl p-space-lg shadow-lg flex flex-col">
+<div class="flex items-center justify-between pb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-body-lg">hub</span>
+<h3 class="font-title-md text-title-md text-on-surface">Diğer Canlı Maçlar</h3>
+</div>
+<span class="font-label-caps text-label-caps text-secondary uppercase font-bold">RADAR AKTİF</span>
+</div>
+<div class="space-y-space-sm mt-space-xs">
+<!-- Live Match Item 1 -->
+<div class="p-space-sm bg-surface-container-low hover:bg-surface-container-high rounded-xl transition-all cursor-pointer">
+<div class="flex justify-between items-center text-on-surface-variant mb-1">
+<span class="font-label-caps text-label-caps uppercase">UEFA ŞAMPİYONLAR LİGİ</span>
+<span class="font-label-caps text-label-caps text-tertiary-container bg-surface-container-lowest px-1.5 py-0.5 rounded font-bold">79'</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface font-semibold">Real Madrid</span>
+<span class="font-body-sm text-body-sm text-on-surface font-semibold">Manchester City</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-data-md text-data-md text-primary font-bold">2 - 1</span>
+<span class="font-data-sm text-data-sm text-secondary">xG 1.84 - 1.62</span>
+</div>
+</div>
+</div>
+<!-- Live Match Item 2 -->
+<div class="p-space-sm bg-surface-container-low hover:bg-surface-container-high rounded-xl transition-all cursor-pointer">
+<div class="flex justify-between items-center text-on-surface-variant mb-1">
+<span class="font-label-caps text-label-caps uppercase">PREMIER LİG</span>
+<span class="font-label-caps text-label-caps text-tertiary-container bg-surface-container-lowest px-1.5 py-0.5 rounded font-bold">52'</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface font-semibold">Arsenal</span>
+<span class="font-body-sm text-body-sm text-on-surface font-semibold">Chelsea</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-data-md text-data-md text-on-surface font-bold">1 - 0</span>
+<span class="font-data-sm text-data-sm text-secondary">xG 0.94 - 0.41</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- CENTER COLUMN (Approx 45% / 5.5 Cols on 12-col grid) -->
+<div class="lg:col-span-8 xl:col-span-6 flex flex-col gap-space-lg">
+<!-- Interactive Football Pitch & Shot / xG Heatmap -->
+<div class="bg-surface-container rounded-xl p-space-lg shadow-xl relative overflow-hidden flex flex-col">
+<!-- Pitch Card Header -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm pb-space-md">
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-body-lg">stadium</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Saha İçi Şut &amp; xG Isı Haritası</h2>
+</div>
+<span class="font-data-sm text-data-sm text-on-surface-variant">Hücum Yönü: GS (Soldan Sağa) ➔ | 14 Toplam Şut</span>
+</div>
+<!-- Shot Legend Pills -->
+<div class="flex items-center gap-space-xs flex-wrap">
+<div class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded-lg">
+<span class="w-3 h-3 rounded-full bg-primary shadow-[0_0_6px_rgba(117,255,158,0.7)]"></span>
+<span class="font-label-caps text-label-caps text-on-surface">GS Gol/İsabet</span>
+</div>
+<div class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded-lg">
+<span class="w-3 h-3 rounded-full bg-secondary shadow-[0_0_6px_rgba(76,214,251,0.7)]"></span>
+<span class="font-label-caps text-label-caps text-on-surface">FB İsabet</span>
+</div>
+<div class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded-lg">
+<span class="w-3 h-3 rounded-full bg-tertiary-container shadow-[0_0_6px_rgba(255,0,127,0.7)]"></span>
+<span class="font-label-caps text-label-caps text-on-surface">İsabetsiz / Blok</span>
+</div>
+</div>
+</div>
+<!-- The Pitch Canvas Graphic Container -->
+<div class="relative w-full aspect-[16/10] bg-[#101935] rounded-xl overflow-hidden shadow-inner flex items-center justify-center p-2">
+<!-- Tactical Pitch SVG Background Markings -->
+<svg class="absolute inset-0 w-full h-full text-surface-container-highest/70" fill="none" viewbox="0 0 1000 640" xmlns="http://www.w3.org/2000/svg">
+<!-- Grass stripes effect -->
+<rect fill="#0c152d" height="640" width="1000"></rect>
+<rect fill="#0f1936" height="640" opacity="0.6" width="100" x="100"></rect>
+<rect fill="#0f1936" height="640" opacity="0.6" width="100" x="300"></rect>
+<rect fill="#0f1936" height="640" opacity="0.6" width="100" x="500"></rect>
+<rect fill="#0f1936" height="640" opacity="0.6" width="100" x="700"></rect>
+<rect fill="#0f1936" height="640" opacity="0.6" width="100" x="900"></rect>
+<!-- Outer Pitch Boundary -->
+<rect height="580" stroke="currentColor" stroke-width="2" width="920" x="40" y="30"></rect>
+<!-- Half-way line -->
+<line stroke="currentColor" stroke-width="2" x1="500" x2="500" y1="30" y2="610"></line>
+<!-- Center Circle & Spot -->
+<circle cx="500" cy="320" r="75" stroke="currentColor" stroke-width="2"></circle>
+<circle cx="500" cy="320" fill="currentColor" r="4"></circle>
+<!-- Left Penalty Area (GS Defense / FB Attack) -->
+<rect height="320" stroke="currentColor" stroke-width="2" width="150" x="40" y="160"></rect>
+<rect height="160" stroke="currentColor" stroke-width="2" width="55" x="40" y="240"></rect>
+<path d="M 190 270 A 70 70 0 0 1 190 370" stroke="currentColor" stroke-width="2"></path>
+<circle cx="140" cy="320" fill="currentColor" r="4"></circle>
+<rect height="80" stroke="currentColor" stroke-width="2" width="15" x="25" y="280"></rect>
+<!-- Right Penalty Area (FB Defense / GS Attack) -->
+<rect height="320" stroke="currentColor" stroke-width="2" width="150" x="810" y="160"></rect>
+<rect height="160" stroke="currentColor" stroke-width="2" width="55" x="905" y="240"></rect>
+<path d="M 810 270 A 70 70 0 0 0 810 370" stroke="currentColor" stroke-width="2"></path>
+<circle cx="860" cy="320" fill="currentColor" r="4"></circle>
+<rect height="80" stroke="currentColor" stroke-width="2" width="15" x="960" y="280"></rect>
+<!-- Corner arcs -->
+<path d="M 40 45 A 15 15 0 0 1 55 30" stroke="currentColor" stroke-width="2"></path>
+<path d="M 40 595 A 15 15 0 0 0 55 610" stroke="currentColor" stroke-width="2"></path>
+<path d="M 960 45 A 15 15 0 0 0 945 30" stroke="currentColor" stroke-width="2"></path>
+<path d="M 960 595 A 15 15 0 0 1 945 610" stroke="currentColor" stroke-width="2"></path>
+</svg>
+<!-- Heatmap Density Patches (Overlay Radial Blur) -->
+<div class="absolute right-[12%] top-[34%] w-44 h-36 bg-primary/20 rounded-full blur-2xl pointer-events-none"></div>
+<div class="absolute right-[22%] top-[40%] w-36 h-28 bg-secondary/15 rounded-full blur-2xl pointer-events-none"></div>
+<div class="absolute left-[10%] top-[45%] w-32 h-24 bg-tertiary-container/15 rounded-full blur-xl pointer-events-none"></div>
+<!-- Interactive Shot Markers layer -->
+<div class="absolute inset-0 p-4">
+<!-- GS Goal 1 (Mertens 18') xG 0.62 -->
+<div class="absolute right-[11%] top-[50%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer">
+<div class="w-8 h-8 rounded-full bg-primary/30 flex items-center justify-center animate-ping absolute"></div>
+<div class="relative w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-data-sm text-data-sm font-bold shadow-[0_0_14px_#75ff9e]">
+                18'
+              </div>
+<div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:flex flex-col bg-surface-container-highest px-space-md py-space-xs rounded-lg shadow-xl pointer-events-none z-20 whitespace-nowrap">
+<span class="font-headline-sm text-body-sm text-primary">Dries Mertens • GOL</span>
+<span class="font-data-sm text-data-sm text-on-surface">xG Değeri: 0.62 • Sağ Ayak</span>
+</div>
+</div>
+<!-- GS Goal 2 (Icardi 61') xG 0.44 -->
+<div class="absolute right-[9%] top-[42%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer">
+<div class="w-7 h-7 rounded-full bg-primary/40 flex items-center justify-center animate-pulse absolute"></div>
+<div class="relative w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center font-data-sm text-data-sm font-bold shadow-[0_0_12px_#75ff9e]">
+                61'
+              </div>
+<div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:flex flex-col bg-surface-container-highest px-space-md py-space-xs rounded-lg shadow-xl pointer-events-none z-20 whitespace-nowrap">
+<span class="font-headline-sm text-body-sm text-primary">Mauro Icardi • GOL</span>
+<span class="font-data-sm text-data-sm text-on-surface">xG Değeri: 0.44 • Kafa Vuruşu</span>
+</div>
+</div>
+<!-- GS On-target Shot (Barış Alper 34') xG 0.22 -->
+<div class="absolute right-[19%] top-[30%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer">
+<div class="w-5 h-5 rounded-full bg-primary text-on-primary flex items-center justify-center font-data-sm text-[10px] font-bold shadow-[0_0_8px_#75ff9e]">
+                34'
+              </div>
+<div class="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 hidden group-hover:flex flex-col bg-surface-container-highest px-space-sm py-1 rounded text-center shadow-lg pointer-events-none z-20 whitespace-nowrap">
+<span class="font-body-sm text-body-sm text-on-surface">Barış Alper (Kurtarış) xG 0.22</span>
+</div>
+</div>
+<!-- FB Goal (Szymanski 39') xG 0.28 -->
+<div class="absolute left-[24%] top-[44%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer">
+<div class="w-7 h-7 rounded-full bg-secondary/40 flex items-center justify-center animate-ping absolute"></div>
+<div class="relative w-7 h-7 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-data-sm text-data-sm font-bold shadow-[0_0_12px_#4cd6fb]">
+                39'
+              </div>
+<div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:flex flex-col bg-surface-container-highest px-space-md py-space-xs rounded-lg shadow-xl pointer-events-none z-20 whitespace-nowrap">
+<span class="font-headline-sm text-body-sm text-secondary">Sebastian Szymański • GOL</span>
+<span class="font-data-sm text-data-sm text-on-surface">xG Değeri: 0.28 • Ceza Sahası Dışı</span>
+</div>
+</div>
+<!-- FB On-target Shot (Tadic 47') xG 0.31 -->
+<div class="absolute left-[13%] top-[36%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer">
+<div class="w-5 h-5 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-data-sm text-[10px] font-bold shadow-[0_0_8px_#4cd6fb]">
+                47'
+              </div>
+<div class="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 hidden group-hover:flex flex-col bg-surface-container-highest px-space-sm py-1 rounded shadow-lg pointer-events-none z-20 whitespace-nowrap">
+<span class="font-body-sm text-body-sm text-on-surface">Dušan Tadić (Kurtarış) xG 0.31</span>
+</div>
+</div>
+<!-- Missed Shot (GS Kerem Demirbay 51') Pink Dot -->
+<div class="absolute right-[25%] top-[60%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer">
+<div class="w-4 h-4 rounded-full bg-tertiary-container text-on-tertiary-container flex items-center justify-center font-data-sm text-[9px] font-bold shadow-[0_0_8px_#ffb4c6]">
+                51'
+              </div>
+<div class="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 hidden group-hover:flex flex-col bg-surface-container-highest px-space-sm py-1 rounded shadow-lg pointer-events-none z-20 whitespace-nowrap">
+<span class="font-body-sm text-body-sm text-on-surface">Kerem D. (Dışarı) xG 0.11</span>
+</div>
+</div>
+<!-- Missed Shot (FB Dzeko 64') Pink Dot -->
+<div class="absolute left-[10%] top-[55%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer">
+<div class="w-4 h-4 rounded-full bg-tertiary-container text-on-tertiary-container flex items-center justify-center font-data-sm text-[9px] font-bold shadow-[0_0_8px_#ffb4c6]">
+                64'
+              </div>
+<div class="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 hidden group-hover:flex flex-col bg-surface-container-highest px-space-sm py-1 rounded shadow-lg pointer-events-none z-20 whitespace-nowrap">
+<span class="font-body-sm text-body-sm text-on-surface">Edin Džeko (Blok) xG 0.19</span>
+</div>
+</div>
+</div>
+<!-- Bottom Micro Pitch Status Overlay -->
+<div class="absolute bottom-3 left-4 right-4 flex items-center justify-between pointer-events-none bg-surface-container-lowest/80 backdrop-blur-md px-space-md py-1 rounded-lg">
+<span class="font-label-caps text-label-caps text-on-surface-variant">ÖN ALAN BASKI ŞİDDETİ: <strong class="text-primary">YÜKSEK (%78)</strong></span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">CEZA SAHASI BULUŞMA: <strong class="text-primary">GS 22</strong> - <strong class="text-secondary">FB 11</strong></span>
+</div>
+</div>
+<!-- Pressure & Momentum Wave Chart (53' - 68') -->
+<div class="mt-space-lg bg-surface-container-low p-space-md rounded-xl">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-body-md">show_chart</span>
+<span class="font-title-md text-body-sm text-on-surface">Canlı Momentum Dalga Grafiği (Son 15 Dakika)</span>
+</div>
+<div class="flex items-center gap-space-md">
+<span class="font-label-caps text-label-caps text-primary uppercase font-bold">• GALATASARAY DOMİNASYONU</span>
+<span class="font-data-sm text-data-sm text-on-surface-variant">53' - 68'</span>
+</div>
+</div>
+<!-- SVG Wave Momentum Visualizer -->
+<div class="w-full h-24 relative overflow-hidden bg-surface-container-lowest rounded-lg p-1">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 500 100">
+<!-- Center Axis (Neutral Pressure) -->
+<line stroke="#2c344d" stroke-dasharray="4 4" stroke-width="1.5" x1="0" x2="500" y1="50" y2="50"></line>
+<!-- Shaded Areas -->
+<!-- GS Area (Top side positive) -->
+<polygon fill="rgba(117, 255, 158, 0.15)" points="0,50 30,42 70,35 120,48 160,25 210,18 260,12 320,15 370,45 420,20 470,10 500,12 500,50"></polygon>
+<!-- FB Area (Bottom side negative) -->
+<polygon fill="rgba(76, 214, 251, 0.18)" points="120,50 140,65 160,50 350,50 370,72 390,68 410,50"></polygon>
+<!-- Momentum Stroke Line -->
+<path d="M 0 50 Q 30 40, 70 35 T 120 50 T 140 68 T 160 30 T 210 20 T 260 12 T 320 18 T 370 70 T 420 22 T 470 10 T 500 12" fill="none" stroke="#75ff9e" stroke-width="2.5"></path>
+<!-- Event Pins on Wave -->
+<!-- Goal Pin at 260px (61' mark) -->
+<circle cx="260" cy="12" fill="#ffb4c6" r="4" stroke="#0a122a" stroke-width="2"></circle>
+<!-- Live Pin at 500px -->
+<circle cx="496" cy="12" fill="#75ff9e" r="4" stroke="#0a122a" stroke-width="2"></circle>
+</svg>
+<div class="absolute top-1 left-2 font-label-caps text-[9px] text-primary font-bold">EV SAHİBİ BASKISI (+82)</div>
+<div class="absolute bottom-1 left-2 font-label-caps text-[9px] text-secondary font-bold">DEPLASMAN BASKISI (-45)</div>
+<div class="absolute top-1 right-2 font-data-sm text-data-sm text-tertiary-container font-bold flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-tertiary-container animate-ping"></span> 61' Icardi Golü
+            </div>
+</div>
+</div>
+<!-- Real-Time AI Tactical Coach Tip Box -->
+<div class="mt-space-md p-space-md bg-surface-container-high rounded-xl flex items-start gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-tint/20 flex items-center justify-center shrink-0 text-primary shadow-sm">
+<span class="material-symbols-outlined text-headline-sm">psychology</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<span class="font-headline-sm text-body-sm text-primary font-bold">Yapay Zeka Taktik Motoru Analizi</span>
+<span class="font-data-sm text-data-sm text-on-surface-variant">Öneri #104 • Doğruluk %89</span>
+</div>
+<p class="font-body-md text-body-sm text-on-surface mt-1 leading-relaxed">
+              Fenerbahçe sol bekinin derinlik kaybı, Galatasaray sağ iç koşularına <strong class="text-primary">1.34 xG potansiyeli</strong> açıyor. Okan Buruk ekibi, ceza yayına indirilen 2. toplarda %73 sahipsiz top kazanma oranına ulaştı. 70-80' arası 3. gol ihtimali %61.
+            </p>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN (Approx 25% / 3 Cols on 12-col grid) -->
+<div class="lg:col-span-12 xl:col-span-3 flex flex-col gap-space-lg">
+<!-- In-Game Player Tracking Widget -->
+<div class="bg-surface-container rounded-xl p-space-lg shadow-lg flex flex-col">
+<div class="flex items-center justify-between pb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-body-lg">person_pin</span>
+<h3 class="font-title-md text-title-md text-on-surface">Maçın Yıldızı Takibi</h3>
+</div>
+<span class="font-data-sm text-data-sm text-primary font-bold">8.7 Puan</span>
+</div>
+<!-- Spotlight Player Card -->
+<div class="flex items-center gap-space-md p-space-sm bg-surface-container-low rounded-xl">
+<img class="w-14 h-14 rounded-xl object-cover shadow-md" data-alt="Dynamic portrait photo of Mauro Icardi football striker in dark match lighting with dramatic stadium spotlights and serious intense sports expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIEopfNpqNk5EnByLc3Nv_io8TJpeknFsYtALK7cX0Acm_7tLMnZLgBETI10bLiSGQfFP8Gi-YcUnN796PScytiAymGkHQLuCP2LQqhoOuu4bm3Dolq5Guu5w5m10RAkzLAzc_5wYc65DsGyYoANvBgPsY2MrxY97BWbJJNZGlSeM5YQ-TBaBmoQ3JGtxr1VOLyecOLv2dMK7HMPCCdgQ9C7UhfkvYSuvyvZFyV_z4LK-Nq5jub5BY"/>
+<div class="flex flex-col">
+<div class="flex items-center gap-1">
+<span class="font-headline-sm text-body-lg text-on-surface font-semibold">Mauro Icardi</span>
+<span class="material-symbols-outlined text-primary text-body-md" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">GALATASARAY • FORVET (#9)</span>
+<div class="flex items-center gap-2 mt-1">
+<span class="font-label-caps text-label-caps bg-primary/20 text-primary px-1.5 py-0.5 rounded font-bold">1 Gol</span>
+<span class="font-label-caps text-label-caps bg-surface-container-high text-on-surface-variant px-1.5 py-0.5 rounded">xG 0.88</span>
+<span class="font-label-caps text-label-caps bg-surface-container-high text-on-surface-variant px-1.5 py-0.5 rounded">3 Şut</span>
+</div>
+</div>
+</div>
+<!-- Key Player Metrics Bar -->
+<div class="space-y-space-sm mt-space-md">
+<div>
+<div class="flex justify-between font-data-sm text-data-sm mb-1">
+<span class="text-on-surface-variant">Pas İsabeti (18/21)</span>
+<span class="text-on-surface font-semibold">%86</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 86%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-data-sm text-data-sm mb-1">
+<span class="text-on-surface-variant">İkili Mücadele Başarısı (6/8)</span>
+<span class="text-on-surface font-semibold">%75</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-secondary rounded-full" style="width: 75%;"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-data-sm text-data-sm mb-1">
+<span class="text-on-surface-variant">Rakip Ceza Sahası Topla Buluşma</span>
+<span class="text-primary font-semibold">9 Kez</span>
+</div>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 90%;"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- AI Micro-Predictions & Quick Lock Slip -->
+<div class="bg-surface-container rounded-xl p-space-lg shadow-lg flex flex-col">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-tertiary-container text-body-lg">flash_on</span>
+<h3 class="font-title-md text-title-md text-on-surface">Anlık Tahmin Pazarı</h3>
+</div>
+<span class="font-label-caps text-label-caps text-tertiary-container bg-surface-container-lowest px-1.5 py-0.5 rounded font-bold">CANLI 68'</span>
+</div>
+<p class="font-data-sm text-data-sm text-on-surface-variant mb-space-md">Yapay zeka telemetri motoru olasılık oranları</p>
+<!-- Prediction 1 -->
+<div class="p-space-md bg-surface-container-low rounded-xl mb-space-sm flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps uppercase text-primary font-bold">YÜKSEK İHTİMAL</span>
+<span class="font-data-md text-data-md text-primary font-bold">%74 İhtimal</span>
+</div>
+<span class="font-title-md text-body-sm text-on-surface">Galatasaray 2.5 Üst Toplam xG Üretimi</span>
+<div class="flex items-center justify-between mt-space-xs pt-space-xs">
+<span class="font-data-sm text-data-sm text-on-surface-variant">Mevcut xG: 1.84</span>
+<button class="px-space-md py-1 bg-primary text-on-primary rounded-lg font-title-md text-body-sm hover:opacity-90 transition-opacity shadow-sm flex items-center gap-1">
+<span>Kilitle</span>
+<span class="font-data-sm font-bold">+50 TP</span>
+</button>
+</div>
+</div>
+<!-- Prediction 2 -->
+<div class="p-space-md bg-surface-container-low rounded-xl flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps uppercase text-secondary font-bold">MİKRO TAHMİN (70-80')</span>
+<span class="font-data-md text-data-md text-secondary font-bold">%56 İhtimal</span>
+</div>
+<span class="font-title-md text-body-sm text-on-surface">Sıradaki Korner: Fenerbahçe</span>
+<div class="flex items-center justify-between mt-space-xs pt-space-xs">
+<span class="font-data-sm text-data-sm text-on-surface-variant">FB Hücum Baskısı: +31</span>
+<button class="px-space-md py-1 bg-secondary text-on-secondary rounded-lg font-title-md text-body-sm hover:opacity-90 transition-opacity shadow-sm flex items-center gap-1">
+<span>Kilitle</span>
+<span class="font-data-sm font-bold">+35 TP</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Live Community Consensus Poll -->
+<div class="bg-surface-container rounded-xl p-space-lg shadow-lg flex flex-col">
+<div class="flex items-center justify-between pb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-body-lg">how_to_vote</span>
+<h3 class="font-title-md text-title-md text-on-surface">Tribün Konsensüsü</h3>
+</div>
+<span class="font-data-sm text-data-sm text-on-surface-variant">24,810 Oy</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface mt-1 mb-space-md">Bu derbi nasıl sonuçlanacak?</p>
+<!-- Segment Interactive Choices -->
+<div class="grid grid-cols-3 gap-space-xs mb-space-sm">
+<button class="py-space-sm px-1 rounded-xl bg-surface-container-high hover:bg-surface-container-highest transition-all flex flex-col items-center">
+<span class="font-headline-sm text-body-sm text-primary font-bold">GS Kazanır</span>
+<span class="font-data-md text-data-md text-on-surface mt-0.5">%62</span>
+</button>
+<button class="py-space-sm px-1 rounded-xl bg-surface-container-high hover:bg-surface-container-highest transition-all flex flex-col items-center">
+<span class="font-headline-sm text-body-sm text-on-surface font-bold">Beraberlik</span>
+<span class="font-data-md text-data-md text-on-surface mt-0.5">%24</span>
+</button>
+<button class="py-space-sm px-1 rounded-xl bg-surface-container-high hover:bg-surface-container-highest transition-all flex flex-col items-center">
+<span class="font-headline-sm text-body-sm text-secondary font-bold">FB Çevirir</span>
+<span class="font-data-md text-data-md text-on-surface mt-0.5">%14</span>
+</button>
+</div>
+<!-- Mini distribution bar -->
+<div class="w-full h-2 rounded-full bg-surface-container-lowest overflow-hidden flex">
+<div class="h-full bg-primary" style="width: 62%;"></div>
+<div class="h-full bg-surface-bright" style="width: 24%;"></div>
+<div class="h-full bg-secondary" style="width: 14%;"></div>
+</div>
+</div>
+<!-- Match Editor Tactical Notes Pin -->
+<div class="bg-surface-container rounded-xl p-space-lg shadow-lg flex flex-col">
+<div class="flex items-center justify-between pb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-body-lg">push_pin</span>
+<h3 class="font-title-md text-title-md text-on-surface">Baş Analist Notu</h3>
+</div>
+<span class="font-label-caps text-label-caps text-primary uppercase font-bold">CANLI 64'</span>
+</div>
+<div class="flex items-center gap-space-sm mb-space-sm">
+<img alt="Mert Vural Analist" class="w-7 h-7 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1U0sK4HYIM6jxxpSlvZCPq5ZRyZLJU0Tf3V5iT5VdGKT7XEGSbD34DLCWZC5saWGzIEbO13bju4htwolM2dSWp1UzzfyXgTFKp-MaHpT9iQOMnBMpvgvm0CQP1rA87lo5kSkp7aCEY89BMzOOxBKGGNoNStirUPg_67MK-swuKvulwsPSsmFfYdVgbxM7jwzww1xEfyrsNRWANUy5hKvzBQ3nz0RkGzkznjgB0etmbsXavyrJJMq6W08UM"/>
+<div class="flex flex-col">
+<span class="font-body-sm text-body-sm text-on-surface font-bold">Mert Vural</span>
+<span class="font-label-caps text-[9px] text-on-surface-variant uppercase">Kıdemli Taktik Editörü</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-normal">
+          "Fenerbahçe geriye düştükten sonra hat boyunu 48 metreye genişletti. Torreira ve Kerem Demirbay orta sahayı 3'e 2 karşılayarak geçiş koridorlarını tıkıyor. Cengiz'in girişiyle sağ çizgiye inme planı belirginleşecek."
+        </p>
+</div>
+</div>
+</section>
+</div></main><footer class="w-full bg-surface-container-lowest mt-space-xl py-space-xl"><div class="w-full px-margin flex flex-col md:flex-row items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm"><img alt="PitchPulse Logo" class="h-6 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UbwqjR9KDTJAYGg1GQHoCG4gvyAIMdKc3_B2d8GwAd7lVAgNfSF4AinUefvK04xspVCVxTCXDt3NSg5Z_owTlObhKHTq7o6RlzbOTGeRJXtRQUuTqBJGHjG4j85n_456Cn1Bi2W5Zb8VmdoZ4nzhPqP2pH1BxahayFsaHvZdUlm6BPlk9E2AcnkzQ-O5rd4vgIFa-2mdTFLF6hW-URwWEEnA-Mmeu1Z0KmTlAgTuS2g2rRfpyLIMk6N7c"/><span class="font-title-md text-body-md text-on-surface-variant">© 2025 PitchPulse Veri ve İstatistik A.Ş. Tüm hakları saklıdır.</span></div><div class="flex items-center gap-space-lg text-on-surface-variant font-body-sm text-body-sm"><a class="hover:text-on-surface transition-colors" href="#">Veri Sağlayıcıları &amp; Metodoloji</a><a class="hover:text-on-surface transition-colors" href="#">API Lisansları</a><a class="hover:text-on-surface transition-colors" href="#">Gizlilik Politikası</a><a class="hover:text-on-surface transition-colors" href="#">Destek Masası</a></div><div class="flex items-center gap-space-xs text-on-surface-variant font-data-sm text-data-sm"><span class="w-2 h-2 rounded-full bg-primary"></span><span>Gecikme: 18ms • Model v4.8</span></div></div></footer></body></html>

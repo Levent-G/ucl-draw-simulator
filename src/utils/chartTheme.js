@@ -27,9 +27,11 @@ export const POSITION_COLORS = {
   FW: CHART_SERIES[1],
 };
 
-export const CHART_GRID = "rgba(255, 255, 255, 0.09)";
-export const CHART_AXIS = "#9db2e6";
-export const CHART_SURFACE = "#0d1c48";
+// Açık temaya geçişte (2026-09-19) bu üçü koyu zemine göre ayarlanmıştı --
+// artık açık paneller üzerinde çiziliyorlar, bu yüzden ters çevrildi.
+export const CHART_GRID = "rgba(11, 19, 43, 0.12)";
+export const CHART_AXIS = "#4b5876";
+export const CHART_SURFACE = "#f6f8fc";
 
 // Klasik futbol analiz ısı haritası paleti (termal kamera tarzı): düşük
 // yoğunlukta saydam, yükseldikçe mavi -> yeşil -> sarı -> kırmızıya döner.

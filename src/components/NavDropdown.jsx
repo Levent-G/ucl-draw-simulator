@@ -1,41 +1,29 @@
-import React, { useEffect, useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import React from "react";
+import { NavLink } from "react-router-dom";
 
 // Sol menüdeki (Sidebar.jsx) açılır-kapanır bölüm -- UCL/Süper Lig'in kendi
 // alt sayfaları (Fikstür/İstatistik/Karşılıklı Geçmiş/Haberler) VE "Diğer"
-// için kullanılır. Bir üst satırda AYRI bir menü yerine, sol menüde tıklayınca
-// altına açılan (akordeon) bir bölüm -- kullanıcı geri bildirimi: "menü
-// solda olsun, ucl menüsü dropdown ile açılsın".
-export default function NavDropdown({ label, icon, items }) {
-  const location = useLocation();
-
-  const isActive = items.some((item) => {
-    if (!item.to) return false;
-    return item.end ? location.pathname === item.to : location.pathname.startsWith(item.to);
-  });
-
-  const [open, setOpen] = useState(isActive);
-
-  // İçindeki bir sayfaya başka bir yerden geçildiğinde (ör. arama kutusundan)
-  // bölüm otomatik açılsın -- aktif linkin kapalı bir akordeonun içinde
-  // "kaybolmaması" için.
-  useEffect(() => {
-    if (isActive) setOpen(true);
-  }, [isActive]);
-
+// için kullanılır. Açık/kapalı durumu artık BURADA değil, Sidebar.jsx'te
+// (tek bir "hangisi açık" state'i olarak) tutuluyor -- kullanıcı geri
+// bildirimi: "çok fazla alt menü açık kalıyor, karışık" -- eskiden her
+// dropdown kendi state'ini tutuyordu ve bir kez açılan ASLA kendiliğinden
+// kapanmıyordu, bu yüzden UCL'ye VE Süper Lig'e uğrayan biri ikisini de
+// sürekli açık görüyordu. Artık gerçek bir akordeon: aynı anda en fazla BİR
+// bölüm açık.
+export default function NavDropdown({ label, icon, items, isActive, isOpen, onToggle }) {
   return (
-    <div className={`sidebar-dropdown ${open ? "open" : ""}`}>
+    <div className={`sidebar-dropdown ${isOpen ? "open" : ""}`}>
       <button
         type="button"
         className={`sidebar-link sidebar-dropdown-trigger ${isActive ? "active" : ""}`}
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
+        onClick={onToggle}
+        aria-expanded={isOpen}
       >
         <span className="sidebar-link-icon">{icon}</span>
         <span className="sidebar-link-label">{label}</span>
         <span className="sidebar-dropdown-caret" aria-hidden="true">▾</span>
       </button>
-      {open && (
+      {isOpen && (
         <div className="sidebar-dropdown-panel">
           {items.map((item) =>
             item.onClick ? (

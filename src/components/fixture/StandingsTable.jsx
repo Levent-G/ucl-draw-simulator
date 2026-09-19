@@ -77,13 +77,13 @@ export default function StandingsTable({
                         </span>
                       </Link>
                     ) : (
-                      <>
+                      <span className="standings-team-link">
                         <Crest team={team} size={18} />
                         <span>
                           {team.name}
                           {isFavorite && <span className="favorite-star" title="Tuttuğun takım">⭐</span>}
                         </span>
-                      </>
+                      </span>
                     )}
                   </td>
                   <td>{s.played}</td>

@@ -194,8 +194,10 @@ function SuperLigLive() {
                   <tr key={row.teamName}>
                     <td style={{ textAlign: "center" }}>{row.rank}</td>
                     <td className="standings-team-cell">
-                      {team && <Crest team={team} size={18} />}
-                      <span>{row.teamName}</span>
+                      <span className="standings-team-link">
+                        {team && <Crest team={team} size={18} />}
+                        <span>{row.teamName}</span>
+                      </span>
                     </td>
                     <td style={{ textAlign: "center" }}>{row.played}</td>
                     <td style={{ textAlign: "center" }}>{row.w}</td>

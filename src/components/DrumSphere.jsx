@@ -14,7 +14,7 @@ const BALL_POSITIONS = [
 // çekilmeden hemen önce beliriyor, toplar karışıyor, top çekiliyor,
 // sonra kayboluyor (yerini PaperReveal'e bırakıyor).
 export default function DrumSphere({ visible, activePot, pickSignal }) {
-  const potColor = POT_COLORS[activePot]?.main || '#5b9dff'
+  const potColor = POT_COLORS[activePot]?.main || '#00b4d8'
 
   return (
     <div className={`sphere-reveal-backdrop ${visible ? 'show' : ''}`}>

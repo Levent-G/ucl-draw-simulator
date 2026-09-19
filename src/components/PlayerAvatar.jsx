@@ -13,7 +13,7 @@ function initials(name) {
 
 export default function PlayerAvatar({ player, size = 34 }) {
   if (!player) return null;
-  const color = POSITION_COLORS[player.position] || "#5468ff";
+  const color = POSITION_COLORS[player.position] || "#00c46a";
   return (
     <span
       className="player-avatar"

@@ -12,6 +12,8 @@ import { getEuropaPlayersByTeam, getAllEuropaPlayers } from "./europaPlayers.js"
 import { SUPER_LIG_TEAMS, SUPER_LIG_COUNTRY_NAMES } from "./superLigTeams.js";
 import { getSuperLigPlayersByTeam, getAllSuperLigPlayers } from "./superLigPlayers.js";
 import { buildSwissZones, buildLeagueZones } from "../utils/predictionEngine.js";
+import UCL_LOGO from "../assets/logos/uefa-champions-league-ball.png";
+import SUPERLIG_LOGO from "../assets/logos/superlig-icon.png";
 
 export const COMPETITIONS = {
   ucl: {
@@ -19,6 +21,10 @@ export const COMPETITIONS = {
     name: "UEFA Şampiyonlar Ligi",
     shortName: "UCL",
     tagline: "İsviçre Modeli · Lig Fazı",
+    // Kullanıcı isteği: kura çekimi ekranındaki (bkz. StartOrb.jsx) UCL
+    // amblemi artık menü/ana sayfa gibi HER yerde tutarlıca kullanılıyor --
+    // aynı dosya, tek bir kaynak.
+    logo: UCL_LOGO,
     format: "swiss",
     teams: TEAMS,
     countryNames: COUNTRY_NAMES,
@@ -51,6 +57,12 @@ export const COMPETITIONS = {
     name: "Trendyol Süper Lig",
     shortName: "Süper Lig",
     tagline: "Çift Devreli Lig",
+    // Kullanıcının kendi sağladığı resmi Trendyol Süper Lig amblemi (bkz.
+    // public/icons/trendyol-super-lig-dikey-logo.png -- dikey tam logodan
+    // sadece amblem kısmı kırpılıp src/assets/logos/superlig-icon.png'ye
+    // kaydedildi, "trendyol"/"SüperLig" yazısı olmadan, UCL topuyla aynı
+    // "sadece amblem" deseniyle tutarlı olsun diye).
+    logo: SUPERLIG_LOGO,
     format: "league",
     teams: SUPER_LIG_TEAMS,
     countryNames: SUPER_LIG_COUNTRY_NAMES,

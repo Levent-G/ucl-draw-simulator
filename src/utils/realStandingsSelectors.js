@@ -33,6 +33,7 @@ import {
 import { TEAM_DOMESTIC_FORM } from "../data/teamDomesticForm.js";
 import { HEAD_TO_HEAD } from "../data/headToHead.js";
 import { NEWS_ITEMS } from "../data/news.js";
+import { CURRENT_INJURIES } from "../data/injuries.js";
 
 // "ucl"/"superlig" için gerçek veri desteği var mı? (europa henüz yok --
 // gerçek kaynağı olmadığından eski simülasyon-öncelikli akışında kalıyor.)
@@ -111,7 +112,14 @@ export function getSuperLigStandings() {
       };
     })
     .filter(Boolean);
-  return { standings, asOf: SUPER_LIG_LIVE_ASOF, fixture: getRealFixture("superlig") };
+  // NOT: getUclLeaguePhaseStandings() bir `started` alanı döner ama bu
+  // fonksiyon eskiden dönmüyordu -- bu yüzden HomePage.jsx'teki
+  // RealCompetitionCard (ve CompetitionAnalyticsPreview) `started` her zaman
+  // undefined/falsy olduğu için Süper Lig'de GERÇEKTE haftalarca maç
+  // oynanmış olsa bile SÜREKLİ "sezona hazır, ilk maçlar yakında" yazan
+  // placeholder'ı gösteriyordu. Düzeltildi.
+  const started = standings.some((s) => s.played > 0);
+  return { standings, started, asOf: SUPER_LIG_LIVE_ASOF, fixture: getRealFixture("superlig") };
 }
 
 export function getRealStandings(competitionKey) {
@@ -169,6 +177,76 @@ function h2hKey(teamIdA, teamIdB) {
 // göstermeli, ASLA uydurma bir geçmiş üretmemeli.
 export function getHeadToHead(teamIdA, teamIdB) {
   return HEAD_TO_HEAD[h2hKey(teamIdA, teamIdB)] || null;
+}
+
+// İki takımın gerçek ikili geçmişinden (varsa) MEVCUT maçın ev/deplasman
+// yönüne göre yeniden yönlendirilmiş zengin istatistikler çıkarır --
+// HEAD_TO_HEAD'teki "summary" alanı sadece alfabetik id sırasına göre
+// kazanma sayısı tutar (yöne bağlı değil); bu fonksiyon ise "homeTeam"
+// (bu spesifik maçtaki ev sahibi) açısından galibiyet/gol/BTTS/2.5 üstü
+// istatistiklerini `meetings` dizisindeki her karşılaşmayı takım ADINA göre
+// yeniden eşleyerek hesaplar. h2h verisi yoksa null döner -- ARAYÜZ BUNU
+// ASLA UYDURMA BİR İSTATİSTİKLE DOLDURMAMALI.
+export function getHeadToHeadStats(homeTeam, awayTeam) {
+  const h2h = getHeadToHead(homeTeam.id, awayTeam.id);
+  if (!h2h || !h2h.meetings?.length) return null;
+  let homeWins = 0;
+  let draws = 0;
+  let awayWins = 0;
+  let homeGoals = 0;
+  let awayGoals = 0;
+  let btts = 0;
+  let over25 = 0;
+  for (const m of h2h.meetings) {
+    const homeTeamWasFirst = m.homeTeam === homeTeam.name;
+    const homeSideGoals = homeTeamWasFirst ? m.homeGoals : m.awayGoals;
+    const awaySideGoals = homeTeamWasFirst ? m.awayGoals : m.homeGoals;
+    homeGoals += homeSideGoals;
+    awayGoals += awaySideGoals;
+    if (homeSideGoals > awaySideGoals) homeWins++;
+    else if (homeSideGoals < awaySideGoals) awayWins++;
+    else draws++;
+    if (homeSideGoals > 0 && awaySideGoals > 0) btts++;
+    if (homeSideGoals + awaySideGoals > 2.5) over25++;
+  }
+  const played = h2h.meetings.length;
+  return {
+    played,
+    homeWins,
+    draws,
+    awayWins,
+    homeGoals,
+    awayGoals,
+    avgGoals: Math.round(((homeGoals + awayGoals) / played) * 100) / 100,
+    bttsPct: Math.round((btts / played) * 100),
+    over25Pct: Math.round((over25 / played) * 100),
+    homeWinPct: Math.round((homeWins / played) * 100),
+    drawPct: Math.round((draws / played) * 100),
+    awayWinPct: Math.round((awayWins / played) * 100),
+  };
+}
+
+// Model tahminini (kadro/katsayı gücüne dayalı, bkz. getMatchWinProbability)
+// VE ikili geçmiş istatistiğini (varsa, bkz. getHeadToHeadStats) ORTALAYARAK
+// tek bir "birleşik" maç olasılığı üretir. Çok az sayıda (1) karşılaşmalık
+// bir geçmiş, %100/%0 gibi aşırı/gürültülü bir orana sahip olabileceğinden
+// (tek bir maçın sonucu), en az 2 karşılaşma şartı aranır -- aksi halde
+// (ya da hiç geçmiş yoksa) sadece model tahminine dönülür, uydurma bir
+// ortalama YAPILMAZ.
+export function getCombinedMatchPrediction(homeTeam, awayTeam, competition) {
+  const model = getMatchWinProbability(homeTeam, awayTeam, competition);
+  const h2hStats = getHeadToHeadStats(homeTeam, awayTeam);
+  if (!h2hStats || h2hStats.played < 2) {
+    return { home: model.homeWinProb, draw: model.drawProb, away: model.awayWinProb, usedH2H: false, h2hStats, model };
+  }
+  return {
+    home: (model.homeWinProb + h2hStats.homeWinPct / 100) / 2,
+    draw: (model.drawProb + h2hStats.drawPct / 100) / 2,
+    away: (model.awayWinProb + h2hStats.awayWinPct / 100) / 2,
+    usedH2H: true,
+    h2hStats,
+    model,
+  };
 }
 
 // competitionKey ve/veya belirli bir takım/maça göre filtrelenmiş, tarihe
@@ -766,4 +844,66 @@ export function getHighestScoringMatches(competitionKey, limit = 5) {
     }
   }
   return rows.sort((a, b) => b.totalGoals - a.totalGoals).slice(0, limit);
+}
+
+// Her takımın kadrosundaki oyuncuların ORTALAMA reytingi (players.js/
+// superLigPlayers.js'teki gerçek, araştırılmış kadro reytinglerinden) --
+// enrichTeamsWithAttackDefense'teki attackRatio/defenseRatio'nun aksine
+// (o ikisi bir takımın KENDİ ortalamasına göre RÖLATİF hücum/savunma
+// eğilimini ölçer, mutlak güç DEĞİL) bu, takımlar ARASI mutlak bir kadro
+// gücü karşılaştırması sağlar -- "İstatistikler" sayfasında henüz kendi
+// başına bir analiz olarak gösterilmeyen bir veri kesiti.
+export function getSquadRatingRanking(competitionKey) {
+  const competition = getCompetition(competitionKey);
+  return competition.teams
+    .map((t) => {
+      const players = competition.getPlayersByTeam(t.id) || [];
+      if (players.length === 0) return null;
+      const avgRating = players.reduce((sum, p) => sum + (p.rating || 0), 0) / players.length;
+      return { teamId: t.id, team: t, avgRating: Math.round(avgRating * 10) / 10, playerCount: players.length };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.avgRating - a.avgRating);
+}
+
+// Her takımın GÜNCEL (bkz. src/data/injuries.js -- statik ama tarihli bir
+// anlık görüntü) sakat/cezalı oyuncu SAYISI -- "İstatistikler" sayfasında
+// daha önce hiç kullanılmayan bir veri seti (injuries.js şimdiye kadar
+// sadece ProbableLineup.jsx'te TEK bir takımın olası kadrosunu filtrelemek
+// için kullanılıyordu). Sadece bu yarışmanın takımlarına ait kayıtlar
+// sayılır; hiç sakatı olmayan takımlar listede yer almaz.
+export function getInjuryCountsByTeam(competitionKey) {
+  const competition = getCompetition(competitionKey);
+  const teamIds = new Set(competition.teams.map((t) => t.id));
+  const counts = {};
+  for (const inj of CURRENT_INJURIES) {
+    if (!teamIds.has(inj.teamId)) continue;
+    counts[inj.teamId] = (counts[inj.teamId] || 0) + 1;
+  }
+  return competition.teams
+    .filter((t) => counts[t.id] > 0)
+    .map((t) => ({ teamId: t.id, team: t, count: counts[t.id] }))
+    .sort((a, b) => b.count - a.count);
+}
+
+// İki takımın çok-eksenli profilini (bkz. getTeamRadarProfile) TEK bir
+// radar grafiğinde üst üste karşılaştırabilmek için birleştirir -- iki
+// takımın ekseni tam örtüşmeyebilir (ör. biri "Lig Konumu" verisine sahip
+// diğeri değil), bu yüzden eksenlerin BİRLEŞİMİ alınır, eksik değerler
+// null bırakılır (Recharts bunu "veri yok" olarak, çizgiyi kırmadan atlar).
+// Maç Merkezi'ndeki "Takım Karşılaştırması" bölümü için.
+export function getMatchRadarComparison(competitionKey, teamAId, teamBId) {
+  const a = getTeamRadarProfile(competitionKey, teamAId);
+  const b = getTeamRadarProfile(competitionKey, teamBId);
+  const aByAxis = Object.fromEntries(a.map((r) => [r.axis, r.value]));
+  const bByAxis = Object.fromEntries(b.map((r) => [r.axis, r.value]));
+  const axisOrder = ["Hücum", "Savunma", "Katsayı", "Form", "Lig Konumu"];
+  const axes = [...new Set([...a.map((r) => r.axis), ...b.map((r) => r.axis)])].sort(
+    (x, y) => axisOrder.indexOf(x) - axisOrder.indexOf(y)
+  );
+  return axes.map((axis) => ({
+    axis,
+    teamA: aByAxis[axis] ?? null,
+    teamB: bByAxis[axis] ?? null,
+  }));
 }

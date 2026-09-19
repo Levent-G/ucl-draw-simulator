@@ -18,6 +18,7 @@ import { hasRealDataSupport } from "../utils/realStandingsSelectors.js";
 import { formatMatchDate } from "../utils/matchDate.js";
 import { toSearchKey } from "../utils/text.js";
 import Crest from "../components/Crest.jsx";
+import CompetitionIcon from "../components/CompetitionIcon.jsx";
 
 // Tahmin Ligi artık TEK bir yarışmaya bağlı değil -- her lig kurulurken
 // hangi gerçek veri destekli yarışma(lar)ı (UCL/Süper Lig, ikisi de olabilir)
@@ -271,12 +272,15 @@ function PredictionLeagueLanding() {
                         onClick={() => toggleKey(comp.key)}
                         aria-pressed={selected}
                       >
-                        <span className="prediction-league-choice-check" aria-hidden="true">
-                          {selected ? "✓" : ""}
+                        <span className="prediction-league-choice-icon">
+                          <CompetitionIcon competition={comp} size={26} />
                         </span>
                         <span className="prediction-league-choice-body">
                           <span className="prediction-league-choice-name">{comp.shortName}</span>
                           <span className="prediction-league-choice-tagline">{comp.tagline}</span>
+                        </span>
+                        <span className="prediction-league-choice-check" aria-hidden="true">
+                          {selected ? "✓" : ""}
                         </span>
                       </button>
                     );
@@ -322,13 +326,25 @@ function PredictionLeagueLanding() {
                   const keys = l.competitionKeys || (l.competitionKey ? [l.competitionKey] : []);
                   return (
                     <Link key={l.id} to={`/tahmin-ligi/${l.id}`} className="prediction-league-list-row">
-                      <span className="prediction-league-list-name">🏆 {l.name}</span>
+                      <span className="prediction-league-list-name">
+                        <span className="prediction-league-list-name-icons">
+                          {keys.map((k) => {
+                            const comp = REAL_COMPETITIONS.find((c) => c.key === k);
+                            return comp ? <CompetitionIcon key={k} competition={comp} size={16} /> : null;
+                          })}
+                        </span>
+                        {l.name}
+                      </span>
                       <span className="prediction-league-list-badges">
-                        {keys.map((k) => (
-                          <span key={k} className="prediction-league-list-badge">
-                            {REAL_COMPETITIONS.find((c) => c.key === k)?.shortName || k}
-                          </span>
-                        ))}
+                        {keys.map((k) => {
+                          const comp = REAL_COMPETITIONS.find((c) => c.key === k);
+                          return (
+                            <span key={k} className="prediction-league-list-badge">
+                              {comp && <CompetitionIcon competition={comp} size={13} />}
+                              {comp?.shortName || k}
+                            </span>
+                          );
+                        })}
                       </span>
                       <span className="footnote">{l.createdByName} tarafından oluşturuldu</span>
                     </Link>
@@ -545,7 +561,7 @@ function PredictionLeagueRoom() {
   return (
     <div className="page-shell">
       <AuthHeader
-        title={league ? `🏆 ${league.name}` : "Tahmin Ligi"}
+        title={league ? league.name : "Tahmin Ligi"}
         right={
           competitionKeys?.length > 0 && (
             <span className="prediction-room-comp-badges">
@@ -658,6 +674,13 @@ function PredictionLeagueRoom() {
                       const mine = myPredictionsByMatch[m.id];
                       const revealed = isMatchRevealed(league, m.id);
                       const actual = revealed ? getLeagueMatchResult(league, m.id) : null;
+                      // Maçın gerçek tarihi geçmiş (revealed) ama gerçek skoru bu
+                      // sitede henüz elle GİRİLMEMİŞ olabilir (bkz.
+                      // realResultsUcl2026.js/liveStatus.js -- statik anlık
+                      // görüntüler). Bu durumda "Tutmadı" gibi YANLIŞ/ERKEN bir
+                      // sonuç göstermek yerine dürüstçe "skor henüz çekilmedi"
+                      // denir -- kullanıcı geri bildirimi.
+                      const revealedNoScore = revealed && !actual;
                       const draft = drafts[m.id] || {};
                       // Kullanıcı geri bildirimi: "diğer kullanıcıların
                       // tahminlerini görebilmeliyiz" -- eskiden bu SADECE sen
@@ -700,13 +723,16 @@ function PredictionLeagueRoom() {
                                 {actual.homeGoals} : {actual.awayGoals}
                               </div>
                             )}
+                            {revealedNoScore && <div className="prediction-match-score-pending">⏳ Skor henüz çekilmedi</div>}
                             {!showPicker ? (
                               <div className="prediction-pick-line">
                                 <span className="pick-text">
                                   <span className="pick-text-tag">Tahminin</span>
                                   {minePredictionLabel}
                                 </span>
-                                {revealed ? (
+                                {revealedNoScore ? (
+                                  <span className="pick-badge pending">⏳ Sonuç bekleniyor</span>
+                                ) : revealed ? (
                                   <span className={`pick-badge ${points > 0 ? "ok" : "no"}`}>
                                     {points > 0 ? `✅ Doğru bildin +${points}` : "❌ Tutmadı"}
                                   </span>
@@ -718,7 +744,9 @@ function PredictionLeagueRoom() {
                               </div>
                             ) : revealed ? (
                               <div className="prediction-row-system">
-                                <span className="footnote">Bu maç oynandı, artık tahmin yapılamaz.</span>
+                                <span className="footnote">
+                                  {revealedNoScore ? "Bu maç oynandı, sonuç henüz eklenmedi -- artık tahmin yapılamaz." : "Bu maç oynandı, artık tahmin yapılamaz."}
+                                </span>
                               </div>
                             ) : useScoreMode ? (
                               <div className="prediction-row-input">
@@ -815,12 +843,23 @@ function PredictionLeagueRoom() {
 
                           {others.length > 0 ? (
                             <div className="prediction-others-row prediction-match-others">
-                              {others.map((o) => (
-                                <span key={o.uid} className="prediction-others-chip">
-                                  <Avatar photoURL={o.photoURL} name={o.displayName} size={16} /> {o.displayName}:{" "}
-                                  {o.kind === "score" ? `${o.homeGoals}-${o.awayGoals}` : describeOutcomePrediction(o, m.homeTeam, m.awayTeam)}
-                                </span>
-                              ))}
+                              {others.map((o) => {
+                                // Kullanıcı geri bildirimi: "kimin tahmini tuttuğunu
+                                // görelim" -- pointsForPrediction ZATEN her tahmin
+                                // için (sadece "mine" değil) çalışan saf bir
+                                // fonksiyon, o.matchId üzerinden gerçek sonucu kendi
+                                // bulur. Skor henüz girilmemişse (revealedNoScore)
+                                // kimseyi yanlışlıkla "tutmadı" göstermeyiz.
+                                const otherPoints = revealed && actual ? pointsForPrediction(o, league) : null;
+                                const otherMark = revealedNoScore ? "⏳" : otherPoints == null ? null : otherPoints > 0 ? "✅" : "❌";
+                                return (
+                                  <span key={o.uid} className={`prediction-others-chip ${otherPoints > 0 ? "is-correct" : otherMark === "❌" ? "is-wrong" : ""}`}>
+                                    <Avatar photoURL={o.photoURL} name={o.displayName} size={16} /> {o.displayName}:{" "}
+                                    {o.kind === "score" ? `${o.homeGoals}-${o.awayGoals}` : describeOutcomePrediction(o, m.homeTeam, m.awayTeam)}
+                                    {otherMark && <span className="prediction-others-mark">{otherMark}</span>}
+                                  </span>
+                                );
+                              })}
                             </div>
                           ) : (
                             <div className="prediction-match-others prediction-match-participants">
@@ -856,9 +895,11 @@ function PredictionLeagueRoom() {
                     {leaderboard.map((row, i) => (
                       <tr key={row.uid} className={user && row.uid === user.uid ? "sorted" : ""}>
                         <td>{i + 1}</td>
-                        <td className="table-team-cell">
-                          <Avatar photoURL={row.photoURL} name={row.displayName} size={20} />
-                          {row.displayName}
+                        <td>
+                          <span className="table-team-cell">
+                            <Avatar photoURL={row.photoURL} name={row.displayName} size={20} />
+                            {row.displayName}
+                          </span>
                         </td>
                         <td>{row.predicted}</td>
                         <td>

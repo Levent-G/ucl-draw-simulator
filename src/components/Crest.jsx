@@ -29,7 +29,7 @@ export default function Crest({ team, size = 266 }) {
   const [imgFailed, setImgFailed] = useState(false)
   // team.pot yoksa (ör. Süper Lig gibi torbasız/lig formatı takımları) nötr
   // bir vurgu rengine düşer.
-  const color = team.pot ? POT_COLORS[team.pot]?.main || '#5468ff' : '#5468ff'
+  const color = team.pot ? POT_COLORS[team.pot]?.main || '#00c46a' : '#00c46a'
 
   const effectiveSize = team.name === FIVE_STAR_TEAM_NAME ? Math.round(size * FIVE_STAR_SIZE_BUMP) : size
 
@@ -73,7 +73,7 @@ export default function Crest({ team, size = 266 }) {
         x="20"
         y="27"
         textAnchor="middle"
-        fontFamily="Oswald, sans-serif"
+        fontFamily="'Space Grotesk', sans-serif"
         fontWeight="700"
         fontSize="13"
         fill="#0a0f22"

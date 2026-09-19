@@ -12,9 +12,9 @@ export function renderShareCard(team, opponents) {
   const ctx = canvas.getContext('2d')
 
   const bg = ctx.createLinearGradient(0, 0, width, height)
-  bg.addColorStop(0, '#050b22')
-  bg.addColorStop(0.5, '#0c2159')
-  bg.addColorStop(1, '#123a7a')
+  bg.addColorStop(0, '#0b132b')
+  bg.addColorStop(0.5, '#132552')
+  bg.addColorStop(1, '#163a63')
   ctx.fillStyle = bg
   ctx.fillRect(0, 0, width, height)
 
@@ -27,7 +27,7 @@ export function renderShareCard(team, opponents) {
   ctx.font = '700 42px Arial, sans-serif'
   ctx.fillText(team.name.toUpperCase(), width / 2, 112)
 
-  ctx.fillStyle = '#5b9dff'
+  ctx.fillStyle = '#00b4d8'
   ctx.font = '600 16px Arial, sans-serif'
   ctx.fillText('LİG FAZI FİKSTÜRÜ', width / 2, 142)
 
@@ -47,7 +47,7 @@ export function renderShareCard(team, opponents) {
 
     ctx.textAlign = 'left'
     ctx.font = '700 14px Arial, sans-serif'
-    ctx.fillStyle = o.home ? '#34d399' : '#e879c9'
+    ctx.fillStyle = o.home ? '#00e676' : '#ff007f'
     ctx.fillText(o.home ? 'İÇ SAHA' : 'DEPLASMAN', 96, y + rowH / 2 - 10)
 
     ctx.fillStyle = '#ffffff'

@@ -379,10 +379,10 @@ export const EUROPA_TEAMS = RAW_EUROPA_TEAMS.map((t, i) => ({
 }));
 
 export const EUROPA_POT_COLORS = {
-  1: { main: "#5b9dff", dim: "#16264d", label: "Torba 1" },
-  2: { main: "#38bdf8", dim: "#123045", label: "Torba 2" },
-  3: { main: "#22d3ee", dim: "#0e3a42", label: "Torba 3" },
-  4: { main: "#2dd4bf", dim: "#0e3a36", label: "Torba 4" },
+  1: { main: "#00b4d8", dim: "#0d2f3d", label: "Torba 1" },
+  2: { main: "#2ac4e0", dim: "#103340", label: "Torba 2" },
+  3: { main: "#4fd8dd", dim: "#0e3a3c", label: "Torba 3" },
+  4: { main: "#00e676", dim: "#0a3322", label: "Torba 4" },
 };
 
 export function getEuropaTeamsByPot(pot) {

@@ -44,6 +44,8 @@ import {
   getAttackDefenseMatrix,
   getGoalsPerMatchdayTrend,
   getSeasonEndProjection,
+  getSquadRatingRanking,
+  getInjuryCountsByTeam,
 } from "../../utils/realStandingsSelectors.js";
 
 const FORM_PAGE_SIZE = 12;
@@ -147,6 +149,8 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
     };
   }, [attackDefenseMatrix]);
   const goalsTrend = useMemo(() => getGoalsPerMatchdayTrend(competitionKey), [competitionKey]);
+  const squadRatings = useMemo(() => getSquadRatingRanking(competitionKey).slice(0, 15), [competitionKey]);
+  const injuryCounts = useMemo(() => getInjuryCountsByTeam(competitionKey), [competitionKey]);
 
   // Gol Kralları -- gerçek, kaynağı belirtilmiş oyuncu bazlı gol verisi (bkz.
   // src/data/topScorers.js). Simülasyon motorunun ürettiği bir şey DEĞİL;
@@ -429,8 +433,10 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
                   .map((row) => (
                     <tr key={row.teamId} className={row.teamId === favoriteTeamId ? "standings-row-favorite" : ""}>
                       <td className="standings-team-cell">
-                        <Crest team={row.team} size={18} />
-                        <span>{row.team.name}</span>
+                        <span className="standings-team-link">
+                          <Crest team={row.team} size={18} />
+                          <span>{row.team.name}</span>
+                        </span>
                       </td>
                       <td>{row.played}</td>
                       <td>{row.cleanSheets} (%{Math.round((row.cleanSheets / row.played) * 100)})</td>
@@ -632,6 +638,61 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
               </Link>
             ))}
           </div>
+        </div>
+      )}
+
+      {squadRatings.length > 0 && (
+        <div className="chart-card chart-card-wide">
+          <h3>⭐ Kadro Gücü Sıralaması</h3>
+          <p className="footnote">
+            Kadrodaki oyuncuların araştırılmış, gerçek reytinglerinin (bkz. Takım/Oyuncu profil sayfaları) ortalaması
+            -- maç sonuçlarından değil, doğrudan kadro kalitesinden türetilir. Katsayıdan (UEFA/geçmiş performans)
+            farklı bir bakış açısı: şu anki kadronun kağıt üzerindeki gücü.
+          </p>
+          <ResponsiveContainer width="100%" height={Math.max(320, squadRatings.length * 26)}>
+            <BarChart data={squadRatings} layout="vertical" margin={{ left: 16, right: 24 }}>
+              <CartesianGrid stroke={CHART_GRID} horizontal={false} />
+              <XAxis type="number" domain={[60, 100]} stroke={CHART_AXIS} tick={{ fill: CHART_AXIS, fontSize: 12 }} />
+              <YAxis
+                type="category"
+                dataKey={(d) => d.team.short}
+                width={78}
+                stroke={CHART_AXIS}
+                tick={(props) => <TeamAxisTick {...props} teamsByKey={teamByShort} fill={CHART_AXIS} />}
+              />
+              <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
+              <Bar dataKey="avgRating" name="Ortalama Kadro Reytingi" radius={[0, 4, 4, 0]} maxBarSize={16}>
+                {squadRatings.map((row) => (
+                  <Cell key={row.teamId} fill={row.teamId === favoriteTeamId ? "#b45309" : CHART_SERIES[6]} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {injuryCounts.length > 0 && (
+        <div className="chart-card">
+          <h3>🩹 Sakatlık Durumu</h3>
+          <p className="footnote">
+            Şu an sakat/cezalı olduğu bilinen oyuncu sayısı (bkz. her takımın sayfasındaki "Olası Kadro" -- sakat
+            oyuncular yanda ayrıca listelenir). Statik bir anlık görüntüdür, günlük güncellenmez.
+          </p>
+          <ResponsiveContainer width="100%" height={Math.max(220, injuryCounts.length * 26)}>
+            <BarChart data={injuryCounts} layout="vertical" margin={{ left: 16, right: 16 }}>
+              <CartesianGrid stroke={CHART_GRID} horizontal={false} />
+              <XAxis type="number" allowDecimals={false} stroke={CHART_AXIS} tick={{ fill: CHART_AXIS, fontSize: 12 }} />
+              <YAxis
+                type="category"
+                dataKey={(d) => d.team.short}
+                width={78}
+                stroke={CHART_AXIS}
+                tick={(props) => <TeamAxisTick {...props} teamsByKey={teamByShort} fill={CHART_AXIS} />}
+              />
+              <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
+              <Bar dataKey="count" name="Sakat/Cezalı Sayısı" fill="#b91c1c" radius={[0, 4, 4, 0]} maxBarSize={16} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       )}
 
