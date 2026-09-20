@@ -135,8 +135,12 @@ describe("PredictionLeagueContext.scorePrediction (kind: score)", () => {
     expect(scorePrediction({ homeGoals: 2, awayGoals: 0 }, { homeGoals: 3, awayGoals: 1 })).toBe(3);
   });
 
-  it("gives 1 point for the correct outcome only (winner right, goal difference wrong)", () => {
-    expect(scorePrediction({ homeGoals: 1, awayGoals: 0 }, { homeGoals: 3, awayGoals: 1 })).toBe(1);
+  it("gives 3 points for the correct outcome only (winner right, goal difference wrong)", () => {
+    // ESKİDEN bu durum 1 puandı (sadece 3'e goal-diff de tutarsa çıkıyordu)
+    // -- kullanıcı geri bildirimi: doğru kazananı bilmek tek başına 3 puan
+    // etmeli, gol farkının tutup tutmaması artık bu tahmin türü için
+    // fark etmiyor (2026-09-21).
+    expect(scorePrediction({ homeGoals: 1, awayGoals: 0 }, { homeGoals: 3, awayGoals: 1 })).toBe(3);
   });
 
   it("gives 3 points for correctly predicting a draw with the same goal difference (0), even off on the exact score", () => {
@@ -145,10 +149,10 @@ describe("PredictionLeagueContext.scorePrediction (kind: score)", () => {
     expect(scorePrediction({ homeGoals: 1, awayGoals: 1 }, { homeGoals: 2, awayGoals: 2 })).toBe(3);
   });
 
-  it("gives 1 point for a draw prediction that gets the outcome right but not the goal difference (trivially 0 for any draw, so this is really about a skewed win prediction)", () => {
+  it("gives 3 points for a win prediction that gets the outcome right but not the goal difference", () => {
     // Kazanan taraf doğru (ev sahibi) ama gol farkı tutmuyor: 3-0 tahmin
-    // edilip 1-0 (fark +1) çıkması.
-    expect(scorePrediction({ homeGoals: 3, awayGoals: 0 }, { homeGoals: 1, awayGoals: 0 })).toBe(1);
+    // edilip 1-0 (fark +1) çıkması -- artık gol farkı tutmasa da 3 puan.
+    expect(scorePrediction({ homeGoals: 3, awayGoals: 0 }, { homeGoals: 1, awayGoals: 0 })).toBe(3);
   });
 
   it("gives 0 points for a completely wrong outcome (predicted home win, away won)", () => {
@@ -335,13 +339,13 @@ describe("PredictionLeagueContext.buildLeaderboard", () => {
       { uid: "a", displayName: "Ali", kind: "score", matchId: "m1", homeGoals: 2, awayGoals: 1 }, // 5
       { uid: "a", displayName: "Ali", kind: "score", matchId: "m2", homeGoals: 1, awayGoals: 0 }, // 0
       { uid: "a", displayName: "Ali", kind: "champion", matchId: "champion", pickedTeamId: "man-city" }, // 0 (yanlış)
-      { uid: "b", displayName: "Ayşe", kind: "score", matchId: "m1", homeGoals: 3, awayGoals: 0 }, // 1
+      { uid: "b", displayName: "Ayşe", kind: "score", matchId: "m1", homeGoals: 3, awayGoals: 0 }, // 3 (doğru kazanan, gol farkı tutmuyor)
       { uid: "b", displayName: "Ayşe", kind: "score", matchId: "m2", homeGoals: 0, awayGoals: 0 }, // 5
       { uid: "b", displayName: "Ayşe", kind: "champion", matchId: "champion", pickedTeamId: "real-madrid" }, // 15 (doğru!)
     ];
     const board = buildLeaderboard(predictions, season);
     expect(board.map((r) => r.uid)).toEqual(["b", "a"]);
-    expect(board[0].points).toBe(21); // 1 + 5 + 15
+    expect(board[0].points).toBe(23); // 3 + 5 + 15
     expect(board[1].points).toBe(5); // 5 + 0 + 0
     expect(board[0].predicted).toBe(3);
   });

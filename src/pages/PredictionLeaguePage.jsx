@@ -237,7 +237,7 @@ function PredictionLeagueLanding() {
           <div className="prediction-intro-point">
             <span className="prediction-intro-point-icon">🎯</span>
             <div>
-              <b>5 puan</b> tam skor · <b>3 puan</b> doğru sonuç + doğru gol farkı · <b>1 puan</b> sadece doğru sonuç
+              <b>5 puan</b> tam skor · <b>3 puan</b> doğru sonuç (galibiyet/beraberlik/mağlubiyet)
             </div>
           </div>
           <div className="prediction-intro-point">
@@ -613,7 +613,7 @@ function PredictionLeagueRoom() {
         <>
           <p className="footnote">
             <b>Sadece kazananı tahmin et:</b> doğru bilirsen <b>{OUTCOME_CORRECT_POINTS} puan</b> · <b>Tam skor tahmin et:</b>{" "}
-            <b>5 puan</b> tam skor, <b>3 puan</b> doğru sonuç + doğru gol farkı, <b>1 puan</b> sadece doğru sonuç ·
+            <b>5 puan</b> tam skor, <b>3 puan</b> doğru sonuç ·
             sezon sonunda en çok puanı toplayan kazanır. Maçın gerçek tarihi geçene kadar tahminler puanlanmaz.
           </p>
 

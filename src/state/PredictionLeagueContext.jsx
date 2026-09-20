@@ -482,8 +482,11 @@ export function usePredictions(leagueId) {
 }
 
 // Bir SKOR tahmininin (kind:"score") gerçek sonuca göre kaç puan
-// getirdiğini hesaplar: 5 = tam skor, 3 = doğru kazanan taraf + doğru gol
-// farkı, 1 = sadece doğru kazanan/beraberlik, 0 = tamamen yanlış.
+// getirdiğini hesaplar: 5 = tam skor, 3 = doğru kazanan/beraberlik (gol
+// farkı tutmasa bile), 0 = tamamen yanlış. ESKİDEN doğru sonuç + doğru gol
+// farkı 3, sadece doğru sonuç 1 puan veriyordu -- kullanıcı geri bildirimi:
+// doğru kazananı bilmek tek başına (skor tam tutmasa da) 3 puan etmeli, 1
+// değil (acil deploy öncesi düzeltme, 2026-09-21).
 export function scorePrediction(prediction, actual) {
   if (!prediction || !actual) return 0;
   const { homeGoals: ph, awayGoals: pa } = prediction;
@@ -495,8 +498,7 @@ export function scorePrediction(prediction, actual) {
     (predictedDiff > 0 && actualDiff > 0) ||
     (predictedDiff < 0 && actualDiff < 0) ||
     (predictedDiff === 0 && actualDiff === 0);
-  if (!sameOutcome) return 0;
-  return predictedDiff === actualDiff ? 3 : 1;
+  return sameOutcome ? 3 : 0;
 }
 
 // "Adım adım" akışın tahmin türlerine ayrı puan ağırlığı verir: şampiyon
