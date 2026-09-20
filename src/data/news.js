@@ -12,7 +12,22 @@
 // 2026-09-10 - 2026-09-16 arasındaki (Süper Lig 5. hafta ve UCL lig fazı
 // açılışı sonrası dönem) hakem tartışması, sakatlık/dönüş, teknik direktör
 // açıklaması ve maç sonrası tepki haberleri eklendi (news-ucl-35..38,
-// news-sl-29..32) -- canlı/otomatik güncellenmez. Bazı öğelerin tam gün
+// news-sl-29..32); 2026-09-19'da yapılan ikinci bir tazelemeyle de UCL lig
+// fazı 1. hafta sonuçlarından eksik kalan iki maç (Napoli-Arsenal,
+// Fenerbahçe-Roma), Fenerbahçe'de İsmail Kartal'ın Roma maçı sonrası kısa
+// süreli istifa krizi, Arteta'nın Sunderland maçı sonrası hakem eleştirisi,
+// Süper Lig 5. ve 6. hafta maçlarından Galatasaray-Kocaelispor,
+// Kasımpaşa-Konyaspor, Kocaelispor-Gaziantep FK sonuçları, Beşiktaş'ın
+// Avrupa Ligi'ndeki Marsilya galibiyeti ve 6. hafta Trabzonspor-Galatasaray
+// derbisi (news-ucl-39..42, news-sl-33..37) eklendi; 2026-09-20'de yapılan
+// üçüncü bir tazelemeyle de Süper Lig 6. haftanın 20 Eylül'de oynanan kalan
+// maçları (Fenerbahçe-Eyüpspor 8-0, Amed SFK-Beşiktaş 3-2, Göztepe-Çaykur
+// Rizespor 2-2, Erzurumspor FK-Samsunspor 1-0), İsmail Kartal'ın Eyüpspor
+// maçı öncesi çift forvet kararı, Okan Buruk'un Trabzonspor derbisindeki
+// kırmızı kartına ilişkin hakem adı ve cezası netleşen detaylar ile
+// Mourinho'nun Atletico Madrid derbisi öncesi Türkiye'deki derbi kültürüne
+// dair yorumu (news-sl-38..43, news-ucl-43) eklendi -- canlı/otomatik
+// güncellenmez. Bazı öğelerin tam gün
 // bilgisi (ör. yaz transfer dönemi içindeki bir imza) kaynaklarda net
 // belirtilmediği için ay/dönem bazında en olası güne yuvarlanmıştır; kulüp,
 // oyuncu, olay ve sonuç bilgileri ise doğrulanmış gerçek bilgilerdir. Skor,
@@ -427,6 +442,60 @@ export const NEWS_ITEMS = [
     competitionKey: "ucl",
     relatedTeamIds: ["t11"],
   },
+  {
+    id: "news-ucl-39",
+    date: "2026-09-09",
+    title: "Napoli - Arsenal: Odegaard'ın golüyle Arsenal deplasmandan 3 puanla döndü",
+    summary:
+      "Allegri'nin Napoli'deki ilk büyük Avrupa sınavında Arsenal, Stadio Diego Armando Maradona'da Martin Odegaard'ın 75. dakikada Christos Tzolis asistiyle attığı golle 1-0 kazandı. Arsenal, William Saliba'sız çıktığı maçta topa sahip olma (%58) ve isabetli şut (19-4) üstünlüğünü kurdu.",
+    source: "ESPN / Al Jazeera",
+    url: "https://www.espn.com/soccer/match/_/gameId/401915423/arsenal-napoli",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t9", "t11"],
+  },
+  {
+    id: "news-ucl-40",
+    date: "2026-09-10",
+    title: "Fenerbahçe, 18 yıllık UCL hasretini bitirdiği ilk maçta Roma ile 1-1 kaldı",
+    summary:
+      "Chobani Stadı'ndaki lig fazı açılış maçında Roma'yı 39. dakikada Bryan Cristante'nin golüyle öne geçiren Fenerbahçe, 48. dakikada Archie Brown'ın golüyle eşitliği buldu; maç 1-1 berabere bitti. Fenerbahçe, 18 yıl sonra döndüğü Şampiyonlar Ligi'nde ilk puanını böylece aldı.",
+    source: "Habertürk / Fanatik / CNN Türk",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t25", "t13"],
+  },
+  {
+    id: "news-ucl-41",
+    date: "2026-09-11",
+    title: "Fenerbahçe'de flaş kriz: İsmail Kartal, Roma maçı sonrası istifa etti, akşam görevine döndü",
+    summary:
+      "Roma ile 1-1 biten Şampiyonlar Ligi maçının ardından basın toplantısında istifa ettiğini açıklayan teknik direktör İsmail Kartal, kulüp yönetiminin ikna çabalarının ardından aynı gün görevine geri döndü. Kulüp, 'İsmail Kartal görevinin başındadır' açıklamasıyla teknik direktörün Gaziantep FK maçı hazırlıklarına devam edeceğini duyurdu.",
+    source: "Fotomaç / Cumhuriyet / Hürriyet",
+    url: "https://www.fotomac.com.tr/fenerbahce/2026/09/11/fenerbahce-ismail-kartal-ile-yola-devam-ediyor",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t25"],
+  },
+  {
+    id: "news-ucl-42",
+    date: "2026-09-12",
+    title: "Arteta'dan Sunderland deplasmanı sonrası penaltı kararına sert tepki",
+    summary:
+      "Arsenal'ın deplasmanda 2-0 kazandığı Premier League maçında Sunderland lehine verilen penaltı kararını eleştiren teknik direktör Mikel Arteta, 'Pozisyonu 20 kez izledim, bu seviyede penaltı verilmesini ya da VAR'ın müdahale şeklini anlayabilmemin bir yolu yok, bu kabul edilemez' dedi.",
+    source: "Al Jazeera / ESPN",
+    url: "https://www.aljazeera.com/sports/2026/9/12/arteta-seethes-at-sunderland-penalty-decision-despite-arsenal-win",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t11"],
+  },
+  {
+    id: "news-ucl-43",
+    date: "2026-09-19",
+    title: "Mourinho'dan Atletico Madrid derbisi öncesi çarpıcı yorum: 'Türkiye'yi hiç söylemeyeyim'",
+    summary:
+      "Real Madrid teknik direktörü José Mourinho, Atletico Madrid derbisi öncesi basın toplantısında farklı ülkelerdeki derbi kültürlerini kıyasladı; Milan-Inter rekabetindeki ilişkilere şaşırdığını söyleyip Portekiz'de bunun imkansız olduğunu belirttikten sonra Türkiye'yi kastederek 'Türkiye'yi hiç söylemeyeyim' dedi.",
+    source: "gzt.com / Habertürk / Star",
+    url: "https://www.gzt.com/spor/jose-mourinho-madrid-derbisi-oncesi-carpici-ifadeler-turkiyeyi-hic-soylemeyeyim-4262480",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t1"],
+  },
 
   // ---- Trendyol Süper Lig 2026-27 ----
   {
@@ -766,6 +835,127 @@ export const NEWS_ITEMS = [
     source: "Hürriyet / Habertürk / beIN Sports",
     competitionKey: "superlig",
     relatedTeamIds: ["s4", "s9"],
+  },
+  {
+    id: "news-sl-33",
+    date: "2026-09-13",
+    title: "Galatasaray, Kocaelispor'u Bardakcı'nın golüyle 1-0 geçip yeniden lider oldu",
+    summary:
+      "Osimhen ve Lemina'nın yokluğunda sahaya çıkan Galatasaray, 5. hafta maçında Kocaelispor'u Abdülkerim Bardakcı'nın 71. dakikada ceza sahası dışından bulduğu golle 1-0 mağlup etti. Bu galibiyetle 13 puana yükselen Galatasaray, liderlik koltuğunu Beşiktaş'tan devraldı; Kocaelispor 9 puanda kaldı.",
+    source: "Habertürk / Fanatik / beIN Sports",
+    url: "https://beinsports.com.tr/mac-ozetleri-goller/super-lig/ozet/2026-2027/5/galatasaray-1-0-kocaelispor-mac-ozeti",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s1", "s17"],
+  },
+  {
+    id: "news-sl-34",
+    date: "2026-09-17",
+    title: "Beşiktaş, Avrupa Ligi'ne Marsilya'yı 4-1 mağlup ederek galibiyetle başladı",
+    summary:
+      "Beşiktaş, Tüpraş Stadı'nda oynanan Avrupa Ligi lig fazı açılış maçında Marsilya'yı 4-1 mağlup etti; İlhan Fakılı ilk yarıda öne geçiren golü attı, Marsilya eşitliği bulsa da Beşiktaş ikinci yarıda Cerny, Murillo ve Poku'nun golleriyle farkı açtı. Vincenzo Italiano yönetimindeki Beşiktaş, teknik direktörün kulüpteki ilk 7 resmi Avrupa kupası maçında 6. galibiyetini aldı.",
+    source: "Hürriyet / Fanatik / CNN Türk",
+    url: "https://www.hurriyet.com.tr/sporarena/besiktas-4-1-marsilya-uefa-avrupa-ligi-maci-ozeti-43309435",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s3"],
+  },
+  {
+    id: "news-sl-35",
+    date: "2026-09-18",
+    title: "Süper Lig 6. hafta açılışı: Kasımpaşa - Konyaspor golsüz bitti",
+    summary:
+      "Trendyol Süper Lig 6. haftasını açan Kasımpaşa - Konyaspor maçı, Recep Tayyip Erdoğan Stadyumu'nda 0-0 sona erdi. Bu sonuçla Kasımpaşa 10 puana yükselirken, Konyaspor 4 puanda kalarak sıralamanın alt sıralarında kaldı.",
+    source: "Hürriyet / Fanatik / beIN Sports",
+    url: "https://www.hurriyet.com.tr/sporarena/kasimpasa-0-0-konyaspor-super-lig-maci-ozeti-43310746",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s8", "s9"],
+  },
+  {
+    id: "news-sl-36",
+    date: "2026-09-19",
+    title: "Kocaelispor, Gaziantep FK'yı 2-0 mağlup ederek evindeki 3. galibiyetini aldı",
+    summary:
+      "Kocaelispor, 6. hafta maçında sahasında ağırladığı Gaziantep FK'yı Berkan Kutlu (56') ve Agyei'nin (76') golleriyle 2-0 mağlup etti. Evindeki 3 maçını da kazanan Kocaelispor 12 puana yükselirken, Gaziantep FK 8 puanda kaldı.",
+    source: "Habertürk / Fanatik / Sporx",
+    url: "https://www.fanatik.com.tr/kocaelispor/ozet-kocaelispor-evinde-rahat-kazandi-milli-araya-3-puanla-girdi-kocaelispor-gaziantep-fk-mac-sonucu-2-0-2638264",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s17", "s15"],
+  },
+  {
+    id: "news-sl-37",
+    date: "2026-09-19",
+    title: "Trabzonspor, Galatasaray derbisinde Salah'ın hat-trick'iyle 4-0 kazandı",
+    summary:
+      "Papara Park'ta oynanan 6. hafta derbisinde Trabzonspor, yaz transferi Mohamed Salah'ın 4., 44. ve 80. dakikalardaki golleri ve Noah Saviolo'nun golüyle Galatasaray'ı 4-0 mağlup etti. Galatasaray'da teknik direktör Okan Buruk 72. dakikada, Lesley Ugochukwu ise 87. dakikada VAR incelemesi sonrası kırmızı kart gördü; Buruk maç sonrası hakeme hiçbir hakaret etmediğini savundu. Galatasaray 13 puanla lider kalırken Trabzonspor 10 puana yükseldi.",
+    source: "Fanatik / Cumhuriyet / Habertürk / Sabah",
+    url: "https://www.fanatik.com.tr/galatasaray/live-trabzonspordan-reisle-ruya-baslangic-aslan-farkli-maglup-ozet-trabzonspor-galatasaray-mac-sonucu-4-0-2638246",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s4", "s1"],
+  },
+  {
+    id: "news-sl-38",
+    date: "2026-09-16",
+    title: "Fenerbahçe'de İsmail Kartal, Eyüpspor maçı için çift forvet kararı aldı",
+    summary:
+      "Gaziantep FK maçında beklenen katkıyı alamadığı gerekçesiyle Kerem Aktürkoğlu'nu yedek bırakmayı değerlendiren teknik direktör İsmail Kartal, Eyüpspor maçında Romelu Lukaku ile Vedat Muriqi'yi birlikte sahaya sürecek çift forvetli bir sisteme yönelmeyi planladığını basına yansıyan raporlara göre kararlaştırdı.",
+    source: "ASpor / Takvim / Milliyet",
+    url: "https://www.aspor.com.tr/fenerbahce/2026/09/16/ismail-kartaldan-kerem-ve-lukaku-icin-flas-karar-aziz-yildirim-samandiraya-gidiyor",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s2"],
+  },
+  {
+    id: "news-sl-39",
+    date: "2026-09-20",
+    title: "Fenerbahçe, Eyüpspor'u kulüp tarihinin en farklı galibiyetlerinden biriyle 8-0 mağlup etti",
+    summary:
+      "Trendyol Süper Lig 6. hafta maçında Chobani Stadı'nda oynanan karşılaşmada Fenerbahçe, Eyüpspor'u 8-0 gibi ağır bir skorla mağlup etti; Vedat Muriqi 4 gol (7', 21', 47', 55') atarken diğer goller Mason Greenwood (5', 80'), Matteo Guendouzi (38') ve İrfan Can Kahveci'den (45+1') geldi. Teknik direktör İsmail Kartal maç sonrası 'Bize güzel bir moral oldu, taraftarlarımıza armağan ediyorum' dedi ve maçın ilk dakikasındaki penaltı pozisyonuyla ilgili 'Geçmişte verilmeyen penaltılarla alamadığımız 4 puanımız var, o puanları alsak bugün ligin lideriydik' diye konuştu.",
+    source: "ajansspor / Habertürk / Fanatik",
+    url: "https://ajansspor.com/haber/fenerbahce-eyupspor-8-0-mac-sonucu-yazili-ozet-735210",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s2", "s16"],
+  },
+  {
+    id: "news-sl-40",
+    date: "2026-09-20",
+    title: "Amed SFK, Beşiktaş'ı 3-2 mağlup ederek milli maç arasına lider girdi",
+    summary:
+      "6. hafta maçında sahasında Beşiktaş'ı ağırlayan Amed Sportif Faaliyetler, Gift Orban (13'), Dia Saba (22') ve Furkan Soyalp'in (59') golleriyle 3-2 kazandı; Beşiktaş'ın golünü Orkun Kökçü penaltıdan attı. Bu galibiyetle puanını 13'e çıkaran Amed SFK, Vincenzo Italiano yönetimindeki Beşiktaş'ın son haftalardaki galibiyet serisini sona erdirip milli maç arasına Süper Lig lideri olarak girdi.",
+    source: "Fanatik / Hürriyet / NTV",
+    url: "https://www.fanatik.com.tr/besiktas/live-amedspor-besiktas-maci-canli-anlatim-amed-bjk-maci-kadrosu-skoru-ve-istatistikleri-2638343",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s11", "s3"],
+  },
+  {
+    id: "news-sl-41",
+    date: "2026-09-20",
+    title: "Göztepe, Çaykur Rizespor'a karşı geriden gelip 2-2'lik beraberlik buldu",
+    summary:
+      "Gürsel Aksel Stadı'ndaki 6. hafta maçında Göztepe'yi 3. dakikada Arda Okan Kurtalan'ın golüyle öne geçiren ev sahibine karşı Çaykur Rizespor, 70. dakikada Olawoyin ve 80. dakikada Doicaru'nun golleriyle 2-1 öne geçti; Göztepe'ye beraberliği getiren gol ise 90+4'te penaltıdan Efkan Bekiroğlu'ndan geldi. Maç 2-2 sona erdi.",
+    source: "ajansspor / Fotospor / Yeni Asır",
+    url: "https://ajansspor.com/haber/yazili-ozet-goztepe-caykur-rizespor-mac-sonucu-2-2-735231",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s7", "s12"],
+  },
+  {
+    id: "news-sl-42",
+    date: "2026-09-20",
+    title: "Erzurumspor FK, Miguel Cardoso'nun golüyle Samsunspor'u 1-0 mağlup etti",
+    summary:
+      "6. hafta maçında sahasında Samsunspor'u ağırlayan Erzurumspor FK, 45. dakikada Miguel Cardoso'nun attığı golle 1-0 kazandı ve puanını 7'ye yükseltti. Teknik direktör Thorsten Fink yönetimindeki Samsunspor ise üst üste 4. maçında da galibiyet alamayarak 4 puanda kaldı.",
+    source: "Fanatik / AA / Hürriyet",
+    url: "https://www.fanatik.com.tr/erzurumspor-fk/erzurum-1-atti-3-aldi-samsun-kazanmayi-unuttu-ozet-erzurumspor-fk-samsunspor-mac-sonucu-1-0-2638361",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s14", "s6"],
+  },
+  {
+    id: "news-sl-43",
+    date: "2026-09-20",
+    title: "Galatasaray'da Okan Buruk'un kırmızı kartına ilişkin detaylar netleşti: hakem ve ceza",
+    summary:
+      "Trabzonspor'a 4-0 mağlup olunan derbide 71. dakikada kırmızı kart gören teknik direktör Okan Buruk'u oyundan atan ismin hakem Batuhan Kolak olduğu netleşti. Buruk, 'Hiçbir hakaret etmedim, kötü bir şey söylemedim, beni isteyerek attı' dedi; aldığı cezayla birlikte milli maç arasının ardından oynanacak sıradaki lig maçında (Kasımpaşa) takımının başında olamayacak.",
+    source: "Fotomaç / Milliyet / Mynet",
+    url: "https://www.fotomac.com.tr/galatasaray/2026/09/19/okan-buruktan-mac-sonu-kirmizi-kart-sozleri-hakem-beni-oyundan-isteyerek-atti",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s1"],
   },
 
   // ---- 2026-27 UCL lig fazı: dikkat çekici eşleşme önizlemeleri ----

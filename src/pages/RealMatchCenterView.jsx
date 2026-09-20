@@ -23,6 +23,8 @@ import {
   getMatchRadarComparison,
   getMatchStatsSummary,
   getStreaks,
+  getPowerIndex,
+  getGoalDependency,
 } from "../utils/realStandingsSelectors.js";
 
 // "Google'daki gibi" -- iki takımın bu sezonki gerçek sonuçlarından türetilen
@@ -166,6 +168,12 @@ export default function RealMatchCenterView() {
   const bttsPct = (s) => (s && s.played > 0 ? Math.round((s.btts / s.played) * 100) : null);
   const over25Pct = (s) => (s && s.played > 0 ? Math.round((s.over25 / s.played) * 100) : null);
   const streakLabel = (s) => (s ? `${s.length} maçtır ${s.type === "W" ? "galip" : s.type === "L" ? "mağlup" : "berabere"}` : "–");
+  const powerIndexRows = getPowerIndex(competitionKey);
+  const homePowerIndex = powerIndexRows.find((r) => r.teamId === homeTeam.id) || null;
+  const awayPowerIndex = powerIndexRows.find((r) => r.teamId === awayTeam.id) || null;
+  const goalDependencyRows = getGoalDependency(competitionKey);
+  const homeDependency = goalDependencyRows.find((r) => r.teamId === homeTeam.id) || null;
+  const awayDependency = goalDependencyRows.find((r) => r.teamId === awayTeam.id) || null;
   const hasQuickStats = homeMatchStats || awayMatchStats;
   const actualLineupEntry = ACTUAL_LINEUPS.find((l) => l.matchId === match.id) || null;
   const hasHomeActualXI = played && !!actualLineupEntry?.homeXI?.length;
@@ -351,6 +359,42 @@ export default function RealMatchCenterView() {
                   <Crest team={awayTeam} size={22} />
                 </span>
               </div>
+              {(homePowerIndex || awayPowerIndex) && (
+                <TeamQuickStatsRow
+                  label="Güç Endeksi"
+                  homeValue={homePowerIndex?.powerIndex ?? "–"}
+                  awayValue={awayPowerIndex?.powerIndex ?? "–"}
+                  homePct={homePowerIndex?.powerIndex ?? 0}
+                  awayPct={awayPowerIndex?.powerIndex ?? 0}
+                />
+              )}
+              {(homeDependency || awayDependency) && (
+                <TeamQuickStatsRow
+                  label="Kilit Oyuncu Bağımlılığı"
+                  homeValue={
+                    homeDependency ? (
+                      <>
+                        %{homeDependency.dependencyPct}
+                        <span className="match-compare-sub"> {homeDependency.playerName}</span>
+                      </>
+                    ) : (
+                      "–"
+                    )
+                  }
+                  awayValue={
+                    awayDependency ? (
+                      <>
+                        %{awayDependency.dependencyPct}
+                        <span className="match-compare-sub"> {awayDependency.playerName}</span>
+                      </>
+                    ) : (
+                      "–"
+                    )
+                  }
+                  homePct={homeDependency?.dependencyPct ?? 0}
+                  awayPct={awayDependency?.dependencyPct ?? 0}
+                />
+              )}
               <TeamQuickStatsRow
                 label="Temiz Sayfa"
                 homeValue={pct(homeMatchStats) ?? "–"}

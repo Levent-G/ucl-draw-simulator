@@ -34,6 +34,7 @@ import { TEAM_DOMESTIC_FORM } from "../data/teamDomesticForm.js";
 import { HEAD_TO_HEAD } from "../data/headToHead.js";
 import { NEWS_ITEMS } from "../data/news.js";
 import { CURRENT_INJURIES } from "../data/injuries.js";
+import { TOP_SCORERS } from "../data/topScorers.js";
 
 // "ucl"/"superlig" için gerçek veri desteği var mı? (europa henüz yok --
 // gerçek kaynağı olmadığından eski simülasyon-öncelikli akışında kalıyor.)
@@ -884,6 +885,349 @@ export function getInjuryCountsByTeam(competitionKey) {
     .filter((t) => counts[t.id] > 0)
     .map((t) => ({ teamId: t.id, team: t, count: counts[t.id] }))
     .sort((a, b) => b.count - a.count);
+}
+
+// "Güç Endeksi" -- kullanıcı isteği: "başka sitelerde bulamayacakları" bir
+// analiz. Diğer sitelerin ayrı ayrı gösterdiği üç gerçek veri kesitini
+// (kadro reytingi + o AN sakat/cezalı olduğu için oynayamayacak oyuncular +
+// son 5 maçlık form) TEK bir 0-100 endekste birleştirir -- "kağıt üzerinde
+// güçlü ama şu an yıldız oyuncuları sahada olmayan" bir takımın gerçek
+// GÜNCEL gücünü, ham kadro reytinginden daha doğru yansıtır. RESMİ bir
+// istatistik DEĞİLDİR -- sitenin kendi normalize modelidir, öyle etiketlenir
+// (bkz. RealAnalysisTab.jsx'teki footnote).
+//
+// Formül (kasıtlı olarak basit ve AÇIKLANABİLİR tutuldu -- "kara kutu" bir
+// puan olmasın diye):
+//   baseRating   = kadronun ortalama reytingi (0-100)
+//   missingImpact = o an sakat/cezalı (bkz. injuries.js) olan, takım
+//                   ortalamasının ÜSTÜNDE reytingli oyuncuların (ortalamanın
+//                   üstündeki kısmının kadro büyüklüğüne bölünmüş toplamı) --
+//                   yıldız bir oyuncuyu kaybetmek, yedek bir oyuncuyu
+//                   kaybetmekten daha çok puan kırar (ortalama altındakiler
+//                   hiç puan kırmaz, negatif "bonus" olmasın diye).
+//   formAdjustment = son 5 maçlık form puanının (bkz. getTeamRadarProfile'daki
+//                    aynı hesap) %50'den sapması × 0.1 -- iyi form küçük bir
+//                    artı, kötü form küçük bir eksi (±5 puana kadar).
+//   powerIndex = baseRating - missingImpact + formAdjustment (0-100'e sıkıştırılır)
+export function getPowerIndex(competitionKey) {
+  const competition = getCompetition(competitionKey);
+  return competition.teams
+    .map((t) => {
+      const players = competition.getPlayersByTeam(t.id) || [];
+      if (players.length === 0) return null;
+      const baseRating = players.reduce((sum, p) => sum + (p.rating || 0), 0) / players.length;
+
+      const unavailable = CURRENT_INJURIES.filter((inj) => inj.teamId === t.id);
+      const unavailablePlayers = unavailable
+        .map((inj) => players.find((p) => p.name === inj.playerName))
+        .filter(Boolean);
+      const missingImpact =
+        unavailablePlayers.reduce((sum, p) => sum + Math.max(0, (p.rating || 0) - baseRating), 0) /
+        Math.max(players.length, 1);
+
+      const formArr = competitionKey === "superlig" ? getSuperLigTeamForm(t.name) : getDomesticForm(t.id)?.form;
+      const formPct =
+        formArr && formArr.length > 0
+          ? (formArr.reduce((sum, r) => sum + (r === "W" ? 3 : r === "D" ? 1 : 0), 0) / (formArr.length * 3)) * 100
+          : null;
+      const formAdjustment = formPct == null ? 0 : (formPct - 50) * 0.1;
+
+      const powerIndex = Math.max(0, Math.min(100, baseRating - missingImpact + formAdjustment));
+      return {
+        teamId: t.id,
+        team: t,
+        baseRating: Math.round(baseRating * 10) / 10,
+        missingImpact: Math.round(missingImpact * 10) / 10,
+        formAdjustment: Math.round(formAdjustment * 10) / 10,
+        unavailableCount: unavailable.length,
+        powerIndex: Math.round(powerIndex * 10) / 10,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.powerIndex - a.powerIndex);
+}
+
+// "Kilit Oyuncu Bağımlılığı" -- kullanıcı isteği: "başka sitelerde
+// bulamayacakları" bir analiz daha. Takımın topScorers.js'teki (gerçek,
+// doğrulanmış) EN GOLCÜ oyuncusunun, takımın puan durumundaki TOPLAM gol
+// sayısına oranı -- "bu oyuncu sakatlanırsa/cezalı olursa takım ne kadar
+// zora girer" sorusuna doğrudan cevap. Sadece o takımın topScorers.js'te
+// GERÇEKTEN kayıtlı bir golcüsü VARSA hesaplanır (uydurma yok); takımın
+// puan durumundaki GF'i 0 ya da hiç golcü kaydı yoksa listeye girmez.
+export function getGoalDependency(competitionKey) {
+  const competition = getCompetition(competitionKey);
+  const { standings } = getRealStandings(competitionKey);
+  if (!standings) return [];
+  const gfByTeam = Object.fromEntries(standings.map((s) => [s.teamId, s.gf]));
+  const scorersByTeam = {};
+  for (const s of TOP_SCORERS) {
+    if (s.competitionKey !== competitionKey) continue;
+    if (!scorersByTeam[s.teamId]) scorersByTeam[s.teamId] = [];
+    scorersByTeam[s.teamId].push(s);
+  }
+  return competition.teams
+    .map((t) => {
+      const teamGf = gfByTeam[t.id];
+      const scorers = scorersByTeam[t.id];
+      if (!teamGf || !scorers || scorers.length === 0) return null;
+      const topScorer = [...scorers].sort((a, b) => b.goals - a.goals)[0];
+      const dependencyPct = Math.min(100, Math.round((topScorer.goals / teamGf) * 100));
+      return {
+        teamId: t.id,
+        team: t,
+        playerName: topScorer.playerName,
+        playerGoals: topScorer.goals,
+        teamGoals: teamGf,
+        dependencyPct,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.dependencyPct - a.dependencyPct);
+}
+
+// "Zirveye/Düşme Hattına Mesafe" -- kullanıcı isteği: puan durumundaki
+// bölge rozetleri (ör. "Avrupa Ligi", "Küme Düşme Hattı") sadece HANGİ
+// bölgede olunduğunu söylüyor, NE KADAR yakın/güvende olunduğunu
+// söylemiyordu. Bu, her takımın (a) bir ÜST bölgeye çıkmak için o bölgedeki
+// EN SON sıradaki takıma kaç puan geride olduğunu, (b) bir ALT bölgeye
+// düşmemek için o bölgenin İLK takımına kaç puan önde olduğunu hesaplar --
+// ikisi de SADECE gerçek puan durumundan, uydurma yok. Takımın kendisi zaten
+// en üst/en alt bölgedeyse ilgili mesafe null döner (çıkacak/düşecek bölge
+// yok).
+export function getZoneBoundaryDistance(competitionKey) {
+  const competition = getCompetition(competitionKey);
+  const { standings, started } = getRealStandings(competitionKey);
+  if (!standings || !started) return [];
+  const zones = competition.zones || [];
+  const sorted = [...standings].sort((a, b) => a.rank - b.rank);
+  const teamById = Object.fromEntries(competition.teams.map((t) => [t.id, t]));
+
+  return sorted
+    .map((row) => {
+      const team = teamById[row.teamId];
+      if (!team) return null;
+      const zoneIndex = zones.findIndex((z) => row.rank <= z.max);
+      const zone = zones[zoneIndex] || zones[zones.length - 1];
+      const zoneAbove = zoneIndex > 0 ? zones[zoneIndex - 1] : null;
+      const zoneBelow = zoneIndex < zones.length - 1 ? zones[zoneIndex + 1] : null;
+
+      const climbTargetTeam = zoneAbove ? sorted[zoneAbove.max - 1] : null;
+      const pointsToClimb = climbTargetTeam ? Math.max(0, climbTargetTeam.pts - row.pts) : null;
+
+      const cushionTeam = zoneBelow ? sorted[zone.max] : null;
+      const pointsCushion = cushionTeam ? Math.max(0, row.pts - cushionTeam.pts) : null;
+
+      return {
+        teamId: row.teamId,
+        team,
+        rank: row.rank,
+        pts: row.pts,
+        played: row.played,
+        zoneLabel: zone.label,
+        zoneTone: zone.tone,
+        pointsToClimb,
+        climbTargetZoneLabel: zoneAbove?.label ?? null,
+        pointsCushion,
+        cushionZoneLabel: zoneBelow?.label ?? null,
+      };
+    })
+    .filter(Boolean);
+}
+
+// "Averaj Kırılganlığı" -- kullanıcı isteği: bir takımın sıradaki
+// konumunun, TEK bir maçın sonucuyla ne kadar kolay değişebileceğini
+// gösteren bir uyarı. Uydurma bir "hipotetik maç" simüle etmek yerine
+// GERÇEK bir mekanizmaya dayanır: puan durumunda AYNI puana sahip iki
+// komşu takımın averaj farkı küçükse (≤2 gol), o averaj sıralaması
+// KIRILGANDIR -- büyük skorlu tek bir maç bu iki takımın sırasını
+// değiştirebilir. Sadece gerçekten "kırılgan" (puanı eşit VE averaj farkı
+// küçük komşusu olan) takımlar döner -- çoğu takım (özellikle sezon
+// başında puanlar seyrekken) bu listede hiç görünmeyebilir, bu normaldir.
+export function getGoalDifferenceFragility(competitionKey) {
+  const { standings, started } = getRealStandings(competitionKey);
+  if (!standings || !started) return [];
+  const competition = getCompetition(competitionKey);
+  const teamById = Object.fromEntries(competition.teams.map((t) => [t.id, t]));
+  const sorted = [...standings].sort((a, b) => a.rank - b.rank);
+
+  return sorted
+    .map((row, i) => {
+      const team = teamById[row.teamId];
+      if (!team) return null;
+      const above = i > 0 ? sorted[i - 1] : null;
+      const below = i < sorted.length - 1 ? sorted[i + 1] : null;
+      let gdGap = null;
+      let rivalRow = null;
+      let direction = null;
+      if (above && above.pts === row.pts) {
+        const gap = above.gd - row.gd;
+        if (gdGap === null || gap < gdGap) {
+          gdGap = gap;
+          rivalRow = above;
+          direction = "above";
+        }
+      }
+      if (below && below.pts === row.pts) {
+        const gap = row.gd - below.gd;
+        if (gdGap === null || gap < gdGap) {
+          gdGap = gap;
+          rivalRow = below;
+          direction = "below";
+        }
+      }
+      if (gdGap == null || gdGap > 2) return null;
+      return {
+        teamId: row.teamId,
+        team,
+        rank: row.rank,
+        pts: row.pts,
+        gd: row.gd,
+        gdGap,
+        direction,
+        rivalTeam: teamById[rivalRow.teamId],
+        rivalGd: rivalRow.gd,
+      };
+    })
+    .filter(Boolean)
+    // Aynı çift (A-B) her iki taraftan da kırılgan çıkabilir (A'nın "aşağı"
+    // komşusu B, B'nin "yukarı" komşusu A) -- listede aynı ilişkiyi İKİ KEZ
+    // göstermemek için sadece rank'i daha düşük (üstteki) takımın satırı
+    // tutulur.
+    .filter((row) => row.rank < (row.rivalTeam ? sorted.find((s) => s.teamId === row.rivalTeam.id)?.rank ?? Infinity : Infinity));
+}
+
+// "Şampiyonluk Gerilimi Endeksi" -- ligin zirvesinin ne kadar SIKI olduğunu
+// tek bir sayıya indirger: lider ile 2. sıradaki takımın puan farkı. Küçük
+// fark = gergin bir zirve yarışı, büyük fark = rahat bir liderlik. SADECE
+// gerçek puan durumundan; geçmiş sezonlarla kıyaslama YAPILMAZ (o veri
+// yok) -- sadece BU sezonun şu anki durumu.
+export function getTitleRaceTension(competitionKey) {
+  const { standings, started } = getRealStandings(competitionKey);
+  if (!standings || !started || standings.length < 2) return null;
+  const sorted = [...standings].sort((a, b) => a.rank - b.rank);
+  const leader = sorted[0];
+  const second = sorted[1];
+  const competition = getCompetition(competitionKey);
+  const teamById = Object.fromEntries(competition.teams.map((t) => [t.id, t]));
+  const gap = leader.pts - second.pts;
+  return {
+    leaderTeam: teamById[leader.teamId],
+    leaderPts: leader.pts,
+    secondTeam: teamById[second.teamId],
+    secondPts: second.pts,
+    gap,
+    // 0-2 puan: çok gergin, 3-5: normal, 6+: rahat -- kaba, açıklanabilir bir eşik.
+    tension: gap <= 2 ? "high" : gap <= 5 ? "medium" : "low",
+  };
+}
+
+// "Zayıf Halka" -- her takımın kadrosunu mevkiye göre (GK/DF/MF/FW) gruplayıp
+// ORTALAMA reytingini ligin o mevki için genel ortalamasıyla kıyaslar; en
+// büyük NEGATİF sapmaya sahip mevki, o takımın "zayıf halkası" olarak
+// döner. En az 2 oyunculu mevki grupları sayılır (tek oyunculu bir grup
+// örneklem olarak çok küçük/güvenilmez olurdu).
+export function getWeakestPositionGroup(competitionKey) {
+  const competition = getCompetition(competitionKey);
+  const POSITIONS = ["GK", "DF", "MF", "FW"];
+  const leagueAvgByPos = {};
+  for (const pos of POSITIONS) {
+    const all = competition.teams.flatMap((t) => (competition.getPlayersByTeam(t.id) || []).filter((p) => p.position === pos));
+    leagueAvgByPos[pos] = all.length > 0 ? all.reduce((s, p) => s + (p.rating || 0), 0) / all.length : null;
+  }
+  return competition.teams
+    .map((t) => {
+      const players = competition.getPlayersByTeam(t.id) || [];
+      let weakest = null;
+      for (const pos of POSITIONS) {
+        const group = players.filter((p) => p.position === pos);
+        if (group.length < 2 || leagueAvgByPos[pos] == null) continue;
+        const avg = group.reduce((s, p) => s + (p.rating || 0), 0) / group.length;
+        const deviation = avg - leagueAvgByPos[pos];
+        if (!weakest || deviation < weakest.deviation) {
+          weakest = { position: pos, avg: Math.round(avg * 10) / 10, leagueAvg: Math.round(leagueAvgByPos[pos] * 10) / 10, deviation: Math.round(deviation * 10) / 10 };
+        }
+      }
+      if (!weakest || weakest.deviation >= 0) return null;
+      return { teamId: t.id, team: t, ...weakest };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.deviation - b.deviation);
+}
+
+// "Beklenen vs Gerçek Sıra" -- bir takımın SADECE kadro kalitesine göre
+// (bkz. getSquadRatingRanking) olması "beklenen" sırası ile, gerçek puan
+// durumundaki sırası arasındaki fark. Pozitif fark = kadrosunun ÜSTÜNDE
+// performans (sürpriz iyi gidiş), negatif fark = kadrosunun ALTINDA
+// performans. xPTS'ten (maç-maç model tahminine göre) FARKLI bir bakış --
+// bu, sezon başındaki HAM kadro kalitesiyle kıyaslar, maç sonuçlarıyla
+// değil.
+export function getExpectedVsActualRank(competitionKey) {
+  const { standings, started } = getRealStandings(competitionKey);
+  if (!standings || !started) return [];
+  const squadRanking = getSquadRatingRanking(competitionKey);
+  const expectedRankByTeam = Object.fromEntries(squadRanking.map((r, i) => [r.teamId, i + 1]));
+  const sorted = [...standings].sort((a, b) => a.rank - b.rank);
+  const competition = getCompetition(competitionKey);
+  const teamById = Object.fromEntries(competition.teams.map((t) => [t.id, t]));
+  return sorted
+    .map((row) => {
+      const team = teamById[row.teamId];
+      const expectedRank = expectedRankByTeam[row.teamId];
+      if (!team || !expectedRank) return null;
+      return {
+        teamId: row.teamId,
+        team,
+        actualRank: row.rank,
+        expectedRank,
+        diff: expectedRank - row.rank,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.diff - a.diff);
+}
+
+// "Gol Çeşitliliği" -- bir takımın kaç FARKLI oyuncusunun gol attığını
+// sayar (bkz. topScorers.js). getGoalDependency'nin tam tersi bakış açısı:
+// yüksek çeşitlilik = gol yükü paylaşılmış (tek oyuncuya bağımlı değil,
+// daha "sürdürülebilir" bir hücum).
+export function getGoalScoringDepth(competitionKey) {
+  const competition = getCompetition(competitionKey);
+  const { standings } = getRealStandings(competitionKey);
+  const gfByTeam = Object.fromEntries((standings || []).map((s) => [s.teamId, s.gf]));
+  const scorerCounts = {};
+  for (const s of TOP_SCORERS) {
+    if (s.competitionKey !== competitionKey) continue;
+    scorerCounts[s.teamId] = (scorerCounts[s.teamId] || 0) + 1;
+  }
+  return competition.teams
+    .filter((t) => scorerCounts[t.id] > 0)
+    .map((t) => ({ teamId: t.id, team: t, scorerCount: scorerCounts[t.id], teamGoals: gfByTeam[t.id] ?? null }))
+    .sort((a, b) => b.scorerCount - a.scorerCount);
+}
+
+// "Ev Sahibi/Deplasman Karakteri" -- iç saha ve deplasmandaki maç başı puan
+// ortalaması arasındaki FARK. Büyük fark = "evinde aslan, deplasmanda
+// kuzu" (ya da tam tersi) bir takım -- home-fortress ya da road-warrior
+// profilleri. En az 2'şer iç saha/deplasman maçı oynamış takımlar sayılır.
+export function getHomeAwayGap(competitionKey) {
+  const competition = getCompetition(competitionKey);
+  return competition.teams
+    .map((t) => {
+      const split = getHomeAwaySplit(competitionKey, t.id);
+      if (split.home.played < 2 || split.away.played < 2) return null;
+      const homePpg = split.home.pts / split.home.played;
+      const awayPpg = split.away.pts / split.away.played;
+      return {
+        teamId: t.id,
+        team: t,
+        homePpg: Math.round(homePpg * 100) / 100,
+        awayPpg: Math.round(awayPpg * 100) / 100,
+        gap: Math.round(Math.abs(homePpg - awayPpg) * 100) / 100,
+        strongerAt: homePpg >= awayPpg ? "home" : "away",
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.gap - a.gap);
 }
 
 // İki takımın çok-eksenli profilini (bkz. getTeamRadarProfile) TEK bir

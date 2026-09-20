@@ -3,7 +3,13 @@ import { Link } from "react-router-dom";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import { TEAMS } from "../data/teams.js";
 import { COMPETITION_LIST } from "../data/competitions.js";
-import { hasRealDataSupport, getRealStandings, getRealFixture } from "../utils/realStandingsSelectors.js";
+import {
+  hasRealDataSupport,
+  getRealStandings,
+  getRealFixture,
+  getGoalDependency,
+  getGoalDifferenceFragility,
+} from "../utils/realStandingsSelectors.js";
 import { isMatchPlayed, formatMatchDate } from "../utils/matchDate.js";
 import { getCompetition } from "../data/competitions.js";
 import Crest from "../components/Crest.jsx";
@@ -107,6 +113,56 @@ function useTickerItems() {
     }
     if (items.length === 0) items.push("⚽ SÜPER ANALİZ — GERÇEK VERİ, GERÇEK ANALİZ");
     return items;
+  }, []);
+}
+
+// "Bu Haftanın Dikkat Çekenleri" -- İstatistikler sayfasındaki derin
+// analizlerin (Güç Endeksi, Kilit Oyuncu Bağımlılığı, Averaj Kırılganlığı)
+// sadece o sayfaya gömülü kalmaması için, iki yarışmadan da en çarpıcı
+// birer/ikişer sonucu ana sayfaya çıkarır -- kullanıcı geri bildirimi:
+// "bunları öne çıkaralım". Her yarışmadan EN ÇARPICI olanı seçilir (ör. en
+// yüksek bağımlılık, en dar averaj farkı); veri yoksa (sezon başı) o
+// kart hiç gösterilmez.
+function useHomeInsights() {
+  return useMemo(() => {
+    const insights = [];
+    for (const comp of REAL_COMPETITIONS) {
+      // Sezon başında (ör. UCL'de 1 haftalık veri) bir takımın TEK golü
+      // varsa "%100 bağımlılık" gibi küçük örneklemden kaynaklanan, yanıltıcı
+      // görünen bir "manşet" olmasın diye -- en az 3 takım golü şartı arandı
+      // (getGoalDependency'nin kendisi bu eşiği uygulamaz, TÜM veriyi
+      // İstatistikler sayfasında eksiksiz gösterir; bu sadece ana sayfa
+      // "manşet" seçimine özel bir filtre).
+      const dependency = getGoalDependency(comp.key).find((d) => d.teamGoals >= 3);
+      if (dependency) {
+        insights.push({
+          key: `dep-${comp.key}`,
+          icon: "🎯",
+          text: (
+            <>
+              <b>{dependency.playerName}</b>, {dependency.team.name}'in gollerinin <b>%{dependency.dependencyPct}</b>'ini
+              tek başına atmış ({comp.shortName})
+            </>
+          ),
+          to: `/${comp.key}/istatistik`,
+        });
+      }
+      const fragile = getGoalDifferenceFragility(comp.key).sort((a, b) => a.gdGap - b.gdGap)[0];
+      if (fragile) {
+        insights.push({
+          key: `gd-${comp.key}`,
+          icon: "⚠️",
+          text: (
+            <>
+              <b>{fragile.team.short}</b> ile <b>{fragile.rivalTeam.short}</b> aynı puanda, aralarında sadece{" "}
+              <b>{fragile.gdGap} gol</b> averaj farkı var ({comp.shortName})
+            </>
+          ),
+          to: `/${comp.key}/istatistik`,
+        });
+      }
+    }
+    return insights.slice(0, 4);
   }, []);
 }
 
@@ -222,8 +278,10 @@ function CompetitionStackCard({ comp, index, hovered, onHover, onLeave }) {
 
 export default function HomePage() {
   const tickerItems = useTickerItems();
+  const insights = useHomeInsights();
   const [heroRef, heroVisible] = useReveal(0.05);
   const [stackRef, stackVisible] = useReveal(0.2);
+  const [insightsRef, insightsVisible] = useReveal(0.2);
   const [chipRef, chipVisible] = useReveal(0.2);
   const [hovered, setHovered] = useState(null);
 
@@ -304,6 +362,25 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {insights.length > 0 && (
+        <section className="home-insights-section" ref={insightsRef}>
+          <h2 className="home-section-title">🔥 Bu Haftanın Dikkat Çekenleri</h2>
+          <div className={`home-insights-grid ${insightsVisible ? "is-in" : ""}`}>
+            {insights.map((insight, i) => (
+              <Link
+                key={insight.key}
+                to={insight.to}
+                className="home-insight-card"
+                style={{ transitionDelay: `${i * 60}ms` }}
+              >
+                <span className="home-insight-icon" aria-hidden="true">{insight.icon}</span>
+                <span className="home-insight-text">{insight.text}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="home-chips-section" ref={chipRef}>
         <h2 className="home-section-title home-chips-title">Keşfet</h2>

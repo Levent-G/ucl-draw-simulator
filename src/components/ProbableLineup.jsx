@@ -112,18 +112,23 @@ export default function ProbableLineup({ team, players, competitionKey }) {
           <div className="probable-lineup-injured">
             <h5 className="probable-lineup-injured-title">🩹 Sakat / Cezalı</h5>
             <div className="probable-lineup-injured-list">
-              {injured.map(({ player, injury }) => (
-                <Link
-                  key={player.id}
-                  to={`/${competitionKey}/oyuncu/${player.id}`}
-                  className="probable-lineup-injured-row"
-                  title={`${injury.reason || "Sakat/cezalı"}${injury.expectedReturn ? ` -- dönüş: ${injury.expectedReturn}` : ""}`}
-                >
-                  <PlayerAvatar player={player} size={22} />
-                  <span className="probable-lineup-injured-name">{player.name}</span>
-                  <span className="probable-lineup-injured-badge" aria-hidden="true">🩹</span>
-                </Link>
-              ))}
+              {injured.map(({ player, injury }) => {
+                // type alanı yoksa (eski kayıtların hiçbiri güncellenmedi)
+                // "injury" varsayılır -- bkz. injuries.js'teki convention notu.
+                const isSuspension = injury.type === "suspension";
+                return (
+                  <Link
+                    key={player.id}
+                    to={`/${competitionKey}/oyuncu/${player.id}`}
+                    className="probable-lineup-injured-row"
+                    title={`${injury.reason || "Sakat/cezalı"}${injury.expectedReturn ? ` -- dönüş: ${injury.expectedReturn}` : ""}`}
+                  >
+                    <PlayerAvatar player={player} size={22} />
+                    <span className="probable-lineup-injured-name">{player.name}</span>
+                    <span className="probable-lineup-injured-badge" aria-hidden="true">{isSuspension ? "🟨" : "🩹"}</span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         )}

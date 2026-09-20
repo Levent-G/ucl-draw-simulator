@@ -1063,6 +1063,116 @@ a.btn-secondary:hover {
   color: var(--text-faint);
   padding: 12px 0;
 }
+.gd-fragility-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.gd-fragility-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+}
+.gd-fragility-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+.gd-fragility-team-away {
+  justify-content: flex-end;
+  text-align: right;
+}
+.gd-fragility-team:hover .gd-fragility-name {
+  text-decoration: underline;
+}
+.gd-fragility-name {
+  font-weight: 600;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gd-fragility-stat {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.gd-fragility-gap {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: #b45309;
+  white-space: nowrap;
+  text-align: center;
+}
+@media (max-width: 560px) {
+  .gd-fragility-row {
+    grid-template-columns: 1fr;
+    justify-items: stretch;
+  }
+  .gd-fragility-team-away {
+    justify-content: flex-start;
+    text-align: left;
+  }
+}
+.title-tension-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 14px 16px;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+.title-tension-team {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.title-tension-badge {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.title-tension-high {
+  color: #b91c1c;
+  background: rgba(239, 68, 68, 0.12);
+}
+.title-tension-medium {
+  color: #b45309;
+  background: rgba(245, 158, 11, 0.12);
+}
+.title-tension-low {
+  color: var(--text-faint);
+  background: var(--bg-panel-alt);
+}
+.zone-distance-safe {
+  color: #15803d;
+  font-weight: 700;
+  font-size: 12px;
+}
+.zone-distance-risky {
+  color: #b91c1c;
+  font-weight: 700;
+  font-size: 12px;
+}
 .standings-scroll {
   overflow-x: auto;
   /* width:100%+min-width:0 OLMADAN bu sarmalayıcı, içindeki (white-space:nowrap
@@ -7204,6 +7314,54 @@ a.team-profile-match-row:hover {
    olarak parmakla kaydırılabilir; masaüstünde fare tekerleğiyle veya
    sürükleyerek kayar.
    ========================================================================== */
+/* "Bu Haftanın Dikkat Çekenleri" -- İstatistikler sayfasındaki derin
+   analizlerden (Güç Endeksi/Kilit Oyuncu Bağımlılığı/Averaj Kırılganlığı)
+   öne çıkanları ana sayfaya taşıyan kısa kartlar. */
+.home-insights-section {
+  margin-bottom: 32px;
+}
+.home-insights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s cubic-bezier(0.2, 0.7, 0.3, 1), transform 0.6s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.home-insights-grid.is-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+.home-insight-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.home-insight-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-bright);
+}
+.home-insight-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.home-insight-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+.home-insight-text b {
+  color: var(--text-primary);
+}
+
 .home-chips-section {
   margin-bottom: 24px;
 }
@@ -8309,6 +8467,12 @@ a.team-profile-match-row:hover {
   font-family: var(--font-mono);
   font-weight: 700;
   font-size: 14px;
+}
+.match-compare-sub {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 10.5px;
+  color: var(--text-faint);
 }
 .match-compare-row-top .match-compare-value:first-child {
   text-align: left;

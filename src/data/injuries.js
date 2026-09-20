@@ -63,10 +63,54 @@
 //     bulunamadığı için önceki kayıt (sadece asOf tarihi güncellenerek)
 //     korunmuştur.
 //
+// --- 2026-09-20 REFRESH NOTU (kart cezaları eklendi) ---
+// Bu tazeleme öncekinden farklı olarak bir YENİDEN araştırma değil, salt bir
+// EKLEMEDİR: mevcut 54 sakatlık kaydına dokunulmadı (asOf tarihleri hâlâ
+// 2026-09-16), sadece yeni eklenen "type" alanı (bkz. aşağıdaki not)
+// kullanılarak GERÇEK, hâlihazırda kart cezası çeken 4 oyuncu eklendi --
+// Süper Lig 6. hafta (18-20 Eylül) ve UCL lig fazı 1. hafta (8-10 Eylül)
+// sonrası WebSearch ile araştırılıp en az 2 bağımsız kaynakla
+// doğrulanmıştır:
+//   - Lesley Ugochukwu (Galatasaray, s1): Trabzonspor derbisinde (19 Eylül,
+//     4-0 mağlubiyet) 85. dakikada VAR incelemesi sonrası doğrudan kırmızı
+//     kart gördü; TFF disiplin talimatına göre otomatik olarak bir sonraki
+//     Süper Lig maçını kaçıracak (Habertürk / NTVSpor / Sporx). NOT: Aynı
+//     maçta teknik direktör Okan Buruk da kırmızı kart gördü ama o bir
+//     OYUNCU değil (teknik direktör), bu yüzden listeye eklenmedi.
+//   - Valentin Mihăilă (Çaykur Rizespor, s12): 12 Eylül'deki Eyüpspor
+//     deplasmanında VAR incelemesiyle doğrudan kırmızı kart gördü, PFDK 2
+//     maç ceza verdi (caytvhaber.com / olay53.com); cezasının son maçı 20
+//     Eylül'deki Göztepe deplasmanı.
+//   - Ethan Mbappé (Lille, t26): 8 Eylül'deki Real Betis maçında (UCL lig
+//     fazı 1. hafta) 56. dakikada VAR ile doğrudan kırmızı kart gördü (rakip
+//     oyuncunun yüzüne kol savurma); UEFA disiplin süreci sürüyor, en az 3
+//     maç ceza bekleniyor -- 2. hafta (13-14 Ekim) maçını kesin kaçıracağı
+//     netleşti (Yahoo Sports / Goal.com / L'Équipe).
+//   - Jan Bednarek (FC Porto, t28): 2025-26 sezonu UEFA Avrupa Ligi çeyrek
+//     finalindeki (Nottingham Forest) kırmızı kartından kalan 2 maçlık ceza,
+//     kulübün bu sezon terfi ettiği Şampiyonlar Ligi'ne taşındı; lig fazının
+//     ilk 2 maçını (Manchester City, Real Betis) kaçırdı, 20 Ekim'deki PSV
+//     Eindhoven maçında dönecek (Sports Mole / A Bola / O Jogo).
+//   - ATLANDI: Göztepeli Ogün Bayrak da GERÇEKTEN cezalı (7 Eylül'deki
+//     kırmızı kartından kalan PFDK 2 maç cezasının son maçı 20 Eylül'deki
+//     Rizespor maçı), ancak superLigPlayers.js'teki Göztepe (s7) kadrosunda
+//     bu isim yer almadığı için (kadro dosyası bazı oyuncuları atlıyor, bkz.
+//     dosya başındaki not) bilerek dışarıda bırakıldı -- kadroda olmayan bir
+//     ismi ProbableLineup.jsx/getPowerIndex zaten eşleştiremeyeceği için
+//     eklemenin bir anlamı da yok.
+//
 // teamId: players.js (UCL, "tN") veya superLigPlayers.js (Süper Lig, "sN")
 // içindeki takım id'si. Galatasaray/Fenerbahçe gibi hem UCL hem Süper
 // Lig'de oynayan kulüplerde, oyuncu ilgili kadro dosyasında GERÇEKTEN yer
 // alıyorsa iki ayrı kayıt (biri "tN", biri "sN") eklenmiştir.
+//
+// type (opsiyonel): "injury" (sakatlık) ya da "suspension" (kart cezası --
+// sarı kart birikimi ya da kırmızı kart sonrası, SADECE bir sonraki maç
+// için geçerli). Alan YOKSA "injury" varsayılır -- bu yüzden önceki
+// kayıtların hiçbiri güncellenmek ZORUNDA değildi (geriye dönük uyumlu).
+// Kullanıcı isteği: "Güç Endeksi"nin (bkz. realStandingsSelectors.js
+// getPowerIndex) kadro gücü hesabına sadece sakatları değil, o hafta kart
+// cezalısı olduğu için oynayamayacak oyuncuları da katması.
 export const CURRENT_INJURIES = [
   // ---- UEFA Şampiyonlar Ligi ----
   {
@@ -286,6 +330,15 @@ export const CURRENT_INJURIES = [
     source: "gzt.com / habergo.com.tr",
   },
   {
+    teamId: "t26",
+    playerName: "Ethan Mbappé",
+    reason: "Kırmızı kart cezası (8 Eylül, Real Betis deplasmanı, 56. dk VAR incelemesiyle doğrudan kırmızı -- rakip oyuncunun yüzüne kol savurma) -- UEFA disiplin süreci sürüyor, en az 3 maç ceza bekleniyor",
+    expectedReturn: "13-14 Ekim (UCL lig fazı 2. haftası maçını kesin kaçıracak; UEFA'nın kesin ceza kararına göre daha da uzayabilir)",
+    asOf: "2026-09-20",
+    source: "Yahoo Sports / Goal.com / L'Équipe (via shango.media) / Get French Football News",
+    type: "suspension",
+  },
+  {
     teamId: "t28",
     playerName: "Samu",
     reason: "Ön çapraz bağ yırtığı (Şubat'tan beri sahalardan uzak)",
@@ -300,6 +353,15 @@ export const CURRENT_INJURIES = [
     expectedReturn: "Yaklaşık 2 ay (Kasım ortası)",
     asOf: "2026-09-16",
     source: "Complete Sports / allAfrica.com",
+  },
+  {
+    teamId: "t28",
+    playerName: "Jan Bednarek",
+    reason: "Kırmızı kart cezası (2025-26 sezonu UEFA Avrupa Ligi çeyrek finali Nottingham Forest maçından kalan 2 maçlık ceza, kulübün bu sezon terfi ettiği Şampiyonlar Ligi'ne taşındı) -- lig fazının ilk 2 maçını (Manchester City, Real Betis) kaçırdı",
+    expectedReturn: "20 Ekim (PSV Eindhoven maçında dönecek)",
+    asOf: "2026-09-20",
+    source: "Sports Mole / A Bola / O Jogo / RotoWire",
+    type: "suspension",
   },
   {
     teamId: "t35",
@@ -350,6 +412,15 @@ export const CURRENT_INJURIES = [
     expectedReturn: "Eylül sonu",
     asOf: "2026-09-16",
     source: "Galatasaray resmi açıklaması / Fotomaç / Habertürk",
+  },
+  {
+    teamId: "s1",
+    playerName: "Lesley Ugochukwu",
+    reason: "Kırmızı kart cezası -- Trabzonspor derbisinde (19 Eylül, 4-0 mağlubiyet) 85. dakikada VAR incelemesi sonrası doğrudan kırmızı kart gördü, TFF disiplin talimatına göre otomatik olarak bir sonraki lig maçında oynayamayacak",
+    expectedReturn: "Bir sonraki Süper Lig maçından sonra (PFDK'nın ek ceza verip vermeyeceği henüz netleşmedi)",
+    asOf: "2026-09-20",
+    source: "Habertürk / NTVSpor / Sporx",
+    type: "suspension",
   },
   {
     teamId: "s2",
@@ -478,6 +549,15 @@ export const CURRENT_INJURIES = [
     expectedReturn: "Ekim 2026 (6-9 aylık öngörülen dönüş penceresinin sonu)",
     asOf: "2026-09-16",
     source: "Sabah / haber7.com / cayhaber.net",
+  },
+  {
+    teamId: "s12",
+    playerName: "Valentin Mihăilă",
+    reason: "Kırmızı kart cezası -- 12 Eylül'deki Eyüpspor deplasmanında VAR incelemesiyle doğrudan kırmızı kart gördü, PFDK 2 maç ceza verdi",
+    expectedReturn: "20 Eylül'deki Göztepe deplasmanından sonra (2 maçlık cezasının son maçı)",
+    asOf: "2026-09-20",
+    source: "caytvhaber.com / olay53.com / 2mart.com.tr",
+    type: "suspension",
   },
   {
     teamId: "s17",

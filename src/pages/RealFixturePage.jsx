@@ -73,7 +73,15 @@ export default function RealFixturePage() {
   // gösterilir -- kullanıcı için en alakalı maç zaten kendi tuttuğu takımın
   // maçıdır.
   const highlightMatch = useMemo(() => {
-    const pending = displayMatches.filter((m) => !isMatchPlayed(m));
+    // NOT: sadece isMatchPlayed (tarih bazlı) kontrolü yeterli değil --
+    // MatchRow.jsx'teki ile AYNI mantık burada da gerekiyor: gerçek bir
+    // sonuç ZATEN elimizdeyse (bkz. buildDisplayMatches -- homeGoals
+    // doluysa), bu maç "oynanmış" sayılmalı, aksi halde bugün erken saatte
+    // biten (ama tarih kontrolü "bugün henüz bitmedi" diyen) bir maç
+    // kullanıcı geri bildirimi: "sonucu olan maçlar Bekleniyor'da kalıyor"
+    // hatasıyla, gerçek sonucu varken hâlâ öne çıkan maç kartında
+    // "⏳ Bekleniyor" gösterebiliyordu.
+    const pending = displayMatches.filter((m) => !isMatchPlayed(m) && m.homeGoals == null);
     if (!pending.length) return null;
     if (favoriteTeamId) {
       const favMatch = pending.find((m) => m.homeTeam.id === favoriteTeamId || m.awayTeam.id === favoriteTeamId);

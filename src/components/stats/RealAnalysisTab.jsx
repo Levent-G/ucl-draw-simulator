@@ -46,7 +46,18 @@ import {
   getSeasonEndProjection,
   getSquadRatingRanking,
   getInjuryCountsByTeam,
+  getPowerIndex,
+  getGoalDependency,
+  getZoneBoundaryDistance,
+  getGoalDifferenceFragility,
+  getTitleRaceTension,
+  getWeakestPositionGroup,
+  getExpectedVsActualRank,
+  getGoalScoringDepth,
+  getHomeAwayGap,
 } from "../../utils/realStandingsSelectors.js";
+
+const POSITION_LABELS_TR = { GK: "Kaleci", DF: "Defans", MF: "Orta Saha", FW: "Forvet" };
 
 const FORM_PAGE_SIZE = 12;
 
@@ -151,6 +162,19 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
   const goalsTrend = useMemo(() => getGoalsPerMatchdayTrend(competitionKey), [competitionKey]);
   const squadRatings = useMemo(() => getSquadRatingRanking(competitionKey).slice(0, 15), [competitionKey]);
   const injuryCounts = useMemo(() => getInjuryCountsByTeam(competitionKey), [competitionKey]);
+  const powerIndex = useMemo(() => getPowerIndex(competitionKey).slice(0, 15), [competitionKey]);
+  const goalDependency = useMemo(() => getGoalDependency(competitionKey).slice(0, 15), [competitionKey]);
+  const zoneDistance = useMemo(() => getZoneBoundaryDistance(competitionKey), [competitionKey]);
+  const gdFragility = useMemo(() => getGoalDifferenceFragility(competitionKey), [competitionKey]);
+  const titleTension = useMemo(() => getTitleRaceTension(competitionKey), [competitionKey]);
+  const weakestGroups = useMemo(() => getWeakestPositionGroup(competitionKey).slice(0, 12), [competitionKey]);
+  const expectedVsActual = useMemo(() => getExpectedVsActualRank(competitionKey), [competitionKey]);
+  const goalScoringDepth = useMemo(() => getGoalScoringDepth(competitionKey).slice(0, 15), [competitionKey]);
+  const homeAwayGap = useMemo(() => getHomeAwayGap(competitionKey).slice(0, 12), [competitionKey]);
+  const mostAbsences = useMemo(
+    () => [...getPowerIndex(competitionKey)].filter((r) => r.unavailableCount > 0).sort((a, b) => b.missingImpact - a.missingImpact).slice(0, 10),
+    [competitionKey]
+  );
 
   // Gol Kralları -- gerçek, kaynağı belirtilmiş oyuncu bazlı gol verisi (bkz.
   // src/data/topScorers.js). Simülasyon motorunun ürettiği bir şey DEĞİL;
@@ -634,6 +658,311 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
                 <span className="fixture-difficulty-pct">
                   %{row.avgWinProbability}
                   <span className="fixture-difficulty-coeff">({row.avgOpponentCoeff})</span>
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {powerIndex.length > 0 && (
+        <div className="chart-card chart-card-wide">
+          <h3>⚡ Güç Endeksi</h3>
+          <p className="footnote">
+            Sitenin kendi birleşik modeli -- resmi bir istatistik DEĞİLDİR. Kadronun ortalama reytingine, o an
+            sakat/cezalı olduğu için oynayamayacak oyuncuların (ortalamanın üstündeki oyuncular daha çok kırar) ve
+            son 5 maçlık formun etkisini ekleyerek "kağıt üzerinde güçlü ama şu an eksik" takımları ortaya çıkarır.
+          </p>
+          <ResponsiveContainer width="100%" height={Math.max(320, powerIndex.length * 30)}>
+            <BarChart data={powerIndex} layout="vertical" margin={{ left: 16, right: 24 }}>
+              <CartesianGrid stroke={CHART_GRID} horizontal={false} />
+              <XAxis type="number" domain={[50, 100]} stroke={CHART_AXIS} tick={{ fill: CHART_AXIS, fontSize: 12 }} />
+              <YAxis
+                type="category"
+                dataKey={(d) => d.team.short}
+                width={78}
+                stroke={CHART_AXIS}
+                tick={(props) => <TeamAxisTick {...props} teamsByKey={teamByShort} fill={CHART_AXIS} />}
+              />
+              <Tooltip
+                content={<ChartTooltip formatter={(v) => v} />}
+                cursor={{ fill: "rgba(255,255,255,0.04)" }}
+                labelFormatter={(label, payload) => {
+                  const row = payload?.[0]?.payload;
+                  if (!row) return label;
+                  const missingLabel = row.missingImpact > 0 ? `-${row.missingImpact}` : "0";
+                  return `${label} -- Kadro: ${row.baseRating} · Eksik etkisi: ${missingLabel} (${row.unavailableCount} oyuncu) · Form: ${row.formAdjustment >= 0 ? "+" : ""}${row.formAdjustment}`;
+                }}
+              />
+              <Bar dataKey="powerIndex" name="Güç Endeksi" radius={[0, 4, 4, 0]} maxBarSize={16}>
+                {powerIndex.map((row) => (
+                  <Cell key={row.teamId} fill={row.teamId === favoriteTeamId ? "#b45309" : CHART_SERIES[5]} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {titleTension && (
+        <div className="chart-card chart-card-wide">
+          <h3>🔥 Şampiyonluk Gerilimi Endeksi</h3>
+          <p className="footnote">
+            Lider ile 2. sıradaki takım arasındaki puan farkı -- SADECE bu sezonun şu anki durumu (geçmiş
+            sezonlarla kıyaslama yapılmaz, o veri yok).
+          </p>
+          <div className="title-tension-row">
+            <span className="title-tension-team">
+              <Crest team={titleTension.leaderTeam} size={26} />
+              {titleTension.leaderTeam.name} <b>{titleTension.leaderPts}P</b>
+            </span>
+            <span className={`title-tension-badge title-tension-${titleTension.tension}`}>
+              {titleTension.gap} puan fark
+              {titleTension.tension === "high" ? " · Çok Gergin 🔥" : titleTension.tension === "medium" ? " · Normal" : " · Rahat"}
+            </span>
+            <span className="title-tension-team">
+              {titleTension.secondTeam.name} <b>{titleTension.secondPts}P</b>
+              <Crest team={titleTension.secondTeam} size={26} />
+            </span>
+          </div>
+        </div>
+      )}
+
+      {weakestGroups.length > 0 && (
+        <div className="chart-card chart-card-wide">
+          <h3>🔗 Zayıf Halka</h3>
+          <p className="footnote">
+            Her takımın kadrosunu mevkiye göre gruplayıp lig ortalamasıyla kıyaslar -- en büyük eksi sapmaya sahip
+            mevki, o takımın "zayıf halkası"dır. En az 2 oyunculu mevki grupları sayılır.
+          </p>
+          <div className="fixture-difficulty-grid">
+            {weakestGroups.map((row) => (
+              <Link key={row.teamId} to={`/${competitionKey}/takim/${row.teamId}`} className={`fixture-difficulty-row ${row.teamId === favoriteTeamId ? "is-favorite" : ""}`}>
+                <Crest team={row.team} size={22} />
+                <span className="fixture-difficulty-name">{row.team.name}</span>
+                <span className="footnote" style={{ flex: 1 }}>
+                  {POSITION_LABELS_TR[row.position]}: {row.avg} <span className="footnote-note">(lig ort. {row.leagueAvg})</span>
+                </span>
+                <span className="fixture-difficulty-pct" style={{ color: "#b91c1c" }}>{row.deviation}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {expectedVsActual.length > 0 && (
+        <div className="chart-card chart-card-wide">
+          <h3>📐 Beklenen vs Gerçek Sıra</h3>
+          <p className="footnote">
+            Sadece kadro kalitesine (Kadro Gücü Sıralaması) göre "olması gereken" sıra ile gerçek puan durumundaki
+            sırası arasındaki fark. Pozitif (yeşil) = kadrosunun ÜSTÜNDE performans, negatif (kırmızı) = ALTINDA.
+            xPTS'ten farklı olarak maç sonuçlarına değil, ham kadro kalitesine kıyaslar.
+          </p>
+          <ResponsiveContainer width="100%" height={Math.max(320, expectedVsActual.length * 24)}>
+            <BarChart data={expectedVsActual} layout="vertical" margin={{ left: 16, right: 24 }}>
+              <CartesianGrid stroke={CHART_GRID} horizontal={false} />
+              <XAxis type="number" stroke={CHART_AXIS} tick={{ fill: CHART_AXIS, fontSize: 12 }} />
+              <YAxis
+                type="category"
+                dataKey={(d) => d.team.short}
+                width={78}
+                stroke={CHART_AXIS}
+                tick={(props) => <TeamAxisTick {...props} teamsByKey={teamByShort} fill={CHART_AXIS} />}
+              />
+              <ReferenceLine x={0} stroke={CHART_AXIS} />
+              <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
+              <Bar dataKey="diff" name="Sıra Farkı (beklenen - gerçek)" radius={[4, 4, 4, 4]} maxBarSize={14}>
+                {expectedVsActual.map((row) => (
+                  <Cell key={row.teamId} fill={row.diff >= 0 ? "#15803d" : "#b91c1c"} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {goalScoringDepth.length > 0 && (
+        <div className="chart-card">
+          <h3>🎽 Gol Çeşitliliği</h3>
+          <p className="footnote">Kaç farklı oyuncunun gol attığı -- yüksek çeşitlilik, gol yükünün paylaşıldığı anlamına gelir.</p>
+          <ResponsiveContainer width="100%" height={Math.max(280, goalScoringDepth.length * 22)}>
+            <BarChart data={goalScoringDepth} layout="vertical" margin={{ left: 16, right: 16 }}>
+              <CartesianGrid stroke={CHART_GRID} horizontal={false} />
+              <XAxis type="number" allowDecimals={false} stroke={CHART_AXIS} tick={{ fill: CHART_AXIS, fontSize: 12 }} />
+              <YAxis
+                type="category"
+                dataKey={(d) => d.team.short}
+                width={78}
+                stroke={CHART_AXIS}
+                tick={(props) => <TeamAxisTick {...props} teamsByKey={teamByShort} fill={CHART_AXIS} />}
+              />
+              <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
+              <Bar dataKey="scorerCount" name="Farklı Golcü Sayısı" fill={CHART_SERIES[6]} radius={[0, 4, 4, 0]} maxBarSize={14} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {homeAwayGap.length > 0 && (
+        <div className="chart-card chart-card-wide">
+          <h3>🏠✈️ Ev Sahibi / Deplasman Karakteri</h3>
+          <p className="footnote">
+            İç saha ve deplasmandaki maç başı puan ortalaması arasındaki fark -- büyük fark, "evinde aslan
+            deplasmanda kuzu" (ya da tam tersi) bir profile işaret eder.
+          </p>
+          <div className="fixture-difficulty-grid">
+            {homeAwayGap.map((row) => (
+              <Link key={row.teamId} to={`/${competitionKey}/takim/${row.teamId}`} className={`fixture-difficulty-row ${row.teamId === favoriteTeamId ? "is-favorite" : ""}`}>
+                <Crest team={row.team} size={22} />
+                <span className="fixture-difficulty-name">{row.team.name}</span>
+                <span className="footnote" style={{ flex: 1 }}>
+                  Ev {row.homePpg} P/M · Dep {row.awayPpg} P/M -- {row.strongerAt === "home" ? "evinde daha güçlü" : "deplasmanda daha güçlü"}
+                </span>
+                <span className="fixture-difficulty-pct">{row.gap}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {mostAbsences.length > 0 && (
+        <div className="chart-card chart-card-wide">
+          <h3>🚑 En Eksik Kadroyla Sahaya Çıkanlar</h3>
+          <p className="footnote">
+            Güç Endeksi'nin "eksik etkisi" bileşenine göre, o an sakat/cezalı oyuncularının kaybı takıma en çok
+            zarar veren takımlar -- sadece kadro ortalamasının ÜSTÜNDE reytingli eksik oyuncular sayılır.
+          </p>
+          <div className="fixture-difficulty-grid">
+            {mostAbsences.map((row) => (
+              <Link key={row.teamId} to={`/${competitionKey}/takim/${row.teamId}`} className={`fixture-difficulty-row ${row.teamId === favoriteTeamId ? "is-favorite" : ""}`}>
+                <Crest team={row.team} size={22} />
+                <span className="fixture-difficulty-name">{row.team.name}</span>
+                <span className="footnote" style={{ flex: 1 }}>{row.unavailableCount} oyuncu eksik</span>
+                <span className="fixture-difficulty-pct" style={{ color: "#b91c1c" }}>
+                  {row.missingImpact > 0 ? `-${row.missingImpact}` : "0"}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {zoneDistance.length > 0 && (
+        <div className="chart-card chart-card-wide">
+          <h3>📏 Zirveye / Düşme Hattına Mesafe</h3>
+          <p className="footnote">
+            Her takımın bir ÜST bölgeye çıkmak için o bölgedeki en son sıradaki takıma kaç puan geride olduğu, ve bir
+            ALT bölgeye düşmemek için o bölgenin ilk takımına kaç puan önde olduğu -- sadece gerçek puan durumundan.
+            Sezon başında (az maç oynanmışken) bu sayılar bir sonuçla hızla değişebilir, dikkatli okunmalı.
+          </p>
+          <div className="standings-scroll">
+            <table className="standings-table">
+              <thead>
+                <tr>
+                  <th className="standings-team-header">Takım</th>
+                  <th>P</th>
+                  <th>Bölge</th>
+                  <th>Yukarı Çıkmak İçin</th>
+                  <th>Aşağı Düşmemek İçin</th>
+                </tr>
+              </thead>
+              <tbody>
+                {zoneDistance.map((row) => (
+                  <tr key={row.teamId} className={row.teamId === favoriteTeamId ? "standings-row-favorite" : ""}>
+                    <td className="standings-team-cell">
+                      <span className="standings-team-link">
+                        <Crest team={row.team} size={18} />
+                        <span>{row.team.name}</span>
+                      </span>
+                    </td>
+                    <td className="pts-cell">{row.pts}</td>
+                    <td>
+                      <span className={`status-badge status-tone-${row.zoneTone}`}>{row.zoneLabel}</span>
+                    </td>
+                    <td>
+                      {row.pointsToClimb == null ? (
+                        <span className="standings-empty">--</span>
+                      ) : row.pointsToClimb === 0 ? (
+                        <span className="zone-distance-safe">Sınırda</span>
+                      ) : (
+                        <>+{row.pointsToClimb} puan <span className="footnote-note">({row.climbTargetZoneLabel})</span></>
+                      )}
+                    </td>
+                    <td>
+                      {row.pointsCushion == null ? (
+                        <span className="standings-empty">--</span>
+                      ) : row.pointsCushion === 0 ? (
+                        <span className="zone-distance-risky">Sınırda</span>
+                      ) : (
+                        <>{row.pointsCushion} puan önde <span className="footnote-note">({row.cushionZoneLabel})</span></>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {gdFragility.length > 0 && (
+        <div className="chart-card chart-card-wide">
+          <h3>⚠️ Averaj Kırılganlığı</h3>
+          <p className="footnote">
+            Aynı puana sahip, averaj farkı sadece 1-2 gol olan komşu takım çiftleri -- büyük skorlu TEK bir maç,
+            aralarındaki sırayı değiştirebilir. Sadece gerçek puan durumundan; hipotetik bir maç UYDURULMAZ.
+          </p>
+          <div className="gd-fragility-list">
+            {gdFragility.map((row) => (
+              <div key={row.teamId} className="gd-fragility-row">
+                <Link to={`/${competitionKey}/takim/${row.teamId}`} className="gd-fragility-team">
+                  <Crest team={row.team} size={22} />
+                  <span className="gd-fragility-name">{row.team.name}</span>
+                  <span className="gd-fragility-stat">{row.pts}P · AV {row.gd > 0 ? `+${row.gd}` : row.gd}</span>
+                </Link>
+                <span className="gd-fragility-gap">sadece {row.gdGap} gol fark</span>
+                <Link to={`/${competitionKey}/takim/${row.rivalTeam.id}`} className="gd-fragility-team gd-fragility-team-away">
+                  <span className="gd-fragility-stat">{row.pts}P · AV {row.rivalGd > 0 ? `+${row.rivalGd}` : row.rivalGd}</span>
+                  <span className="gd-fragility-name">{row.rivalTeam.name}</span>
+                  <Crest team={row.rivalTeam} size={22} />
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {goalDependency.length > 0 && (
+        <div className="chart-card chart-card-wide">
+          <h3>🎯 Kilit Oyuncu Bağımlılığı</h3>
+          <p className="footnote">
+            Takımın gerçek Gol Kralları verisindeki en golcü oyuncusunun, takımın puan durumundaki TOPLAM gol
+            sayısına oranı -- yüksek yüzde, "bu oyuncu sakatlanırsa/cezalı olursa takım hücumda çok zorlanır" demek.
+            Sadece gerçek, doğrulanmış gol verisi olan takımlar listelenir.
+          </p>
+          <div className="fixture-difficulty-grid">
+            {goalDependency.map((row) => (
+              <Link
+                key={row.teamId}
+                to={`/${competitionKey}/takim/${row.teamId}`}
+                className={`fixture-difficulty-row ${row.teamId === favoriteTeamId ? "is-favorite" : ""}`}
+              >
+                <Crest team={row.team} size={22} />
+                <span className="fixture-difficulty-name" title={`${row.playerName} (${row.playerGoals}/${row.teamGoals} gol)`}>
+                  {row.playerName}
+                </span>
+                <span className="fixture-difficulty-track">
+                  <span
+                    className="fixture-difficulty-fill"
+                    style={{
+                      width: `${row.dependencyPct}%`,
+                      background: `hsl(${Math.round((100 - row.dependencyPct) * 1.3)}, 65%, 46%)`,
+                    }}
+                  />
+                </span>
+                <span className="fixture-difficulty-pct">
+                  %{row.dependencyPct}
+                  <span className="fixture-difficulty-coeff">({row.playerGoals}/{row.teamGoals})</span>
                 </span>
               </Link>
             ))}

@@ -626,7 +626,24 @@ export function isMatchRevealed(league, matchId) {
   // src/utils/matchDate.js'teki isMatchPlayed zaten bu tam hatayı düzeltmek
   // için gün bazlı (saatsiz) kıyaslıyor -- burada onu tekrar yazmak yerine
   // aynı fonksiyonu kullanıyoruz.
-  return isMatchPlayed({ date });
+  if (isMatchPlayed({ date })) return true;
+  // AMA salt tarih kontrolü tek başına yeterli değil: isMatchPlayed bugüne
+  // tarihli bir maçı (akşam maçı henüz başlamamış olabilir diye, bkz.
+  // yukarıdaki not) hep "oynanmadı" sayar -- OYSA bugün tarihli bir maç
+  // ZATEN oynanıp bitmiş VE gerçek sonucu elimize (liveStatus.js/
+  // realResultsUcl2026.js'e) girilmiş olabilir (RealFixturePage.jsx'teki
+  // highlightMatch/MatchRow.jsx'teki hasSim ile AYNI mantık). Kullanıcı geri
+  // bildirimi: "sonuçlanan maçlar belli olmuyor" -- bugün tarihli, sonucu
+  // zaten girilmiş maçlar Tahmin Ligi'nde hâlâ "beklemede" görünüyordu.
+  // SADECE gerçek veri destekli (ucl/superlig) yarışmalarda -- simüle
+  // edilmiş (Firestore'da baştan hazır `league.results`) liglerde BUNU
+  // YAPMA, aksi halde asıl korunması gereken "spoiler" (sahte, baştan
+  // üretilmiş sonuç) tarih gelmeden sızdırılmış olur.
+  const match = resolveLeagueMatch(league, matchId);
+  if (match && hasRealDataSupport(match.competitionKey)) {
+    return !!getRealMatchResult(match.competitionKey, match);
+  }
+  return false;
 }
 
 // Sezonun TAMAMI (fikstürdeki her maç) açığa çıktı mı -- "Lig Sıralaması"
