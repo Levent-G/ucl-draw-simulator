@@ -13,6 +13,13 @@ export default function MatchRow({ match, userScore, onUserScoreChange, competit
   // sayılmadığı için yanlışlıkla "⏳ Bekleniyor" gösterirdi.
   const hasSim = match.homeGoals != null && match.awayGoals != null;
   const played = isMatchPlayed(match) || hasSim;
+  // Bazı akışlarda (ör. InteractivePrediction'ın "Skorları Ben Gireyim"
+  // sekmesi) match nesnesi ham fikstürden gelir ve olasılık alanları HİÇ
+  // yok -- ?? 0 ile varsayılana düşmek yanlışlıkla "%0/%0/%100" gibi
+  // UYDURMA bir olasılık gösterirdi. Alan gerçekten VARSA (buildDisplayMatches
+  // ya da simulateSeason -- ikisi de her zaman doldurur) göster, yoksa hiç
+  // gösterme.
+  const hasProb = match.homeWinProb != null;
   const homePct = Math.round((match.homeWinProb ?? 0) * 100);
   const drawPct = Math.round((match.drawProb ?? 0) * 100);
   const awayPct = Math.max(0, 100 - homePct - drawPct);
@@ -48,22 +55,34 @@ export default function MatchRow({ match, userScore, onUserScoreChange, competit
           {played ? "Maç Merkezi →" : "Maç Analizi →"}
         </Link>
 
-        {played && (
-          <>
-            <div
-              className="match-row-probs"
-              title={`Modelin tahmini -- Ev sahibi ${homePct}% · Berabere ${drawPct}% · Deplasman ${awayPct}%`}
-            >
-              <span className="prob-seg prob-home" style={{ width: `${homePct}%` }} />
-              <span className="prob-seg prob-draw" style={{ width: `${drawPct}%` }} />
-              <span className="prob-seg prob-away" style={{ width: `${awayPct}%` }} />
-            </div>
-            <div className="match-row-prob-labels">
-              <span>{homePct}%</span>
-              <span>{drawPct}%</span>
-              <span>{awayPct}%</span>
-            </div>
-          </>
+        {/* ESKİDEN bu bölüm SADECE played===true iken gösteriliyordu -- yani
+            "Model: N. Hafta Tahminleri" gibi bölümlerde (bkz. RealAnalysisTab
+            -- nextMatches KASITLI OLARAK sadece OYNANMAMIŞ maçları listeler)
+            olasılık çubuğu HİÇBİR ZAMAN görünmüyordu, çünkü played her zaman
+            false'tu. Modelin tahmini hem oynanmamış (asıl amaç -- "kim
+            favori") hem de oynanmış (ör. eğlence modu simülasyonunda "model
+            ne kadar haklı çıktı" karşılaştırması) maçlarda anlamlı olduğu
+            için artık played'e değil hasProb'a (bkz. yukarı) bağlı --
+            InteractivePrediction'ın "Skorları Ben Gireyim" sekmesi gibi
+            olasılık verisi HİÇ hesaplanmamış ham fikstür nesnelerinde ise
+            (hasProb false) UYDURMA bir %0/%0/%100 göstermek yerine hiç
+            gösterilmiyor. */}
+        {hasProb && (
+        <>
+        <div
+          className="match-row-probs"
+          title={`Modelin tahmini -- Ev sahibi ${homePct}% · Berabere ${drawPct}% · Deplasman ${awayPct}%`}
+        >
+          <span className="prob-seg prob-home" style={{ width: `${homePct}%` }} />
+          <span className="prob-seg prob-draw" style={{ width: `${drawPct}%` }} />
+          <span className="prob-seg prob-away" style={{ width: `${awayPct}%` }} />
+        </div>
+        <div className="match-row-prob-labels">
+          <span>{homePct}%</span>
+          <span>{drawPct}%</span>
+          <span>{awayPct}%</span>
+        </div>
+        </>
         )}
 
         {!readOnly && (

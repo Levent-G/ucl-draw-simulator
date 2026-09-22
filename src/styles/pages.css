@@ -739,15 +739,113 @@ button.site-nav-dropdown-trigger {
   min-width: 0;
 }
 
+/* Kullanıcı isteği (2026-09-21): sayfa başlığı bloğu artık .page-shell'in
+   üst/yan boşluğunu (22px/24px) iptal edip TAM GENİŞLİK (viewport/sidebar
+   kenarına kadar bleed) bir şerit -- .broadcast-hero'daki AYNI bleed
+   tekniği (negatif margin + iç padding ile telafi). Ayrıca "güzel
+   animasyonlarla destekle" isteğiyle: yumuşak bir hareketli gradyan arka
+   plan (::before, aurora-vari ama çok belirgin OLMAYAN -- metin okunurluğu
+   bozulmasın diye opacity düşük), başlığın altında soldan sağa "çizilen" bir
+   vurgu çizgisi (::after, tek seferlik), ve başlık/açıklamanın sayfa
+   açılışında hafif yukarı kayarak belirmesi (fade+slide-up, stagger'lı).
+   prefers-reduced-motion kullanıcıları için TÜM animasyonlar kapatılır. */
 .page-header {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 24px;
   flex-wrap: wrap;
-  padding-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+  margin: -22px -24px 24px;
+  padding: 30px 24px 24px;
   border-bottom: 1px solid var(--line);
-  margin-bottom: 20px;
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--accent-bright) 7%, var(--bg-panel)) 0%,
+    var(--bg-panel) 45%,
+    color-mix(in srgb, var(--ucl-blue-1) 6%, var(--bg-panel)) 100%
+  );
+}
+.page-header::before {
+  content: "";
+  position: absolute;
+  top: -60%;
+  right: -10%;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent-bright) 16%, transparent), transparent 70%);
+  pointer-events: none;
+  animation: page-header-drift 14s ease-in-out infinite;
+}
+@keyframes page-header-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-24px, 18px) scale(1.12); }
+}
+.page-header > div {
+  position: relative;
+  z-index: 1;
+}
+.page-header > div:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.page-header-actions {
+  position: relative;
+  z-index: 1;
+}
+.page-header h1,
+.page-header p,
+.page-eyebrow {
+  animation: page-header-fade-up 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.page-eyebrow {
+  animation-delay: 0s;
+}
+.page-header h1 {
+  animation-delay: 0.06s;
+  position: relative;
+  display: inline-block;
+}
+.page-header h1::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  height: 2px;
+  width: 100%;
+  background: linear-gradient(90deg, var(--accent-bright), transparent);
+  transform-origin: left;
+  animation: page-header-underline 0.7s 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.page-header p {
+  animation-delay: 0.12s;
+}
+@keyframes page-header-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes page-header-underline {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-header::before {
+    animation: none;
+  }
+  .page-header h1,
+  .page-header p,
+  .page-eyebrow,
+  .page-header h1::after {
+    animation: none;
+  }
 }
 .page-eyebrow {
   font-family: var(--font-mono);
@@ -815,7 +913,6 @@ button.site-nav-dropdown-trigger {
 .page-header p {
   font-size: 13px;
   color: var(--text-dim);
-  max-width: 640px;
   line-height: 1.5;
 }
 .page-header-actions {
@@ -5444,6 +5541,15 @@ a.team-profile-match-row:hover {
   border-radius: 999px;
   padding: 3px 10px;
 }
+.prediction-missing-warning {
+  font-size: 12.5px;
+  color: #b45309;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+}
 .prediction-team-search {
   width: 100%;
   padding: 10px 14px;
@@ -8505,6 +8611,44 @@ a.team-profile-match-row:hover {
   background: var(--pink);
   transition: width 0.4s ease;
 }
+.match-card-badges {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.match-card-badges-away {
+  justify-content: flex-end;
+}
+.match-card-badge {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.match-scorers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.match-scorer-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.match-scorer-name {
+  flex: 1;
+  color: var(--text-primary);
+}
+.match-scorer-minute {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--text-faint);
+  font-size: 12px;
+}
 .real-team-form-head {
   display: flex;
   align-items: center;
@@ -9065,6 +9209,127 @@ a.team-profile-match-row:hover {
   border-radius: 999px;
   overflow: hidden;
   background: var(--bg-panel);
+}
+
+.rooting-guide-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rooting-guide-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+}
+.rooting-guide-team {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+.rooting-guide-team.is-rooting {
+  background: rgba(0, 135, 74, 0.14);
+  color: var(--accent-bright);
+}
+.rooting-guide-team-away {
+  margin-left: auto;
+}
+.rooting-guide-pct {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+.rooting-guide-vs {
+  font-size: 10.5px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+}
+.rooting-guide-star {
+  font-size: 13px;
+}
+.rooting-guide-impact {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  text-align: right;
+}
+
+.comeback-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+.comeback-subhead {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-dim);
+  margin: 0 0 8px;
+}
+.comeback-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.comeback-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  padding: 6px 8px;
+  border-radius: var(--radius-md);
+  background: var(--bg-panel);
+}
+.comeback-score {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.next-win-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.next-win-row {
+  display: grid;
+  grid-template-columns: minmax(90px, 130px) minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+.next-win-row:last-child {
+  border-bottom: none;
+}
+.next-win-focus {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.next-win-focus-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.next-win-focus-pct {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--accent-bright);
 }
 
 .pagination-bar {

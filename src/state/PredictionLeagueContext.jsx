@@ -483,10 +483,13 @@ export function usePredictions(leagueId) {
 
 // Bir SKOR tahmininin (kind:"score") gerçek sonuca göre kaç puan
 // getirdiğini hesaplar: 5 = tam skor, 3 = doğru kazanan/beraberlik (gol
-// farkı tutmasa bile), 0 = tamamen yanlış. ESKİDEN doğru sonuç + doğru gol
-// farkı 3, sadece doğru sonuç 1 puan veriyordu -- kullanıcı geri bildirimi:
-// doğru kazananı bilmek tek başına (skor tam tutmasa da) 3 puan etmeli, 1
-// değil (acil deploy öncesi düzeltme, 2026-09-21).
+// farkı tutmasa bile), -0.5 = tamamen yanlış. ESKİDEN yanlış tahmin 0
+// puandı -- kullanıcı geri bildirimi: yanlış tahminin bir bedeli olmalı,
+// aksi halde rastgele/gelişigüzel tahmin girmenin hiçbir riski yok (2026-09-21).
+// NOT: hiç tahmin GİRİLMEMİŞ bir maç (prediction=null) bu cezayı ASLA
+// almaz -- ceza sadece GİRİLİP yanlış çıkan tahminler içindir (bkz. altta
+// `!prediction` erken dönüşü); kullanıcı bilinçli olarak "boş bırakılan
+// tahmin cezasız kalsın" dedi.
 export function scorePrediction(prediction, actual) {
   if (!prediction || !actual) return 0;
   const { homeGoals: ph, awayGoals: pa } = prediction;
@@ -498,7 +501,7 @@ export function scorePrediction(prediction, actual) {
     (predictedDiff > 0 && actualDiff > 0) ||
     (predictedDiff < 0 && actualDiff < 0) ||
     (predictedDiff === 0 && actualDiff === 0);
-  return sameOutcome ? 3 : 0;
+  return sameOutcome ? 3 : -0.5;
 }
 
 // "Adım adım" akışın tahmin türlerine ayrı puan ağırlığı verir: şampiyon
@@ -514,7 +517,7 @@ const STANDINGS_MAX_POINTS_PER_TEAM = 3;
 // UCL/Avrupa Ligi'nde artık tam skor değil, basit bir "tuttuğun takım bu
 // maçtan kaç puan alır" (Galibiyet=3/Beraberlik=1/Mağlubiyet=0, futbolun
 // kendi puanlama mantığı) tahmini yapılıyor -- doğru bilmek sabit bu kadar
-// puan kazandırır (yanlışsa 0).
+// puan kazandırır (yanlışsa -0.5, bkz. pointsForPrediction'daki "outcome" dalı).
 export const OUTCOME_CORRECT_POINTS = 3;
 
 // Bir lig belgesinin fikstürünü, {competitionKey, matchdays} çiftlerinden
@@ -708,7 +711,8 @@ export function pointsForPrediction(prediction, league) {
     if (!isHome && !isAway) return 0;
     const diff = isHome ? actual.homeGoals - actual.awayGoals : actual.awayGoals - actual.homeGoals;
     const actualResult = diff > 0 ? "win" : diff < 0 ? "loss" : "draw";
-    return actualResult === prediction.result ? OUTCOME_CORRECT_POINTS : 0;
+    // Yanlış tahmin -0.5 puan -- bkz. scorePrediction'daki aynı kuralın notu.
+    return actualResult === prediction.result ? OUTCOME_CORRECT_POINTS : -0.5;
   }
   if (prediction.kind === "standings") {
     return standingsPoints(prediction.order, getLeagueStandingsOrder(league));

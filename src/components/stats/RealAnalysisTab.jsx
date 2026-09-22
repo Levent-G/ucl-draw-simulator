@@ -19,6 +19,7 @@ import {
   Legend,
 } from "recharts";
 import Crest from "../Crest.jsx";
+import ProbabilityBar from "../ProbabilityBar.jsx";
 import MatchRow from "../fixture/MatchRow.jsx";
 import Pagination from "../Pagination.jsx";
 import ChartTooltip from "./ChartTooltip.jsx";
@@ -44,6 +45,13 @@ import {
   getAttackDefenseMatrix,
   getGoalsPerMatchdayTrend,
   getSeasonEndProjection,
+  getTitleOdds,
+  getRootingGuide,
+  getGoalTimingDistribution,
+  getComebackAndBlownLeads,
+  getXgPerformance,
+  getDisciplineRanking,
+  getPenaltyStats,
   getSquadRatingRanking,
   getInjuryCountsByTeam,
   getPowerIndex,
@@ -86,6 +94,19 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
   const byDefense = useMemo(() => [...goalsData].sort((a, b) => a.ga - b.ga).slice(0, 15), [goalsData]);
 
   const projectionData = useMemo(() => getSeasonEndProjection(competitionKey).slice(0, 15), [competitionKey]);
+  const titleOdds = useMemo(() => getTitleOdds(competitionKey).slice(0, 10), [competitionKey]);
+  // Ağır bir Monte Carlo hesabı (bkz. getRootingGuide) -- SADECE tuttuğun
+  // takım varsa ve o takımın gerçekten bir şampiyonluk ihtimali varsa
+  // çalışır, bu yüzden favoriteTeamId olmayan/şansı ~0 olan ziyaretçiler
+  // için maliyetsiz.
+  const rootingGuide = useMemo(() => getRootingGuide(competitionKey, favoriteTeamId), [competitionKey, favoriteTeamId]);
+  const goalTiming = useMemo(() => getGoalTimingDistribution(competitionKey), [competitionKey]);
+  const comebackEvents = useMemo(() => getComebackAndBlownLeads(competitionKey), [competitionKey]);
+  const comebacks = useMemo(() => comebackEvents.filter((e) => e.type === "comeback"), [comebackEvents]);
+  const blownLeads = useMemo(() => comebackEvents.filter((e) => e.type === "blown"), [comebackEvents]);
+  const xgPerformance = useMemo(() => getXgPerformance(competitionKey), [competitionKey]);
+  const disciplineRanking = useMemo(() => getDisciplineRanking(competitionKey), [competitionKey]);
+  const penaltyStats = useMemo(() => getPenaltyStats(competitionKey).filter((p) => p.scored > 0 || p.conceded > 0), [competitionKey]);
 
   const nextMatchday = useMemo(() => {
     for (const md of fixture || []) {
@@ -97,6 +118,33 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
     () => (nextMatchday ? buildDisplayMatches(competitionKey, nextMatchday.matches).filter((m) => !isMatchPlayed(m)) : []),
     [nextMatchday, competitionKey]
   );
+  // "Bu takım bir sonraki maçını kazanır mı?" -- yukarıdaki nextMatches ZATEN
+  // sıradaki haftanın maçlarını model olasılıklarıyla (homeWinProb/drawProb/
+  // awayWinProb) taşıyor, burada sadece her maçı İKİ takım satırına (ev
+  // sahibi + deplasman, kendi kazanma yüzdesiyle) açıp kazanma ihtimaline
+  // göre sıralıyoruz -- yeni bir hesaplama gerekmiyor.
+  const nextMatchWinRows = useMemo(() => {
+    const rows = [];
+    for (const m of nextMatches) {
+      rows.push({
+        key: `${m.id}-h`,
+        team: m.homeTeam,
+        opponent: m.awayTeam,
+        isHome: true,
+        winPct: Math.round((m.homeWinProb ?? 0) * 100),
+        drawPct: Math.round((m.drawProb ?? 0) * 100),
+      });
+      rows.push({
+        key: `${m.id}-a`,
+        team: m.awayTeam,
+        opponent: m.homeTeam,
+        isHome: false,
+        winPct: Math.round((m.awayWinProb ?? 0) * 100),
+        drawPct: Math.round((m.drawProb ?? 0) * 100),
+      });
+    }
+    return rows.sort((a, b) => b.winPct - a.winPct);
+  }, [nextMatches]);
 
   const formRows = useMemo(() => {
     const sorted = [...(standings || [])].sort((a, b) => a.rank - b.rank);
@@ -274,6 +322,256 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
             </div>
           )}
         </>
+      )}
+
+      {nextMatchWinRows.length > 0 && (
+        <div className="chart-card chart-card-wide">
+          <h3>🔮 Bir Sonraki Maçını Kazanır mı?</h3>
+          <p className="footnote">
+            Her takımın SIRADAKİ maçı için modelin (katsayı + kadro gücü + ev sahibi avantajı) hesapladığı galibiyet
+            ihtimali -- gerçek bir bahis oranı değildir, sadece istatistiksel bir tahmindir.
+          </p>
+          <div className="next-win-list">
+            {nextMatchWinRows.map((r) => {
+              const lossPct = Math.max(0, 100 - r.winPct - r.drawPct);
+              return (
+                <div key={r.key} className="next-win-row">
+                  <div className="next-win-focus">
+                    <Crest team={r.team} size={22} />
+                    <span className="next-win-focus-name">{r.team.short}</span>
+                    <b className="next-win-focus-pct">%{r.winPct}</b>
+                  </div>
+                  <ProbabilityBar
+                    size="mini"
+                    homeTeam={r.isHome ? r.team : r.opponent}
+                    awayTeam={r.isHome ? r.opponent : r.team}
+                    homePct={r.isHome ? r.winPct : lossPct}
+                    drawPct={r.drawPct}
+                    awayPct={r.isHome ? lossPct : r.winPct}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {titleOdds.length > 0 && (
+        <div className="chart-card chart-card-wide">
+          <h3>{competitionKey === "superlig" ? "🏆 Şampiyonluk İhtimali" : "🏆 Lig Fazını Zirvede Bitirme İhtimali"}</h3>
+          <p className="footnote">
+            {competitionKey === "superlig" ? (
+              <>
+                Kalan fikstürün TAMAMI, modelin galibiyet/beraberlik/mağlubiyet olasılıklarına göre 300 kez baştan
+                sona simüle edilerek her takımın kaç simülasyonda 1. bitirdiği sayılır -- bu bir bahis oranı değildir,
+                sadece güncel puan durumu ve kalan fikstürün zorluğuna dayalı istatistiksel bir modeldir.
+              </>
+            ) : (
+              <>
+                UCL'de lig fazını 1. bitirmek turnuvanın kendisini kazanmak DEĞİLDİR (eleme turları var) -- bu sadece
+                kalan lig fazı maçlarının 300 kez simüle edilmesiyle "lig fazı 1.liği" ihtimalini gösterir.
+              </>
+            )}{" "}
+            Düşük görünen bir yüzde "imkansız" demek değildir -- sadece bu kadar denemede az gözlendiği anlamına gelir.
+          </p>
+          <ResponsiveContainer width="100%" height={Math.max(260, titleOdds.length * 30)}>
+            <BarChart data={titleOdds} layout="vertical" margin={{ left: 16, right: 24 }}>
+              <CartesianGrid stroke={CHART_GRID} horizontal={false} />
+              <XAxis type="number" domain={[0, 100]} stroke={CHART_AXIS} tick={{ fill: CHART_AXIS, fontSize: 12 }} unit="%" />
+              <YAxis
+                type="category"
+                dataKey="team.short"
+                width={78}
+                stroke={CHART_AXIS}
+                tick={(props) => <TeamAxisTick {...props} teamsByKey={teamByShort} fill={CHART_AXIS} />}
+              />
+              <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
+              <Bar dataKey="titlePct" name="Şampiyonluk İhtimali" radius={[0, 4, 4, 0]} maxBarSize={18}>
+                {titleOdds.map((row) => (
+                  <Cell key={row.teamId} fill={row.teamId === favoriteTeamId ? "#fbbf24" : CHART_SERIES[0]} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {rootingGuide && (
+        <div className="chart-card chart-card-wide rooting-guide-card">
+          <h3>🧭 Bu Hafta Kimi Tutmalısın?</h3>
+          <p className="footnote">
+            {teamById[favoriteTeamId]?.short}'in {rootingGuide.metricLabel} şu an <b>%{rootingGuide.baselinePct}</b>.
+            Kendi maçın dışında bu hafta oynanan diğer maçların HER BİRİNİ (o maç ev sahibi kazanırsa / deplasman
+            kazanırsa diye 1-0 ve 0-1 varsayımıyla) yeniden simüle ettik -- hangi sonucun senin takımının şansını EN
+            ÇOK değiştirdiğini gösteriyoruz. Bu bir gerçek tahmin değil, "ne olursa ne olur" senaryo analizidir; başka
+            hiçbir sitede yok çünkü hem tuttuğun takıma özel hem de tam bir Monte Carlo simülasyonu gerektiriyor.
+          </p>
+          <div className="rooting-guide-list">
+            {rootingGuide.rows.map((r) => (
+              <div key={r.matchId} className="rooting-guide-row">
+                <div className={`rooting-guide-team ${r.rootFor === "home" ? "is-rooting" : ""}`}>
+                  {r.rootFor === "home" && <span className="rooting-guide-star">👉</span>}
+                  <Crest team={r.homeTeam} size={20} />
+                  <span>{r.homeTeam.short}</span>
+                  <span className="rooting-guide-pct">%{r.homeWinPct}</span>
+                </div>
+                <span className="rooting-guide-vs">vs</span>
+                <div className={`rooting-guide-team rooting-guide-team-away ${r.rootFor === "away" ? "is-rooting" : ""}`}>
+                  <span className="rooting-guide-pct">%{r.awayWinPct}</span>
+                  <span>{r.awayTeam.short}</span>
+                  <Crest team={r.awayTeam} size={20} />
+                  {r.rootFor === "away" && <span className="rooting-guide-star">👈</span>}
+                </div>
+                <span className="rooting-guide-impact">Etki: ±%{r.impact}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {goalTiming.total > 0 && (
+        <div className="chart-card chart-card-wide">
+          <h3>⏱️ Kritik Dakika Analizi</h3>
+          <p className="footnote">
+            Gollerin maç içinde hangi dakika aralığında yoğunlaştığı -- şu an sadece detaylı gol-dakikası verisi olan{" "}
+            <b>{goalTiming.matchCount} maçtan</b> ({goalTiming.total} gol), sezonun tamamından değil. Daha fazla hafta
+            için detaylı istatistik eklendikçe bu örneklem büyüyecek.
+          </p>
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={goalTiming.bands} margin={{ left: 0, right: 16 }}>
+              <CartesianGrid stroke={CHART_GRID} vertical={false} />
+              <XAxis dataKey="label" stroke={CHART_AXIS} tick={{ fill: CHART_AXIS, fontSize: 12 }} />
+              <YAxis allowDecimals={false} stroke={CHART_AXIS} tick={{ fill: CHART_AXIS, fontSize: 11 }} unit="%" />
+              <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
+              <Bar dataKey="pct" name="Gollerin %'si" fill={CHART_SERIES[1]} radius={[4, 4, 0, 0]} maxBarSize={40} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {(comebacks.length > 0 || blownLeads.length > 0) && (
+        <div className="chart-card chart-card-wide">
+          <h3>🔄 Geriden Gelip Kazanma / Elden Kaçırma</h3>
+          <p className="footnote">
+            Detaylı gol-dakikası verisi olan maçlarda, maçın bir anında geride olup sonunda KAZANAN takımlar
+            ("geriden gelme") ve bir anında önde olup sonunda kazanamayan takımlar ("elden kaçırma").
+          </p>
+          <div className="comeback-columns">
+            <div>
+              <h4 className="comeback-subhead">✅ Geriden Gelip Kazandı</h4>
+              {comebacks.length === 0 ? (
+                <p className="footnote">Bu maçlarda hiç görülmedi.</p>
+              ) : (
+                <ul className="comeback-list">
+                  {comebacks.map((e, i) => (
+                    <li key={i} className="comeback-item">
+                      <Crest team={e.team} size={18} /> <b>{e.team.short}</b>
+                      <span className="comeback-score">
+                        {e.homeTeam.short} {e.homeGoals}-{e.awayGoals} {e.awayTeam.short}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <div>
+              <h4 className="comeback-subhead">❌ Elden Kaçırdı</h4>
+              {blownLeads.length === 0 ? (
+                <p className="footnote">Bu maçlarda hiç görülmedi.</p>
+              ) : (
+                <ul className="comeback-list">
+                  {blownLeads.map((e, i) => (
+                    <li key={i} className="comeback-item">
+                      <Crest team={e.team} size={18} /> <b>{e.team.short}</b>
+                      <span className="comeback-score">
+                        {e.homeTeam.short} {e.homeGoals}-{e.awayGoals} {e.awayTeam.short}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {xgPerformance.length > 0 && (
+        <div className="chart-card chart-card-wide">
+          <h3>🍀 Şanslı mı Şanssız mı? (xG Farkı)</h3>
+          <p className="footnote">
+            Takımın GERÇEKTEN attığı gol sayısı, o maçlar için elimizdeki xG (beklenen gol) değerinden ne kadar
+            sapıyor -- pozitif: attığı fırsatlardan beklenenden FAZLA gol buluyor (klinik/şanslı), negatif: beklenen
+            fırsatları gole çeviremiyor (şanssız/verimsiz). Sadece xG verisi olan{" "}
+            <b>{xgPerformance[0]?.matches ? "birkaç" : ""} maçtan</b> hesaplanır, küçük bir örneklem.
+          </p>
+          <ResponsiveContainer width="100%" height={Math.max(220, xgPerformance.length * 28)}>
+            <BarChart data={xgPerformance} layout="vertical" margin={{ left: 16, right: 24 }}>
+              <CartesianGrid stroke={CHART_GRID} horizontal={false} />
+              <XAxis type="number" stroke={CHART_AXIS} tick={{ fill: CHART_AXIS, fontSize: 12 }} />
+              <YAxis
+                type="category"
+                dataKey="team.short"
+                width={78}
+                stroke={CHART_AXIS}
+                tick={(props) => <TeamAxisTick {...props} teamsByKey={teamByShort} fill={CHART_AXIS} />}
+              />
+              <ReferenceLine x={0} stroke={CHART_AXIS} />
+              <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
+              <Bar dataKey="luck" name="Gol - xG farkı" radius={[0, 4, 4, 0]} maxBarSize={16}>
+                {xgPerformance.map((row) => (
+                  <Cell key={row.teamId} fill={row.luck >= 0 ? CHART_SERIES[1] : CHART_SERIES[6] || "#dc2626"} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {disciplineRanking.length > 0 && (
+        <div className="chart-card chart-card-wide">
+          <h3>🟨 Fair Play / Kart Ligi</h3>
+          <p className="footnote">
+            Faul + sarı/kırmızı kart verisi olan maçlardan bir disiplin skoru (sarı=1, kırmızı=3, faul=0.1 ağırlıklı
+            toplam) -- düşük skor daha disiplinli demektir. En disiplinliden en az disiplinliye sıralı.
+          </p>
+          <div className="fixture-difficulty-grid">
+            {disciplineRanking.map((row) => (
+              <div key={row.teamId} className="fixture-difficulty-row">
+                <Crest team={row.team} size={22} />
+                <span className="fixture-difficulty-name">{row.team.short}</span>
+                <span className="footnote" style={{ flex: 1 }}>
+                  <span className="footnote-note">
+                    {row.yellow} 🟨 · {row.red} 🟥 · {row.fouls} faul ({row.matches} maç)
+                  </span>
+                </span>
+                <span className="fixture-difficulty-pct">{row.disciplineScore}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {penaltyStats.length > 0 && (
+        <div className="chart-card chart-card-wide">
+          <h3>🎯 Penaltı İstatistikleri</h3>
+          <p className="footnote">Detaylı gol verisi olan maçlarda penaltıdan atılan/yenen gol sayısı.</p>
+          <div className="fixture-difficulty-grid">
+            {penaltyStats.map((row) => (
+              <div key={row.teamId} className="fixture-difficulty-row">
+                <Crest team={row.team} size={22} />
+                <span className="fixture-difficulty-name">{row.team.short}</span>
+                <span className="footnote" style={{ flex: 1 }}>
+                  <span className="footnote-note">
+                    {row.scored} atılan · {row.conceded} yenen
+                  </span>
+                </span>
+                <span className="fixture-difficulty-pct" style={{ color: row.net >= 0 ? "var(--accent-bright)" : "var(--pink)" }}>
+                  {row.net > 0 ? `+${row.net}` : row.net}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       {progression.length > 1 && progressionTeamIds.length > 0 && (

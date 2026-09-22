@@ -105,9 +105,9 @@ describe("PredictionLeagueContext.pointsForPrediction (kind: outcome, basit Gali
     expect(pointsForPrediction(prediction, league)).toBe(OUTCOME_CORRECT_POINTS);
   });
 
-  it("awards 0 when the predicted result is wrong", () => {
+  it("deducts 0.5 points when the predicted result is wrong", () => {
     const prediction = { kind: "outcome", matchId: "m1", teamId: "barcelona", result: "win" };
-    expect(pointsForPrediction(prediction, league)).toBe(0);
+    expect(pointsForPrediction(prediction, league)).toBe(-0.5);
   });
 
   it("treats a draw correctly from either team's perspective", () => {
@@ -155,8 +155,8 @@ describe("PredictionLeagueContext.scorePrediction (kind: score)", () => {
     expect(scorePrediction({ homeGoals: 3, awayGoals: 0 }, { homeGoals: 1, awayGoals: 0 })).toBe(3);
   });
 
-  it("gives 0 points for a completely wrong outcome (predicted home win, away won)", () => {
-    expect(scorePrediction({ homeGoals: 2, awayGoals: 0 }, { homeGoals: 0, awayGoals: 1 })).toBe(0);
+  it("deducts 0.5 points for a completely wrong outcome (predicted home win, away won)", () => {
+    expect(scorePrediction({ homeGoals: 2, awayGoals: 0 }, { homeGoals: 0, awayGoals: 1 })).toBe(-0.5);
   });
 
   it("gives 0 points when there is no prediction or no actual result yet", () => {
@@ -337,8 +337,8 @@ describe("PredictionLeagueContext.buildLeaderboard", () => {
     };
     const predictions = [
       { uid: "a", displayName: "Ali", kind: "score", matchId: "m1", homeGoals: 2, awayGoals: 1 }, // 5
-      { uid: "a", displayName: "Ali", kind: "score", matchId: "m2", homeGoals: 1, awayGoals: 0 }, // 0
-      { uid: "a", displayName: "Ali", kind: "champion", matchId: "champion", pickedTeamId: "man-city" }, // 0 (yanlış)
+      { uid: "a", displayName: "Ali", kind: "score", matchId: "m2", homeGoals: 1, awayGoals: 0 }, // -0.5 (yanlış -- ev sahibi galibiyeti tahmin etti, gerçek berabere)
+      { uid: "a", displayName: "Ali", kind: "champion", matchId: "champion", pickedTeamId: "man-city" }, // 0 (yanlış -- champion/knockout hâlâ ceza yok)
       { uid: "b", displayName: "Ayşe", kind: "score", matchId: "m1", homeGoals: 3, awayGoals: 0 }, // 3 (doğru kazanan, gol farkı tutmuyor)
       { uid: "b", displayName: "Ayşe", kind: "score", matchId: "m2", homeGoals: 0, awayGoals: 0 }, // 5
       { uid: "b", displayName: "Ayşe", kind: "champion", matchId: "champion", pickedTeamId: "real-madrid" }, // 15 (doğru!)
@@ -346,7 +346,7 @@ describe("PredictionLeagueContext.buildLeaderboard", () => {
     const board = buildLeaderboard(predictions, season);
     expect(board.map((r) => r.uid)).toEqual(["b", "a"]);
     expect(board[0].points).toBe(23); // 3 + 5 + 15
-    expect(board[1].points).toBe(5); // 5 + 0 + 0
+    expect(board[1].points).toBe(4.5); // 5 - 0.5 + 0
     expect(board[0].predicted).toBe(3);
   });
 

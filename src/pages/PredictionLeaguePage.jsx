@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { COMPETITION_LIST } from "../data/competitions.js";
 import {
@@ -237,7 +237,7 @@ function PredictionLeagueLanding() {
           <div className="prediction-intro-point">
             <span className="prediction-intro-point-icon">🎯</span>
             <div>
-              <b>5 puan</b> tam skor · <b>3 puan</b> doğru sonuç (galibiyet/beraberlik/mağlubiyet)
+              <b>5 puan</b> tam skor · <b>3 puan</b> doğru sonuç (galibiyet/beraberlik/mağlubiyet) · <b>-0.5 puan</b> yanlış tahmin
             </div>
           </div>
           <div className="prediction-intro-point">
@@ -448,6 +448,20 @@ function PredictionLeagueRoom() {
   const activeWeek = weeks[activeWeekIndex] || null;
   const isViewingPastWeek = activeWeekIndex < currentWeekIndex;
 
+  // Hafta sekmesi şeridi yan tarafa kayabiliyor (bkz. .prediction-week-tabs
+  // -- overflow-x:auto), ama sezon ilerledikçe (34 haftaya kadar) şerit
+  // uzadıkça "şu anki hafta" sekmesi hep en sonda kalıyor, kullanıcı her
+  // seferinde elle sona kaydırmak zorunda kalıyordu. Sayfa açıldığında (ve
+  // lig/hafta değiştiğinde) şu anki haftanın sekmesini otomatik görünür
+  // alana getiriyoruz.
+  const weekTabsRef = useRef(null);
+  useEffect(() => {
+    const container = weekTabsRef.current;
+    if (!container) return;
+    const activeBtn = container.querySelector(".prediction-week-tab.active");
+    if (activeBtn) activeBtn.scrollIntoView({ behavior: "auto", inline: "center", block: "nearest" });
+  }, [leagueId, currentWeekIndex]);
+
   const filteredMatches = useMemo(() => {
     if (!activeWeek) return [];
     const q = toSearchKey(teamQuery.trim());
@@ -456,6 +470,16 @@ function PredictionLeagueRoom() {
       (m) => toSearchKey(m.homeTeam?.name || "").includes(q) || toSearchKey(m.awayTeam?.name || "").includes(q)
     );
   }, [activeWeek, teamQuery]);
+
+  // Kullanıcı geri bildirimi: "her hafta tüm takımlara tahmin girilmeli" --
+  // boş bırakılan tahminler cezalandırılmıyor (bilinçli karar), ama bunu
+  // hatırlatan bir uyarı göstermek doğru yönlendirmeyi sağlıyor. Sadece hâlâ
+  // AÇIK (revealed olmamış, yani tahmin yapılabilir) maçlar sayılır --
+  // kapanmış bir maç için artık yapılacak bir şey yok.
+  const missingPredictionCount = useMemo(() => {
+    if (!activeWeek || isViewingPastWeek) return 0;
+    return activeWeek.matches.filter((m) => !myPredictionsByMatch[m.id] && !isMatchRevealed(league, m.id)).length;
+  }, [activeWeek, isViewingPastWeek, myPredictionsByMatch, league]);
 
   const leaderboard = useMemo(() => (league ? buildLeaderboard(predictions, league) : []), [predictions, league]);
 
@@ -613,7 +637,7 @@ function PredictionLeagueRoom() {
         <>
           <p className="footnote">
             <b>Sadece kazananı tahmin et:</b> doğru bilirsen <b>{OUTCOME_CORRECT_POINTS} puan</b> · <b>Tam skor tahmin et:</b>{" "}
-            <b>5 puan</b> tam skor, <b>3 puan</b> doğru sonuç ·
+            <b>5 puan</b> tam skor, <b>3 puan</b> doğru sonuç · her iki tahmin türünde de yanlış çıkarsa <b>-0.5 puan</b> ·
             sezon sonunda en çok puanı toplayan kazanır. Maçın gerçek tarihi geçene kadar tahminler puanlanmaz.
           </p>
 
@@ -632,7 +656,7 @@ function PredictionLeagueRoom() {
                 <p className="footnote">Bu ligin fikstürü henüz yüklenmedi.</p>
               ) : (
                 <>
-                  <div className="prediction-week-tabs">
+                  <div className="prediction-week-tabs" ref={weekTabsRef}>
                     {weeks.slice(0, currentWeekIndex + 1).map((w, i) => {
                       const isOpen = i === currentWeekIndex;
                       return (
@@ -656,6 +680,13 @@ function PredictionLeagueRoom() {
                       <span className="prediction-week-current-tag">Şu anki hafta</span>
                     )}
                   </div>
+
+                  {missingPredictionCount > 0 && (
+                    <p className="prediction-missing-warning">
+                      ⚠️ Bu hafta <b>{missingPredictionCount}</b> maça henüz tahmin girmedin -- tahmin girmezsen o maçtan
+                      hiç puan kazanamazsın, hepsine tahmin girmeyi unutma.
+                    </p>
+                  )}
 
                   <input
                     type="text"
@@ -734,7 +765,7 @@ function PredictionLeagueRoom() {
                                   <span className="pick-badge pending">⏳ Sonuç bekleniyor</span>
                                 ) : revealed ? (
                                   <span className={`pick-badge ${points > 0 ? "ok" : "no"}`}>
-                                    {points > 0 ? `✅ Doğru bildin +${points}` : "❌ Tutmadı"}
+                                    {points > 0 ? `✅ Doğru bildin +${points}` : `❌ Tutmadı ${points}`}
                                   </span>
                                 ) : (
                                   <button type="button" className="prediction-change-link" onClick={() => handleChangePrediction(m.id, mine)}>

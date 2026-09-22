@@ -102,32 +102,36 @@ export default function StatsPage() {
         />
       )}
 
-      <div className="stats-toolbar">
-        <div className="stats-tabs">
-          {TABS.map((t) => (
-            <button key={t.key} className={tab === t.key ? "active" : ""} onClick={() => setTab(t.key)}>
-              {t.label}
-            </button>
-          ))}
-        </div>
+      {(TABS.length > 1 || (tab !== "countries" && tab !== "season-xi" && tab !== "analiz")) && (
+        <div className="stats-toolbar">
+          {TABS.length > 1 && (
+            <div className="stats-tabs">
+              {TABS.map((t) => (
+                <button key={t.key} className={tab === t.key ? "active" : ""} onClick={() => setTab(t.key)}>
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          )}
 
-        {tab !== "countries" && tab !== "season-xi" && tab !== "analiz" && (
-          <div className="team-filter">
-            <label htmlFor="stats-team-filter">Takım filtresi</label>
-            <TeamFilterSelect
-              teams={competition.teams}
-              value={selectedTeamId}
-              onChange={setSelectedTeamId}
-              placeholder={favoriteTeamId ? "⭐ Tuttuğun takım" : "Tüm takımlar"}
-            />
-            {selectedTeam && (
-              <button className="btn-ghost team-filter-clear" onClick={() => setSelectedTeamId("")}>
-                Filtreyi Temizle
-              </button>
-            )}
-          </div>
-        )}
-      </div>
+          {tab !== "countries" && tab !== "season-xi" && tab !== "analiz" && (
+            <div className="team-filter">
+              <label htmlFor="stats-team-filter">Takım filtresi</label>
+              <TeamFilterSelect
+                teams={competition.teams}
+                value={selectedTeamId}
+                onChange={setSelectedTeamId}
+                placeholder={favoriteTeamId ? "⭐ Tuttuğun takım" : "Tüm takımlar"}
+              />
+              {selectedTeam && (
+                <button className="btn-ghost team-filter-clear" onClick={() => setSelectedTeamId("")}>
+                  Filtreyi Temizle
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {tab === "teams" && (
         <TeamsTab

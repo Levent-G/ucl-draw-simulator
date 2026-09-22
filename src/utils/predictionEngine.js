@@ -228,7 +228,7 @@ export function expectedGoals(homeTeam, awayTeam, tacticsById, settings) {
   return { lambdaHome, lambdaAway };
 }
 
-function samplePoisson(lambda) {
+export function samplePoisson(lambda) {
   const L = Math.exp(-lambda);
   let k = 0;
   let p = 1;

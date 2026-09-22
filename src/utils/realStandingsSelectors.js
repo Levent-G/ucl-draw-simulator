@@ -20,6 +20,7 @@ import {
   enrichTeamsWithAttackDefense,
   expectedGoals,
   matchProbabilities,
+  samplePoisson,
 } from "./predictionEngine.js";
 import { isMatchPlayed } from "./matchDate.js";
 import { REAL_FIXTURE_2026 } from "../data/realFixture2026.js";
@@ -35,6 +36,8 @@ import { HEAD_TO_HEAD } from "../data/headToHead.js";
 import { NEWS_ITEMS } from "../data/news.js";
 import { CURRENT_INJURIES } from "../data/injuries.js";
 import { TOP_SCORERS } from "../data/topScorers.js";
+import { SUPER_LIG_MATCH_STATS } from "../data/matchStatsSuperLig.js";
+import { UCL_MATCH_STATS } from "../data/matchStatsUcl.js";
 
 // "ucl"/"superlig" için gerçek veri desteği var mı? (europa henüz yok --
 // gerçek kaynağı olmadığından eski simülasyon-öncelikli akışında kalıyor.)
@@ -147,6 +150,243 @@ export function getRealMatchResult(competitionKey, match) {
     return r ? { homeGoals: r.homeGoals, awayGoals: r.awayGoals, date: match.date, label: r.label } : null;
   }
   return null;
+}
+
+// Bir maçın possession/şut/korner/kart/gol-atıcı istatistiklerini (varsa)
+// döner -- şu an sadece Süper Lig 6. Hafta (sr6m0..sr6m8) ve UCL 1. Hafta
+// (r1m0..r1m17) için doldurulmuş (bkz. src/data/matchStatsSuperLig.js /
+// matchStatsUcl.js -- her ikisi de gerçek, çapraz doğrulanmış veri;
+// doğrulanamayan alanlar tamamen atlanmıştır, ASLA UYDURULMAMIŞTIR). Diğer
+// tüm maçlar için null döner -- arayüz bu durumda bölümü hiç göstermemeli.
+export function getMatchStats(matchId) {
+  return SUPER_LIG_MATCH_STATS[matchId] || UCL_MATCH_STATS[matchId] || null;
+}
+
+// Aşağıdaki 5 seçici (getGoalTimingDistribution, getComebackAndBlownLeads,
+// getXgPerformance, getDisciplineRanking, getPenaltyStats) HEPSİ SADECE
+// matchStatsSuperLig.js/matchStatsUcl.js'te detaylı istatistiği (gol
+// dakikaları, xG, faul/kart) OLAN maçlardan hesaplanır -- şu an bu SADECE
+// Süper Lig 6. Hafta ve UCL 1. Hafta demek (bkz. getMatchStats'in başındaki
+// not). Yani örneklem KÜÇÜK ve BÜYÜYECEK (yeni haftalar eklendikçe bu
+// fonksiyonlar otomatik daha fazla maçı kapsayacak, kod değişmeyecek) --
+// arayüz bunu her zaman "şu ana kadar detaylı verisi olan N maçtan" gibi
+// dürüst bir örneklem notuyla göstermeli, sanki tüm sezonun istatistiğiymiş
+// gibi SUNMAMALI.
+function matchStatsForCompetition(competitionKey) {
+  if (competitionKey === "superlig") return SUPER_LIG_MATCH_STATS;
+  if (competitionKey === "ucl") return UCL_MATCH_STATS;
+  return {};
+}
+
+const GOAL_TIME_BANDS = [
+  { key: "0-15", label: "0-15’", test: (m) => m <= 15 },
+  { key: "16-30", label: "16-30’", test: (m) => m > 15 && m <= 30 },
+  { key: "31-45", label: "31-45’(+)", test: (m) => m > 30 && m <= 45 },
+  { key: "46-60", label: "46-60’", test: (m) => m > 45 && m <= 60 },
+  { key: "61-75", label: "61-75’", test: (m) => m > 60 && m <= 75 },
+  { key: "76-90", label: "76-90’(+)", test: (m) => m > 75 },
+];
+
+// Gollerin maç içinde HANGİ dakika aralığında yoğunlaştığını gösterir --
+// detaylı gol-dakikası verisi olan TÜM maçlardaki (bkz. yukarıdaki genel
+// not) her gol, dakikasına göre 6 dakika aralığından birine sayılır.
+export function getGoalTimingDistribution(competitionKey) {
+  const matchStats = matchStatsForCompetition(competitionKey);
+  const bands = GOAL_TIME_BANDS.map((b) => ({ key: b.key, label: b.label, count: 0 }));
+  let total = 0;
+  let matchCount = 0;
+  for (const stats of Object.values(matchStats)) {
+    if (!stats.scorers || stats.scorers.length === 0) continue;
+    matchCount++;
+    for (const s of stats.scorers) {
+      const bandIdx = GOAL_TIME_BANDS.findIndex((b) => b.test(s.minute));
+      if (bandIdx === -1) continue;
+      bands[bandIdx].count++;
+      total++;
+    }
+  }
+  return { bands: bands.map((b) => ({ ...b, pct: total > 0 ? Math.round((b.count / total) * 1000) / 10 : 0 })), total, matchCount };
+}
+
+// Detaylı gol-dakikası verisi olan maçlarda "geriden gelip KAZANMA" (maçın
+// bir anında geride olup sonunda kazanan) ve "elden kaçırma" (maçın bir
+// anında önde olup sonunda kazanamayan -- beraberlik ya da mağlubiyet)
+// olaylarını listeler. Kendi kale golleri de skor sayımına dahildir (hangi
+// takımın LEHİNE olduğuna göre) çünkü asıl önemli olan skor tablosu, golü
+// kimin attığı değil.
+export function getComebackAndBlownLeads(competitionKey) {
+  const fixture = getRealFixture(competitionKey);
+  if (!fixture) return [];
+  const matchStats = matchStatsForCompetition(competitionKey);
+  const events = [];
+  for (const md of fixture) {
+    for (const m of md.matches) {
+      const stats = matchStats[m.id];
+      if (!stats?.scorers || stats.scorers.length === 0) continue;
+      const real = getRealMatchResult(competitionKey, m);
+      if (!real) continue;
+      const timeline = [...stats.scorers].sort((a, b) => a.minute - b.minute);
+      let home = 0;
+      let away = 0;
+      let homeEverLed = false;
+      let awayEverLed = false;
+      let homeEverTrailed = false;
+      let awayEverTrailed = false;
+      for (const g of timeline) {
+        if (g.teamId === m.homeTeam.id) home++;
+        else if (g.teamId === m.awayTeam.id) away++;
+        else continue;
+        if (home > away) {
+          homeEverLed = true;
+          awayEverTrailed = true;
+        } else if (away > home) {
+          awayEverLed = true;
+          homeEverTrailed = true;
+        }
+      }
+      const finalHomeWin = real.homeGoals > real.awayGoals;
+      const finalAwayWin = real.awayGoals > real.homeGoals;
+      const meta = { matchId: m.id, homeTeam: m.homeTeam, awayTeam: m.awayTeam, homeGoals: real.homeGoals, awayGoals: real.awayGoals, date: m.date };
+      if (finalHomeWin && homeEverTrailed) events.push({ type: "comeback", teamId: m.homeTeam.id, team: m.homeTeam, ...meta });
+      if (finalAwayWin && awayEverTrailed) events.push({ type: "comeback", teamId: m.awayTeam.id, team: m.awayTeam, ...meta });
+      if (!finalHomeWin && homeEverLed) events.push({ type: "blown", teamId: m.homeTeam.id, team: m.homeTeam, ...meta });
+      if (!finalAwayWin && awayEverLed) events.push({ type: "blown", teamId: m.awayTeam.id, team: m.awayTeam, ...meta });
+    }
+  }
+  return events;
+}
+
+// "Şanslı mı şanssız mı?" -- takımın GERÇEK attığı/yediği gol sayısı, o
+// maçlar için elimizdeki xG (beklenen gol) değerinden ne kadar sapıyor.
+// luck > 0: takım şanslı/klinik (xG'sinden FAZLA gol atıyor ya da xG'sinden
+// AZ gol yiyor gibi okunabilir -- burada sadece hücum tarafı, "attığı gol -
+// kendi xG'si" hesaplanır). SADECE xG verisi olan maçlar sayılır.
+export function getXgPerformance(competitionKey) {
+  const fixture = getRealFixture(competitionKey);
+  if (!fixture) return [];
+  const competition = getCompetition(competitionKey);
+  const matchStats = matchStatsForCompetition(competitionKey);
+  const agg = {};
+  for (const md of fixture) {
+    for (const m of md.matches) {
+      const stats = matchStats[m.id];
+      const real = getRealMatchResult(competitionKey, m);
+      if (!stats?.xg || !real) continue;
+      const hId = m.homeTeam.id;
+      const aId = m.awayTeam.id;
+      if (!agg[hId]) agg[hId] = { gf: 0, xgFor: 0, ga: 0, xgAgainst: 0, matches: 0 };
+      if (!agg[aId]) agg[aId] = { gf: 0, xgFor: 0, ga: 0, xgAgainst: 0, matches: 0 };
+      agg[hId].gf += real.homeGoals;
+      agg[hId].xgFor += stats.xg.home;
+      agg[hId].ga += real.awayGoals;
+      agg[hId].xgAgainst += stats.xg.away;
+      agg[hId].matches++;
+      agg[aId].gf += real.awayGoals;
+      agg[aId].xgFor += stats.xg.away;
+      agg[aId].ga += real.homeGoals;
+      agg[aId].xgAgainst += stats.xg.home;
+      agg[aId].matches++;
+    }
+  }
+  return Object.entries(agg)
+    .map(([teamId, a]) => {
+      const team = competition.teams.find((t) => t.id === teamId);
+      if (!team) return null;
+      return {
+        teamId,
+        team,
+        matches: a.matches,
+        gf: a.gf,
+        xgFor: Math.round(a.xgFor * 10) / 10,
+        ga: a.ga,
+        xgAgainst: Math.round(a.xgAgainst * 10) / 10,
+        luck: Math.round((a.gf - a.xgFor) * 10) / 10,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.luck - a.luck);
+}
+
+// Faul + sarı/kırmızı kart verisi olan maçlardan bir "disiplin skoru"
+// (düşük = daha disiplinli): sarı=1, kırmızı=3, faul=0.1 ağırlıklı toplam.
+export function getDisciplineRanking(competitionKey) {
+  const fixture = getRealFixture(competitionKey);
+  if (!fixture) return [];
+  const competition = getCompetition(competitionKey);
+  const matchStats = matchStatsForCompetition(competitionKey);
+  const agg = {};
+  for (const md of fixture) {
+    for (const m of md.matches) {
+      const stats = matchStats[m.id];
+      if (!stats || (!stats.fouls && !stats.cards)) continue;
+      const hId = m.homeTeam.id;
+      const aId = m.awayTeam.id;
+      if (!agg[hId]) agg[hId] = { fouls: 0, yellow: 0, red: 0, matches: 0 };
+      if (!agg[aId]) agg[aId] = { fouls: 0, yellow: 0, red: 0, matches: 0 };
+      if (stats.fouls) {
+        agg[hId].fouls += stats.fouls.home;
+        agg[aId].fouls += stats.fouls.away;
+      }
+      if (stats.cards) {
+        agg[hId].yellow += stats.cards.home.yellow;
+        agg[hId].red += stats.cards.home.red;
+        agg[aId].yellow += stats.cards.away.yellow;
+        agg[aId].red += stats.cards.away.red;
+      }
+      agg[hId].matches++;
+      agg[aId].matches++;
+    }
+  }
+  return Object.entries(agg)
+    .map(([teamId, a]) => {
+      const team = competition.teams.find((t) => t.id === teamId);
+      if (!team) return null;
+      return {
+        teamId,
+        team,
+        matches: a.matches,
+        fouls: a.fouls,
+        yellow: a.yellow,
+        red: a.red,
+        disciplineScore: Math.round((a.yellow * 1 + a.red * 3 + a.fouls * 0.1) * 10) / 10,
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.disciplineScore - b.disciplineScore);
+}
+
+// Detaylı gol verisi olan maçlarda penaltıdan atılan/yenen gol sayısı --
+// scorer.penalty===true olan girişlerden (bkz. matchStatsSuperLig.js/
+// matchStatsUcl.js).
+export function getPenaltyStats(competitionKey) {
+  const fixture = getRealFixture(competitionKey);
+  if (!fixture) return [];
+  const competition = getCompetition(competitionKey);
+  const matchStats = matchStatsForCompetition(competitionKey);
+  const agg = {};
+  for (const md of fixture) {
+    for (const m of md.matches) {
+      const stats = matchStats[m.id];
+      if (!stats?.scorers) continue;
+      for (const s of stats.scorers) {
+        if (!s.penalty) continue;
+        const scoringTeamId = s.teamId;
+        const concedingTeamId = scoringTeamId === m.homeTeam.id ? m.awayTeam.id : m.homeTeam.id;
+        if (!agg[scoringTeamId]) agg[scoringTeamId] = { scored: 0, conceded: 0 };
+        if (!agg[concedingTeamId]) agg[concedingTeamId] = { scored: 0, conceded: 0 };
+        agg[scoringTeamId].scored++;
+        agg[concedingTeamId].conceded++;
+      }
+    }
+  }
+  return Object.entries(agg)
+    .map(([teamId, a]) => {
+      const team = competition.teams.find((t) => t.id === teamId);
+      if (!team) return null;
+      return { teamId, team, scored: a.scored, conceded: a.conceded, net: a.scored - a.conceded };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.net - a.net);
 }
 
 // Süper Lig'de bir takımın SON `limit` maçtaki (bu ligin kendi içindeki)
@@ -731,6 +971,194 @@ export function getSeasonEndProjection(competitionKey) {
     })
     .filter(Boolean)
     .sort((a, b) => b.projected - a.projected);
+}
+
+// "Bu takım şampiyon olur mu?" sorusuna GERÇEK bir olasılık yüzdesiyle cevap
+// -- getSeasonEndProjection'ın aksine (tek bir "beklenen puan" sayısı) burada
+// kalan fikstürün TAMAMI defalarca (varsayılan 300 kez) Poisson tabanlı
+// Monte Carlo ile simüle edilir (ŞU ANA KADAR GERÇEKTEN toplanan puan/averaj
+// + kalan her maç için modelin lambdaHome/lambdaAway'inden örneklenen bir
+// skor), her simülasyonun sonunda puan (sonra averaj) sıralamasıyla 1. olan
+// takım belirlenir, ve bir takımın kaç simülasyonda 1. bitirdiğinin yüzdesi
+// döner. UCL'de "lig fazını 1. bitirmek" ASLA turnuvanın kendisini kazanmak
+// anlamına gelmez (eleme turları var) -- bu yüzden çağıran taraf (bkz.
+// RealAnalysisTab.jsx) competitionKey'e göre etiketi/açıklamayı değiştirmeli,
+// bu fonksiyon sadece "lig fazı 1.liği" olasılığını hesaplar.
+//
+// ÖNEMLİ dürüstlük notu: az sayıdaki deneme yüzünden küçük bir ihtimali
+// (ör. gerçekte %0.3 olan bir şeyi) 300 denemede hiç YAKALAMAMIŞ olabiliriz
+// -- bu yüzden "%0" asla "imkansız" diye sunulmamalı, sadece "bu kadar
+// denemede hiç gözlenmedi" demektir (bkz. UI'daki footnote).
+// Ortak Monte Carlo çekirdeği -- getTitleOdds VE getRootingGuide (bkz. altta)
+// TARAFINDAN paylaşılır. `overrides`: { [matchId]: {homeGoals,awayGoals} }
+// verilirse, o maç RASTGELE simüle edilmez, doğrudan verilen skorla
+// baseline'a işlenir -- "ya şu maç şöyle biterse?" senaryolarını (bkz.
+// getRootingGuide) ucuza hesaplamak için (aynı motor, tek bir maç sabitlenmiş).
+function simulateTitleOddsInternal(competitionKey, trials, overrides) {
+  const competition = getCompetition(competitionKey);
+  const fixture = getRealFixture(competitionKey);
+  const { standings } = getRealStandings(competitionKey);
+  if (!fixture || !standings || standings.length === 0) return null;
+
+  const enrichedById = enrichedTeamMap(competition);
+  const baseline = {};
+  for (const row of standings) baseline[row.teamId] = { pts: row.pts, gf: row.gf, ga: row.ga };
+
+  const remainingMatches = [];
+  for (const md of fixture) {
+    for (const m of md.matches) {
+      if (getRealMatchResult(competitionKey, m)) continue;
+      const forced = overrides?.[m.id];
+      if (forced) {
+        const hs = baseline[m.homeTeam.id];
+        const as_ = baseline[m.awayTeam.id];
+        if (hs && as_) {
+          hs.gf += forced.homeGoals;
+          hs.ga += forced.awayGoals;
+          as_.gf += forced.awayGoals;
+          as_.ga += forced.homeGoals;
+          if (forced.homeGoals > forced.awayGoals) hs.pts += 3;
+          else if (forced.homeGoals < forced.awayGoals) as_.pts += 3;
+          else {
+            hs.pts += 1;
+            as_.pts += 1;
+          }
+        }
+        continue;
+      }
+      remainingMatches.push(m);
+    }
+  }
+
+  const titleCounts = {};
+  const relegationCounts = {};
+  const europeCounts = {};
+  for (const row of standings) {
+    titleCounts[row.teamId] = 0;
+    relegationCounts[row.teamId] = 0;
+    europeCounts[row.teamId] = 0;
+  }
+  const zones = competition.zones;
+
+  for (let t = 0; t < trials; t++) {
+    const state = {};
+    for (const teamId in baseline) state[teamId] = { ...baseline[teamId] };
+    for (const m of remainingMatches) {
+      const home = enrichedById[m.homeTeam.id];
+      const away = enrichedById[m.awayTeam.id];
+      if (!home || !away || !state[home.id] || !state[away.id]) continue;
+      const { lambdaHome, lambdaAway } = expectedGoals(home, away);
+      const hg = samplePoisson(lambdaHome);
+      const ag = samplePoisson(lambdaAway);
+      state[home.id].gf += hg;
+      state[home.id].ga += ag;
+      state[away.id].gf += ag;
+      state[away.id].ga += hg;
+      if (hg > ag) state[home.id].pts += 3;
+      else if (hg < ag) state[away.id].pts += 3;
+      else {
+        state[home.id].pts += 1;
+        state[away.id].pts += 1;
+      }
+    }
+    // Bu denemenin TAM sıralaması -- sadece 1.yi değil, her takımın bölgesini
+    // (şampiyon/Avrupa/orta sıra/küme düşme) belirlemek için gerekli (bkz.
+    // getRootingGuide -- şampiyonluk şansı olmayan bir takım için "kimi
+    // tutmalısın" sorusu küme düşme kurtuluşu ya da Avrupa hattı üzerinden
+    // sorulur).
+    const ranked = Object.entries(state)
+      .map(([teamId, s]) => ({ teamId, pts: s.pts, gd: s.gf - s.ga }))
+      .sort((a, b) => b.pts - a.pts || b.gd - a.gd);
+    ranked.forEach((r, i) => {
+      const rank = i + 1;
+      if (rank === 1) titleCounts[r.teamId]++;
+      if (zones) {
+        const zone = resolveZone(zones, rank);
+        if (zone.key === "relegation") relegationCounts[r.teamId]++;
+        else if (zone.key === "ucl" || zone.key === "europa") europeCounts[r.teamId]++;
+      }
+    });
+  }
+
+  return standings
+    .map((row) => ({
+      teamId: row.teamId,
+      team: competition.teams.find((t) => t.id === row.teamId),
+      pts: row.pts,
+      titlePct: Math.round((titleCounts[row.teamId] / trials) * 1000) / 10,
+      survivalPct: Math.round((1 - relegationCounts[row.teamId] / trials) * 1000) / 10,
+      europePct: Math.round((europeCounts[row.teamId] / trials) * 1000) / 10,
+    }))
+    .filter((row) => row.team)
+    .sort((a, b) => b.titlePct - a.titlePct);
+}
+
+export function getTitleOdds(competitionKey, trials = 300) {
+  return simulateTitleOddsInternal(competitionKey, trials, null) || [];
+}
+
+// "Bu Hafta Kimi Tutmalısın?" -- HİÇBİR sitede olmayan, tuttuğun takıma özel
+// bir bölüm: bu haftaki DİĞER maçların (tuttuğun takımın kendi maçı hariç)
+// her biri için "ev sahibi kazanırsa" ve "deplasman kazanırsa" senaryolarını
+// AYNI Monte Carlo motoruyla (o TEK maç sabitlenmiş, geri kalanı yine
+// rastgele) yeniden simüle edip, hangi sonucun tuttuğun takımın şampiyonluk
+// ihtimalini NE KADAR değiştirdiğini hesaplar -- en çok etkileyen maç en
+// üstte. Varsayımsal skorlar (1-0/0-1) sadece "kim kazandı" farkını temsil
+// eder, gerçek bir tahmin değildir. favoriteTeamId yoksa ya da bu hafta
+// başka maç yoksa null döner.
+export function getRootingGuide(competitionKey, favoriteTeamId, trials = 200) {
+  if (!favoriteTeamId) return null;
+  const fixture = getRealFixture(competitionKey);
+  if (!fixture) return null;
+  const { standings } = getRealStandings(competitionKey);
+  const favRow = standings?.find((r) => r.teamId === favoriteTeamId);
+  if (!favRow) return null;
+
+  const md = fixture.find((md) => md.matches.some((m) => !getRealMatchResult(competitionKey, m)));
+  if (!md) return null;
+  const favMatch = md.matches.find((m) => m.homeTeam.id === favoriteTeamId || m.awayTeam.id === favoriteTeamId);
+  const otherMatches = md.matches.filter((m) => m.id !== favMatch?.id && !getRealMatchResult(competitionKey, m));
+  if (otherMatches.length === 0) return null;
+
+  // Hangi metrik bu takım için GERÇEKTEN anlamlı: küme düşme hattındaysa
+  // "kurtulma" ihtimali, şampiyonluk/UCL bölgesindeyse şampiyonluk ihtimali,
+  // aksi halde (orta sıra/Avrupa Ligi hattı) Avrupa kupalarına kalma
+  // ihtimali. Böylece HER takım için (sadece zirvedekiler için değil)
+  // anlamlı bir "kimi tutmalısın" sorusu üretilir.
+  const zoneKey = favRow.status;
+  const metric = zoneKey === "relegation" ? "survivalPct" : zoneKey === "champion" || zoneKey === "ucl" ? "titlePct" : "europePct";
+  const metricLabel =
+    metric === "survivalPct" ? "küme düşmeme ihtimali" : metric === "titlePct" ? "şampiyonluk ihtimali" : "Avrupa kupalarına kalma ihtimali";
+
+  const baseline = simulateTitleOddsInternal(competitionKey, trials, null);
+  if (!baseline) return null;
+  const baselinePct = baseline.find((r) => r.teamId === favoriteTeamId)?.[metric] ?? 0;
+  // Bu metrik zaten pratikte kesinleşmişse (neredeyse %0 ya da %100) senaryo
+  // analizinin bir kıymeti yok -- göstermeye değer bir şey yok.
+  if (baselinePct < 0.1 || baselinePct > 99.9) return null;
+
+  const rows = otherMatches
+    .map((m) => {
+      const homeWinSim = simulateTitleOddsInternal(competitionKey, trials, { [m.id]: { homeGoals: 1, awayGoals: 0 } });
+      const awayWinSim = simulateTitleOddsInternal(competitionKey, trials, { [m.id]: { homeGoals: 0, awayGoals: 1 } });
+      const homeWinPct = homeWinSim?.find((r) => r.teamId === favoriteTeamId)?.[metric] ?? 0;
+      const awayWinPct = awayWinSim?.find((r) => r.teamId === favoriteTeamId)?.[metric] ?? 0;
+      return {
+        matchId: m.id,
+        homeTeam: m.homeTeam,
+        awayTeam: m.awayTeam,
+        date: m.date,
+        homeWinPct,
+        awayWinPct,
+        rootFor: homeWinPct >= awayWinPct ? "home" : "away",
+        impact: Math.round(Math.abs(homeWinPct - awayWinPct) * 10) / 10,
+      };
+    })
+    .filter((r) => r.impact > 0)
+    .sort((a, b) => b.impact - a.impact);
+
+  if (rows.length === 0) return null;
+  return { matchdayLabel: md.label, favMatch, baselinePct, metric, metricLabel, rows };
 }
 
 // Tüm OYNANMIŞ gerçek maçlarda ev sahibi galibiyeti / beraberlik / deplasman

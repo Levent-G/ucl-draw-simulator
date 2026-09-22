@@ -25,6 +25,7 @@ import {
   getStreaks,
   getPowerIndex,
   getGoalDependency,
+  getMatchStats,
 } from "../utils/realStandingsSelectors.js";
 
 // "Google'daki gibi" -- iki takımın bu sezonki gerçek sonuçlarından türetilen
@@ -175,6 +176,9 @@ export default function RealMatchCenterView() {
   const homeDependency = goalDependencyRows.find((r) => r.teamId === homeTeam.id) || null;
   const awayDependency = goalDependencyRows.find((r) => r.teamId === awayTeam.id) || null;
   const hasQuickStats = homeMatchStats || awayMatchStats;
+  const matchStats = played && result ? getMatchStats(match.id) : null;
+  const sortedScorers = matchStats?.scorers ? [...matchStats.scorers].sort((a, b) => a.minute - b.minute) : [];
+  const teamById = (id) => (id === homeTeam.id ? homeTeam : id === awayTeam.id ? awayTeam : null);
   const actualLineupEntry = ACTUAL_LINEUPS.find((l) => l.matchId === match.id) || null;
   const hasHomeActualXI = played && !!actualLineupEntry?.homeXI?.length;
   const hasAwayActualXI = played && !!actualLineupEntry?.awayXI?.length;
@@ -255,6 +259,186 @@ export default function RealMatchCenterView() {
           </p>
         )}
       </div>
+
+      {matchStats && (
+        <div className="chart-card chart-card-wide">
+          <h3>📊 Maç İstatistikleri</h3>
+          <p className="footnote">
+            Bu maçın gerçek, kaynaklardan doğrulanmış box-score istatistikleri. Doğrulanamayan alanlar (ör. bazı
+            maçlarda isabetli şut ya da kart sayısı) uydurulmadan tamamen atlanmıştır -- bu yüzden bazı satırlar bu
+            maç için hiç görünmeyebilir.
+          </p>
+          {matchStats.possession && (
+            <TeamQuickStatsRow
+              label="Topa Sahip Olma"
+              homeValue={matchStats.possession.home}
+              awayValue={matchStats.possession.away}
+              suffix="%"
+              homePct={matchStats.possession.home}
+              awayPct={matchStats.possession.away}
+            />
+          )}
+          {matchStats.shots && (
+            <TeamQuickStatsRow
+              label="Şut"
+              homeValue={matchStats.shots.home}
+              awayValue={matchStats.shots.away}
+              homePct={matchStats.shots.home}
+              awayPct={matchStats.shots.away}
+            />
+          )}
+          {matchStats.shotsOnTarget && (
+            <TeamQuickStatsRow
+              label="İsabetli Şut"
+              homeValue={matchStats.shotsOnTarget.home}
+              awayValue={matchStats.shotsOnTarget.away}
+              homePct={matchStats.shotsOnTarget.home}
+              awayPct={matchStats.shotsOnTarget.away}
+            />
+          )}
+          {matchStats.corners && (
+            <TeamQuickStatsRow
+              label="Korner"
+              homeValue={matchStats.corners.home}
+              awayValue={matchStats.corners.away}
+              homePct={matchStats.corners.home}
+              awayPct={matchStats.corners.away}
+            />
+          )}
+          {matchStats.xg && (
+            <TeamQuickStatsRow
+              label="Beklenen Gol (xG)"
+              homeValue={matchStats.xg.home.toFixed(2)}
+              awayValue={matchStats.xg.away.toFixed(2)}
+              homePct={matchStats.xg.home}
+              awayPct={matchStats.xg.away}
+            />
+          )}
+          {matchStats.bigChances && (
+            <TeamQuickStatsRow
+              label="Büyük Fırsat"
+              homeValue={matchStats.bigChances.home}
+              awayValue={matchStats.bigChances.away}
+              homePct={matchStats.bigChances.home}
+              awayPct={matchStats.bigChances.away}
+            />
+          )}
+          {matchStats.passAccuracy && (
+            <TeamQuickStatsRow
+              label="Pas İsabeti"
+              homeValue={matchStats.passAccuracy.home}
+              awayValue={matchStats.passAccuracy.away}
+              suffix="%"
+              homePct={matchStats.passAccuracy.home}
+              awayPct={matchStats.passAccuracy.away}
+            />
+          )}
+          {matchStats.duelsWon && (
+            <TeamQuickStatsRow
+              label="İkili Mücadele Kazanma"
+              homeValue={matchStats.duelsWon.home}
+              awayValue={matchStats.duelsWon.away}
+              homePct={matchStats.duelsWon.home}
+              awayPct={matchStats.duelsWon.away}
+            />
+          )}
+          {matchStats.saves && (
+            <TeamQuickStatsRow
+              label="Kaleci Kurtarışı"
+              homeValue={matchStats.saves.home}
+              awayValue={matchStats.saves.away}
+              homePct={matchStats.saves.home}
+              awayPct={matchStats.saves.away}
+            />
+          )}
+          {matchStats.fouls && (
+            <TeamQuickStatsRow
+              label="Faul"
+              homeValue={matchStats.fouls.home}
+              awayValue={matchStats.fouls.away}
+              homePct={matchStats.fouls.home}
+              awayPct={matchStats.fouls.away}
+            />
+          )}
+          {matchStats.offsides && (
+            <TeamQuickStatsRow
+              label="Ofsayt"
+              homeValue={matchStats.offsides.home}
+              awayValue={matchStats.offsides.away}
+              homePct={matchStats.offsides.home}
+              awayPct={matchStats.offsides.away}
+            />
+          )}
+          {matchStats.cards && (
+            <div className="match-compare-row">
+              <div className="match-compare-row-top">
+                <span className="match-card-badges">
+                  {matchStats.cards.home.yellow > 0 && <span className="match-card-badge">🟨 {matchStats.cards.home.yellow}</span>}
+                  {matchStats.cards.home.red > 0 && <span className="match-card-badge">🟥 {matchStats.cards.home.red}</span>}
+                  {matchStats.cards.home.yellow === 0 && matchStats.cards.home.red === 0 && <span className="match-card-badge">–</span>}
+                </span>
+                <span className="match-compare-label">Kartlar</span>
+                <span className="match-card-badges match-card-badges-away">
+                  {matchStats.cards.away.yellow === 0 && matchStats.cards.away.red === 0 && <span className="match-card-badge">–</span>}
+                  {matchStats.cards.away.red > 0 && <span className="match-card-badge">🟥 {matchStats.cards.away.red}</span>}
+                  {matchStats.cards.away.yellow > 0 && <span className="match-card-badge">🟨 {matchStats.cards.away.yellow}</span>}
+                </span>
+              </div>
+            </div>
+          )}
+          {matchStats.zonePressure && (
+            <>
+              <TeamQuickStatsRow
+                label="Savunma Bölgesi Baskısı"
+                homeValue={matchStats.zonePressure.home.def}
+                awayValue={matchStats.zonePressure.away.def}
+                suffix="%"
+                homePct={matchStats.zonePressure.home.def}
+                awayPct={matchStats.zonePressure.away.def}
+              />
+              <TeamQuickStatsRow
+                label="Orta Saha Baskısı"
+                homeValue={matchStats.zonePressure.home.mid}
+                awayValue={matchStats.zonePressure.away.mid}
+                suffix="%"
+                homePct={matchStats.zonePressure.home.mid}
+                awayPct={matchStats.zonePressure.away.mid}
+              />
+              <TeamQuickStatsRow
+                label="Hücum Bölgesi Baskısı"
+                homeValue={matchStats.zonePressure.home.att}
+                awayValue={matchStats.zonePressure.away.att}
+                suffix="%"
+                homePct={matchStats.zonePressure.home.att}
+                awayPct={matchStats.zonePressure.away.att}
+              />
+              <p className="footnote footnote-note">
+                Bölge baskısı, gerçek oyuncu takip (heat map) verisi değil -- maç raporlarının tasvirinden çıkarılan
+                yaklaşık bir okumadır.
+              </p>
+            </>
+          )}
+          {sortedScorers.length > 0 && (
+            <div className="match-scorers-list">
+              {sortedScorers.map((s, i) => {
+                const team = teamById(s.teamId);
+                return (
+                  <div key={i} className="match-scorer-row">
+                    {team && <Crest team={team} size={20} />}
+                    <span className="match-scorer-name">
+                      ⚽ {s.playerName}
+                      {s.ownGoal && " (kendi kalesi)"}
+                      {s.penalty && " (pen.)"}
+                    </span>
+                    <span className="match-scorer-minute">{s.minute}'</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          <p className="footnote footnote-note">Kaynak: {matchStats.source} · Anlık görüntü: {matchStats.asOf}</p>
+        </div>
+      )}
 
       <div className="chart-card chart-card-wide">
         <h3>🤝 Karşılıklı Geçmiş</h3>
