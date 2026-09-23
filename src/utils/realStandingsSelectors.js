@@ -36,6 +36,7 @@ import { HEAD_TO_HEAD } from "../data/headToHead.js";
 import { NEWS_ITEMS } from "../data/news.js";
 import { CURRENT_INJURIES } from "../data/injuries.js";
 import { TOP_SCORERS } from "../data/topScorers.js";
+import { SEASON_STORY_SUPERLIG, SEASON_STORY_UCL } from "../data/seasonStory.js";
 import { SUPER_LIG_MATCH_STATS } from "../data/matchStatsSuperLig.js";
 import { UCL_MATCH_STATS } from "../data/matchStatsUcl.js";
 
@@ -501,6 +502,17 @@ export function getNews({ competitionKey, teamId, matchId, limit } = {}) {
   return typeof limit === "number" ? items.slice(0, limit) : items;
 }
 
+// "Sezon Hikayesi" -- öne çıkan anların (bkz. src/data/seasonStory.js)
+// kronolojik listesi, isteğe bağlı kategori/takım filtresiyle. Varsayılan
+// sıralama en ESKİDEN en YENİYE (bir hikaye/günlük gibi okunsun diye) --
+// getNews'in aksine (orada en yeni en üstte, bir haber akışı mantığıyla).
+export function getSeasonStory(competitionKey, { category, teamId } = {}) {
+  let items = competitionKey === "superlig" ? SEASON_STORY_SUPERLIG : competitionKey === "ucl" ? SEASON_STORY_UCL : [];
+  if (category) items = items.filter((s) => s.category === category);
+  if (teamId) items = items.filter((s) => s.relatedTeamIds?.includes(teamId));
+  return [...items].sort((a, b) => a.date.localeCompare(b.date));
+}
+
 // Tek bir maçın (henüz oynanmamış olsa da) hafif, tek-maçlık model kazanma
 // olasılığı -- tam sezon Poisson simülasyonu GEREKMEDEN (bkz.
 // predictionEngine.js: expectedGoals + matchProbabilities). MatchCenterPage
@@ -510,8 +522,11 @@ export function getMatchWinProbability(homeTeam, awayTeam, competition) {
   const enriched = enrichTeamsWithAttackDefense(competition.teams, competition.getAllPlayers());
   const home = enriched.find((t) => t.id === homeTeam.id) || homeTeam;
   const away = enriched.find((t) => t.id === awayTeam.id) || awayTeam;
-  const { lambdaHome, lambdaAway } = expectedGoals(home, away);
-  return matchProbabilities(lambdaHome, lambdaAway);
+  // computeFormAdjustedPrediction (bkz. buildDisplayMatches'in hemen üstü)
+  // ile AYNI çekirdek -- form/gidişat düzeltmesi burada da uygulanır ki
+  // Maç Merkezi'ndeki "Maç Öncesi Model Tahmini" ile Fikstür/İstatistikler
+  // sayfalarındaki tahminler TUTARLI kalsın.
+  return computeFormAdjustedPrediction(competition.key, home, away);
 }
 
 // Bir maç listesini (tek haftalık ya da tüm fikstür), MatchRow/
@@ -521,6 +536,48 @@ export function getMatchWinProbability(homeTeam, awayTeam, competition) {
 // olmayan (henüz oynanmamış ya da sonucu henüz elle girilmemiş) maçlarda
 // skor alanları dokunulmadan (undefined) kalır -- bileşenler bunu zaten
 // "– : –" / "⏳ Bekleniyor" olarak dürüstçe gösteriyor.
+// Bir takımın GERÇEK son 5 maçtaki formunu (W/D/L dizisi -- Süper Lig'de
+// getSuperLigTeamForm, UCL'de getDomesticForm'un kendi ligindeki formu) tek
+// bir çarpana indirger: 0.85 (son 5 maçta hiç kazanmamış) ile 1.15 (son 5
+// maçın tamamını kazanmış) arasında -- kasıtlı olarak DAR bir aralık,
+// "güçlü ama gerçekçi" bir düzeltme için (kullanıcı isteği: form/gidişat
+// modele girsin ama sonuçlar çılgınlaşmasın). Form verisi yoksa (yeni
+// yükselen bir takımın henüz kendi liginde geçmişi yoksa vb.) nötr 1
+// döner -- modelin geri kalanı (katsayı+kadro gücü) DEĞİŞMEDEN çalışır.
+function getFormMultiplier(competitionKey, team) {
+  const form = competitionKey === "superlig" ? getSuperLigTeamForm(team.name, 5) : getDomesticForm(team.id)?.form;
+  if (!form || form.length === 0) return 1;
+  const pts = form.reduce((s, r) => s + (r === "W" ? 3 : r === "D" ? 1 : 0), 0);
+  const pct = pts / (form.length * 3);
+  return 0.85 + pct * 0.3;
+}
+
+// Tek maçlık model tahminini (bkz. getMatchWinProbability'nin AYNI
+// expectedGoals+matchProbabilities çekirdeği) GERÇEK güncel form/gidişat
+// bilgisiyle zenginleştirir -- kullanıcı isteği: "arkada güçlü bir
+// algoritma... geçmiş maçlara/gidişata baksın". Katsayı+kadro gücünden
+// gelen "temel" λ (lambda), her takımın KENDİ güncel formuna göre hafifçe
+// (bkz. getFormMultiplier -- ±%15 ile sınırlı) yukarı/aşağı çekilir; sonuç
+// hem olasılıklar (homeWinProb/drawProb/awayWinProb) hem de bu λ'lardan
+// türetilen bir "tahmini skor" (predictedHomeGoals/predictedAwayGoals --
+// λ'nın en yakın tam sayıya yuvarlanması) olarak döner. BU TAHMİNİ SKOR
+// ASLA gerçek bir sonuç DEĞİLDİR -- arayüz bunu her zaman "Model Tahmini"
+// gibi AÇIKÇA etiketleyip gerçek skor alanından (– : – / ⏳ Bekleniyor)
+// görsel olarak ayrı göstermelidir.
+function computeFormAdjustedPrediction(competitionKey, home, away) {
+  const { lambdaHome: baseHome, lambdaAway: baseAway } = expectedGoals(home, away);
+  const homeForm = getFormMultiplier(competitionKey, home);
+  const awayForm = getFormMultiplier(competitionKey, away);
+  const lambdaHome = baseHome * homeForm;
+  const lambdaAway = baseAway * awayForm;
+  const probs = matchProbabilities(lambdaHome, lambdaAway);
+  return {
+    ...probs,
+    predictedHomeGoals: Math.max(0, Math.round(lambdaHome)),
+    predictedAwayGoals: Math.max(0, Math.round(lambdaAway)),
+  };
+}
+
 export function buildDisplayMatches(competitionKey, matches) {
   const competition = getCompetition(competitionKey);
   const enrichedTeams = enrichTeamsWithAttackDefense(competition.teams, competition.getAllPlayers());
@@ -529,14 +586,15 @@ export function buildDisplayMatches(competitionKey, matches) {
     const real = getRealMatchResult(competitionKey, m);
     const home = enrichedById[m.homeTeam.id] || m.homeTeam;
     const away = enrichedById[m.awayTeam.id] || m.awayTeam;
-    const { lambdaHome, lambdaAway } = expectedGoals(home, away);
-    const probs = matchProbabilities(lambdaHome, lambdaAway);
+    const prediction = computeFormAdjustedPrediction(competitionKey, home, away);
     return {
       ...m,
       ...(real ? { homeGoals: real.homeGoals, awayGoals: real.awayGoals } : {}),
-      homeWinProb: probs.homeWinProb,
-      drawProb: probs.drawProb,
-      awayWinProb: probs.awayWinProb,
+      homeWinProb: prediction.homeWinProb,
+      drawProb: prediction.drawProb,
+      awayWinProb: prediction.awayWinProb,
+      predictedHomeGoals: prediction.predictedHomeGoals,
+      predictedAwayGoals: prediction.predictedAwayGoals,
     };
   });
 }

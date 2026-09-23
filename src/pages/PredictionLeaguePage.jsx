@@ -70,6 +70,58 @@ function Avatar({ photoURL, name, size = 24 }) {
   );
 }
 
+// Bir sayının (tam puanlarda tam sayı, ceza puanlarında .5 içerebilir) 0'dan
+// hedefe doğru hızlanıp yavaşlayarak "sayması" -- src/hooks/useReveal.js'teki
+// useCountUp'tan farklı olarak ondalıklı değerleri de destekler (Tahmin
+// Ligi'nde -0.5 puanlar yüzünden toplam puan tam sayı olmayabilir).
+function useAnimatedNumber(target, duration = 900) {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    if (typeof target !== "number") return undefined;
+    let raf;
+    const start = performance.now();
+    const tick = (now) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setValue(target * eased);
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+  return value;
+}
+
+// Kullanıcı geri bildirimi: "sıralama tablosunu animasyonlu daha modern bir
+// tasarıma çevir" -- eski <table className="sortable-table"> (sitenin genel
+// istatistik tabloları için paylaşılan, sade bir stil) yerine, her satırı
+// sırayla (staggered) beliren, ilk 3'ü madalyayla öne çıkan, puanı sayarak
+// dolan kart-satır listesi.
+function LeaderboardRow({ row, rank, isMe, delay }) {
+  const animatedPoints = useAnimatedNumber(row.points);
+  const isWhole = Number.isInteger(row.points);
+  const displayPoints = isWhole ? Math.round(animatedPoints) : animatedPoints.toFixed(1);
+  const medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : null;
+  return (
+    <div
+      className={`prediction-leaderboard-row ${rank <= 3 ? `is-top rank-${rank}` : ""} ${isMe ? "is-me" : ""}`}
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <span className="prediction-leaderboard-rank">{medal || rank}</span>
+      <span className="prediction-leaderboard-user">
+        <Avatar photoURL={row.photoURL} name={row.displayName} size={28} />
+        <span className="prediction-leaderboard-name">{row.displayName}</span>
+        {isMe && <span className="prediction-leaderboard-me-tag">Sen</span>}
+      </span>
+      <span className="prediction-leaderboard-predicted">
+        <span className="prediction-leaderboard-stat">{row.predicted} tahmin</span>
+        <span className="prediction-leaderboard-stat is-resolved">{row.scored} sonuçlandı</span>
+      </span>
+      <span className="prediction-leaderboard-points">{displayPoints}</span>
+    </div>
+  );
+}
+
 // Firebase, giriş hatalarını ham bir `error.code` (ör. "auth/configuration-not-found")
 // olarak fırlatır -- bunlar Firebase Console'da eksik bir kurulum adımına
 // işaret eder, kullanıcının anlayabileceği bir dile çeviriyoruz.
@@ -577,9 +629,18 @@ function PredictionLeagueRoom() {
     }
   };
 
+  // Kullanıcı geri bildirimi: "GAL kazanır gibi kısaltma yazmasın, takım
+  // ismini büyük yazsın" -- kısaltma (short) yerine tam takım ismi, ve
+  // okunurluk için normal metinden daha büyük/kalın gösterilir (bkz.
+  // .pick-team-name -- pages.css).
   function describeOutcomePrediction(prediction, homeTeam, awayTeam) {
     if (prediction.result === "draw") return "Berabere";
-    return prediction.result === "win" ? `${homeTeam.short} Kazanır` : `${awayTeam.short} Kazanır`;
+    const team = prediction.result === "win" ? homeTeam : awayTeam;
+    return (
+      <>
+        <span className="pick-team-name">{team.name}</span> Kazanır
+      </>
+    );
   }
 
   return (
@@ -599,22 +660,23 @@ function PredictionLeagueRoom() {
         }
       />
 
+      {/* Kullanıcı geri bildirimi: "Liglerim sayfanın altında solda olsun,
+          Tahminlerimi Sıfırla da (toolbar'da) olmasın" -- Liglerim linki artık
+          sayfanın en altında (bkz. bileşenin sonu), sıfırlama butonu ise
+          "Bu Ligi Sil" ile aynı mantıkta olduğu için Sıralama sekmesindeki
+          .prediction-danger-zone'a taşındı (bkz. aşağı). */}
       {user && (
         <div className="prediction-league-toolbar">
-          <button className="btn-secondary btn-small" onClick={handleCopyLink}>
-            {linkCopied ? "✅ Kopyalandı" : "🔗 Davet Linkini Kopyala"}
+          <button
+            type="button"
+            className={`prediction-toolbar-btn is-invite ${linkCopied ? "is-copied" : ""}`}
+            onClick={handleCopyLink}
+          >
+            <span className="prediction-toolbar-btn-icon">{linkCopied ? "✅" : "🔗"}</span>
+            {linkCopied ? "Kopyalandı" : "Davet Linkini Kopyala"}
           </button>
-          <Link to="/tahmin-ligi" className="footnote">
-            ← Liglerim
-          </Link>
-          {league && (
-            <button className="btn-ghost btn-small" onClick={handleResetMine} disabled={resettingMine}>
-              {resettingMine ? "…" : "🔄 Tahminlerimi Sıfırla"}
-            </button>
-          )}
         </div>
       )}
-      {resetMineError && <p style={{ color: "#f87171" }}>{resetMineError}</p>}
 
       {user && leagueLoading && <p className="footnote">Lig kontrol ediliyor…</p>}
 
@@ -635,11 +697,33 @@ function PredictionLeagueRoom() {
 
       {user && league && (
         <>
-          <p className="footnote">
-            <b>Sadece kazananı tahmin et:</b> doğru bilirsen <b>{OUTCOME_CORRECT_POINTS} puan</b> · <b>Tam skor tahmin et:</b>{" "}
-            <b>5 puan</b> tam skor, <b>3 puan</b> doğru sonuç · her iki tahmin türünde de yanlış çıkarsa <b>-0.5 puan</b> ·
-            sezon sonunda en çok puanı toplayan kazanır. Maçın gerçek tarihi geçene kadar tahminler puanlanmaz.
-          </p>
+          {/* Kullanıcı geri bildirimi: "puanların nasıl verildiğini net şekilde
+              görsün, sade şık" -- eskiden tek, kalabalık bir cümleydi (aynı
+              +3 kuralı hem "sadece kazananı tahmin et" hem "tam skor" modu
+              için AYRI AYRI yazılıyordu). Artık her puan değeri TEK bir kart
+              olarak gösteriliyor -- OUTCOME_CORRECT_POINTS (3) ile
+              scorePrediction'ın "sameOutcome" dalı (3) ZATEN aynı değer
+              olduğu için ("Sonucu doğru bildin" kartı) iki modu da tek
+              kartla doğru şekilde temsil ediyor. */}
+          <div className="prediction-scoring-guide">
+            <div className="prediction-scoring-item is-max">
+              <span className="prediction-scoring-value">+5</span>
+              <span className="prediction-scoring-label">Tam skoru birebir bildin</span>
+            </div>
+            <div className="prediction-scoring-item is-mid">
+              <span className="prediction-scoring-value">+{OUTCOME_CORRECT_POINTS}</span>
+              <span className="prediction-scoring-label">Sonucu (Galibiyet/Beraberlik/Mağlubiyet) doğru bildin</span>
+            </div>
+            <div className="prediction-scoring-item is-negative">
+              <span className="prediction-scoring-value">-0.5</span>
+              <span className="prediction-scoring-label">Yanlış tahmin</span>
+            </div>
+            <div className="prediction-scoring-item is-neutral">
+              <span className="prediction-scoring-value">🏆</span>
+              <span className="prediction-scoring-label">Sezon sonu en çok puan lig birincisi olur</span>
+            </div>
+          </div>
+          <p className="footnote prediction-scoring-note">Maçın gerçek tarihi geçene kadar hiçbir tahmin puanlanmaz.</p>
 
           <div className="stats-tabs">
             <button className={tab === "maclar" ? "active" : ""} onClick={() => setTab("maclar")}>
@@ -829,7 +913,7 @@ function PredictionLeagueRoom() {
                                     onClick={() => handleOutcomeSubmit(m, "win")}
                                     disabled={submitting[m.id]}
                                   >
-                                    {m.homeTeam.short} Kazanır
+                                    {m.homeTeam.name} Kazanır
                                   </button>
                                   <button
                                     className="prediction-pick-btn"
@@ -843,7 +927,7 @@ function PredictionLeagueRoom() {
                                     onClick={() => handleOutcomeSubmit(m, "loss")}
                                     disabled={submitting[m.id]}
                                   >
-                                    {m.awayTeam.short} Kazanır
+                                    {m.awayTeam.name} Kazanır
                                   </button>
                                 </div>
                                 <button
@@ -913,34 +997,32 @@ function PredictionLeagueRoom() {
               {leaderboard.length === 0 ? (
                 <p className="footnote">Henüz kimse tahmin girmedi -- ilk sen ol!</p>
               ) : (
-                <table className="sortable-table">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th>Kullanıcı</th>
-                      <th>Tahmin Sayısı</th>
-                      <th>Puan</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {leaderboard.map((row, i) => (
-                      <tr key={row.uid} className={user && row.uid === user.uid ? "sorted" : ""}>
-                        <td>{i + 1}</td>
-                        <td>
-                          <span className="table-team-cell">
-                            <Avatar photoURL={row.photoURL} name={row.displayName} size={20} />
-                            {row.displayName}
-                          </span>
-                        </td>
-                        <td>{row.predicted}</td>
-                        <td>
-                          <b>{row.points}</b>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <div className="prediction-leaderboard">
+                  <div className="prediction-leaderboard-row prediction-leaderboard-head">
+                    <span>Sıra</span>
+                    <span>Kullanıcı</span>
+                    <span className="prediction-leaderboard-predicted">Tahminler</span>
+                    <span>Puan</span>
+                  </div>
+                  {leaderboard.map((row, i) => (
+                    <LeaderboardRow
+                      key={row.uid}
+                      row={row}
+                      rank={i + 1}
+                      isMe={!!(user && row.uid === user.uid)}
+                      delay={Math.min(i, 12) * 55}
+                    />
+                  ))}
+                </div>
               )}
+
+              <div className="prediction-danger-zone">
+                <p className="footnote">Sadece kendi tahminlerini bu ligden tamamen silmek istersen:</p>
+                <button className="btn-secondary btn-small" onClick={handleResetMine} disabled={resettingMine}>
+                  {resettingMine ? "Sıfırlanıyor…" : "🔄 Tahminlerimi Sıfırla"}
+                </button>
+                {resetMineError && <p style={{ color: "#f87171" }}>{resetMineError}</p>}
+              </div>
 
               <div className="prediction-danger-zone">
                 <p className="footnote">Bu Tahmin Ligi'ni tamamen silmek -- HERKESİN tahminini ve puanını kalıcı olarak silmek -- istersen:</p>
@@ -952,6 +1034,15 @@ function PredictionLeagueRoom() {
             </div>
           )}
         </>
+      )}
+
+      {/* Kullanıcı isteği: "Liglerim butonu sayfanın altında solda olsun". */}
+      {user && (
+        <div className="prediction-league-footer">
+          <Link to="/tahmin-ligi" className="prediction-toolbar-back">
+            ← Liglerim
+          </Link>
+        </div>
       )}
     </div>
   );

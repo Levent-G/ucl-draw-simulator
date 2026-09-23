@@ -193,6 +193,7 @@ export function deserializeFixture(raw, teams) {
         awayTeam: teamById[m.awayId],
         viaPot: m.viaPot,
         date: m.date,
+        time: m.time,
       }))
       .filter((m) => m.homeTeam && m.awayTeam),
   }));

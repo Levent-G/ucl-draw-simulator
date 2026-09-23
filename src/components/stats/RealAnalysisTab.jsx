@@ -81,6 +81,14 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
   const teamById = useMemo(() => Object.fromEntries(competition.teams.map((t) => [t.id, t])), [competition]);
   const teamByShort = useMemo(() => Object.fromEntries(competition.teams.map((t) => [t.short, t])), [competition]);
   const topRef = useRef(null);
+  // Kullanıcı geri bildirimi: "sonraki/önceki diyince scroll atıyor" --
+  // eskiden BÜTÜN sayfadaki (artık 30+ bölümlü, çok uzun) Pagination'lar
+  // AYNI topRef'i (sayfanın en tepesi) paylaşıyordu; "Model Tahminleri" ya
+  // da "Form Durumu" gibi sayfanın ORTASINDAKİ bir bölümde sayfa değiştirmek
+  // kullanıcıyı sayfanın en tepesine fırlatıyordu. Artık her Pagination
+  // KENDİ kartının başına kaydırıyor.
+  const modelPredictionsRef = useRef(null);
+  const formGuideRef = useRef(null);
 
   const goalsData = useMemo(
     () =>
@@ -1324,10 +1332,10 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
       )}
 
       {nextMatches.length > 0 && (
-        <div className="chart-card chart-card-wide">
+        <div className="chart-card chart-card-wide" ref={modelPredictionsRef}>
           <h3>🔮 Model: {nextMatchday.number}. Hafta Tahminleri</h3>
           <p className="footnote">Tek maçlık model kazanma olasılığı (katsayı + kadro gücüne dayalı) -- gerçek bahis oranı değildir.</p>
-          <Pagination items={nextMatches} pageSize={8} topRef={topRef}>
+          <Pagination items={nextMatches} pageSize={8} topRef={modelPredictionsRef}>
             {(pageItems) => (
               <div className="match-list">
                 {pageItems.map((m) => (
@@ -1339,14 +1347,14 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
         </div>
       )}
 
-      <div className="chart-card chart-card-wide">
+      <div className="chart-card chart-card-wide" ref={formGuideRef}>
         <h3>📋 Form Durumu (tüm takımlar)</h3>
         <p className="footnote">
           {competitionKey === "superlig"
             ? "Süper Lig'deki son 5 gerçek maç sonucu."
             : "Kulübün kendi ülke ligindeki son 5 gerçek maç sonucu."}
         </p>
-        <Pagination items={formRows} pageSize={FORM_PAGE_SIZE} topRef={topRef}>
+        <Pagination items={formRows} pageSize={FORM_PAGE_SIZE} topRef={formGuideRef}>
           {(pageItems) => (
             <div className="form-guide-list">
               {pageItems.map((row) => (

@@ -24,6 +24,7 @@ import './styles/pages.css'
 const HomePage = lazy(() => import('./pages/HomePage.jsx'))
 const CompetitionHomeRoute = lazy(() => import('./pages/CompetitionHomeRoute.jsx'))
 const NewsPage = lazy(() => import('./pages/NewsPage.jsx'))
+const SeasonStoryPage = lazy(() => import('./pages/SeasonStoryPage.jsx'))
 const DrawPage = lazy(() => import('./pages/DrawPage.jsx'))
 const LeagueHomePage = lazy(() => import('./pages/LeagueHomePage.jsx'))
 const FixturePage = lazy(() => import('./pages/FixturePage.jsx'))
@@ -71,6 +72,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                               <Route path="/eglence-modu" element={<FunModeLandingPage />} />
                               <Route path="/:competitionKey" element={<CompetitionHomeRoute />} />
                               <Route path="/:competitionKey/haberler" element={<NewsPage />} />
+                              <Route path="/:competitionKey/sezon-hikayesi" element={<SeasonStoryPage />} />
                               <Route path="/:competitionKey/kura-simulasyonu" element={<DrawPage />} />
                               <Route path="/:competitionKey/sezon-simulasyonu" element={<LeagueHomePage />} />
                               <Route path="/:competitionKey/fikstur" element={<FixturePage />} />

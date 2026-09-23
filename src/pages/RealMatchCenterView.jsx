@@ -200,7 +200,11 @@ export default function RealMatchCenterView() {
           <h1>
             {homeTeam.name} — {awayTeam.name}
           </h1>
-          <p>{dateLabel ? `${dateLabel} tarihinde ${played ? "oynandı" : "oynanacak"}.` : ""}</p>
+          <p>
+            {dateLabel
+              ? `${dateLabel}${match.time ? `, saat ${match.time}` : ""} tarihinde ${played ? "oynandı" : "oynanacak"}.`
+              : ""}
+          </p>
         </div>
       </header>
 
@@ -245,6 +249,11 @@ export default function RealMatchCenterView() {
           )}
         </p>
         <ProbabilityBar homeTeam={homeTeam} awayTeam={awayTeam} homePct={homePct} drawPct={drawPct} awayPct={awayPct} />
+        {!result && prediction.model.predictedHomeGoals != null && (
+          <p className="footnote footnote-note" title="Modelin form/gidişat-düzeltmeli tahmini -- gerçek bir sonuç değildir">
+            Model tahmini skor: <b>{homeTeam.short} {prediction.model.predictedHomeGoals} - {prediction.model.predictedAwayGoals} {awayTeam.short}</b>
+          </p>
+        )}
         {prediction.usedH2H && (
           <p className="footnote footnote-note">
             Model tekbaşına: {homeTeam.short} %{Math.round(prediction.model.homeWinProb * 100)} · Beraberlik %

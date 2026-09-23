@@ -44,12 +44,30 @@ export default function MatchRow({ match, userScore, onUserScoreChange, competit
       </div>
 
       <div className="match-row-center">
-        {formatMatchDate(match.date) && <span className="match-row-date">{formatMatchDate(match.date)}</span>}
+        {formatMatchDate(match.date) && (
+          <span className="match-row-date">
+            {formatMatchDate(match.date)}
+            {match.time && <span className="match-row-time"> · {match.time}</span>}
+          </span>
+        )}
         {hasSim && match.isDerby && <span className="match-row-derby-badge">🔥 Derbi</span>}
         <div className="match-row-score">
           {hasSim ? `${match.homeGoals} : ${match.awayGoals}` : "– : –"}
         </div>
         {!played && <span className="match-row-pending">⏳ Bekleniyor</span>}
+        {/* Kullanıcı isteği: "Model Tahminleri skorları tahmin etmiyor gibi,
+            onlarda da etsin" -- gerçek skor henüz yokken (bkz. yukarıdaki
+            "– : –") modelin form/gidişat-düzeltmeli λ'sından türetilen
+            YAKLAŞIK bir skor tahmini (bkz. buildDisplayMatches ->
+            computeFormAdjustedPrediction) burada AYRI ve AÇIKÇA "Model:"
+            etiketiyle gösterilir -- gerçek sonuçla ASLA karıştırılmamalı,
+            bu yüzden gerçek skor alanının YERİNE değil, YANINA/ALTINA
+            ekleniyor. */}
+        {!played && match.predictedHomeGoals != null && (
+          <span className="match-row-predicted-score" title="Modelin form/gidişat-düzeltmeli tahmini -- gerçek bir sonuç değildir">
+            Model: {match.predictedHomeGoals}-{match.predictedAwayGoals}
+          </span>
+        )}
 
         <Link to={`/${competitionKey}/mac/${match.id}`} className="match-row-details-link">
           {played ? "Maç Merkezi →" : "Maç Analizi →"}

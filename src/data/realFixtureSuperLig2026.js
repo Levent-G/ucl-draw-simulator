@@ -15,15 +15,47 @@
 //   sayfasından (aynı URL deseni) alındı ve ayrıca standart çift devreli
 //   lig simetrisiyle (n. hafta ile n+17. hafta aynı eşleşmenin ev sahibi/
 //   deplasman YER DEĞİŞTİRİLMİŞ hali olmalı) çapraz kontrol edilip
-//   doğrulandı. ANCAK bu haftalar için TFF sayfası henüz maç başına ayrı
-//   gün/saat vermiyor (bkz. gerçek Süper Lig pratiği: yayıncı (beIN Sports/
-//   Tabii/TRT) programı her hafta yaklaştıkça netleşir) -- bu yüzden bu
-//   dosyada 7-34. haftaların HER maçına, TFF'nin o hafta için verdiği TEK
-//   taslak tarih uygulanmıştır (haftanın 9 maçı da aynı "date" değerini
-//   taşır). Bu tarihler ileride (TV programı netleştikçe) maç bazında
-//   güncellenmelidir -- eşleşmelerin (kim kime karşı, ev/deplasman) kendisi
-//   resmi kaynaktan geldiği için GÜVENİLİRDİR, sadece gün/saat kesinliği
-//   haftaya göre değişir.
+//   doğrulandı. Bu eşleşmelerin kendisi (kim kime karşı, ev/deplasman)
+//   resmi kaynaktan geldiği için GÜVENİLİRDİR ve bu tazelemede DEĞİŞTİRİLMEDİ.
+//
+// 22 EYLÜL 2026 TAZELEMESİ (maç bazında tarih/saat doğrulaması):
+//   Kullanıcı fikstürdeki tarihlerin (ve eksik saatlerin) gözden geçirilmesini
+//   istedi. Bu tazelemede:
+//   a) 1-6. Haftalar (oynanmış maçlar) tff.org, src/data/liveStatus.js'in
+//      kendi (bağımsız araştırılmış) tarihleri VE ek olarak Hürriyet/
+//      Habertürk/Fotomac/Fanatik/beIN Sports/Takvim/Mynet/Sporx/ESPN/CNN
+//      Türk/Yeni Şafak/Sahadan gibi dış kaynaklarla örneklem bazında (1.
+//      Hafta Galatasaray-Çorum FK 14 Ağustos; 6. Hafta Fenerbahçe-Eyüpspor
+//      8-0, 20 Eylül) çapraz doğrulandı -- TÜM tarihler DOĞRU çıktı, hiçbir
+//      düzeltme gerekmedi.
+//   b) 7-16. Haftalar: tff.org/Default.aspx?pageID=198&hafta=N sayfaları bu
+//      tarihte artık HER maç için AYRI gün VE saat veriyor (yayıncı programı
+//      netleşmiş) -- bu 10 haftanın 90 maçının TAMAMI tek tek tff.org'dan
+//      çekilip (her hafta içindeki 9 maçın 18 takım adının hiç tekrar
+//      etmediği kontrol edilerek) tek tek güncellendi; ayrıca aynı 90 maçın
+//      ev sahibi/deplasman eşleşmesi dosyada zaten var olan (önceden
+//      doğrulanmış) eşleşmelerle BİREBİR örtüştüğü doğrulandı (0 uyuşmazlık)
+//      -- bu yüzden yeni tarih/saatler yüksek güvenilirlikte kabul edildi.
+//      Bu haftaların "(taslak)" etiketi kaldırıldı, "label" alanı gerçek
+//      tarih aralığını yansıtacak şekilde güncellendi.
+//   c) 17-34. Haftalar: tff.org hâlâ haftanın 9 maçının TAMAMINA TEK bir
+//      taslak tarih veriyor (maç başına ayrı gün/saat henüz yok) -- bu,
+//      yayıncının (beIN Sports/Tabii/TRT) o kadar ileri haftalar için
+//      programını henüz açıklamadığı anlamına gelir (gerçek Süper Lig
+//      pratiği: TV programı genelde maçtan 1-2 hafta önce netleşir). Bu
+//      haftaların TEK taslak tarihleri de tff.org ile karşılaştırıldı ve
+//      dosyadaki mevcut tarihlerin HEPSİ zaten doğru çıktı (değişiklik
+//      gerekmedi) -- sadece "(taslak)" etiketi ve bu yorum güncel tutuldu.
+//      Bu haftalar ileride (TV programı netleştikçe) maç bazında
+//      güncellenmelidir.
+//   d) "time" alanı: yeni eklendi (bkz. her maç objesi). SADECE gerçekten
+//      doğrulanmış saat varsa dolduruldu (7-16. Haftalar, TRT/Türkiye yerel
+//      saati, 24 saat formatı, ör. "20:00") -- 1-6. Haftalar (geçmiş maçlar,
+//      kaynaklarda saat tutarsız/eksik olduğundan uydurulmadı) ve 17-34.
+//      Haftalar (saat henüz TFF'de yok) için "time" alanı KASITLI olarak
+//      hiç eklenmedi (uydurma saat YOK). "date" alanının formatı/anlamı
+//      DEĞİŞMEDİ -- src/utils/matchDate.js (isMatchPlayed) hâlâ sadece
+//      "date"i gün bazında karşılaştırıyor, "time" alanını kullanmıyor.
 //
 // Format: fixtureEngine.js'in serializeFixture() çıktısıyla aynı şekilde --
 // deserializeFixture(REAL_FIXTURE_SUPERLIG_2026, SUPER_LIG_TEAMS) ile
@@ -393,601 +425,691 @@ export const REAL_FIXTURE_SUPERLIG_2026 = [
   },
   {
     "number": 7,
-    "label": "7. Hafta — 11 Ekim 2026 (taslak)",
+    "label": "7. Hafta — 9-12 Ekim 2026",
     "matches": [
       {
         "id": "sr7m0",
         "homeId": "s15",
         "awayId": "s13",
-        "date": "2026-10-11"
+        "date": "2026-10-11",
+        "time": "16:00"
       },
       {
         "id": "sr7m1",
         "homeId": "s16",
         "awayId": "s7",
-        "date": "2026-10-11"
+        "date": "2026-10-12",
+        "time": "20:00"
       },
       {
         "id": "sr7m2",
         "homeId": "s10",
         "awayId": "s14",
-        "date": "2026-10-11"
+        "date": "2026-10-10",
+        "time": "16:00"
       },
       {
         "id": "sr7m3",
         "homeId": "s9",
         "awayId": "s5",
-        "date": "2026-10-11"
+        "date": "2026-10-11",
+        "time": "13:30"
       },
       {
         "id": "sr7m4",
         "homeId": "s1",
         "awayId": "s8",
-        "date": "2026-10-11"
+        "date": "2026-10-09",
+        "time": "20:00"
       },
       {
         "id": "sr7m5",
         "homeId": "s3",
         "awayId": "s17",
-        "date": "2026-10-11"
+        "date": "2026-10-11",
+        "time": "19:00"
       },
       {
         "id": "sr7m6",
         "homeId": "s6",
         "awayId": "s4",
-        "date": "2026-10-11"
+        "date": "2026-10-10",
+        "time": "16:00"
       },
       {
         "id": "sr7m7",
         "homeId": "s12",
         "awayId": "s2",
-        "date": "2026-10-11"
+        "date": "2026-10-10",
+        "time": "19:00"
       },
       {
         "id": "sr7m8",
         "homeId": "s18",
         "awayId": "s11",
-        "date": "2026-10-11"
+        "date": "2026-10-10",
+        "time": "13:30"
       }
     ]
   },
   {
     "number": 8,
-    "label": "8. Hafta — 18 Ekim 2026 (taslak)",
+    "label": "8. Hafta — 16-19 Ekim 2026",
     "matches": [
       {
         "id": "sr8m0",
         "homeId": "s4",
         "awayId": "s3",
-        "date": "2026-10-18"
+        "date": "2026-10-19",
+        "time": "20:00"
       },
       {
         "id": "sr8m1",
         "homeId": "s8",
         "awayId": "s6",
-        "date": "2026-10-18"
+        "date": "2026-10-18",
+        "time": "13:30"
       },
       {
         "id": "sr8m2",
         "homeId": "s5",
         "awayId": "s15",
-        "date": "2026-10-18"
+        "date": "2026-10-18",
+        "time": "19:00"
       },
       {
         "id": "sr8m3",
         "homeId": "s11",
         "awayId": "s9",
-        "date": "2026-10-18"
+        "date": "2026-10-17",
+        "time": "16:00"
       },
       {
         "id": "sr8m4",
         "homeId": "s18",
         "awayId": "s1",
-        "date": "2026-10-18"
+        "date": "2026-10-17",
+        "time": "16:00"
       },
       {
         "id": "sr8m5",
         "homeId": "s13",
         "awayId": "s12",
-        "date": "2026-10-18"
+        "date": "2026-10-16",
+        "time": "20:00"
       },
       {
         "id": "sr8m6",
         "homeId": "s2",
         "awayId": "s10",
-        "date": "2026-10-18"
+        "date": "2026-10-17",
+        "time": "19:00"
       },
       {
         "id": "sr8m7",
         "homeId": "s17",
         "awayId": "s7",
-        "date": "2026-10-18"
+        "date": "2026-10-18",
+        "time": "16:00"
       },
       {
         "id": "sr8m8",
         "homeId": "s14",
         "awayId": "s16",
-        "date": "2026-10-18"
+        "date": "2026-10-17",
+        "time": "13:30"
       }
     ]
   },
   {
     "number": 9,
-    "label": "9. Hafta — 25 Ekim 2026 (taslak)",
+    "label": "9. Hafta — 23-26 Ekim 2026",
     "matches": [
       {
         "id": "sr9m0",
         "homeId": "s15",
         "awayId": "s14",
-        "date": "2026-10-25"
+        "date": "2026-10-24",
+        "time": "16:00"
       },
       {
         "id": "sr9m1",
         "homeId": "s16",
         "awayId": "s8",
-        "date": "2026-10-25"
+        "date": "2026-10-24",
+        "time": "13:30"
       },
       {
         "id": "sr9m2",
         "homeId": "s10",
         "awayId": "s17",
-        "date": "2026-10-25"
+        "date": "2026-10-23",
+        "time": "20:00"
       },
       {
         "id": "sr9m3",
         "homeId": "s9",
         "awayId": "s18",
-        "date": "2026-10-25"
+        "date": "2026-10-25",
+        "time": "16:00"
       },
       {
         "id": "sr9m4",
         "homeId": "s1",
         "awayId": "s2",
-        "date": "2026-10-25"
+        "date": "2026-10-26",
+        "time": "21:30"
       },
       {
         "id": "sr9m5",
         "homeId": "s3",
         "awayId": "s5",
-        "date": "2026-10-25"
+        "date": "2026-10-26",
+        "time": "19:00"
       },
       {
         "id": "sr9m6",
         "homeId": "s6",
         "awayId": "s11",
-        "date": "2026-10-25"
+        "date": "2026-10-24",
+        "time": "19:00"
       },
       {
         "id": "sr9m7",
         "homeId": "s12",
         "awayId": "s4",
-        "date": "2026-10-25"
+        "date": "2026-10-26",
+        "time": "19:00"
       },
       {
         "id": "sr9m8",
         "homeId": "s7",
         "awayId": "s13",
-        "date": "2026-10-25"
+        "date": "2026-10-25",
+        "time": "19:00"
       }
     ]
   },
   {
     "number": 10,
-    "label": "10. Hafta — 1 Kasım 2026 (taslak)",
+    "label": "10. Hafta — 30 Ekim - 2 Kasım 2026",
     "matches": [
       {
         "id": "sr10m0",
         "homeId": "s4",
         "awayId": "s15",
-        "date": "2026-11-01"
+        "date": "2026-11-01",
+        "time": "16:00"
       },
       {
         "id": "sr10m1",
         "homeId": "s9",
         "awayId": "s1",
-        "date": "2026-11-01"
+        "date": "2026-10-30",
+        "time": "20:00"
       },
       {
         "id": "sr10m2",
         "homeId": "s2",
         "awayId": "s7",
-        "date": "2026-11-01"
+        "date": "2026-10-31",
+        "time": "19:00"
       },
       {
         "id": "sr10m3",
         "homeId": "s17",
         "awayId": "s12",
-        "date": "2026-11-01"
+        "date": "2026-10-31",
+        "time": "16:00"
       },
       {
         "id": "sr10m4",
         "homeId": "s8",
         "awayId": "s3",
-        "date": "2026-11-01"
+        "date": "2026-11-01",
+        "time": "19:00"
       },
       {
         "id": "sr10m5",
         "homeId": "s5",
         "awayId": "s6",
-        "date": "2026-11-01"
+        "date": "2026-11-01",
+        "time": "16:00"
       },
       {
         "id": "sr10m6",
         "homeId": "s11",
         "awayId": "s16",
-        "date": "2026-11-01"
+        "date": "2026-11-01",
+        "time": "13:30"
       },
       {
         "id": "sr10m7",
         "homeId": "s18",
         "awayId": "s10",
-        "date": "2026-11-01"
+        "date": "2026-11-02",
+        "time": "20:00"
       },
       {
         "id": "sr10m8",
         "homeId": "s14",
         "awayId": "s13",
-        "date": "2026-11-01"
+        "date": "2026-10-31",
+        "time": "13:30"
       }
     ]
   },
   {
     "number": 11,
-    "label": "11. Hafta — 8 Kasım 2026 (taslak)",
+    "label": "11. Hafta — 6-8 Kasım 2026",
     "matches": [
       {
         "id": "sr11m0",
         "homeId": "s15",
         "awayId": "s8",
-        "date": "2026-11-08"
+        "date": "2026-11-06",
+        "time": "20:00"
       },
       {
         "id": "sr11m1",
         "homeId": "s16",
         "awayId": "s17",
-        "date": "2026-11-08"
+        "date": "2026-11-07",
+        "time": "13:30"
       },
       {
         "id": "sr11m2",
         "homeId": "s10",
         "awayId": "s4",
-        "date": "2026-11-08"
+        "date": "2026-11-08",
+        "time": "18:30"
       },
       {
         "id": "sr11m3",
         "homeId": "s12",
         "awayId": "s14",
-        "date": "2026-11-08"
+        "date": "2026-11-08",
+        "time": "13:30"
       },
       {
         "id": "sr11m4",
         "homeId": "s7",
         "awayId": "s5",
-        "date": "2026-11-08"
+        "date": "2026-11-07",
+        "time": "19:00"
       },
       {
         "id": "sr11m5",
         "homeId": "s13",
         "awayId": "s2",
-        "date": "2026-11-08"
+        "date": "2026-11-08",
+        "time": "16:00"
       },
       {
         "id": "sr11m6",
         "homeId": "s1",
         "awayId": "s11",
-        "date": "2026-11-08"
+        "date": "2026-11-07",
+        "time": "19:00"
       },
       {
         "id": "sr11m7",
         "homeId": "s3",
         "awayId": "s18",
-        "date": "2026-11-08"
+        "date": "2026-11-08",
+        "time": "21:00"
       },
       {
         "id": "sr11m8",
         "homeId": "s6",
         "awayId": "s9",
-        "date": "2026-11-08"
+        "date": "2026-11-07",
+        "time": "16:00"
       }
     ]
   },
   {
     "number": 12,
-    "label": "12. Hafta — 22 Kasım 2026 (taslak)",
+    "label": "12. Hafta — 21-23 Kasım 2026",
     "matches": [
       {
         "id": "sr12m0",
         "homeId": "s4",
         "awayId": "s16",
-        "date": "2026-11-22"
+        "date": "2026-11-22",
+        "time": "19:00"
       },
       {
         "id": "sr12m1",
         "homeId": "s8",
         "awayId": "s10",
-        "date": "2026-11-22"
+        "date": "2026-11-22",
+        "time": "16:00"
       },
       {
         "id": "sr12m2",
         "homeId": "s5",
         "awayId": "s13",
-        "date": "2026-11-22"
+        "date": "2026-11-23",
+        "time": "20:00"
       },
       {
         "id": "sr12m3",
         "homeId": "s11",
         "awayId": "s12",
-        "date": "2026-11-22"
+        "date": "2026-11-21",
+        "time": "13:30"
       },
       {
         "id": "sr12m4",
         "homeId": "s18",
         "awayId": "s15",
-        "date": "2026-11-22"
+        "date": "2026-11-21",
+        "time": "13:30"
       },
       {
         "id": "sr12m5",
         "homeId": "s9",
         "awayId": "s3",
-        "date": "2026-11-22"
+        "date": "2026-11-22",
+        "time": "16:00"
       },
       {
         "id": "sr12m6",
         "homeId": "s1",
         "awayId": "s6",
-        "date": "2026-11-22"
+        "date": "2026-11-21",
+        "time": "16:00"
       },
       {
         "id": "sr12m7",
         "homeId": "s17",
         "awayId": "s2",
-        "date": "2026-11-22"
+        "date": "2026-11-21",
+        "time": "19:00"
       },
       {
         "id": "sr12m8",
         "homeId": "s14",
         "awayId": "s7",
-        "date": "2026-11-22"
+        "date": "2026-11-22",
+        "time": "13:30"
       }
     ]
   },
   {
     "number": 13,
-    "label": "13. Hafta — 29 Kasım 2026 (taslak)",
+    "label": "13. Hafta — 27-30 Kasım 2026",
     "matches": [
       {
         "id": "sr13m0",
         "homeId": "s15",
         "awayId": "s11",
-        "date": "2026-11-29"
+        "date": "2026-11-28",
+        "time": "19:00"
       },
       {
         "id": "sr13m1",
         "homeId": "s16",
         "awayId": "s5",
-        "date": "2026-11-29"
+        "date": "2026-11-29",
+        "time": "16:00"
       },
       {
         "id": "sr13m2",
         "homeId": "s10",
         "awayId": "s9",
-        "date": "2026-11-29"
+        "date": "2026-11-27",
+        "time": "20:00"
       },
       {
         "id": "sr13m3",
         "homeId": "s2",
         "awayId": "s14",
-        "date": "2026-11-29"
+        "date": "2026-11-29",
+        "time": "19:00"
       },
       {
         "id": "sr13m4",
         "homeId": "s3",
         "awayId": "s1",
-        "date": "2026-11-29"
+        "date": "2026-11-30",
+        "time": "21:00"
       },
       {
         "id": "sr13m5",
         "homeId": "s6",
         "awayId": "s18",
-        "date": "2026-11-29"
+        "date": "2026-11-28",
+        "time": "16:00"
       },
       {
         "id": "sr13m6",
         "homeId": "s12",
         "awayId": "s8",
-        "date": "2026-11-29"
+        "date": "2026-11-27",
+        "time": "20:00"
       },
       {
         "id": "sr13m7",
         "homeId": "s7",
         "awayId": "s4",
-        "date": "2026-11-29"
+        "date": "2026-11-30",
+        "time": "19:00"
       },
       {
         "id": "sr13m8",
         "homeId": "s13",
         "awayId": "s17",
-        "date": "2026-11-29"
+        "date": "2026-11-29",
+        "time": "13:30"
       }
     ]
   },
   {
     "number": 14,
-    "label": "14. Hafta — 6 Aralık 2026 (taslak)",
+    "label": "14. Hafta — 4-7 Aralık 2026",
     "matches": [
       {
         "id": "sr14m0",
         "homeId": "s4",
         "awayId": "s13",
-        "date": "2026-12-06"
+        "date": "2026-12-06",
+        "time": "19:00"
       },
       {
         "id": "sr14m1",
         "homeId": "s9",
         "awayId": "s15",
-        "date": "2026-12-06"
+        "date": "2026-12-05",
+        "time": "13:30"
       },
       {
         "id": "sr14m2",
         "homeId": "s1",
         "awayId": "s12",
-        "date": "2026-12-06"
+        "date": "2026-12-04",
+        "time": "20:00"
       },
       {
         "id": "sr14m3",
         "homeId": "s3",
         "awayId": "s6",
-        "date": "2026-12-06"
+        "date": "2026-12-06",
+        "time": "16:00"
       },
       {
         "id": "sr14m4",
         "homeId": "s8",
         "awayId": "s7",
-        "date": "2026-12-06"
+        "date": "2026-12-07",
+        "time": "20:00"
       },
       {
         "id": "sr14m5",
         "homeId": "s5",
         "awayId": "s2",
-        "date": "2026-12-06"
+        "date": "2026-12-05",
+        "time": "19:00"
       },
       {
         "id": "sr14m6",
         "homeId": "s11",
         "awayId": "s10",
-        "date": "2026-12-06"
+        "date": "2026-12-05",
+        "time": "16:00"
       },
       {
         "id": "sr14m7",
         "homeId": "s18",
         "awayId": "s16",
-        "date": "2026-12-06"
+        "date": "2026-12-06",
+        "time": "16:00"
       },
       {
         "id": "sr14m8",
         "homeId": "s14",
         "awayId": "s17",
-        "date": "2026-12-06"
+        "date": "2026-12-06",
+        "time": "13:30"
       }
     ]
   },
   {
     "number": 15,
-    "label": "15. Hafta — 13 Aralık 2026 (taslak)",
+    "label": "15. Hafta — 11-14 Aralık 2026",
     "matches": [
       {
         "id": "sr15m0",
         "homeId": "s15",
         "awayId": "s3",
-        "date": "2026-12-13"
+        "date": "2026-12-14",
+        "time": "20:00"
       },
       {
         "id": "sr15m1",
         "homeId": "s16",
         "awayId": "s1",
-        "date": "2026-12-13"
+        "date": "2026-12-12",
+        "time": "19:00"
       },
       {
         "id": "sr15m2",
         "homeId": "s10",
         "awayId": "s6",
-        "date": "2026-12-13"
+        "date": "2026-12-12",
+        "time": "16:00"
       },
       {
         "id": "sr15m3",
         "homeId": "s2",
         "awayId": "s4",
-        "date": "2026-12-13"
+        "date": "2026-12-13",
+        "time": "19:00"
       },
       {
         "id": "sr15m4",
         "homeId": "s17",
         "awayId": "s18",
-        "date": "2026-12-13"
+        "date": "2026-12-13",
+        "time": "13:30"
       },
       {
         "id": "sr15m5",
         "homeId": "s12",
         "awayId": "s5",
-        "date": "2026-12-13"
+        "date": "2026-12-13",
+        "time": "16:00"
       },
       {
         "id": "sr15m6",
         "homeId": "s7",
         "awayId": "s9",
-        "date": "2026-12-13"
+        "date": "2026-12-13",
+        "time": "16:00"
       },
       {
         "id": "sr15m7",
         "homeId": "s13",
         "awayId": "s11",
-        "date": "2026-12-13"
+        "date": "2026-12-11",
+        "time": "20:00"
       },
       {
         "id": "sr15m8",
         "homeId": "s14",
         "awayId": "s8",
-        "date": "2026-12-13"
+        "date": "2026-12-12",
+        "time": "13:30"
       }
     ]
   },
   {
     "number": 16,
-    "label": "16. Hafta — 20 Aralık 2026 (taslak)",
+    "label": "16. Hafta — 18-21 Aralık 2026",
     "matches": [
       {
         "id": "sr16m0",
         "homeId": "s4",
         "awayId": "s17",
-        "date": "2026-12-20"
+        "date": "2026-12-21",
+        "time": "20:00"
       },
       {
         "id": "sr16m1",
         "homeId": "s8",
         "awayId": "s2",
-        "date": "2026-12-20"
+        "date": "2026-12-18",
+        "time": "20:00"
       },
       {
         "id": "sr16m2",
         "homeId": "s5",
         "awayId": "s14",
-        "date": "2026-12-20"
+        "date": "2026-12-19",
+        "time": "16:00"
       },
       {
         "id": "sr16m3",
         "homeId": "s11",
         "awayId": "s7",
-        "date": "2026-12-20"
+        "date": "2026-12-18",
+        "time": "20:00"
       },
       {
         "id": "sr16m4",
         "homeId": "s18",
         "awayId": "s13",
-        "date": "2026-12-20"
+        "date": "2026-12-20",
+        "time": "13:30"
       },
       {
         "id": "sr16m5",
         "homeId": "s9",
         "awayId": "s16",
-        "date": "2026-12-20"
+        "date": "2026-12-19",
+        "time": "13:30"
       },
       {
         "id": "sr16m6",
         "homeId": "s1",
         "awayId": "s10",
-        "date": "2026-12-20"
+        "date": "2026-12-19",
+        "time": "19:00"
       },
       {
         "id": "sr16m7",
         "homeId": "s3",
         "awayId": "s12",
-        "date": "2026-12-20"
+        "date": "2026-12-20",
+        "time": "19:00"
       },
       {
         "id": "sr16m8",
         "homeId": "s6",
         "awayId": "s15",
-        "date": "2026-12-20"
+        "date": "2026-12-20",
+        "time": "16:00"
       }
     ]
   },

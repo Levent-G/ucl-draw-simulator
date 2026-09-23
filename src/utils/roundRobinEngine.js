@@ -89,7 +89,7 @@ export function deserializeRoundRobinFixture(raw, teams) {
     number: md.number,
     label: md.label,
     matches: md.matches
-      .map((m) => ({ id: m.id, homeTeam: teamById[m.homeId], awayTeam: teamById[m.awayId], date: m.date }))
+      .map((m) => ({ id: m.id, homeTeam: teamById[m.homeId], awayTeam: teamById[m.awayId], date: m.date, time: m.time }))
       .filter((m) => m.homeTeam && m.awayTeam),
   }));
 }

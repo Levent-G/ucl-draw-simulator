@@ -15,6 +15,59 @@
 // position: "GK" | "DF" | "MF" | "FW"
 // rating: 1-99 arası kurgusal güç puanı (takımın coeff değeriyle uyumlu,
 // gol/asist dağılımı ağırlıklandırmasında kullanılır).
+//
+// --- 2026-09-23 EKLEME NOTU (eksik mevki doldurma) ---
+// "Muhtemel Kadro" (ProbableLineup.jsx) diziliminde bazı takımların belirli
+// mevkilerde (injuries.js'teki sakat/cezalılar çıkarıldıktan sonra) 4-3-3
+// formasyonunu doldurmaya yetecek sayıda GERÇEK ve MÜSAİT oyuncusu
+// kalmıyordu -- bu maddeler o boşlukları GERÇEK oyuncularla doldurmak için
+// eklendi (WebSearch ile araştırıldı, çoğu 2+ bağımsız kaynakla
+// doğrulandı), hiçbir isim uydurulmadı:
+//   - Galatasaray (s1, FW boşluğu -- Osimhen sakat, tek müsait forvet
+//     Leão'ydu): Deniz Gül (1 Eylül 2026'da Porto'dan transfer edilen,
+//     santrafor mevkisinde oynayan milli forvet -- CNN Türk/Galatasaray.org/
+//     ESPN) ve Can Armando Güner (kulübün resmi A takım kadrosunda yer alan,
+//     Gladbach altyapısından 2025/26 kışında transfer edilen genç forvet/
+//     kanat -- galatasaray.org resmi profil sayfası/Türkçe Vikipedi/Hürriyet)
+//     eklendi.
+//   - Trabzonspor (s4, FW boşluğu -- Onuachu sakat, sadece 2 müsait forvet
+//     kalmıştı): 19 Eylül'deki Galatasaray derbisinin GERÇEK ilk 11'inde
+//     forma giyen Franculino Djú (Midtjylland'dan transfer, 9 numara,
+//     Fotomaç/NTVSpor/ESPN) ve Noah Saviolo (Vitória'dan transfer,
+//     kulübün 205. yabancı oyuncusu, Hürriyet/AA) eklendi.
+//   - İstanbul Başakşehir (s5, DF boşluğu -- sadece 3 müsait defans
+//     kalmıştı): 19 Eylül'deki Gençlerbirliği maçının GERÇEK ilk 11'inde
+//     forma giyen Emin Bayram (Galatasaray altyapısı/KVC Westerlo'dan
+//     transfer, Milliyet/Goal.com/TFF), Ousseynou Ba (Olympiacos'tan
+//     transfer, Senegalli stoper, Hürriyet/NTVSpor) ve Saba Kharebashvili
+//     (genç sol bek, Fotmob) eklendi.
+//   - Samsunspor (s6, FW boşluğu -- Mouandilmadji ve Fatih Kaya sakat,
+//     sadece 1 müsait forvet kalmıştı): Mohamed Bayo (4-5 Eylül 2026'da
+//     Lille'den KESİN transferle katıldı, önceki sezon Gaziantep FK'ye
+//     kiralıkken 32 maçta 15 gol atmıştı -- Get French Football News/Yahoo
+//     Sports/Fotomaç/Sabah; NOT: s15 Gaziantep FK kaydındaki aynı isim artık
+//     GÜNCEL DEĞİL çünkü kiralığı bitip Samsunspor'a kesin transfer oldu,
+//     ancak talimat gereği mevcut kayıtlara dokunulmadı) ve Kouadou Jaurès
+//     Assoumou (Ocak 2026'da Troyes'ten transfer edilen kanat forvet --
+//     Türkçe Vikipedi/Fotomaç/Sabah/Fanatik) eklendi.
+//   - Amed SFK (s11, DF boşluğu -- kadroda HİÇ defans oyuncusu yoktu):
+//     dosyada bu takım için sıfırdan araştırılan 4 gerçek stoper/bek, her
+//     biri en az 2 bağımsız kaynakla doğrulandı: David Bates (İskoç stoper,
+//     Haziran 2026, ajansspor.com/aspor.com.tr/DHA), Lumbardh Dellova
+//     (Kosovalı stoper, CSKA Sofia'dan, Temmuz 2026, Fanatik/Türkçe
+//     Vikipedi/amedspor.com.tr resmi sitesi), Amadou Cissé (Ginaeli sağ
+//     bek/stoper, Strasbourg'dan, ajansspor.com/amedspor.com.tr resmi
+//     sitesi/sporx.com) ve Mehmet Yeşil (2024'ten beri kulüpte olan Türk
+//     bek, TFF resmi profili/Flashscore/365Scores).
+//   - Çorum FK (s13, DF boşluğu -- sadece 2 müsait defans kalmıştı): 19
+//     Eylül'deki Alanyaspor maçının GERÇEK ilk 11'inde forma giyen Gökhan
+//     Sazdağı (Beşiktaş'tan transfer, sağ bek, DHA/T24/Mackolik) ve Andrei
+//     Borza (Rumen milli takımından genç sol bek, Rapid București'ten
+//     transfer, DHA/Sabah/NTVSpor) eklendi. NOT: Aynı maçın kadrosunda yer
+//     alan üçüncü bir stoper Hrvoje Smolčić de gerçek bir Çorum FK
+//     transferi olsa da, bu isim dosyada ZATEN s17 (Kocaelispor) kadrosunda
+//     kayıtlı olduğu için (o kaydın hatalı olma ihtimaline rağmen mevcut
+//     kayıtlara dokunulmaması talimatı gereği) tekrar eklenmedi.
 import { POSITION_LABELS } from "./players.js";
 
 const RAW_SUPER_LIG_ROSTERS = {
@@ -43,6 +96,8 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Aleksey Batrakov", "MF", "RUS", 77],
     ["Victor Osimhen", "FW", "NGA", 89],
     ["Rafael Leão", "FW", "POR", 86],
+    ["Deniz Gül", "FW", "TUR", 74],
+    ["Can Armando Güner", "FW", "GER", 65],
   ],
   s2: [
     // Fenerbahçe
@@ -115,6 +170,8 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Mohamed Salah", "FW", "EGY", 90],
     ["Paul Onuachu", "FW", "NGA", 78],
     ["Umut Nayir", "FW", "TUR", 71],
+    ["Franculino Djú", "FW", "GNB", 74],
+    ["Noah Saviolo", "FW", "POR", 71],
   ],
   s5: [
     // İstanbul Başakşehir
@@ -123,6 +180,9 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Léo Duarte", "DF", "BRA", 71],
     ["Jerome Opoku", "DF", "GHA", 70],
     ["Christopher Opéri", "DF", "CIV", 69],
+    ["Emin Bayram", "DF", "TUR", 68],
+    ["Ousseynou Ba", "DF", "SEN", 73],
+    ["Saba Kharebashvili", "DF", "GEO", 62],
     ["Amine Harit", "MF", "MAR", 75],
     ["Miguel Crespo", "MF", "POR", 71],
     ["Ivan Brnić", "MF", "CRO", 68],
@@ -155,6 +215,8 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Marius Mouandilmadji", "FW", "TCD", 75],
     ["Fatih Kaya", "FW", "TUR", 68],
     ["Richie Omorowa", "FW", "SWE", 68],
+    ["Mohamed Bayo", "FW", "GUI", 71],
+    ["Kouadou Jaurès Assoumou", "FW", "CIV", 65],
   ],
   s7: [
     // Göztepe
@@ -250,6 +312,10 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Rayan Lutin", "FW", "FRA", 65],
     ["Berk Kızıldemir", "MF", "TUR", 62],
     ["Gökhan Gül", "MF", "TUR", 63],
+    ["David Bates", "DF", "SCO", 65],
+    ["Lumbardh Dellova", "DF", "KVX", 64],
+    ["Amadou Cissé", "DF", "GUI", 58],
+    ["Mehmet Yeşil", "DF", "TUR", 62],
   ],
   s12: [
     // Çaykur Rizespor
@@ -281,6 +347,8 @@ const RAW_SUPER_LIG_ROSTERS = {
     ["Hasan Akinay", "GK", "TUR", 60],
     ["Joseph Attamah", "DF", "GHA", 65],
     ["Sinan Osmanoğlu", "DF", "TUR", 61],
+    ["Gökhan Sazdağı", "DF", "TUR", 66],
+    ["Andrei Borza", "DF", "ROU", 64],
     ["Ferhat Yazgan", "MF", "TUR", 65],
     ["Atakan Akkaynak", "MF", "TUR", 62],
     ["Pedrinho", "MF", "POR", 66],

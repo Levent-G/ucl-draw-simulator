@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { FORMATIONS } from "../state/DreamTeamContext.jsx";
 import PlayerAvatar from "./PlayerAvatar.jsx";
 import { CURRENT_INJURIES } from "../data/injuries.js";
+import { buildRealBasedLineup } from "../utils/realLineupSelectors.js";
 
 const FORMATION_KEY = "4-3-3";
 
@@ -62,14 +63,19 @@ function buildProbableLineup(players, slots) {
 // AYNI görsel dilde (bkz. pitch/pitch-slot CSS'i), ama salt okunur ve tek bir
 // gerçek kulübün kayıtlı kadrosundan besleniyor.
 export default function ProbableLineup({ team, players, competitionKey }) {
-  const slots = FORMATIONS[FORMATION_KEY].slots;
+  const realBased = useMemo(
+    () => buildRealBasedLineup({ teamId: team.id, teamName: team.name, competitionKey, players: players || [] }),
+    [players, team.id, team.name, competitionKey]
+  );
+  const formationKey = realBased?.formation || FORMATION_KEY;
+  const slots = FORMATIONS[formationKey].slots;
   const availablePlayers = useMemo(
     () => excludeCurrentlyInjured(players || [], team.id),
     [players, team.id]
   );
   const assigned = useMemo(
-    () => buildProbableLineup(availablePlayers, slots),
-    [availablePlayers, slots]
+    () => (realBased ? realBased.assigned : buildProbableLineup(availablePlayers, slots)),
+    [realBased, availablePlayers, slots]
   );
   const injured = useMemo(
     () => getCurrentlyInjured(players || [], team.id),
@@ -79,11 +85,18 @@ export default function ProbableLineup({ team, players, competitionKey }) {
   return (
     <div className="probable-lineup">
       <div className="probable-lineup-head">
-        <h4>🔮 Olası Kadro — {team.short} ({FORMATION_KEY})</h4>
+        <h4>🔮 Olası Kadro — {team.short} ({formationKey})</h4>
         <p className="footnote">
-          Resmi/doğrulanmış bir ilk 11 DEĞİLDİR -- kulübün kayıtlı oyuncularından, reytinge göre otomatik
-          oluşturulan örnek bir diziliş. Hâlihazırda sakat/cezalı olduğu bilinen oyuncular (bkz.
-          src/data/injuries.js) bu dizilişten çıkarılıp sahanın yanında 🩹 ile ayrıca gösterilmiştir.
+          {realBased ? (
+            <>Takımın en son gerçek maçındaki (kaynak: {realBased.source}) ilk 11'i ve diziliş şekli temel alınmıştır.
+            Sonradan sakat/cezalı olan ya da o maçtaki ismi doğrulanamayan oyuncuların yerine (🔁 ile işaretli)
+            kadronun aynı mevkideki en iyi müsait oyuncusu konulmuştur -- yine de bu, resmî bir sonraki maç
+            kadrosu DEĞİLDİR.</>
+          ) : (
+            <>Resmi/doğrulanmış bir ilk 11 DEĞİLDİR -- kulübün kayıtlı oyuncularından, reytinge göre otomatik
+            oluşturulan örnek bir diziliş.</>
+          )}
+          {" "}Hâlihazırda sakat/cezalı olduğu bilinen oyuncular sahanın yanında 🩹 ile ayrıca gösterilmiştir.
         </p>
       </div>
       <div className="probable-lineup-body">
@@ -92,14 +105,28 @@ export default function ProbableLineup({ team, players, competitionKey }) {
             <span className="pitch-center-circle" />
             <span className="pitch-center-line" />
           </div>
-          {assigned.map(({ slot, player }) => (
+          {assigned.map(({ slot, player, rawName, replacedInjuredName }) => (
             <div className="pitch-slot" style={{ left: `${slot.x}%`, top: `${slot.y}%` }} key={slot.id}>
               {player ? (
-                <Link to={`/${competitionKey}/oyuncu/${player.id}`} className="pitch-slot-filled">
+                <Link
+                  to={`/${competitionKey}/oyuncu/${player.id}`}
+                  className="pitch-slot-filled"
+                  title={replacedInjuredName ? `${replacedInjuredName} sakat/cezalı olduğu için yerine kondu` : undefined}
+                >
                   <PlayerAvatar player={player} size={30} />
                   <span className="pitch-slot-name">{player.name}</span>
                   <span className="pitch-slot-meta">{player.rating}</span>
+                  {replacedInjuredName && (
+                    <span className="pitch-slot-note-tag pitch-slot-note-tag-sub" aria-hidden="true">🔁</span>
+                  )}
                 </Link>
+              ) : rawName ? (
+                <div
+                  className="pitch-slot-filled pitch-slot-real-only"
+                  title="Gerçek son maç kadrosunda yer aldı; sitenin oyuncu veritabanında eşleşme bulunamadı"
+                >
+                  <span className="pitch-slot-name">{rawName}</span>
+                </div>
               ) : (
                 <div className="pitch-slot-empty">
                   <span className="pitch-slot-pos">{slot.position}</span>

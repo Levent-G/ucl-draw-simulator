@@ -9,6 +9,7 @@ import {
   getRealFixture,
   getGoalDependency,
   getGoalDifferenceFragility,
+  getNews,
 } from "../utils/realStandingsSelectors.js";
 import { isMatchPlayed, formatMatchDate } from "../utils/matchDate.js";
 import { getCompetition } from "../data/competitions.js";
@@ -279,9 +280,11 @@ function CompetitionStackCard({ comp, index, hovered, onHover, onLeave }) {
 export default function HomePage() {
   const tickerItems = useTickerItems();
   const insights = useHomeInsights();
+  const latestNews = useMemo(() => getNews({ limit: 6 }), []);
   const [heroRef, heroVisible] = useReveal(0.05);
   const [stackRef, stackVisible] = useReveal(0.2);
   const [insightsRef, insightsVisible] = useReveal(0.2);
+  const [newsRef, newsVisible] = useReveal(0.2);
   const [chipRef, chipVisible] = useReveal(0.2);
   const [hovered, setHovered] = useState(null);
 
@@ -378,6 +381,42 @@ export default function HomePage() {
                 <span className="home-insight-text">{insight.text}</span>
               </Link>
             ))}
+          </div>
+        </section>
+      )}
+
+      {latestNews.length > 0 && (
+        <section className="home-news-section" ref={newsRef}>
+          <div className="home-news-heading">
+            <h2 className="home-section-title">
+              <span className="home-news-live-dot" aria-hidden="true" />
+              Son Dakika
+            </h2>
+            <span className="home-news-heading-hint">kaydırarak gör →</span>
+          </div>
+          <div className="home-news-scroll">
+            <div className={`home-news-track ${newsVisible ? "is-in" : ""}`}>
+              {latestNews.map((n, i) => (
+                <Link
+                  key={n.id}
+                  to={`/${n.competitionKey}/haberler`}
+                  className={`home-news-card ${i === 0 ? "is-featured" : ""} home-news-card-${n.competitionKey}`}
+                  style={{ transitionDelay: `${i * 90}ms` }}
+                >
+                  <div className="home-news-card-accent" aria-hidden="true" />
+                  <div className="home-news-card-body">
+                    <div className="home-news-card-head">
+                      <CompetitionIcon competition={getCompetition(n.competitionKey)} size={16} />
+                      <span className="home-news-card-comp">{getCompetition(n.competitionKey)?.shortName}</span>
+                      <span className="home-news-card-date">{formatMatchDate(n.date)}</span>
+                    </div>
+                    <h3 className="home-news-card-title">{n.title}</h3>
+                    <p className="home-news-card-summary">{n.summary}</p>
+                    <span className="home-news-card-cta">Devamını oku →</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
       )}

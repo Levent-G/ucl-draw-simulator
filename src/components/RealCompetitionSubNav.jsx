@@ -13,6 +13,7 @@ const VIEWS = [
   { key: "istatistik", icon: "📊", label: "İstatistikler" },
   { key: "karsilikli", icon: "🤝", label: "Karşılıklı Geçmiş" },
   { key: "haberler", icon: "📰", label: "Haberler" },
+  { key: "sezon-hikayesi", icon: "📖", label: "Sezon Hikayesi" },
 ];
 
 // UCL/Süper Lig için TEK bir gezinme çubuğu -- NavBar'ın (site geneli)

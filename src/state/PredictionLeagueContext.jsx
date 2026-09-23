@@ -762,6 +762,24 @@ export function computeDerivedStandings(fixture, myScorePredictionsByMatch, leag
   return computeStandingsFromUserScores(fixture, userScores, { teams, zones });
 }
 
+// Bir tahminin gerçek sonucunun artık BELLİ olup olmadığını (puanının kesin/
+// nihai olup olmadığını) söyler -- pointsForPrediction'daki her kind'ın
+// kendi "henüz belli değil -> 0 puan" koşuluyla BİREBİR aynı mantığı kullanır.
+// Kullanıcı geri bildirimi: "tabloda tahmin sayısı ve sonuçlanan tahmin
+// sayısını da göster" -- leaderboard'da bu ikisini AYRI göstermek için gerekli.
+function isPredictionResolved(prediction, league) {
+  if (!prediction || !league) return false;
+  if (prediction.kind === "champion") return !!league.knockout?.champion;
+  if (prediction.kind === "knockout") {
+    const [roundIdxStr] = String(prediction.matchId).split("-");
+    const round = league.knockout?.rounds?.[Number(roundIdxStr) || 0];
+    return !!round?.ties?.find((t) => t.id === prediction.matchId)?.winnerId;
+  }
+  if (prediction.kind === "standings") return isSeasonFullyRevealed(league);
+  // "score"/"outcome" -- ikisi de haftalık gerçek maç tahminleri.
+  return isMatchRevealed(league, prediction.matchId);
+}
+
 // Bir lig odasının tam sıralama tablosunu (kullanıcı başına toplam puan +
 // tahmin sayısı) üretir -- predictions ve league'den türetilir, Firestore'da
 // AYRICA saklanmaz (her zaman kaynağından yeniden hesaplanır).
@@ -780,7 +798,7 @@ export function buildLeaderboard(predictions, league, standingsCtx) {
     const entry = byUser[p.uid];
     entry.predicted++;
     entry.points += pointsForPrediction(p, league);
-    entry.scored++;
+    if (isPredictionResolved(p, league)) entry.scored++;
   }
 
   if (standingsCtx?.fixture && league && isSeasonFullyRevealed(league)) {

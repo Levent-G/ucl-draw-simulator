@@ -16,6 +16,7 @@ function realDropdownItems(competitionKey) {
     { to: `/${competitionKey}/istatistik`, icon: "📊", label: "İstatistikler" },
     { to: `/${competitionKey}/karsilikli`, icon: "🤝", label: "Karşılıklı Geçmiş" },
     { to: `/${competitionKey}/haberler`, icon: "📰", label: "Haberler" },
+    { to: `/${competitionKey}/sezon-hikayesi`, icon: "📖", label: "Sezon Hikayesi" },
   ];
 }
 
