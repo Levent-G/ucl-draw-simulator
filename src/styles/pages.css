@@ -5758,32 +5758,17 @@ a.team-profile-match-row:hover {
   border-color: var(--success);
   box-shadow: none;
 }
-.prediction-toolbar-btn.is-reset {
-  background: transparent;
-  color: var(--text-faint);
-  border-color: var(--line-strong);
-}
-.prediction-toolbar-btn.is-reset:not(:disabled):hover {
-  color: #b91c1c;
-  border-color: #b91c1c;
-  background: rgba(239, 68, 68, 0.08);
-}
 .prediction-toolbar-btn-icon {
   font-size: 13px;
   line-height: 1;
 }
-@media (max-width: 640px) {
-  .prediction-league-toolbar {
-    justify-content: center;
-  }
-  .prediction-toolbar-back {
-    order: -1;
-    width: 100%;
-    text-align: center;
-  }
-  .prediction-toolbar-spacer {
-    display: none;
-  }
+/* Kullanıcı isteği: "Liglerim butonu sayfanın altında solda olsun". */
+.prediction-league-footer {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
 }
 
 /* Kullanıcı geri bildirimi: "puanların nasıl verildiğini net şekilde

@@ -52,8 +52,9 @@ function findUclMatchSide(teamId, matchId) {
 }
 
 // Takımın en son (araştırılmış) gerçek maçındaki ilk 11 isim listesini
-// (GK -> DF -> MF -> FW sırasında, bkz. FORMATIONS'ın slot sırası) ve gerçek
-// diziliş şeklini döner. Bu takım için doğrulanmış veri yoksa null.
+// (SIRASI ÖNEMSİZ -- buildRealBasedLineup her ismi kadronun kendi mevki
+// etiketine göre yerleştirir) ve gerçek diziliş şeklini döner. Bu takım
+// için doğrulanmış veri yoksa null.
 export function getLatestRealXi({ teamId, teamName, competitionKey }) {
   if (competitionKey === "superlig") {
     const entry = LATEST_LINEUP_SUPERLIG[teamId];
@@ -91,6 +92,16 @@ function matchRosterPlayer(rawName, players, usedIds) {
 // gerekirse (sakat/cezalı olmuş ya da o slotun ismi hiç doğrulanamamışsa)
 // kadronun aynı mevkideki en iyi müsait oyuncusuyla doldurur. Bu takım için
 // hiç gerçek veri yoksa null döner.
+//
+// Kullanıcı geri bildirimi: "muhtemel kadrolar doğru mevkilerde olmuyor" --
+// kök neden: ESKİ sürüm, araştırılmış xi listesinin GK->DF->MF->FW SIRASINDA
+// olduğunu VARSAYIP slotlara indeks bazlı (i'inci isim -> i'inci slot)
+// atıyordu. Ama araştırma kaynakları (maç raporları) bu sırayı GARANTİ
+// ETMİYOR -- ör. bir kanat oyuncusu listede "savunma" bölgesinde görünüp
+// yanlışlıkla bir bek slotuna, bir santrfor da bir orta saha slotuna
+// düşebiliyordu. Artık her gerçek ismi ÖNCE kadrodaki (players) GERÇEK
+// mevki etiketine (player.position) göre eşleştiriyoruz -- sıraya değil,
+// GERÇEK mevkiye güveniyoruz.
 export function buildRealBasedLineup({ teamId, teamName, competitionKey, players }) {
   const real = getLatestRealXi({ teamId, teamName, competitionKey });
   if (!real || !FORMATIONS[real.formation]) return null;
@@ -98,34 +109,75 @@ export function buildRealBasedLineup({ teamId, teamName, competitionKey, players
   const slots = FORMATIONS[real.formation].slots;
   const usedIds = new Set();
 
-  const prelim = slots.map((slot, i) => {
-    const rawName = real.names[i] || null;
-    const player = rawName ? matchRosterPlayer(rawName, players, usedIds) : null;
-    if (player) usedIds.add(player.id);
-    return { slot, rawName, player };
-  });
-
-  const pools = { GK: [], DF: [], MF: [], FW: [] };
-  for (const p of players) {
-    if (pools[p.position] && !isCurrentlyInjured(teamId, p.name)) pools[p.position].push(p);
-  }
-  for (const pos in pools) pools[pos].sort((a, b) => (b.rating || 0) - (a.rating || 0));
-
-  const assigned = prelim.map(({ slot, rawName, player }) => {
-    const realPlayerInjured = player && isCurrentlyInjured(teamId, player.name);
-    if (!rawName || realPlayerInjured) {
-      const pool = pools[slot.position] || [];
-      const replacement = pool.find((p) => !usedIds.has(p.id));
-      if (replacement) usedIds.add(replacement.id);
-      return {
-        slot,
-        player: replacement || null,
-        rawName: null,
-        isReplacement: true,
-        replacedInjuredName: realPlayerInjured ? player.name : null,
-      };
+  // 1. Her gerçek ismi kadrodaki bir oyuncuya eşle ve kadronun KENDİ
+  //    kayıtlı mevki etiketini (GK/DF/MF/FW) al -- xi listesindeki SIRAYA
+  //    değil, bu gerçek etikete göre slotlara dağıtılacak.
+  const matchedByPosition = { GK: [], DF: [], MF: [], FW: [] };
+  const unmatchedNames = [];
+  for (const rawName of real.names) {
+    const player = matchRosterPlayer(rawName, players, usedIds);
+    if (player) {
+      usedIds.add(player.id);
+      (matchedByPosition[player.position] || (matchedByPosition[player.position] = [])).push({ rawName, player });
+    } else {
+      unmatchedNames.push(rawName);
     }
-    return { slot, player, rawName, isReplacement: false, replacedInjuredName: null };
+  }
+
+  // 2. Sakat/cezalı OLMAYAN, henüz kullanılmamış oyunculardan mevkiine göre
+  //    reytinge göre sıralı bir "tamamlama/yedek" havuzu -- hem sakat gerçek
+  //    starterların yerine hem de gerçek veri hiç yetmeyen slotlar için.
+  const fallbackPools = { GK: [], DF: [], MF: [], FW: [] };
+  for (const p of players) {
+    if (fallbackPools[p.position] && !isCurrentlyInjured(teamId, p.name)) fallbackPools[p.position].push(p);
+  }
+  for (const pos in fallbackPools) fallbackPools[pos].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+
+  const takeFallback = (position) => {
+    const pool = fallbackPools[position] || [];
+    const replacement = pool.find((p) => !usedIds.has(p.id));
+    if (replacement) usedIds.add(replacement.id);
+    return replacement || null;
+  };
+
+  // 3. Slotları ÖNCE kendi mevkisiyle eşleşen gerçek adayla doldurmayı dene.
+  const prelim = slots.map((slot) => ({ slot, known: matchedByPosition[slot.position]?.shift() || null }));
+
+  // Bir mevki kategorisinde slot sayısından FAZLA gerçek aday çıkabilir (ör.
+  // 3 MF slotuna karşı 5 "MF" etiketli gerçek starter -- roster'da kanat
+  // oyuncusu MF/FW gibi tek bir sabit mevkiyle etiketlenmiş olsa da, o maçta
+  // formasyonun başka bir hattında oynamış olabilir). Bu TAŞAN ama hâlâ
+  // GERÇEK starterlar tamamen atılmasın diye ayrı bir havuzda tutulup, kendi
+  // mevkisinde gerçek aday bulunamayan bir slotu doldurmak için kullanılır --
+  // ama SADECE aynı "bölge" içinde (savunma: GK/DF, hücum: MF/FW) -- yoksa
+  // ör. taşan bir kanat oyuncusu (MF etiketli) boş kalan bir BEK slotuna
+  // düşüp görsel olarak "defans oynuyormuş" gibi YANLIŞ bir izlenim
+  // verebilir. Aynı bölgede taşan gerçek aday yoksa, o slot dürüstçe
+  // algoritmik en iyi müsait oyuncuya düşer (uydurma bir mevki eşleşmesi
+  // yapılmaz).
+  const ZONE_OF_POSITION = { GK: "back", DF: "back", MF: "front", FW: "front" };
+  const overflowByZone = { back: [], front: [] };
+  for (const pos in matchedByPosition) overflowByZone[ZONE_OF_POSITION[pos]].push(...matchedByPosition[pos]);
+
+  const assigned = prelim.map(({ slot, known }) => {
+    if (known) {
+      const realPlayerInjured = isCurrentlyInjured(teamId, known.player.name);
+      if (!realPlayerInjured) {
+        return { slot, player: known.player, rawName: known.rawName, isReplacement: false, replacedInjuredName: null };
+      }
+      const replacement = takeFallback(slot.position);
+      return { slot, player: replacement, rawName: null, isReplacement: true, replacedInjuredName: known.player.name };
+    }
+    const overflow = overflowByZone[ZONE_OF_POSITION[slot.position]].shift();
+    if (overflow) {
+      return { slot, player: overflow.player, rawName: overflow.rawName, isReplacement: false, replacedInjuredName: null };
+    }
+    const unmatchedName = unmatchedNames.shift();
+    if (unmatchedName) {
+      return { slot, player: null, rawName: unmatchedName, isReplacement: false, replacedInjuredName: null };
+    }
+    const replacement = takeFallback(slot.position);
+    return { slot, player: replacement, rawName: null, isReplacement: true, replacedInjuredName: null };
   });
 
   return { assigned, formation: real.formation, source: real.source };
