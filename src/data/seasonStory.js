@@ -610,6 +610,43 @@ export const SEASON_STORY_SUPERLIG = [
     relatedPlayerNames: ["Valentin Mihăilă", "Oğuzhan Aksu", "Fevzi Korkmaz"],
     source: "olay53.com / mynet.com / karsmanset.com / takvim.com.tr",
   },
+  // ---- 2026-10-12 tazelemesi: milli ara ve 7. hafta ----
+  {
+    id: "sl-story-w7-1",
+    date: "2026-09-29",
+    week: 6,
+    category: "teknik-direktor",
+    title: "Eyüpspor'da 8-0'ın faturası: Özhan Pulat gitti, Mustafa Dalcı geldi",
+    summary:
+      "Fenerbahçe deplasmanında alınan 8-0'lık yenilginin ardından sonucu 'utanç verici' olarak niteleyen Özhan Pulat istifa etti; milli arada yönetim Mustafa Dalcı ile anlaştı.",
+    relatedTeamIds: ["s16", "s2"],
+    relatedPlayerNames: ["Özhan Pulat", "Mustafa Dalcı"],
+    source: "İstiklal / Milli Gazete / Politikam",
+  },
+  {
+    id: "sl-story-w7-2",
+    date: "2026-10-09",
+    week: 7,
+    category: "basari",
+    title: "10 kişilik Galatasaray uzatmada iki golle liderliğe uçtu",
+    summary:
+      "Lucas Torreira'nın 65. dakikada VAR sonrası direkt kırmızı kart görmesinin ve Kasımpaşa'nın 68'de eşitlemesinin ardından Galatasaray, Barış Alper Yılmaz (90') ve Mario Lemina'nın (90+6') golleriyle 3-1 kazandı ve 16 puanla zirveye yerleşti; RAMS Park'taki yenilmezlik serisi 39 maça çıktı.",
+    relatedTeamIds: ["s1", "s8"],
+    relatedPlayerNames: ["Lucas Torreira", "Barış Alper Yılmaz", "Mario Lemina"],
+    source: "Hürriyet / Takvim / Fanatik / ESPN",
+  },
+  {
+    id: "sl-story-w7-3",
+    date: "2026-10-11",
+    week: 7,
+    category: "rekor",
+    title: "Vlahović'ten Beşiktaş'ta 26 yıl sonra bir ilk",
+    summary:
+      "Dušan Vlahović, Kocaelispor'a karşı 31. dakikada penaltıdan attığı golle Süper Lig'de ilk 11'de başladığı ilk dört maçın hepsinde gol atmayı başardı; Beşiktaş forması giyen bir oyuncu bunu 26 yıl sonra ilk kez yaptı. Beşiktaş 2-1'lik galibiyetle 15 puana yükselip ikinci sıraya çıktı.",
+    relatedTeamIds: ["s3", "s17"],
+    relatedPlayerNames: ["Dušan Vlahović"],
+    source: "Takvim / Habertürk",
+  },
 ];
 
 // 2026-09-23 DOLDURMA TURU (UCL): dosya UEFA Şampiyonlar Ligi için ilk kez

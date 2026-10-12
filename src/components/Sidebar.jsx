@@ -29,7 +29,6 @@ const MORE_ITEMS = [
   { to: "/eglence-modu", label: "Eğlence Modu", icon: "🎮" },
   { to: "/ruya-takim", label: "Rüya Takım", icon: "⭐" },
   { to: "/basarilar", label: "Başarılar", icon: "🏅" },
-  { to: "/ayarlar", label: "Ayarlar", icon: "⚙️" },
 ];
 
 function itemsMatchPath(items, pathname) {
@@ -100,10 +99,6 @@ export default function Sidebar({ open, onClose }) {
               />
             );
           })}
-          <NavLink to="/canli" className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}>
-            <span className="sidebar-link-icon">📡</span>
-            <span className="sidebar-link-label">Canlı Skorlar</span>
-          </NavLink>
           <NavLink
             to="/tahmin-ligi"
             className={({ isActive }) => `sidebar-link sidebar-link-prediction ${isActive ? "active" : ""}`}

@@ -99,6 +99,25 @@
 //     ismi ProbableLineup.jsx/getPowerIndex zaten eşleştiremeyeceği için
 //     eklemenin bir anlamı da yok.
 //
+// --- 2026-10-12 REFRESH NOTU (Süper Lig 7. hafta sonrası, kısmi) ---
+// 9-11 Ekim maç raporları ve ilk 11/yedek listeleriyle doğrulanarak:
+//   - ÇIKARILANLAR: Osimhen ve Lemina (s1+t35 -- Kasımpaşa maçında
+//     oynadılar, Lemina gol attı), Ugochukwu (cezasını Kasımpaşa maçında
+//     çekti), Asensio (s2+t25 -- Rize'de ilk 11'de başlayıp gol attı),
+//     Guendouzi (t25 -- Rize'de ilk 11'de), Mert Hakan Yandaş (Rize'de yedek
+//     kulübesinde), Onuachu (Samsun'da 77'de oyuna girdi), Mihăilă (2 maçlık
+//     cezası 20 Eylül'de bitti).
+//   - GÜNCELLENENLER: Singo (dönüş hedefi 17 Ekim Gençlerbirliği maçı --
+//     kulüp doktoru Yener İnce/AA), Malinovskyi (10 Ekim'de hâlâ kadroda
+//     yoktu).
+//   - EKLENENLER: Torreira (kırmızı kart cezası), Černý (11 Ekim'de
+//     sakatlanıp çıktı), Dijksteel (Kocaelispor açıklaması).
+//   - DOKUNULMAYANLAR: UCL kulüplerinin kayıtları ile bu haftanın maç
+//     kadrolarından durumu doğrulanamayan Süper Lig kayıtları (ör. Rıdvan
+//     Yılmaz, Samsunspor'un Mouandilmadji/Fatih Kaya'sı) -- asOf tarihleri
+//     eski kaldı; UCL 2. hafta (13-14 Ekim) öncesinde yeniden kontrol
+//     edilmeli.
+//
 // teamId: players.js (UCL, "tN") veya superLigPlayers.js (Süper Lig, "sN")
 // içindeki takım id'si. Galatasaray/Fenerbahçe gibi hem UCL hem Süper
 // Lig'de oynayan kulüplerde, oyuncu ilgili kadro dosyasında GERÇEKTEN yer
@@ -314,22 +333,6 @@ export const CURRENT_INJURIES = [
     source: "CNN Türk / Milliyet / NTV / sakat-ve-cezali.com",
   },
   {
-    teamId: "t25",
-    playerName: "Marco Asensio",
-    reason: "Sol bacak üst adalesinde zorlanma ve gerileme (Konyaspor maçında sakatlandı)",
-    expectedReturn: "20 Eylül (Eyüpspor maçı hedefi)",
-    asOf: "2026-09-16",
-    source: "beIN Sports Türkiye / Fanatik / gzt.com",
-  },
-  {
-    teamId: "t25",
-    playerName: "Mattéo Guendouzi",
-    reason: "UEFA disiplin cezası (4 maç, 2'si bu sezon) -- yalnızca UCL maçlarını etkiler",
-    expectedReturn: "20 Ekim (Fenerbahçe - Slavia Prag maçında dönecek)",
-    asOf: "2026-09-16",
-    source: "gzt.com / habergo.com.tr",
-  },
-  {
     teamId: "t26",
     playerName: "Ethan Mbappé",
     reason: "Kırmızı kart cezası (8 Eylül, Real Betis deplasmanı, 56. dk VAR incelemesiyle doğrudan kırmızı -- rakip oyuncunun yüzüne kol savurma) -- UEFA disiplin süreci sürüyor, en az 3 maç ceza bekleniyor",
@@ -366,77 +369,20 @@ export const CURRENT_INJURIES = [
   {
     teamId: "t35",
     playerName: "Wilfried Singo",
-    reason: "Sağ uyluk biceps femoris kas grubunda tendon hasarı ve kanama",
-    expectedReturn: "Ekim başı (en az 1 ay)",
-    asOf: "2026-09-16",
-    source: "Galatasaray resmi açıklaması / Fotomaç / Habertürk / Sporx",
-  },
-  {
-    teamId: "t35",
-    playerName: "Victor Osimhen",
-    reason: "Sağ adduktor (kasık) kas grubunda gerilme ve ağrı",
-    expectedReturn: "Eylül sonu",
-    asOf: "2026-09-16",
-    source: "Galatasaray resmi açıklaması / Fotomaç / Habertürk",
-  },
-  {
-    teamId: "t35",
-    playerName: "Mario Lemina",
-    reason: "Sağ adduktor (kasık) kas grubunda gerilme ve ağrı",
-    expectedReturn: "Eylül sonu",
-    asOf: "2026-09-16",
-    source: "Galatasaray resmi açıklaması / Fotomaç / Habertürk",
+    reason: "Sağ uyluk biceps femoris kas grubunda tendon hasarı ve kanama -- tedavisi iyi gidiyor ama Kasımpaşa (9 Ekim) ve Barcelona (13 Ekim) maçlarında forma giymesi beklenmiyor",
+    expectedReturn: "17 Ekim (Gençlerbirliği maçı hedefleniyor)",
+    asOf: "2026-10-11",
+    source: "Galatasaray resmi açıklaması / AA (kulüp doktoru Yener İnce) / A Haber / Milli Gazete",
   },
 
   // ---- Trendyol Süper Lig ----
   {
     teamId: "s1",
     playerName: "Wilfried Singo",
-    reason: "Sağ uyluk biceps femoris kas grubunda tendon hasarı ve kanama",
-    expectedReturn: "Ekim başı (en az 1 ay)",
-    asOf: "2026-09-16",
-    source: "Galatasaray resmi açıklaması / Fotomaç / Habertürk / Sporx",
-  },
-  {
-    teamId: "s1",
-    playerName: "Victor Osimhen",
-    reason: "Sağ adduktor (kasık) kas grubunda gerilme ve ağrı",
-    expectedReturn: "Eylül sonu",
-    asOf: "2026-09-16",
-    source: "Galatasaray resmi açıklaması / Fotomaç / Habertürk",
-  },
-  {
-    teamId: "s1",
-    playerName: "Mario Lemina",
-    reason: "Sağ adduktor (kasık) kas grubunda gerilme ve ağrı",
-    expectedReturn: "Eylül sonu",
-    asOf: "2026-09-16",
-    source: "Galatasaray resmi açıklaması / Fotomaç / Habertürk",
-  },
-  {
-    teamId: "s1",
-    playerName: "Lesley Ugochukwu",
-    reason: "Kırmızı kart cezası -- Trabzonspor derbisinde (19 Eylül, 4-0 mağlubiyet) 85. dakikada VAR incelemesi sonrası doğrudan kırmızı kart gördü, TFF disiplin talimatına göre otomatik olarak bir sonraki lig maçında oynayamayacak",
-    expectedReturn: "Bir sonraki Süper Lig maçından sonra (PFDK'nın ek ceza verip vermeyeceği henüz netleşmedi)",
-    asOf: "2026-09-20",
-    source: "Habertürk / NTVSpor / Sporx",
-    type: "suspension",
-  },
-  {
-    teamId: "s2",
-    playerName: "Marco Asensio",
-    reason: "Sol bacak üst adalesinde zorlanma ve gerileme (Konyaspor maçında sakatlandı)",
-    expectedReturn: "20 Eylül (Eyüpspor maçı hedefi)",
-    asOf: "2026-09-16",
-    source: "beIN Sports Türkiye / Fanatik / gzt.com",
-  },
-  {
-    teamId: "s2",
-    playerName: "Mert Hakan Yandaş",
-    reason: "Sol ayak bileği eklem enfeksiyonu nedeniyle artroskopik debridman ameliyatı oldu; ayrıca bahis soruşturması kapsamındaki hak mahrumiyeti cezası Tahkim Kurulu kararıyla 6 aya indirildi",
-    expectedReturn: "Eylül'deki milli maç arasının ardından",
-    asOf: "2026-09-16",
-    source: "Habertürk / Sözcü / beIN Sports Türkiye / karar.com",
+    reason: "Sağ uyluk biceps femoris kas grubunda tendon hasarı ve kanama -- tedavisi iyi gidiyor ama Kasımpaşa (9 Ekim) ve Barcelona (13 Ekim) maçlarında forma giymesi beklenmiyor",
+    expectedReturn: "17 Ekim (Gençlerbirliği maçı hedefleniyor)",
+    asOf: "2026-10-11",
+    source: "Galatasaray resmi açıklaması / AA (kulüp doktoru Yener İnce) / A Haber / Milli Gazete",
   },
   {
     teamId: "s3",
@@ -457,18 +403,10 @@ export const CURRENT_INJURIES = [
   {
     teamId: "s4",
     playerName: "Ruslan Malinovskyi",
-    reason: "Sol dizin iç kısmında yaygın yumuşak doku ve kemik ödemi",
-    expectedReturn: "Eylül sonu",
-    asOf: "2026-09-16",
+    reason: "Sol dizin iç kısmında yaygın yumuşak doku ve kemik ödemi -- 10 Ekim Samsunspor maçında da sakatlığı nedeniyle kadroda yoktu",
+    expectedReturn: null,
+    asOf: "2026-10-11",
     source: "gzt.com / haber61.net / 61saat.com",
-  },
-  {
-    teamId: "s4",
-    playerName: "Paul Onuachu",
-    reason: "Uyluk kas sakatlığı (Gençlerbirliği maçında, 2 gol attıktan sonra çıktı)",
-    expectedReturn: "Eylül sonu",
-    asOf: "2026-09-16",
-    source: "ASpor / Hürriyet / gzt.com",
   },
   {
     teamId: "s6",
@@ -551,21 +489,38 @@ export const CURRENT_INJURIES = [
     source: "Sabah / haber7.com / cayhaber.net",
   },
   {
-    teamId: "s12",
-    playerName: "Valentin Mihăilă",
-    reason: "Kırmızı kart cezası -- 12 Eylül'deki Eyüpspor deplasmanında VAR incelemesiyle doğrudan kırmızı kart gördü, PFDK 2 maç ceza verdi",
-    expectedReturn: "20 Eylül'deki Göztepe deplasmanından sonra (2 maçlık cezasının son maçı)",
-    asOf: "2026-09-20",
-    source: "caytvhaber.com / olay53.com / 2mart.com.tr",
-    type: "suspension",
-  },
-  {
     teamId: "s17",
     playerName: "Bruno Petković",
     reason: "Uzun süredir devam eden, netliğe kavuşmamış sakatlık (kulüp/doktorlar dahi kesin teşhis koyamadı, ameliyat ihtimali var)",
     expectedReturn: null,
     asOf: "2026-09-16",
     source: "kocaeligazetesi.com.tr / kocaelihalkgazetesi.com",
+  },
+  // ---- 2026-10-12 tazelemesi (7. hafta sonrası) ----
+  {
+    teamId: "s17",
+    playerName: "Anfernee Dijksteel",
+    reason: "Biceps femoris kasında yırtık -- bireysel saha çalışmalarına başladı",
+    expectedReturn: null,
+    asOf: "2026-10-06",
+    source: "beIN Sports Türkiye (Kocaelispor sağlık açıklaması)",
+  },
+  {
+    teamId: "s3",
+    playerName: "Václav Černý",
+    reason: "11 Ekim Kocaelispor maçında 38. dakika civarında sakatlanarak yerini İlhan Fakılı'ya bıraktı; sakatlığın türü henüz açıklanmadı",
+    expectedReturn: null,
+    asOf: "2026-10-11",
+    source: "Takvim / Habertürk",
+  },
+  {
+    teamId: "s1",
+    playerName: "Lucas Torreira",
+    reason: "Kırmızı kart cezası -- 9 Ekim Kasımpaşa maçında VAR incelemesi sonrası son adam pozisyonundan direkt kırmızı kart gördü; bir sonraki Süper Lig maçında oynayamayacak (Şampiyonlar Ligi'ndeki Barcelona maçına engel değil)",
+    expectedReturn: "Bir sonraki Süper Lig maçından sonra (PFDK'nın ek ceza verip vermeyeceği henüz netleşmedi)",
+    asOf: "2026-10-11",
+    source: "Hürriyet / Takvim / ESPN",
+    type: "suspension",
   },
   {
     teamId: "s18",

@@ -7,6 +7,16 @@ import React, { createContext, useCallback, useContext, useEffect, useRef, useSt
 // unlock() idempotenttir -- zaten açık bir başarı için tekrar çağrılması
 // güvenlidir (no-op).
 export const ACHIEVEMENTS = [
+  // --- Gerçek Veri & Tahmin Ligi (2026-09-27 eklendi -- kullanıcı isteği:
+  // "başarılar kısmını arttır"; siteye artık asıl kimliğini veren GERÇEK
+  // veri özelliklerine (Tahmin Ligi, favori takım, sezon hikayesi) hiç
+  // rozet yoktu, hepsi eski simülasyon dönemindendi). ---
+  { key: "favori-taraftar", icon: "⭐", label: "Favori Taraftar", desc: "Bir takımın profilinden onu \"Takımım\" olarak seçtin." },
+  { key: "tahmin-ligi-kurucusu", icon: "🏗️", label: "Lig Kurucusu", desc: "Kendi Tahmin Ligi'ni kurdun." },
+  { key: "ilk-tahmin", icon: "📝", label: "İlk Tahmin", desc: "Tahmin Ligi'nde ilk maç tahminini yaptın." },
+  { key: "gercek-kahin", icon: "🔮", label: "Gerçek Kahin", desc: "Tahmin Ligi'nde gerçek bir maçın skorunu birebir tuttun." },
+  { key: "hikaye-meraklisi", icon: "📖", label: "Hikaye Meraklısı", desc: "Bir sezonun Sezon Hikayesi sayfasını açtın." },
+
   // --- Kura & Sezon ---
   { key: "ilk-kura", icon: "🎟️", label: "İlk Adım", desc: "Herhangi bir yarışmada kura çektin ya da sezonu başlattın." },
   { key: "ucl-yolcusu", icon: "🌟", label: "UCL Yolcusu", desc: "UEFA Şampiyonlar Ligi'nde en az bir model tahmini oluşturdun." },
@@ -19,7 +29,6 @@ export const ACHIEVEMENTS = [
 
   // --- Rüya Takım ---
   { key: "kadro-ustasi", icon: "⭐", label: "Kadro Ustası", desc: "Rüya Takım'da 11 kişilik kadroyu tamamladın." },
-  { key: "taktisyen", icon: "📋", label: "Taktisyen", desc: "Rüya Takım'ı bir yarışmaya gönderdin." },
   { key: "formasyon-mimari", icon: "🧩", label: "Formasyon Mimarı", desc: "Rüya Takım'da 3 farklı diziliş denedin." },
   { key: "saha-mimari", icon: "🖐️", label: "Saha Mimarı", desc: "Bir oyuncuyu sahada serbestçe sürükleyip taşıdın." },
   { key: "karsilastirma-uzmani", icon: "⚖️", label: "Karşılaştırma Uzmanı", desc: "İki oyuncuyu yan yana karşılaştırdın." },

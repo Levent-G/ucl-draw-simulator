@@ -306,4 +306,94 @@ export const SUPER_LIG_MATCH_STATS = {
     asOf: "2026-09-21",
     source: "ajansspor.com / Fotospor / Yeni Asır / takvim.com.tr / Sabah (gol dakikaları topScorers.js/news.js'ten) / mackolik.com / fotmob.com (fouls/offsides/passAccuracy/xg/bigChances, 2. tazeleme)",
   },
+
+  // Galatasaray 3-1 Kasımpaşa (9 Ekim 2026, 7. Hafta, RAMS Park, hakem
+  // Halil Umut Meler). Sadece goller eklendi -- topa sahip olma/şut/kart
+  // sayıları maçtan ~1,5 saat sonra yapılan bu tazelemede iki bağımsız
+  // kaynakla doğrulanamadı, uydurulmadan atlandı. Galatasaray'da Lucas
+  // Torreira 65'te (Hürriyet 63' diyor) VAR sonrası son adam pozisyonundan
+  // direkt kırmızı kart gördü; sarı kart sayıları bilinmediği için "cards"
+  // alanı eklenmedi.
+  sr7m4: {
+    scorers: [
+      { teamId: "s1", playerName: "Abdülkerim Bardakcı", minute: 45 },
+      { teamId: "s8", playerName: "Jesurun Rak-Sakyi", minute: 68 },
+      { teamId: "s1", playerName: "Barış Alper Yılmaz", minute: 90 },
+      { teamId: "s1", playerName: "Mario Lemina", minute: 90 }, // 90+6'
+    ],
+    asOf: "2026-10-09",
+    source: "Hürriyet / Takvim / ESPN / haberler.com",
+  },
+
+  // 10 Ekim 2026'da oynanan 7. Hafta maçları -- sadece doğrulanmış goller
+  // eklendi (topa sahip olma/şut/kart sayıları maç gecesi iki kaynakla
+  // doğrulanamadı, atlandı).
+  // Gençlerbirliği 2-2 Amed SFK (Eryaman Stadyumu)
+  sr7m8: {
+    scorers: [
+      { teamId: "s11", playerName: "Dia Saba", minute: 25, penalty: true },
+      { teamId: "s18", playerName: "Rafael Luis", minute: 54 },
+      { teamId: "s11", playerName: "Samuel Ballet", minute: 68 },
+      { teamId: "s18", playerName: "Thalisson", minute: 90 }, // 90+3'
+    ],
+    asOf: "2026-10-10",
+    source: "Habertürk / Takvim / A Haber / sondakika.com",
+  },
+  // Alanyaspor 0-0 Erzurumspor FK (Alanya Oba Stadyumu, kırmızı kart yok)
+  sr7m2: {
+    scorers: [],
+    asOf: "2026-10-10",
+    source: "Hürriyet / ajansspor.com / Takvim / Habertürk",
+  },
+  // Samsunspor 0-3 Trabzonspor -- Samsunspor'da Melih Kabasakal 43'te
+  // Elliot Watt'a kafa attığı için kırmızı kart gördü (Hürriyet); sarı kart
+  // sayıları doğrulanamadığından "cards" alanı eklenmedi.
+  sr7m6: {
+    scorers: [
+      { teamId: "s4", playerName: "Ernest Muçi", minute: 28 }, // bazı kaynaklar 27'
+      { teamId: "s4", playerName: "Chibuike Nwaiwu", minute: 38 },
+      { teamId: "s4", playerName: "Franculino Dju", minute: 40 },
+    ],
+    asOf: "2026-10-10",
+    source: "Hürriyet / Takvim / Fanatik / Fotomaç",
+  },
+  // Çaykur Rizespor 0-3 Fenerbahçe
+  sr7m7: {
+    scorers: [
+      { teamId: "s2", playerName: "Marco Asensio", minute: 12 },
+      { teamId: "s2", playerName: "İrfan Can Kahveci", minute: 83 },
+      { teamId: "s2", playerName: "Oğuz Aydın", minute: 87 },
+    ],
+    asOf: "2026-10-10",
+    source: "Takvim / Fotomaç / FOX Sports / fener.org",
+  },
+
+  // 11 Ekim 2026'da oynanan 7. Hafta maçları -- sadece doğrulanmış goller.
+  // Konyaspor 0-0 Başakşehir (Medaş Konya Büyükşehir Stadyumu)
+  sr7m3: {
+    scorers: [],
+    asOf: "2026-10-11",
+    source: "Fanatik / Habertürk / Sabah / Yeni Şafak",
+  },
+  // Gaziantep FK 0-3 Çorum FK -- Çorum FK'de Burak Yılmaz'ın ilk galibiyeti
+  sr7m0: {
+    scorers: [
+      { teamId: "s13", playerName: "Cengiz Ünder", minute: 37 },
+      { teamId: "s13", playerName: "Alexandros Kyziridis", minute: 60 }, // Star 59'
+      { teamId: "s13", playerName: "Markus Karlsbakk", minute: 83 },
+    ],
+    asOf: "2026-10-11",
+    source: "Star / Sabah / Takvim / beIN Sports",
+  },
+  // Beşiktaş 2-1 Kocaelispor -- Beşiktaş'ta Vaclav Cerny 38' civarında
+  // sakatlanıp yerini İlhan Fakılı'ya bıraktı (Takvim).
+  sr7m5: {
+    scorers: [
+      { teamId: "s3", playerName: "Orkun Kökçü", minute: 18 },
+      { teamId: "s17", playerName: "Show", minute: 27 }, // Habertürk 21'
+      { teamId: "s3", playerName: "Dušan Vlahović", minute: 31, penalty: true },
+    ],
+    asOf: "2026-10-11",
+    source: "Takvim / Habertürk / Sabah / Fanatik",
+  },
 };

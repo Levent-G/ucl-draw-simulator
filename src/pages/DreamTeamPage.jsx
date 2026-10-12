@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import {
   ResponsiveContainer,
   RadarChart,
@@ -10,7 +10,6 @@ import {
   Legend,
 } from "recharts";
 import { useDreamTeam, FORMATIONS, ZONES, zoneForY } from "../state/DreamTeamContext.jsx";
-import { useTeamInjection } from "../state/TeamInjectionContext.jsx";
 import { useTransferMarket } from "../state/TransferContext.jsx";
 import { useAchievements } from "../state/AchievementsContext.jsx";
 import { findPlayerByGlobalId } from "../utils/crossCompetitionPlayers.js";
@@ -71,80 +70,6 @@ function PitchSlot({ slot, coords, player, isDragging, onPick, onClear, onDragSt
           <span className="pitch-slot-pos">{slot.position}</span>
         </button>
       )}
-    </div>
-  );
-}
-
-// Rüya Takım kadrosunu Süper Lig'e gönderip Süper Lig sayfasına yönlendirir.
-// Hangi takımın yerine geçileceği İSTENMEZ/SEÇTİRİLMEZ -- otomatik olarak
-// kadronun "Bir takımdan başla" ile geldiği Süper Lig takımıdır
-// (autoDetectedTeamId). Kadro tek bir Süper Lig takımından gelmiyorsa (elle
-// karıştırılmış/başka ligden başlanmış) gönderim tamamen devre dışı kalır --
-// manuel bir "hangi takımın yerine" seçimi yoktur. Enjeksiyon bir kez
-// yapıldıktan sonra kalıcıdır (bu sekmeden ayrılınca sıfırlanmaz) --
-// kullanıcı istediği zaman "Geri Çek" ile eski takımı iade edebilir.
-function SendToSuperLig({ filledPlayers, isFull, autoDetectedTeamId }) {
-  const navigate = useNavigate();
-  const { injections, sendDreamTeam, clearInjection } = useTeamInjection();
-
-  const injection = injections.superlig;
-  const isSent = injection?.team?.id === DREAM_TEAM_ID;
-  const canSend = isFull && !!autoDetectedTeamId;
-
-  const handleSend = () => {
-    if (!canSend) return;
-    const avgRating = Math.round(
-      filledPlayers.reduce((s, p) => s + p.rating, 0) / filledPlayers.length
-    );
-    const team = {
-      id: DREAM_TEAM_ID,
-      name: "Rüya Takım",
-      short: "DRM",
-      country: "DREAM",
-      coeff: Math.round(avgRating * 1.35 * 10) / 10,
-    };
-    const players = filledPlayers.map((p, i) => ({
-      id: `dream-p${i}`,
-      name: p.name,
-      position: p.position,
-      nationality: p.nationality,
-      rating: p.rating,
-      teamId: team.id,
-    }));
-    sendDreamTeam("superlig", team, players, autoDetectedTeamId);
-    navigate("/superlig");
-  };
-
-  return (
-    <div className="dreamteam-send">
-      <div className="dreamteam-send-head">
-        <span className="dreamteam-send-title">Kadroyu Süper Lig'e Gönder</span>
-        {!isFull && (
-          <span className="dreamteam-send-hint">
-            Gönderebilmek için önce kadroyu tamamlamalısın (11/11).
-          </span>
-        )}
-        {isFull && !autoDetectedTeamId && (
-          <span className="dreamteam-send-hint">
-            Bu kadro tek bir Süper Lig takımından gelmiyor -- gönderebilmek için önce "Bir takımdan başla" ile bir
-            Süper Lig takımı seç.
-          </span>
-        )}
-      </div>
-
-      <div className="dreamteam-send-buttons">
-        <button className="btn-secondary" disabled={!canSend} onClick={handleSend}>
-          Süper Lig'e Gönder
-        </button>
-        {isSent && (
-          <span className="dreamteam-send-status">
-            {injection.removedTeam.name} yerine gönderildi
-            <button className="btn-ghost" onClick={() => clearInjection("superlig")}>
-              Geri Çek
-            </button>
-          </span>
-        )}
-      </div>
     </div>
   );
 }
@@ -322,15 +247,6 @@ function SquadBuilder() {
   // listede çıkmasın diye tüm mevcut seçimleri dışarıda tutuyoruz.
   const excludeGlobalIds = useMemo(() => Object.values(squad), [squad]);
 
-  // Kadronun TAMAMI (11/11) tek bir Süper Lig takımından geliyorsa ("Bir
-  // takımdan başla" hiç değiştirilmemişse) Süper Lig'e gönderim formunda o
-  // takımı kolaylık olsun diye ön-seçili gösterir -- yine de gönder butonu
-  // seçim yapılmadan aktif olmaz (bkz. SendToSuperLig).
-  const autoDetectedSuperLigTeamId = useMemo(() => {
-    if (filledCount !== SQUAD_SIZE) return "";
-    const teamIds = new Set(filledPlayers.map((p) => (p.competitionKey === "superlig" ? p.teamId : null)));
-    return teamIds.size === 1 && !teamIds.has(null) ? [...teamIds][0] : "";
-  }, [filledPlayers, filledCount]);
 
   return (
     <>
@@ -379,12 +295,6 @@ function SquadBuilder() {
           </button>
         )}
       </div>
-
-      <SendToSuperLig
-        filledPlayers={filledPlayers}
-        isFull={filledCount === SQUAD_SIZE}
-        autoDetectedTeamId={autoDetectedSuperLigTeamId}
-      />
 
       <p className="pitch-drag-hint">
         🖐️ Kadrodaki bir oyuncuyu tutup sahanın istediğin noktasına sürükle —

@@ -101,8 +101,9 @@ export const TEAM_DOMESTIC_FORM = {
   t26: { league: "Ligue 1", country: "Fransa", position: 4, played: 3, w: 2, d: 1, l: 0, pts: 7, form: ["D", "W", "W"], asOf: "2026-09-08" }, // Lille (Brest ile 2-2, Lyon'u 4-2, 3. hafta Toulouse'u deplasmanda 1-0 yendi; pozisyon Sky Sports ile 8 Eylül'de çapraz doğrulandı -- 4. sıra, 3 değil)
 
   // ---- Süper Lig (Türkiye) -- src/data/liveStatus.js SUPER_LIG_LIVE_STANDINGS/RESULTS ile birebir aynı kaynak, 4. hafta sonrası, 7 Eylül 2026 (bu satır liveStatus.js her tazelendiğinde buradan da senkron edilmeli; aksi halde TeamProfilePage.jsx'te "Süper Lig Formu" ile "Son 5 maç" blokları farklı/çelişkili görünür) ----
-  t25: { league: "Süper Lig", country: "Türkiye", position: 9, played: 4, w: 2, d: 0, l: 2, pts: 6, form: ["L", "W", "W", "L"], asOf: "2026-09-07" }, // Fenerbahçe (Gençlerbirliği'ne 1-2, Konyaspor'u 4-2, Samsunspor deplasmanında 2-0, Beşiktaş'a evinde 1-2)
-  t35: { league: "Süper Lig", country: "Türkiye", position: 1, played: 4, w: 3, d: 1, l: 0, pts: 10, form: ["D", "W", "W", "W"], asOf: "2026-09-07" }, // Galatasaray (Çorum FK ile 2-2, Erzurumspor deplasmanında 4-0, Göztepe'yi 3-2, Başakşehir deplasmanında 3-2)
+  // 2026-10-12: liveStatus.js'teki 7. hafta (11 Ekim) sonrası tabloyla senkronlandı; form = son 5 maç.
+  t25: { league: "Süper Lig", country: "Türkiye", position: 4, played: 7, w: 4, d: 1, l: 2, pts: 13, form: ["W", "L", "D", "W", "W"], asOf: "2026-10-11" }, // Fenerbahçe (3. hf Samsunspor'u 2-0 yendi, 4. hf Beşiktaş'a 1-2, 5. hf Gaziantep FK ile 0-0, 6. hf Eyüpspor'u 8-0, 7. hf Çaykur Rizespor'u 3-0)
+  t35: { league: "Süper Lig", country: "Türkiye", position: 1, played: 7, w: 5, d: 1, l: 1, pts: 16, form: ["W", "W", "W", "L", "W"], asOf: "2026-10-11" }, // Galatasaray (3. hf Göztepe'yi 3-2, 4. hf Başakşehir'i 3-2, 5. hf Kocaelispor'u 1-0, 6. hf Trabzonspor'a 0-4, 7. hf Kasımpaşa'yı 3-1)
 
   // ---- Liga Portugal (Portekiz) -- ESPN, 5. hafta sonrası, 5 Eylül 2026 ----
   // Sporting: 1.hf Estrela Amadora ile 2-2, 2.hf Vitória SC'yi 3-2 yendi (doğrulandı);

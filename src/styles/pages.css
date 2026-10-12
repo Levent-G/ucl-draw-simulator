@@ -5378,29 +5378,55 @@ a.team-profile-match-row:hover {
 .prediction-league-list-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
   background: var(--bg-panel);
   border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
   text-decoration: none;
   color: var(--text-primary);
+  transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
 .prediction-league-list-row:hover {
   border-color: var(--accent);
+  box-shadow: 0 8px 20px -14px rgba(11, 19, 43, 0.35);
+  transform: translateY(-1px);
+}
+.prediction-league-list-icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(234, 179, 8, 0.14);
+  font-size: 16px;
+}
+.prediction-league-list-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
 }
 .prediction-league-list-name {
+  font-weight: 700;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.prediction-league-list-meta {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-weight: 600;
+  flex-wrap: wrap;
 }
-.prediction-league-list-name-icons {
-  display: flex;
-  align-items: center;
-  gap: 3px;
+.prediction-league-list-arrow {
   flex-shrink: 0;
+  color: var(--text-faint);
+  font-size: 16px;
 }
 .prediction-league-list-badges {
   display: flex;
@@ -5424,11 +5450,34 @@ a.team-profile-match-row:hover {
 /* Tahmin Ligi giriş sayfasındaki açıklama kartı -- "puanların neye göre
    verildiğini bilsin" geri bildirimi için, giriş yapmadan önce bile görünür. */
 .prediction-intro-card {
+  position: relative;
+  overflow: hidden;
   background: var(--bg-card);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  padding: 20px 22px;
+  padding: 22px 24px;
   margin-bottom: 18px;
+}
+.prediction-intro-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(234, 179, 8, 0.1), rgba(0, 135, 74, 0.08) 50%, transparent 80%);
+  pointer-events: none;
+}
+.prediction-intro-card > * {
+  position: relative;
+}
+.prediction-intro-card-badge {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(234, 179, 8, 0.16);
+  font-size: 24px;
+  margin-bottom: 10px;
 }
 .prediction-intro-card h2 {
   margin-bottom: 8px;
@@ -8719,7 +8768,7 @@ a.team-profile-match-row:hover {
 .whatsnew-modal {
   display: flex;
   flex-direction: column;
-  width: min(680px, 100%);
+  width: min(720px, 100%);
   max-height: 85vh;
   background: var(--bg-card);
   border: 1px solid var(--line-strong);
@@ -8727,6 +8776,31 @@ a.team-profile-match-row:hover {
   box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.8);
   animation: whatsnew-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
   overflow: hidden;
+}
+.whatsnew-head {
+  position: relative;
+  overflow: hidden;
+}
+.whatsnew-head::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(0, 135, 74, 0.14), rgba(0, 144, 171, 0.1) 45%, transparent 75%);
+  pointer-events: none;
+}
+.whatsnew-head > * {
+  position: relative;
+}
+.whatsnew-section {
+  margin-bottom: 18px;
+}
+.whatsnew-section-title {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 10px;
 }
 .whatsnew-body {
   overflow-y: auto;
@@ -8813,7 +8887,14 @@ a.team-profile-match-row:hover {
   background: var(--bg-panel-alt);
 }
 .whatsnew-item-icon {
-  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--bg-panel-alt);
+  font-size: 16px;
   flex-shrink: 0;
 }
 .whatsnew-item-title {
@@ -9895,56 +9976,250 @@ a.team-profile-match-row:hover {
   background: var(--bg-panel);
 }
 
+.home-away-character-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+}
+.home-away-character-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.home-away-character-row:hover {
+  border-color: var(--line-strong);
+  box-shadow: 0 8px 20px -14px rgba(11, 19, 43, 0.35);
+}
+.home-away-character-row.is-favorite {
+  border-color: rgba(217, 119, 6, 0.55);
+  background: rgba(245, 158, 11, 0.14);
+}
+.home-away-character-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.home-away-character-name {
+  font-size: 13px;
+  font-weight: 700;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.home-away-character-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.home-away-character-badge.is-home {
+  color: var(--ucl-blue-1);
+  background: rgba(0, 144, 171, 0.12);
+}
+.home-away-character-badge.is-away {
+  color: var(--pink);
+  background: rgba(194, 24, 91, 0.1);
+}
+.home-away-character-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.home-away-character-bar-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.home-away-character-bar-icon {
+  font-size: 12px;
+  width: 16px;
+  flex-shrink: 0;
+  text-align: center;
+}
+.home-away-character-bar-track {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.home-away-character-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+}
+.home-away-character-bar-fill.is-home {
+  background: var(--ucl-blue-1);
+}
+.home-away-character-bar-fill.is-away {
+  background: var(--pink);
+}
+.home-away-character-bar-value {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  width: 26px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.progression-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 14px;
+  padding-top: 8px;
+}
+.progression-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  color: var(--text-dim);
+}
+.progression-legend-swatch {
+  width: 10px;
+  height: 3px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
 .rooting-guide-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 .rooting-guide-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: var(--radius-md);
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: var(--radius-lg);
   background: var(--bg-panel);
   border: 1px solid var(--line);
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
 }
-.rooting-guide-team {
+.rooting-guide-row:hover {
+  border-color: var(--line-strong);
+  box-shadow: 0 8px 20px -14px rgba(11, 19, 43, 0.35);
+}
+.rooting-guide-side {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  padding: 4px 8px;
-  border-radius: 999px;
+  gap: 8px;
+  min-width: 0;
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
 }
-.rooting-guide-team.is-rooting {
-  background: rgba(0, 135, 74, 0.14);
-  color: var(--accent-bright);
+.rooting-guide-side-away {
+  flex-direction: row-reverse;
+  justify-self: end;
+  text-align: right;
 }
-.rooting-guide-team-away {
-  margin-left: auto;
+.rooting-guide-side-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
-.rooting-guide-pct {
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  color: var(--text-faint);
+.rooting-guide-side-away .rooting-guide-side-text {
+  align-items: flex-end;
 }
-.rooting-guide-vs {
-  font-size: 10.5px;
-  color: var(--text-faint);
-  text-transform: uppercase;
+.rooting-guide-side.is-rooting {
+  background: rgba(0, 135, 74, 0.1);
+  box-shadow: 0 0 0 1.5px var(--accent) inset;
 }
-.rooting-guide-star {
-  font-size: 13px;
+.rooting-guide-side-name {
+  font-weight: 700;
+  font-size: 13.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.rooting-guide-impact {
-  width: 100%;
+.rooting-guide-side-pct {
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--text-faint);
-  text-align: right;
+}
+.rooting-guide-side.is-rooting .rooting-guide-side-pct {
+  color: var(--accent);
+  font-weight: 700;
+}
+.rooting-guide-badge {
+  position: absolute;
+  top: -10px;
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: var(--accent);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  box-shadow: 0 3px 8px -2px rgba(0, 135, 74, 0.5);
+}
+.rooting-guide-side:not(.rooting-guide-side-away) .rooting-guide-badge {
+  left: 6px;
+}
+.rooting-guide-side-away .rooting-guide-badge {
+  right: 6px;
+}
+.rooting-guide-mid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 84px;
+}
+.rooting-guide-bar {
+  display: flex;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--line);
+}
+.rooting-guide-bar-home {
+  height: 100%;
+  background: var(--ucl-blue-1);
+}
+.rooting-guide-bar-away {
+  height: 100%;
+  background: var(--pink);
+}
+.rooting-guide-impact-badge {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+@media (max-width: 640px) {
+  .rooting-guide-row {
+    grid-template-columns: 1fr;
+    justify-items: stretch;
+  }
+  .rooting-guide-side-away {
+    justify-self: stretch;
+  }
+  .rooting-guide-mid {
+    min-width: 0;
+  }
 }
 
 .comeback-columns {

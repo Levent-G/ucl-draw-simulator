@@ -704,9 +704,9 @@ export const TOP_SCORERS = [
     playerName: "Dušan Vlahović",
     teamId: "s3", // Beşiktaş
     competitionKey: "superlig",
-    goals: 5, // 3. hafta Çorum FK'ya hat-trick, 4. hafta derbide 1, 6. hafta Amed SFK deplasmanında 1 (55')
-    matchesPlayed: 6,
-    asOf: "2026-09-20",
+    goals: 6, // 3. hafta Çorum FK'ya hat-trick, 4. hafta derbide 1, 6. hafta Amed SFK deplasmanında 1 (55'), 7. hafta Kocaelispor'a 1 (31', penaltıdan)
+    matchesPlayed: 7,
+    asOf: "2026-10-11",
     source: "beIN Sports / fotomac.com.tr / takvim.com.tr / sofascore.com / gzt.com / Habertürk",
   },
   {
@@ -781,10 +781,10 @@ export const TOP_SCORERS = [
     playerName: "Ernest Muçi",
     teamId: "s4", // Trabzonspor
     competitionKey: "superlig",
-    goals: 1, // 4. hafta Gençlerbirliği'ne -- 5. ve 6. hafta golsüz geçti (bkz. Salah/Saviolo notları)
-    matchesPlayed: 6,
-    asOf: "2026-09-20",
-    source: "Hürriyet / Fanatik / Star",
+    goals: 2, // 4. hafta Gençlerbirliği'ne -- 5. ve 6. hafta golsüz geçti (bkz. Salah/Saviolo notları); 7. hafta Samsunspor deplasmanında 1 (Hürriyet 28', başka kaynaklar 27'; Mustafa Eskihellaç asistiyle)
+    matchesPlayed: 7,
+    asOf: "2026-10-10",
+    source: "Hürriyet / Fanatik / Star / Takvim (7. hafta)",
   },
 
   // ---- Trendyol Süper Lig 2026-27 -- 5. Hafta, 11-14 Eylül 2026'da oynanan 9 maçın TAMAMI ----
@@ -869,10 +869,10 @@ export const TOP_SCORERS = [
     playerName: "Cengiz Ünder",
     teamId: "s13", // Çorum FK
     competitionKey: "superlig",
-    goals: 2, // 5. hafta Samsunspor deplasmanında 2 (10', 15')
-    matchesPlayed: 6,
-    asOf: "2026-09-19",
-    source: "Fanatik / Habertürk / Sporkolik.net",
+    goals: 3, // 5. hafta Samsunspor deplasmanında 2 (10', 15'), 7. hafta Gaziantep FK deplasmanında 1 (37')
+    matchesPlayed: 7,
+    asOf: "2026-10-11",
+    source: "Fanatik / Habertürk / Sporkolik.net / Star / Takvim (7. hafta)",
   },
   {
     // superLigPlayers.js'te Çorum FK (s13) kadrosunda YOK, bkz. üstteki not.
@@ -885,10 +885,10 @@ export const TOP_SCORERS = [
     playerName: "Alexandros Kyziridis",
     teamId: "s13", // Çorum FK
     competitionKey: "superlig",
-    goals: 3, // 1. hafta Galatasaray'a karşı 1 (59', kulübün Süper Lig tarihindeki ilk golü), 4. hafta Eyüpspor'a 1, 5. hafta Samsunspor deplasmanında 1 (69'/70')
-    matchesPlayed: 6,
-    asOf: "2026-09-20",
-    source: "Hürriyet / ajansspor.com / gzt.com / Fanatik / Habertürk / Sporkolik.net",
+    goals: 4, // 1. hafta Galatasaray'a karşı 1 (59', kulübün Süper Lig tarihindeki ilk golü), 4. hafta Eyüpspor'a 1, 5. hafta Samsunspor deplasmanında 1 (69'/70'), 7. hafta Gaziantep FK deplasmanında 1 (60'; Star 59')
+    matchesPlayed: 7,
+    asOf: "2026-10-11",
+    source: "Hürriyet / ajansspor.com / gzt.com / Fanatik / Habertürk / Sporkolik.net / Star (7. hafta)",
   },
   {
     // superLigPlayers.js'te Göztepe (s7) kadrosunda YOK, ama gol atışı en
@@ -985,10 +985,117 @@ export const TOP_SCORERS = [
     playerName: "Abdülkerim Bardakcı",
     teamId: "s1", // Galatasaray
     competitionKey: "superlig",
-    goals: 1, // 5. hafta Kocaelispor'a, 71' (ceza sahası dışından)
-    matchesPlayed: 6,
-    asOf: "2026-09-19",
-    source: "Habertürk / Fanatik / beIN Sports",
+    goals: 2, // 5. hafta Kocaelispor'a, 71' (ceza sahası dışından); 7. hafta Kasımpaşa'ya 45' (kafa, Batrakov asistiyle)
+    matchesPlayed: 7,
+    asOf: "2026-10-09",
+    source: "Habertürk / Fanatik / beIN Sports / Hürriyet / Takvim (7. hafta)",
+  },
+  // ---- Trendyol Süper Lig 2026-27 -- 7. Hafta, 9 Ekim 2026: Galatasaray 3-1 Kasımpaşa ----
+  // Gol dakikaları Hürriyet maç özeti + Takvim + ESPN ile çapraz doğrulandı.
+  // Üç oyuncunun da bu sezonki İLK lig golü (1-6. hafta listesinde yoklar).
+  {
+    playerName: "Barış Alper Yılmaz",
+    teamId: "s1", // Galatasaray
+    competitionKey: "superlig",
+    goals: 1, // 7. hafta Kasımpaşa'ya 90' (Jakobs asistiyle)
+    asOf: "2026-10-09",
+    source: "Hürriyet / Takvim / ESPN / haberler.com",
+  },
+  {
+    playerName: "Mario Lemina",
+    teamId: "s1", // Galatasaray
+    competitionKey: "superlig",
+    goals: 1, // 7. hafta Kasımpaşa'ya 90+6' (Osimhen asistiyle; haberler.com 90+5' yazıyor, Hürriyet/Takvim/ESPN 90+6')
+    asOf: "2026-10-09",
+    source: "Hürriyet / Takvim / ESPN",
+  },
+  {
+    playerName: "Jesurun Rak-Sakyi",
+    teamId: "s8", // Kasımpaşa
+    competitionKey: "superlig",
+    goals: 1, // 7. hafta Galatasaray deplasmanında 68' (Diarra asistiyle)
+    asOf: "2026-10-09",
+    source: "Hürriyet / Takvim / ESPN",
+  },
+  // ---- Trendyol Süper Lig 2026-27 -- 7. Hafta, 10 Ekim 2026'da oynanan 4 maç ----
+  // Gol dakikaları her maç için en az iki bağımsız kaynakla doğrulandı
+  // (Habertürk/Takvim/A Haber -- Gençlerbirliği-Amed; Hürriyet/Takvim --
+  // Samsunspor-Trabzonspor; Takvim/Fotomaç -- Rizespor-Fenerbahçe). Aşağıdaki
+  // oyuncuların hepsi bu sezonki İLK lig golünü attı (1-6. hafta listesinde
+  // yoklar); oynadıkları maç sayısı doğrulanamadığı için matchesPlayed
+  // alanı uydurulmadan atlandı.
+  {
+    playerName: "Rafael Luis",
+    teamId: "s18", // Gençlerbirliği
+    competitionKey: "superlig",
+    goals: 1, // 7. hafta Amed SFK'ya 54' (serbest vuruş)
+    asOf: "2026-10-10",
+    source: "Habertürk / Takvim / A Haber",
+  },
+  {
+    playerName: "Thalisson",
+    teamId: "s18", // Gençlerbirliği
+    competitionKey: "superlig",
+    goals: 1, // 7. hafta Amed SFK'ya 90+3' (kornerden kafa; A Haber 90+2' yazıyor)
+    asOf: "2026-10-10",
+    source: "Habertürk / sondakika.com / A Haber",
+  },
+  {
+    playerName: "Samuel Ballet",
+    teamId: "s11", // Amed SFK
+    competitionKey: "superlig",
+    goals: 1, // 7. hafta Gençlerbirliği deplasmanında 68' (ceza sahası dışından)
+    asOf: "2026-10-10",
+    source: "Habertürk / Takvim / A Haber",
+  },
+  {
+    playerName: "Chibuike Nwaiwu",
+    teamId: "s4", // Trabzonspor
+    competitionKey: "superlig",
+    goals: 1, // 7. hafta Samsunspor deplasmanında 38'
+    asOf: "2026-10-10",
+    source: "Hürriyet / Takvim / Fanatik",
+  },
+  {
+    playerName: "Franculino Dju",
+    teamId: "s4", // Trabzonspor
+    competitionKey: "superlig",
+    goals: 1, // 7. hafta Samsunspor deplasmanında 40' (Salah asistiyle)
+    asOf: "2026-10-10",
+    source: "Hürriyet / Takvim / Fanatik",
+  },
+  {
+    playerName: "Marco Asensio",
+    teamId: "s2", // Fenerbahçe
+    competitionKey: "superlig",
+    goals: 1, // 7. hafta Çaykur Rizespor deplasmanında 12' (Kerem Aktürkoğlu asistiyle) -- 2 Ağustos'taki sakatlığından sonraki ilk lig maçı
+    asOf: "2026-10-10",
+    source: "Takvim / Fotomaç / FOX Sports",
+  },
+  {
+    playerName: "Oğuz Aydın",
+    teamId: "s2", // Fenerbahçe
+    competitionKey: "superlig",
+    goals: 1, // 7. hafta Çaykur Rizespor deplasmanında 87' (Lukaku asistiyle; 80'de oyuna girdi)
+    asOf: "2026-10-10",
+    source: "Takvim / Fotomaç / FOX Sports",
+  },
+  // ---- Trendyol Süper Lig 2026-27 -- 7. Hafta, 11 Ekim 2026 ----
+  {
+    playerName: "Markus Karlsbakk",
+    teamId: "s13", // Çorum FK
+    competitionKey: "superlig",
+    goals: 1, // 7. hafta Gaziantep FK deplasmanında 83' -- bu sezonki ilk lig golü
+    asOf: "2026-10-11",
+    source: "Star / Sabah / Takvim",
+  },
+  {
+    playerName: "Show",
+    teamId: "s17", // Kocaelispor
+    competitionKey: "superlig",
+    goals: 1, // 7. hafta Beşiktaş deplasmanında 27' (Habertürk 21' yazıyor; Takvim ve arama özeti 27') -- bu sezonki ilk lig golü
+    asOf: "2026-10-11",
+    source: "Takvim / Habertürk / Sabah",
   },
 
   // ---- Trendyol Süper Lig 2026-27 -- 6. Hafta, 18-19 Eylül 2026'da oynanan 5/9 maç ----
@@ -1101,10 +1208,10 @@ export const TOP_SCORERS = [
     playerName: "İrfan Can Kahveci",
     teamId: "s2", // Fenerbahçe
     competitionKey: "superlig",
-    goals: 1, // 6. hafta Eyüpspor'a, 45+1'
-    matchesPlayed: 6,
-    asOf: "2026-09-20",
-    source: "Habertürk / Hürriyet",
+    goals: 2, // 6. hafta Eyüpspor'a, 45+1'; 7. hafta Çaykur Rizespor deplasmanında 83' (Oğuz Aydın asistiyle)
+    matchesPlayed: 7,
+    asOf: "2026-10-10",
+    source: "Habertürk / Hürriyet / Takvim / Fotomaç (7. hafta)",
   },
   {
     playerName: "Miguel Cardoso",
@@ -1119,10 +1226,10 @@ export const TOP_SCORERS = [
     playerName: "Dia Saba",
     teamId: "s11", // Amed SFK
     competitionKey: "superlig",
-    goals: 1, // 6. hafta Beşiktaş'a, 22'
-    matchesPlayed: 6,
-    asOf: "2026-09-20",
-    source: "gzt.com / Habertürk / Fanatik / Cumhuriyet",
+    goals: 2, // 6. hafta Beşiktaş'a, 22'; 7. hafta Gençlerbirliği deplasmanında 25' (penaltıdan)
+    matchesPlayed: 7,
+    asOf: "2026-10-10",
+    source: "gzt.com / Habertürk / Fanatik / Cumhuriyet / Takvim (7. hafta)",
   },
   {
     // superLigPlayers.js'teki s11 (Amed SFK) kadrosunda YOK, ama gol atışı
@@ -1139,10 +1246,10 @@ export const TOP_SCORERS = [
     playerName: "Orkun Kökçü",
     teamId: "s3", // Beşiktaş
     competitionKey: "superlig",
-    goals: 1, // 6. hafta Amed SFK deplasmanında, 90+8' (penaltı)
-    matchesPlayed: 6,
-    asOf: "2026-09-20",
-    source: "gzt.com / Habertürk / Fanatik / Cumhuriyet",
+    goals: 2, // 6. hafta Amed SFK deplasmanında, 90+8' (penaltı); 7. hafta Kocaelispor'a 18' (Cerny asistiyle) -- milli takımdan ayak parmağı çatlağıyla dönmüştü
+    matchesPlayed: 7,
+    asOf: "2026-10-11",
+    source: "gzt.com / Habertürk / Fanatik / Cumhuriyet / Takvim (7. hafta)",
   },
   {
     // Haber kaynakları "Arda Okan Kurtalan" / "Arda Okan" yazdı;

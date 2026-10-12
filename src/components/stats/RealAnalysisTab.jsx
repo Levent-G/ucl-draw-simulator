@@ -73,6 +73,27 @@ function FormCell({ result }) {
   return <span className={`form-badge form-badge-${result}`}>{result}</span>;
 }
 
+// Kullanıcı isteği: "Puan Durumu Gelişimi takım logolarını kullan" -- Recharts'ın
+// varsayılan legend'ı sadece renkli çizgi + kısaltma gösteriyordu, takımı
+// ayırt etmek zordu. Bu, o grafiğin legend'ını takım rozetiyle gösteren
+// özel bir render fonksiyonu.
+function TeamLineLegend({ payload, teamsByKey }) {
+  return (
+    <div className="progression-legend">
+      {payload?.map((entry) => {
+        const team = teamsByKey[entry.dataKey];
+        return (
+          <span key={entry.dataKey} className="progression-legend-item">
+            <span className="progression-legend-swatch" style={{ background: entry.color }} />
+            {team && <Crest team={team} size={16} />}
+            <span>{entry.value}</span>
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
 // UCL/Süper Lig İstatistikler sayfasının "📈 Analiz" sekmesi -- gerçek puan
 // durumundan türetilen hücum/savunma grafikleri, modelin sezon sonu puan
 // projeksiyonu, sıradaki haftanın model tahminleri ve tüm takımların form
@@ -417,20 +438,33 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
           <div className="rooting-guide-list">
             {rootingGuide.rows.map((r) => (
               <div key={r.matchId} className="rooting-guide-row">
-                <div className={`rooting-guide-team ${r.rootFor === "home" ? "is-rooting" : ""}`}>
-                  {r.rootFor === "home" && <span className="rooting-guide-star">👉</span>}
-                  <Crest team={r.homeTeam} size={20} />
-                  <span>{r.homeTeam.short}</span>
-                  <span className="rooting-guide-pct">%{r.homeWinPct}</span>
+                <div className={`rooting-guide-side ${r.rootFor === "home" ? "is-rooting" : ""}`}>
+                  {r.rootFor === "home" && <span className="rooting-guide-badge">Bunu Tut</span>}
+                  <Crest team={r.homeTeam} size={26} />
+                  <div className="rooting-guide-side-text">
+                    <span className="rooting-guide-side-name">{r.homeTeam.short}</span>
+                    <span className="rooting-guide-side-pct">%{r.homeWinPct}</span>
+                  </div>
                 </div>
-                <span className="rooting-guide-vs">vs</span>
-                <div className={`rooting-guide-team rooting-guide-team-away ${r.rootFor === "away" ? "is-rooting" : ""}`}>
-                  <span className="rooting-guide-pct">%{r.awayWinPct}</span>
-                  <span>{r.awayTeam.short}</span>
-                  <Crest team={r.awayTeam} size={20} />
-                  {r.rootFor === "away" && <span className="rooting-guide-star">👈</span>}
+
+                <div className="rooting-guide-mid">
+                  <div className="rooting-guide-bar">
+                    <span className="rooting-guide-bar-home" style={{ width: `${r.homeWinPct}%` }} />
+                    <span className="rooting-guide-bar-away" style={{ width: `${r.awayWinPct}%` }} />
+                  </div>
+                  <span className="rooting-guide-impact-badge" title="Bu sonucun senin takımının şansını ne kadar değiştirdiği">
+                    Etki ±%{r.impact}
+                  </span>
                 </div>
-                <span className="rooting-guide-impact">Etki: ±%{r.impact}</span>
+
+                <div className={`rooting-guide-side rooting-guide-side-away ${r.rootFor === "away" ? "is-rooting" : ""}`}>
+                  <div className="rooting-guide-side-text">
+                    <span className="rooting-guide-side-name">{r.awayTeam.short}</span>
+                    <span className="rooting-guide-side-pct">%{r.awayWinPct}</span>
+                  </div>
+                  <Crest team={r.awayTeam} size={26} />
+                  {r.rootFor === "away" && <span className="rooting-guide-badge">Bunu Tut</span>}
+                </div>
               </div>
             ))}
           </div>
@@ -595,7 +629,7 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
               <XAxis dataKey="matchday" stroke={CHART_AXIS} tick={{ fill: CHART_AXIS, fontSize: 11 }} label={{ value: "Hafta", position: "insideBottom", offset: -2, fill: CHART_AXIS, fontSize: 11 }} />
               <YAxis allowDecimals={false} stroke={CHART_AXIS} tick={{ fill: CHART_AXIS, fontSize: 11 }} />
               <Tooltip content={<ChartTooltip />} />
-              <Legend wrapperStyle={{ color: CHART_AXIS, fontSize: 11 }} />
+              <Legend content={(props) => <TeamLineLegend {...props} teamsByKey={teamById} />} />
               {progressionTeamIds.map((teamId, i) => {
                 const isFav = teamId === favoriteTeamId;
                 return (
@@ -1088,7 +1122,7 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
       )}
 
       {goalScoringDepth.length > 0 && (
-        <div className="chart-card">
+        <div className="chart-card chart-card-wide">
           <h3>🎽 Gol Çeşitliliği</h3>
           <p className="footnote">Kaç farklı oyuncunun gol attığı -- yüksek çeşitlilik, gol yükünün paylaşıldığı anlamına gelir.</p>
           <ResponsiveContainer width="100%" height={Math.max(280, goalScoringDepth.length * 22)}>
@@ -1116,17 +1150,43 @@ export default function RealAnalysisTab({ competition, competitionKey, standings
             İç saha ve deplasmandaki maç başı puan ortalaması arasındaki fark -- büyük fark, "evinde aslan
             deplasmanda kuzu" (ya da tam tersi) bir profile işaret eder.
           </p>
-          <div className="fixture-difficulty-grid">
-            {homeAwayGap.map((row) => (
-              <Link key={row.teamId} to={`/${competitionKey}/takim/${row.teamId}`} className={`fixture-difficulty-row ${row.teamId === favoriteTeamId ? "is-favorite" : ""}`}>
-                <Crest team={row.team} size={22} />
-                <span className="fixture-difficulty-name">{row.team.name}</span>
-                <span className="footnote" style={{ flex: 1 }}>
-                  Ev {row.homePpg} P/M · Dep {row.awayPpg} P/M -- {row.strongerAt === "home" ? "evinde daha güçlü" : "deplasmanda daha güçlü"}
-                </span>
-                <span className="fixture-difficulty-pct">{row.gap}</span>
-              </Link>
-            ))}
+          <div className="home-away-character-grid">
+            {homeAwayGap.map((row) => {
+              const maxPpg = 3;
+              const homePct = Math.min(100, (row.homePpg / maxPpg) * 100);
+              const awayPct = Math.min(100, (row.awayPpg / maxPpg) * 100);
+              return (
+                <Link
+                  key={row.teamId}
+                  to={`/${competitionKey}/takim/${row.teamId}`}
+                  className={`home-away-character-row ${row.teamId === favoriteTeamId ? "is-favorite" : ""}`}
+                >
+                  <div className="home-away-character-head">
+                    <Crest team={row.team} size={24} />
+                    <span className="home-away-character-name">{row.team.name}</span>
+                    <span className={`home-away-character-badge ${row.strongerAt === "home" ? "is-home" : "is-away"}`}>
+                      {row.strongerAt === "home" ? "🏠 Evinde güçlü" : "✈️ Deplasmanda güçlü"} · {row.gap}
+                    </span>
+                  </div>
+                  <div className="home-away-character-bars">
+                    <div className="home-away-character-bar-line">
+                      <span className="home-away-character-bar-icon">🏠</span>
+                      <span className="home-away-character-bar-track">
+                        <span className="home-away-character-bar-fill is-home" style={{ width: `${homePct}%` }} />
+                      </span>
+                      <span className="home-away-character-bar-value">{row.homePpg}</span>
+                    </div>
+                    <div className="home-away-character-bar-line">
+                      <span className="home-away-character-bar-icon">✈️</span>
+                      <span className="home-away-character-bar-track">
+                        <span className="home-away-character-bar-fill is-away" style={{ width: `${awayPct}%` }} />
+                      </span>
+                      <span className="home-away-character-bar-value">{row.awayPpg}</span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       )}

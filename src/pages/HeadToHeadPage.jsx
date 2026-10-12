@@ -7,7 +7,7 @@ import TeamFilterSelect from "../components/stats/TeamFilterSelect.jsx";
 import Crest from "../components/Crest.jsx";
 import { formatMatchDate } from "../utils/matchDate.js";
 import { useFavoriteTeam } from "../state/FavoriteTeamContext.jsx";
-import { hasRealDataSupport, getHeadToHead } from "../utils/realStandingsSelectors.js";
+import { hasRealDataSupport, getHeadToHead, getNextRealOpponent } from "../utils/realStandingsSelectors.js";
 
 // İki takım arasındaki TÜM geçmiş simülasyon sonuçlarını (her "tahminleri
 // yenile" birikerek matchHistory'ye eklenir -- bkz. CompetitionContext)
@@ -48,7 +48,14 @@ export default function HeadToHeadPage() {
   const { competition, matchHistory, hasSimulation } = useCompetition(competitionKey);
   const { favoriteTeamId } = useFavoriteTeam(competitionKey);
   const [teamAId, setTeamAId] = useState(() => favoriteTeamId || "");
-  const [teamBId, setTeamBId] = useState("");
+  // Kullanıcı isteği: "tuttuğun takım seçiliyse, diğer takımı tuttuğun
+  // takımın en yakın maçının rakibi yap" -- ilk açılışta elle seçim
+  // yapmadan da anlamlı bir karşılaştırma göstermek için.
+  const [teamBId, setTeamBId] = useState(() =>
+    favoriteTeamId && hasRealDataSupport(competitionKey)
+      ? getNextRealOpponent(competitionKey, favoriteTeamId) || ""
+      : ""
+  );
 
   const teamA = competition.teams.find((t) => t.id === teamAId) || null;
   const teamB = competition.teams.find((t) => t.id === teamBId) || null;

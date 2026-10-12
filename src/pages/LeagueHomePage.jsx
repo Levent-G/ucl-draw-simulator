@@ -187,15 +187,15 @@ export default function LeagueHomePage() {
             {competition.teams.length} takımlı çift devreli lig (herkes
             herkesle iki kez oynar). Sezonu başlatınca fikstür otomatik
             oluşur ve şampiyon kısa süre sonra kendiliğinden belli olur --
-            sıradaki maçlar ve sıralama tahminini Canlı Skorlar sayfasından
-            takip edebilirsin.
+            sıradaki maçlar ve sıralama tahminini bu ligin kendi fikstür
+            sayfasından takip edebilirsin.
           </p>
         </div>
         <div className="page-header-actions">
           {hasDraw ? (
             <>
-              <Link to="/canli" className="btn-primary">
-                Canlı Skorlar'da Tahminleri Gör
+              <Link to={`/${competitionKey}/fikstur`} className="btn-primary">
+                Fikstürde Tahminleri Gör
               </Link>
               {champion && (
                 <button className="btn-secondary" onClick={handleSimulateSeason} disabled={simulating}>

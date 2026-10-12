@@ -15,6 +15,7 @@ import {
   OUTCOME_CORRECT_POINTS,
 } from "../state/PredictionLeagueContext.jsx";
 import { hasRealDataSupport } from "../utils/realStandingsSelectors.js";
+import { useAchievements } from "../state/AchievementsContext.jsx";
 import { formatMatchDate } from "../utils/matchDate.js";
 import { toSearchKey } from "../utils/text.js";
 import Crest from "../components/Crest.jsx";
@@ -247,15 +248,19 @@ function PredictionLeagueLanding() {
   const { user } = usePredictionAuth();
   const createLeague = useCreateLeague();
   const { leagues, loading: leaguesLoading, error: leaguesError } = useMyLeagues();
+  const { unlock } = useAchievements();
 
   const [selectedKeys, setSelectedKeys] = useState(["ucl"]);
   const [name, setName] = useState("");
   const [starting, setStarting] = useState(false);
   const [startError, setStartError] = useState(null);
 
-  const toggleKey = (key) => {
-    setSelectedKeys((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
-  };
+  // Kullanıcı isteği: "Tahmin Ligi'nde hem UCL hem Süper Lig aynı anda
+  // oluşturulamasın" -- eskiden serbest çoklu seçimdi (toggleKey), artık
+  // tek seferde sadece BİR yarışma seçilebiliyor (radio-button gibi).
+  // Veri modeli (competitionKeys dizisi) bilerek DEĞİŞTİRİLMEDİ -- geriye
+  // dönük uyumluluk için tek elemanlı bir dizi olarak kalıyor.
+  const selectKey = (key) => setSelectedKeys([key]);
 
   const handleCreate = async () => {
     if (selectedKeys.length === 0) return;
@@ -263,6 +268,7 @@ function PredictionLeagueLanding() {
     setStartError(null);
     try {
       const leagueId = await createLeague(selectedKeys, name.trim());
+      unlock("tahmin-ligi-kurucusu");
       navigate(`/tahmin-ligi/${leagueId}`);
     } catch (e) {
       setStartError(describeFirestoreError(e));
@@ -279,6 +285,7 @@ function PredictionLeagueLanding() {
           neye göre verildiğini bilsin" -- bu yüzden giriş yapmadan önce bile
           görünen, kısa/net bir açıklama kartı. */}
       <div className="prediction-intro-card">
+        <div className="prediction-intro-card-badge" aria-hidden="true">🏆</div>
         <h2>Tahmin Ligi Nedir?</h2>
         <p>
           Arkadaşlarınla (ya da yalnız) kurduğun bir lig odasında, her hafta oynanacak <b>gerçek</b> UCL/Süper Lig
@@ -312,7 +319,7 @@ function PredictionLeagueLanding() {
             </p>
             <div className="prediction-create-form">
               <div className="prediction-create-field">
-                <label>Hangi lig(ler) için? (birden fazla seçebilirsin)</label>
+                <label>Hangi lig için? (bir lig, hem UCL hem Süper Lig aynı anda olamaz)</label>
                 <div className="prediction-league-choice-row">
                   {REAL_COMPETITIONS.map((comp) => {
                     const selected = selectedKeys.includes(comp.key);
@@ -321,7 +328,7 @@ function PredictionLeagueLanding() {
                         key={comp.key}
                         type="button"
                         className={`prediction-league-choice ${selected ? "selected" : ""}`}
-                        onClick={() => toggleKey(comp.key)}
+                        onClick={() => selectKey(comp.key)}
                         aria-pressed={selected}
                       >
                         <span className="prediction-league-choice-icon">
@@ -378,27 +385,25 @@ function PredictionLeagueLanding() {
                   const keys = l.competitionKeys || (l.competitionKey ? [l.competitionKey] : []);
                   return (
                     <Link key={l.id} to={`/tahmin-ligi/${l.id}`} className="prediction-league-list-row">
-                      <span className="prediction-league-list-name">
-                        <span className="prediction-league-list-name-icons">
-                          {keys.map((k) => {
-                            const comp = REAL_COMPETITIONS.find((c) => c.key === k);
-                            return comp ? <CompetitionIcon key={k} competition={comp} size={16} /> : null;
-                          })}
+                      <span className="prediction-league-list-icon">🏆</span>
+                      <span className="prediction-league-list-body">
+                        <span className="prediction-league-list-name">{l.name}</span>
+                        <span className="prediction-league-list-meta">
+                          <span className="prediction-league-list-badges">
+                            {keys.map((k) => {
+                              const comp = REAL_COMPETITIONS.find((c) => c.key === k);
+                              return (
+                                <span key={k} className="prediction-league-list-badge">
+                                  {comp && <CompetitionIcon competition={comp} size={13} />}
+                                  {comp?.shortName || k}
+                                </span>
+                              );
+                            })}
+                          </span>
+                          <span className="footnote">{l.createdByName} tarafından oluşturuldu</span>
                         </span>
-                        {l.name}
                       </span>
-                      <span className="prediction-league-list-badges">
-                        {keys.map((k) => {
-                          const comp = REAL_COMPETITIONS.find((c) => c.key === k);
-                          return (
-                            <span key={k} className="prediction-league-list-badge">
-                              {comp && <CompetitionIcon competition={comp} size={13} />}
-                              {comp?.shortName || k}
-                            </span>
-                          );
-                        })}
-                      </span>
-                      <span className="footnote">{l.createdByName} tarafından oluşturuldu</span>
+                      <span className="prediction-league-list-arrow" aria-hidden="true">→</span>
                     </Link>
                   );
                 })}
@@ -471,6 +476,7 @@ function PredictionLeagueRoom() {
     submitOutcomePrediction,
     resetMyPredictions,
   } = usePredictions(leagueId);
+  const { unlock } = useAchievements();
 
   const [tab, setTab] = useState("maclar");
   const [teamQuery, setTeamQuery] = useState("");
@@ -482,6 +488,16 @@ function PredictionLeagueRoom() {
   // -- isteyen bir maç için buradan "Tam skor tahmin et"e geçebilir.
   const [scoreModeMatchIds, setScoreModeMatchIds] = useState({});
   const [linkCopied, setLinkCopied] = useState(false);
+
+  // Kullanıcı isteği: "başarılar kısmını arttır" -- kendi tahminlerinden
+  // biri, maçın gerçek tarihi geçip sonuç belli olunca TAM SKOR (5 puan)
+  // tutarsa "Gerçek Kahin" rozeti açılır.
+  useEffect(() => {
+    const hasExactHit = Object.values(myPredictionsByMatch).some(
+      (p) => isMatchRevealed(league, p.matchId) && pointsForPrediction(p, league) === 5
+    );
+    if (hasExactHit) unlock("gercek-kahin");
+  }, [myPredictionsByMatch, league, unlock]);
 
   const weeks = useMemo(() => buildWeeks(fixturesByKey), [fixturesByKey]);
   const currentWeekIndex = useMemo(() => {
@@ -601,6 +617,7 @@ function PredictionLeagueRoom() {
     try {
       if (myPredictionsByMatch[matchId]) await deletePrediction(matchId);
       await submitScorePrediction(matchId, Number(draft.home), Number(draft.away));
+      unlock("ilk-tahmin");
       setEditingMatchIds((prev) => ({ ...prev, [matchId]: false }));
     } catch (e) {
       setSubmitErrors((prev) => ({ ...prev, [matchId]: describeFirestoreError(e) }));
@@ -621,6 +638,7 @@ function PredictionLeagueRoom() {
     try {
       if (myPredictionsByMatch[matchId]) await deletePrediction(matchId);
       await submitOutcomePrediction(matchId, match.homeTeam.id, result);
+      unlock("ilk-tahmin");
       setEditingMatchIds((prev) => ({ ...prev, [matchId]: false }));
     } catch (e) {
       setSubmitErrors((prev) => ({ ...prev, [matchId]: describeFirestoreError(e) }));

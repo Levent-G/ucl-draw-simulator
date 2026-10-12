@@ -13,8 +13,8 @@ export default function AchievementsPage() {
           </div>
           <h1>Başarılar</h1>
           <p>
-            Uygulamayı kullandıkça (kura çekmek, sezon tamamlamak, kadro kurmak, transfer yapmak,
-            tahmin tutturmak…) otomatik olarak açılır -- tarayıcında kalıcıdır.
+            Uygulamayı kullandıkça (Tahmin Ligi kurmak, tahmin tutturmak, favori takım seçmek, kadro
+            kurmak, kura çekmek, transfer yapmak…) otomatik olarak açılır -- tarayıcında kalıcıdır.
           </p>
         </div>
       </header>

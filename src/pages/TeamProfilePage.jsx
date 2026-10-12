@@ -5,6 +5,7 @@ import { useCompetition } from "../state/CompetitionContext.jsx";
 import { useTransferMarket } from "../state/TransferContext.jsx";
 import { useCareer } from "../state/CareerContext.jsx";
 import { useFavoriteTeam } from "../state/FavoriteTeamContext.jsx";
+import { useAchievements } from "../state/AchievementsContext.jsx";
 import { FORMATIONS } from "../state/DreamTeamContext.jsx";
 import Crest from "../components/Crest.jsx";
 import PlayerAvatar from "../components/PlayerAvatar.jsx";
@@ -187,6 +188,7 @@ export default function TeamProfilePage() {
   const { getEffectivePlayersByTeam, transfers } = useTransferMarket(competitionKey);
   const { getCoeffDelta } = useCareer();
   const { favoriteTeamId, setFavoriteTeam } = useFavoriteTeam(competitionKey);
+  const { unlock } = useAchievements();
   const isFavorite = favoriteTeamId === teamId;
 
   const team = useMemo(() => competition.teams.find((t) => t.id === teamId), [competition, teamId]);
@@ -318,7 +320,11 @@ export default function TeamProfilePage() {
             <button
               type="button"
               className={`favorite-toggle-btn ${isFavorite ? "is-favorite" : ""}`}
-              onClick={() => setFavoriteTeam(isFavorite ? null : team.id)}
+              onClick={() => {
+                const next = isFavorite ? null : team.id;
+                setFavoriteTeam(next);
+                if (next) unlock("favori-taraftar");
+              }}
             >
               {isFavorite ? "⭐ Tuttuğun Takım" : "☆ Takımım Olarak Seç"}
             </button>

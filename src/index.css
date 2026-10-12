@@ -196,11 +196,10 @@ button {
 .brand-title {
   font-size: clamp(20px, 2.6vw, 30px);
   text-transform: uppercase;
-  line-height: 1;
-  background: linear-gradient(180deg, #ffffff 0%, #b9c9f6 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  line-height: 1.1;
+  /* Açık temada eski beyaz->açık mavi gradyanlı "clip-text" başlık açık
+     zeminde neredeyse görünmez kalıyordu -- düz mürekkep rengi. */
+  color: var(--text-primary);
 }
 
 .brand-sub {
@@ -338,11 +337,12 @@ button {
 .sphere-panel {
   background: radial-gradient(
     circle at 50% 30%,
-    #16204a 0%,
-    var(--bg-panel) 70%
+    #ffffff 0%,
+    #e8eef8 75%
   );
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius-lg);
+  box-shadow: 0 30px 70px -24px rgba(11, 19, 43, 0.45);
   padding: 16px 34px;
   display: flex;
   flex-direction: column;
@@ -351,6 +351,10 @@ button {
   width: fit-content;
   position: relative;
   overflow: hidden;
+  /* Dönen ::after ışık süpürmesi (panelin %140'ı) backdrop-filter'lı bir
+     ebeveynin içinde overflow:hidden ile kırpılmayıp panelin dışına
+     dikdörtgen olarak taşıyordu -- clip-path her durumda kırpar. */
+  clip-path: inset(0 round var(--radius-lg));
 }
 
 .sphere-panel::after {
@@ -364,7 +368,7 @@ button {
   background: conic-gradient(
     from 200deg,
     transparent 0deg,
-    rgba(255, 255, 255, 0.05) 40deg,
+    rgba(0, 144, 171, 0.06) 40deg,
     transparent 90deg
   );
   animation: sweep 6s linear infinite;
@@ -387,11 +391,11 @@ button {
   border: 3px solid var(--line-strong);
   background: radial-gradient(
     circle at 35% 30%,
-    rgba(255, 255, 255, 0.08),
-    rgba(255, 255, 255, 0.01) 60%
+    rgba(255, 255, 255, 0.95),
+    rgba(214, 226, 243, 0.85) 70%
   );
-  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6),
-    0 0 60px -10px rgba(84, 104, 255, 0.35);
+  box-shadow: inset 0 0 36px rgba(11, 19, 43, 0.18),
+    0 0 60px -10px rgba(0, 144, 171, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -474,7 +478,7 @@ button {
   transform: translateX(-50%);
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.18),
+    rgba(0, 144, 171, 0.22),
     transparent 70%
   );
   clip-path: polygon(42% 0, 58% 0, 100% 100%, 0% 100%);
@@ -738,11 +742,11 @@ button {
 }
 
 .pot-table-card {
-  background: linear-gradient(165deg, #0a1c4d 0%, #0d2b6b 100%);
+  background: var(--bg-panel);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-lg);
   padding: 10px 10px 4px;
-  box-shadow: 0 16px 40px -18px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 16px 40px -22px rgba(11, 19, 43, 0.35);
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -777,7 +781,7 @@ button {
   height: 6px;
 }
 .pot-table-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(11, 19, 43, 0.2);
   border-radius: 999px;
 }
 
@@ -792,12 +796,12 @@ button {
      DRAW TABLE -- gerçek UEFA yayın grafiğine sadık, tek parça, kayan ana tablo
      ========================================================================== */
 .draw-table-wrap {
-  background: linear-gradient(165deg, #0a1c4d 0%, #0d2b6b 100%);
+  background: var(--bg-panel);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-lg);
   padding: 18px 18px 4px;
   margin-bottom: 32px;
-  box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 20px 50px -24px rgba(11, 19, 43, 0.35);
 }
 
 .pot-tables-panel {
@@ -845,7 +849,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(5, 10, 34, 0.6);
+  background: rgba(238, 241, 247, 0.72);
   backdrop-filter: blur(3px);
   border-radius: var(--radius-md);
   z-index: 6;
@@ -881,7 +885,7 @@ button {
   height: 8px;
 }
 .draw-table-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(11, 19, 43, 0.2);
   border-radius: 999px;
 }
 .draw-table-scroll::-webkit-scrollbar-track {
@@ -915,6 +919,9 @@ button {
 }
 .draw-table thead tr:first-child th.corner-cell {
   background: var(--table-name-col);
+  color: var(--text-dim);
+  left: 0;
+  z-index: 3;
   text-align: left;
   padding-left: 14px;
 }
@@ -925,6 +932,7 @@ button {
   font-weight: 500;
   letter-spacing: 0.08em;
   padding: 7px 6px;
+  white-space: nowrap;
 }
 
 .pot-divider-row td {
@@ -941,7 +949,7 @@ button {
 
 .draw-row td {
   padding: 6px 3px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(11, 19, 43, 0.06);
   text-align: center;
   white-space: nowrap;
 }
@@ -997,7 +1005,7 @@ button {
   background: var(--table-name-col);
 }
 .draw-row:nth-child(odd) .team-name-cell {
-  background: #081540;
+  background: #e4eaf4;
 }
 .draw-row.active-row .team-name-cell {
   background: var(--table-highlight) !important;
@@ -1012,7 +1020,7 @@ button {
   animation: cell-fill-in 0.45s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 .fixture-cell.loading {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(0, 144, 171, 0.05);
 }
 .cell-shimmer {
   position: absolute;
@@ -1188,7 +1196,7 @@ button {
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--text-dim);
 }
 .start-orb-sub {
   font-family: var(--font-display);
@@ -1196,9 +1204,8 @@ button {
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--text-primary);
   margin-top: 2px;
-  text-shadow: 0 2px 12px rgba(91, 157, 255, 0.5);
 }
 
 .control-bar-hint {
@@ -1257,7 +1264,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(4, 8, 26, 0.6);
+  background: rgba(11, 19, 43, 0.38);
   backdrop-filter: blur(5px);
   opacity: 0;
   pointer-events: none;
@@ -1277,7 +1284,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(4, 8, 26, 0.6);
+  background: rgba(11, 19, 43, 0.38);
   backdrop-filter: blur(6px);
   opacity: 0;
   pointer-events: none;
@@ -1445,12 +1452,19 @@ button {
   bottom: 20px;
   z-index: 40;
   width: 270px;
-  background: rgba(9, 18, 50, 0.92);
+  background: rgba(255, 255, 255, 0.97);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-md);
   padding: 12px;
-  box-shadow: 0 20px 45px -15px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 20px 45px -18px rgba(11, 19, 43, 0.4);
   backdrop-filter: blur(6px);
+}
+/* Masaüstünde sol menü (pages.css .app-sidebar, 250px) sabit bir kolon --
+   panel left:20px'te kalınca menünün ALTINDA kalıp kesiliyordu. */
+@media (min-width: 961px) {
+  .current-draw-panel {
+    left: 270px;
+  }
 }
 @media (max-width: 700px) {
   .current-draw-panel {
@@ -1469,7 +1483,7 @@ button {
   gap: 7px;
   padding: 5px 7px;
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--bg-panel-alt);
   animation: cdp-row-in 0.4s ease;
 }
 @keyframes cdp-row-in {
@@ -1518,7 +1532,7 @@ button {
   font-family: var(--font-display);
   font-size: 14px;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--text-primary);
 }
 
 /* ==========================================================================
@@ -1658,12 +1672,12 @@ button {
      ========================================================================== */
 .setup-panel {
   position: relative;
-  background: linear-gradient(160deg, #0e1c48 0%, #0a1533 100%);
+  background: var(--bg-panel);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-lg);
   padding: 16px 20px 16px 22px;
   margin-bottom: 16px;
-  box-shadow: 0 14px 34px -18px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 14px 34px -22px rgba(11, 19, 43, 0.35);
   overflow: hidden;
 }
 .setup-panel::before {
@@ -1847,7 +1861,7 @@ button {
     rgba(84, 104, 255, 0.22)
   );
   border-color: var(--pink);
-  color: #fff;
+  color: var(--text-primary);
   box-shadow: 0 0 0 1px rgba(232, 121, 201, 0.35),
     0 6px 16px -6px rgba(232, 121, 201, 0.5);
 }
@@ -1925,14 +1939,14 @@ button {
   display: flex;
   align-items: center;
   gap: 14px;
-  background: linear-gradient(120deg, #450a0a 0%, #3b0764 100%);
-  border: 1px solid rgba(248, 113, 113, 0.4);
+  background: linear-gradient(120deg, #fff1f2 0%, #f5f0ff 100%);
+  border: 1px solid rgba(220, 38, 38, 0.3);
   border-radius: var(--radius-lg);
   padding: 14px 20px;
   font-size: 14px;
   color: var(--text-primary);
   margin-bottom: 18px;
-  box-shadow: 0 16px 36px -18px rgba(127, 29, 29, 0.7);
+  box-shadow: 0 16px 36px -24px rgba(127, 29, 29, 0.45);
   overflow: hidden;
 }
 .death-group-badge::after {
@@ -1959,16 +1973,16 @@ button {
   border-radius: 50%;
 }
 .death-group-badge b {
-  color: #fca5a5;
+  color: #b91c1c;
 }
 
 .favorite-card {
   position: relative;
-  background: linear-gradient(165deg, #0a1c4d 0%, #0d2b6b 100%);
+  background: var(--bg-panel);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-lg);
   padding: 20px 20px 18px;
-  box-shadow: 0 20px 44px -20px rgba(0, 0, 0, 0.65);
+  box-shadow: 0 20px 44px -24px rgba(11, 19, 43, 0.35);
   overflow: hidden;
 }
 .favorite-card::before {
@@ -2004,13 +2018,13 @@ button {
   font-family: var(--font-display);
   font-size: 21px;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--text-primary);
   margin-top: 2px;
 }
 .favorite-prediction-score {
   font-family: var(--font-mono);
   font-size: 12.5px;
-  color: #fff;
+  color: var(--text-primary);
   background: rgba(232, 121, 201, 0.18);
   border: 1px solid rgba(232, 121, 201, 0.4);
   border-radius: 999px;
@@ -2252,8 +2266,15 @@ button {
   .setup-row {
     gap: 10px;
   }
+  .setup-field {
+    flex-wrap: wrap;
+    min-width: 0;
+    width: 100%;
+  }
   .setup-field select {
-    max-width: 160px;
+    max-width: 100%;
+    flex: 1 1 140px;
+    min-width: 0;
     font-size: 12px;
   }
   .setup-count {

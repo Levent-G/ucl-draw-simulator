@@ -26,8 +26,12 @@
 // maçı öncesi çift forvet kararı, Okan Buruk'un Trabzonspor derbisindeki
 // kırmızı kartına ilişkin hakem adı ve cezası netleşen detaylar ile
 // Mourinho'nun Atletico Madrid derbisi öncesi Türkiye'deki derbi kültürüne
-// dair yorumu (news-sl-38..43, news-ucl-43) eklendi -- canlı/otomatik
-// güncellenmez. Bazı öğelerin tam gün
+// dair yorumu (news-sl-38..43, news-ucl-43) eklendi; 2026-10-09'da yapılan
+// dördüncü tazelemeyle milli ara dönemi (Eyüpspor'da Özhan Pulat'ın istifası
+// ve Mustafa Dalcı'nın gelişi, Galatasaray/Beşiktaş/Kocaelispor/Fenerbahçe
+// sakatlık-dönüş haberleri, 7. hafta programı) ile UCL 2. hafta öncesi
+// Aston Villa-Fenerbahçe ve Galatasaray-Barcelona notları (news-sl-44..49,
+// news-ucl-44..45) eklendi -- canlı/otomatik güncellenmez. Bazı öğelerin tam gün
 // bilgisi (ör. yaz transfer dönemi içindeki bir imza) kaynaklarda net
 // belirtilmediği için ay/dönem bazında en olası güne yuvarlanmıştır; kulüp,
 // oyuncu, olay ve sonuç bilgileri ise doğrulanmış gerçek bilgilerdir. Skor,
@@ -496,6 +500,40 @@ export const NEWS_ITEMS = [
     competitionKey: "ucl",
     relatedTeamIds: ["t1"],
   },
+  // 2026-10-09 tazelemesi: lig fazı 2. hafta (13-14 Ekim) öncesi.
+  {
+    id: "news-ucl-44",
+    date: "2026-10-08",
+    title: "Aston Villa - Fenerbahçe: Sarı-lacivertliler 2. haftada İngiltere deplasmanında",
+    summary:
+      "İlk haftada Kadıköy'de Roma ile 1-1 berabere kalan Fenerbahçe, lig fazının 2. haftasında 14 Ekim Çarşamba günü TSİ 22.00'de Birmingham'da Aston Villa'ya konuk olacak. Villa ilk haftada Club Brugge deplasmanından 3-2 galibiyetle dönmüştü.",
+    source: "Milli Gazete / Euronews Türkçe",
+    url: "https://www.milligazete.com.tr/aston-villa-fenerbahce-maci-ne-zaman-saat-kacta-hangi-kanalda-fenerbahcenin-sampiyonlar-ligi-fiksturu",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t20", "t25"],
+  },
+  {
+    id: "news-ucl-45",
+    date: "2026-10-08",
+    title: "Galatasaray, Barcelona'yı 13 Ekim'de RAMS Park'ta ağırlıyor",
+    summary:
+      "Şampiyonlar Ligi'ne 9 Eylül'de Sporting CP deplasmanında 3-1 yenilgiyle başlayan Galatasaray, lig fazının 2. haftasında 13 Ekim Salı TSİ 22.00'de Barcelona'yı RAMS Park'ta konuk edecek. Barcelona ilk haftada Feyenoord'u 5-1 yenmişti.",
+    source: "Milli Gazete / Habertürk",
+    url: "https://www.milligazete.com.tr/galatasaray-barcelona-maci-hangi-gun-saat-kacta-rams-parkta-mi-milli-maclar-ne-zaman-bitiyor",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t35", "t7"],
+  },
+  {
+    id: "news-ucl-46",
+    date: "2026-10-09",
+    title: "Barcelona'da Raphinha, Galatasaray deplasmanında yok",
+    summary:
+      "Hansi Flick, 9 Ekim'deki basın toplantısında takım kaptanı Raphinha'nın Getafe ve Galatasaray maçlarını kaçıracağını açıkladı. Brezilyalı oyuncunun sağ uyluğunda, Brezilya'nın 29 Eylül'deki Avustralya maçında devre arasında oyundan çıktıktan sonra şişlik oluşmuştu; testlerde kas yırtığı çıkmadı ve ESPN'e göre 20 Ekim'deki PSG maçında dönmesi bekleniyor.",
+    source: "France 24 / ESPN / Yahoo Sports",
+    url: "https://www.france24.com/en/live-news/20261009-barca-skipper-raphinha-out-against-getafe-and-galatasaray",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t7", "t35"],
+  },
 
   // ---- Trendyol Süper Lig 2026-27 ----
   {
@@ -954,6 +992,174 @@ export const NEWS_ITEMS = [
       "Trabzonspor'a 4-0 mağlup olunan derbide 71. dakikada kırmızı kart gören teknik direktör Okan Buruk'u oyundan atan ismin hakem Batuhan Kolak olduğu netleşti. Buruk, 'Hiçbir hakaret etmedim, kötü bir şey söylemedim, beni isteyerek attı' dedi; aldığı cezayla birlikte milli maç arasının ardından oynanacak sıradaki lig maçında (Kasımpaşa) takımının başında olamayacak.",
     source: "Fotomaç / Milliyet / Mynet",
     url: "https://www.fotomac.com.tr/galatasaray/2026/09/19/okan-buruktan-mac-sonu-kirmizi-kart-sozleri-hakem-beni-oyundan-isteyerek-atti",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s1"],
+  },
+  // 2026-10-09 tazelemesi: milli ara (21 Eylül - 6 Ekim) dönemi ve 7. hafta
+  // (9-12 Ekim) öncesi gelişmeler. Her öğe, yayın tarihi kaynak sayfası
+  // açılarak doğrulandı (news-sl-44..49).
+  {
+    id: "news-sl-44",
+    date: "2026-09-20",
+    title: "Fenerbahçe'ye 8-0 yenilen Eyüpspor'da Özhan Pulat istifa etti",
+    summary:
+      "6. haftada Fenerbahçe deplasmanında 8-0 yenilen Eyüpspor'da teknik direktör Özhan Pulat, maçın ardından görevi bırakma kararı aldı. Pulat sonucu 'utanç verici' olarak niteledi ve sezon başında kısa sürede, kısıtlı imkanlarla takım kurmaya çalıştıklarını söyledi; istifası yönetim tarafından kabul edildi.",
+    source: "İstiklal / 24 Saat / Ensonhaber",
+    url: "https://www.istiklal.com.tr/spor/fenerbahceye-8-0-yenilen-eyupsporda-ozhan-pulat-istifa-etti-1105917h",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s16", "s2"],
+  },
+  {
+    id: "news-sl-45",
+    date: "2026-09-29",
+    title: "Eyüpspor'da Mustafa Dalcı dönemi başladı",
+    summary:
+      "Özhan Pulat'ın istifasının ardından hızlı bir teknik direktör arayışına giren Eyüpspor yönetimi, adaylarla yaptığı görüşmelerin sonunda Mustafa Dalcı ile anlaştığını açıkladı. Dalcı, takımın başına milli aranın ardından 12 Ekim'deki Göztepe maçında çıkacak.",
+    source: "Milli Gazete / Politikam",
+    url: "https://www.milligazete.com.tr/eyupsporda-mustafa-dalci-donemi-basladi",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s16", "s7"],
+  },
+  {
+    id: "news-sl-46",
+    date: "2026-09-23",
+    title: "Galatasaray'da milli arada sakatlık mesaisi: Osimhen ve Lemina Kasımpaşa'ya yetişiyor, Singo yok",
+    summary:
+      "Başakşehir maçında sağ adale bölgesinde zorlanma yaşayan Victor Osimhen ile Mario Lemina'nın 9 Ekim'deki Kasımpaşa maçına yetişmesi bekleniyor. Sağ arka adale tendonunda hasar ve kanama tespit edilen Wilfried Singo'nun dönüşü Gençlerbirliği maçına kaldı; Roland Sallai'nin durumu ise tedavi sürecine göre netleşecek.",
+    source: "Milli Gazete / Hürriyet / Fanatik",
+    url: "https://www.milligazete.com.tr/osimhen-lemina-sallai-ve-singo-kasimpasa-macinda-oynayacak-mi-galatasarayda-sakat-futbolcularin-son-durumu-ne",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s1", "s8"],
+  },
+  {
+    id: "news-sl-47",
+    date: "2026-10-06",
+    title: "Süper Lig'de milli ara bitti: 7. hafta Galatasaray-Kasımpaşa maçıyla başlıyor",
+    summary:
+      "A Milli Takım'ın UEFA Uluslar Ligi maçları nedeniyle verilen milli ara sona erdi. 7. hafta 9 Ekim Cuma 20.00'deki Galatasaray-Kasımpaşa maçıyla açılıyor; Çaykur Rizespor-Fenerbahçe ve Samsunspor-Trabzonspor 10 Ekim'de, Beşiktaş-Kocaelispor 11 Ekim'de oynanacak, hafta 12 Ekim'de Eyüpspor-Göztepe maçıyla kapanacak.",
+    source: "Gazete Oksijen / NTV / Milli Gazete",
+    url: "https://gazeteoksijen.com/spor/super-ligde-7-haftanin-mac-programi-291797",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s1", "s8", "s2", "s12", "s3", "s17"],
+  },
+  {
+    id: "news-sl-48",
+    date: "2026-10-07",
+    title: "Fenerbahçe'de Asensio Rize'de ilk 11'e dönüyor",
+    summary:
+      "2 Ağustos'taki sakatlığının ardından uzun süre forma giyemeyen Marco Asensio, milli arada rehabilitasyonunu tamamladı ve hazırlık maçında olumlu sinyaller verdi. İsmail Kartal'ın İspanyol yıldızı 10 Ekim'deki Çaykur Rizespor deplasmanında ilk 11'de oynatmayı planladığı belirtiliyor; Asensio geçen sezon aynı deplasmanda 2 gol, 1 asistle oynamıştı.",
+    source: "Haberkenti / beIN Sports",
+    url: "https://www.haberkenti.com/fenerbahcede-rize-plani-degisti-ismail-kartal-sahneyi-asensioya-birakiyor",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s2", "s12"],
+  },
+  {
+    id: "news-sl-49",
+    date: "2026-10-07",
+    title: "Beşiktaş'ta Orkun Kökçü belirsizliği, Kocaelispor'da 6 oyuncu döndü",
+    summary:
+      "Ayak parmağındaki çatlak nedeniyle A Milli Takım kadrosundan çıkarılan Orkun Kökçü henüz takımla çalışmalara başlamadı; ağrıları sürerse 11 Ekim'deki Kocaelispor maçında risk alınmayacak, yerine Fabio Miretti oynayacak. Rakip Kocaelispor'da ise Jovanovic, Rivas, Gulliksen, Cinan, Agyei ve Aye sakatlıklarını atlatıp takıma döndü; Zoukrou, Maglica, Baku ve Dijksteel'in tedavisi sürüyor.",
+    source: "Halk TV / beIN Sports",
+    url: "https://halktv.com.tr/spor/orkun-kokcunun-son-durumu-netlesti-besiktasta-gozler-kritik-macta-1059984h",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s3", "s17"],
+  },
+  {
+    id: "news-sl-50",
+    date: "2026-10-09",
+    title: "10 kişi kalan Galatasaray, uzatmada bulduğu gollerle Kasımpaşa'yı 3-1 yendi ve liderliğe yükseldi",
+    summary:
+      "7. haftanın açılış maçında RAMS Park'ta Galatasaray, Abdülkerim Bardakcı'nın 45. dakikadaki kafa golüyle öne geçti. Lucas Torreira'nın 65. dakikada VAR sonrası direkt kırmızı kart görmesinin ardından Rak-Sakyi 68'de eşitliği sağladı; Barış Alper Yılmaz 90'da ve Mario Lemina 90+6'da attıkları gollerle skoru 3-1'e taşıdı. Sarı-kırmızılılar 16 puanla maç fazlasıyla lider, Kasımpaşa 10 puanda kaldı. Galatasaray böylece RAMS Park'taki yenilmezlik serisini 39 maça çıkardı.",
+    source: "Hürriyet / Takvim / Fanatik / ESPN",
+    url: "https://www.hurriyet.com.tr/sporarena/galatasaray-3-1-kasimpasa-super-lig-maci-ozeti-43334783",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s1", "s8"],
+  },
+  {
+    id: "news-sl-51",
+    date: "2026-10-10",
+    title: "Asensio döndü, Fenerbahçe Rize'den 3 golle döndü",
+    summary:
+      "Uzun sakatlığın ardından ilk 11'e dönen Marco Asensio, 12. dakikada Kerem Aktürkoğlu'nun pasıyla Fenerbahçe'yi öne geçirdi. 80. dakikada oyuna giren Oğuz Aydın önce İrfan Can Kahveci'nin 83'teki golüne asist yaptı, ardından 87'de Lukaku'nun pasıyla kendisi skoru 3-0'a getirdi. Fenerbahçe puanını 13'e çıkardı.",
+    source: "Takvim / Fotomaç / FOX Sports",
+    url: "https://www.takvim.com.tr/spor/fenerbahce/2026/10/09/caykur-rizespor-0-3-fenerbahce-super-lig-mac-sonucu",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s12", "s2"],
+  },
+  {
+    id: "news-sl-52",
+    date: "2026-10-10",
+    title: "Karadeniz derbisi Trabzonspor'un: Samsun'da ilk yarıda 3 gol",
+    summary:
+      "Trabzonspor, Samsunspor deplasmanında Muçi, Nwaiwu ve Franculino Dju'nun 28-40. dakikalar arasında attığı gollerle ilk yarıda 3-0 öne geçti ve skoru korudu. Samsunspor'da Melih Kabasakal 43. dakikada Elliot Watt'a kafa attığı için kırmızı kart gördü. Trabzonspor üst üste ikinci galibiyetiyle 13 puana yükseldi.",
+    source: "Hürriyet / Fanatik / Takvim",
+    url: "https://www.hurriyet.com.tr/sporarena/samsunspor-trabzonspor-maci-canli-super-lig-43336329",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s6", "s4"],
+  },
+  {
+    id: "news-sl-53",
+    date: "2026-10-10",
+    title: "Gençlerbirliği 90+3'te güldü: Amed SFK'nin liderlik yolunda kayıp",
+    summary:
+      "Eryaman'da Amed SFK, Dia Saba'nın 25'teki penaltı golü ve Samuel Ballet'nin 68'deki uzaktan şutuyla iki kez öne geçti; Gençlerbirliği önce Rafael Luis'in 54'teki serbest vuruş golüyle, ardından uzatmanın 3. dakikasında Thalisson'un kornerden kafasıyla eşitliği yakaladı. 2-2 biten maçla Amed SFK 14 puanla ikinci sırada kaldı.",
+    source: "Habertürk / Takvim / A Haber",
+    url: "https://www.haberturk.com/spor/genclerbirligi-2-amed-sportif-faaliyetler-2-mac-sonucu-super-lig-3918720",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s18", "s11"],
+  },
+  {
+    id: "news-sl-54",
+    date: "2026-10-10",
+    title: "Alanya'da gol sesi çıkmadı: Alanyaspor 0-0 Erzurumspor FK",
+    summary:
+      "Alanya Oba Stadyumu'ndaki maçta iki takım da fırsatları değerlendiremedi; Erzurumspor'un 2. dakikadaki şutunu kaleci Victor kurtardı, İbrahim Kaya'nın 32'deki kafası üstten auta gitti. Alanyaspor 12, Erzurumspor FK 8 puana yükseldi.",
+    source: "Hürriyet / ajansspor / Takvim",
+    url: "https://www.hurriyet.com.tr/sporarena/canli-anlatim-alanyaspor-erzurumspor-fk-maci-43336512",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s10", "s14"],
+  },
+  {
+    id: "news-sl-55",
+    date: "2026-10-11",
+    title: "Beşiktaş, Kocaelispor'u 2-1 yenip ikinci sıraya yükseldi; Vlahović'ten 26 yıl sonra bir ilk",
+    summary:
+      "Milli takımdan ayak parmağı çatlağıyla dönen Orkun Kökçü 18. dakikada Václav Černý'nin pasıyla Beşiktaş'ı öne geçirdi; Kocaelispor 27'de Show'un golüyle eşitledi. 29'da Tiago Djalo'ya yapılan faul sonrası verilen penaltıyı 31'de Dušan Vlahović gole çevirdi. Vlahović, Süper Lig'de ilk 11'de başladığı ilk dört maçın hepsinde gol atarak Beşiktaş'ta 26 yıl sonra bir ilke imza attı. Černý 38. dakikada sakatlanıp yerini İlhan Fakılı'ya bıraktı. Beşiktaş 15 puanla ikinci sıraya yükseldi.",
+    source: "Takvim / Habertürk / Sabah / Fanatik",
+    url: "https://www.takvim.com.tr/spor/besiktas/2026/10/10/besiktas-2-1-kocaelispor-super-lig-mac-sonucu",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s3", "s17"],
+  },
+  {
+    id: "news-sl-56",
+    date: "2026-10-11",
+    title: "Burak Yılmaz'lı Çorum FK, Gaziantep'ten 3 golle döndü",
+    summary:
+      "Çorum FK, teknik direktör Burak Yılmaz yönetimindeki ilk galibiyetini Gaziantep FK deplasmanında aldı: Cengiz Ünder (37'), Alexandros Kyziridis (60') ve Markus Karlsbakk'ın (83') golleriyle 3-0. Çorum FK puanını 10'a çıkarırken Gaziantep FK 8 puanda kaldı.",
+    source: "Star / Sabah / Takvim / beIN Sports",
+    url: "https://www.star.com.tr/spor/mac-sonucu-gaziantep-fk-0-corum-fk-3-haber-2045910/",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s15", "s13"],
+  },
+  {
+    id: "news-sl-57",
+    date: "2026-10-11",
+    title: "Konya'da gol sesi çıkmadı: Konyaspor 0-0 Başakşehir",
+    summary:
+      "Medaş Konya Büyükşehir Stadyumu'ndaki maçta Gonçalves (33'), Toth (38') ve Shomurodov'un (90+3') denemeleri sonuç vermedi. Üst üste ikinci beraberliğini alan Konyaspor 5 puanla 15. sırada, son dört maçında üçüncü kez puan kaybeden Başakşehir 8 puanla 11. sırada.",
+    source: "Habertürk / Fanatik / Sabah / Yeni Şafak",
+    url: "https://www.haberturk.com/spor/konyaspor-basaksehir-mac-sonucu-iste-konya-basaksehir-maci-ozeti-super-lig-3918887",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s9", "s5"],
+  },
+  {
+    id: "news-sl-58",
+    date: "2026-10-11",
+    title: "Galatasaray'da Singo Barcelona maçında da yok, Sallai'ye dönüş yolu göründü",
+    summary:
+      "Kulüp doktoru Yener İnce, Singo, Osimhen ve Sallai'nin sağlık durumuna ilişkin açıklama yaptı; haberlere göre Roland Sallai'nin sakatlığı geride kaldı ve 13 Ekim'deki Barcelona maçında forma giyme ihtimali bulunuyor. Uyluk kasında tendon hasarı bulunan Wilfried Singo'nun ise Barcelona maçında süre alması beklenmiyor; dönüşü için 17 Ekim'deki Gençlerbirliği maçı hedefleniyor.",
+    source: "AA / A Haber / Milli Gazete / Fotospor",
+    url: "https://www.aa.com.tr/tr/spor/yener-inceden-singo-osimhen-ve-sallainin-saglik-durumuna-iliskin-aciklama/4081474",
     competitionKey: "superlig",
     relatedTeamIds: ["s1"],
   },

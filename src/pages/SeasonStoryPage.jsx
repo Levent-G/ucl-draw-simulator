@@ -1,10 +1,11 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getCompetition } from "../data/competitions.js";
 import CompetitionStepper from "../components/CompetitionStepper.jsx";
 import Crest from "../components/Crest.jsx";
 import TeamFilterSelect from "../components/stats/TeamFilterSelect.jsx";
 import { useFavoriteTeam } from "../state/FavoriteTeamContext.jsx";
+import { useAchievements } from "../state/AchievementsContext.jsx";
 import { formatMatchDate } from "../utils/matchDate.js";
 import { getSeasonStory } from "../utils/realStandingsSelectors.js";
 
@@ -30,8 +31,13 @@ export default function SeasonStoryPage() {
   const { competitionKey } = useParams();
   const competition = getCompetition(competitionKey);
   const { favoriteTeamId } = useFavoriteTeam(competitionKey);
+  const { unlock } = useAchievements();
   const [categoryFilter, setCategoryFilter] = useState(null);
   const [teamFilter, setTeamFilter] = useState(null);
+
+  useEffect(() => {
+    unlock("hikaye-meraklisi");
+  }, [unlock]);
 
   const activeTeamFilter = teamFilter !== null ? teamFilter : favoriteTeamId;
   const story = useMemo(

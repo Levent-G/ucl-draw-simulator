@@ -56,6 +56,29 @@ export function getRealFixture(competitionKey) {
   return null;
 }
 
+// Bir takımın GERÇEK fikstüründeki bir SONRAKİ (henüz oynanmamış, en yakın
+// tarihli) maçının rakibini bulur. Kullanıcı isteği: "Karşılıklı Geçmiş'te
+// tuttuğun takım seçiliyse, diğer takımı tuttuğun takımın en yakın maçının
+// rakibi yap" -- sayfa ilk açıldığında elle iki takım seçmeye gerek kalmadan
+// anlamlı bir karşılaştırma göstermek için. Gerçek veri desteği olmayan
+// (europa) ya da fikstürü olmayan bir yarışma için null döner.
+export function getNextRealOpponent(competitionKey, teamId) {
+  const fixture = getRealFixture(competitionKey);
+  if (!fixture || !teamId) return null;
+  const upcoming = [];
+  for (const week of fixture) {
+    for (const m of week.matches) {
+      if (m.homeTeam.id !== teamId && m.awayTeam.id !== teamId) continue;
+      if (isMatchPlayed(m)) continue;
+      upcoming.push(m);
+    }
+  }
+  if (upcoming.length === 0) return null;
+  upcoming.sort((a, b) => new Date(a.date) - new Date(b.date));
+  const next = upcoming[0];
+  return next.homeTeam.id === teamId ? next.awayTeam.id : next.homeTeam.id;
+}
+
 // Fikstürdeki, "şu an" en yakın haftayı bulur -- en az bir maçı henüz
 // oynanmamış İLK hafta. Tüm haftalar oynandıysa son haftayı döner.
 export function findCurrentMatchdayIndex(fixture) {
