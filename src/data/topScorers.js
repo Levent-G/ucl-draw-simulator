@@ -731,10 +731,10 @@ export const TOP_SCORERS = [
     playerName: "Juan",
     teamId: "s7", // Göztepe
     competitionKey: "superlig",
-    goals: 4, // 3. hafta Galatasaray'a 1, 4. hafta Gaziantep FK'ya 2, 5. hafta Alanyaspor'a 1 (73', penaltıdan) -- 6. hafta Çaykur Rizespor'a karşı (2-2) golsüz kaldı (o maçın golleri Kurtulan ve Bekiroğlu'na yazıldı, aşağıya bkz.)
-    matchesPlayed: 6,
-    asOf: "2026-09-20",
-    source: "beIN Sports / Hürriyet / fotmob.com",
+    goals: 5, // 3. hafta Galatasaray'a 1, 4. hafta Gaziantep FK'ya 2, 5. hafta Alanyaspor'a 1 (73', penaltıdan) -- 6. hafta Çaykur Rizespor'a karşı (2-2) golsüz kaldı (o maçın golleri Kurtulan ve Bekiroğlu'na yazıldı, aşağıya bkz.); 7. hafta Eyüpspor deplasmanında 1 (11', penaltıdan)
+    matchesPlayed: 7,
+    asOf: "2026-10-12",
+    source: "beIN Sports / Hürriyet / fotmob.com / Habertürk (7. hafta)",
   },
   {
     playerName: "Kacper Kozłowski",
@@ -1096,6 +1096,17 @@ export const TOP_SCORERS = [
     goals: 1, // 7. hafta Beşiktaş deplasmanında 27' (Habertürk 21' yazıyor; Takvim ve arama özeti 27') -- bu sezonki ilk lig golü
     asOf: "2026-10-11",
     source: "Takvim / Habertürk / Sabah",
+  },
+  // ---- Trendyol Süper Lig 2026-27 -- 7. Hafta, 12 Ekim 2026 ----
+  {
+    // superLigPlayers.js'teki Göztepe (s7) kadrosunda YOK, ama hat-trick'i
+    // birden fazla bağımsız kaynakla doğrulandı.
+    playerName: "André Henrique",
+    teamId: "s7", // Göztepe
+    competitionKey: "superlig",
+    goals: 3, // 7. hafta Eyüpspor deplasmanında hat-trick: 54', 59', 75' (penaltı) -- bu sezonki ilk lig golleri
+    asOf: "2026-10-12",
+    source: "Habertürk / Hürriyet / NTVSpor",
   },
 
   // ---- Trendyol Süper Lig 2026-27 -- 6. Hafta, 18-19 Eylül 2026'da oynanan 5/9 maç ----

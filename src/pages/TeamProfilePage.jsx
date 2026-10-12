@@ -402,6 +402,7 @@ export default function TeamProfilePage() {
                 {domesticForm.league} — {domesticForm.position ? `${domesticForm.position}. sıra` : "?"}
                 {domesticForm.played != null ? ` (${domesticForm.played} maç, ${domesticForm.pts} puan)` : ""}
                 {domesticForm.asOf ? ` · Anlık görüntü: ${domesticForm.asOf}` : ""}
+                {domesticForm.formAsOf ? ` · Form verisi: ${domesticForm.formAsOf}` : ""}
               </p>
               <div className="team-profile-form">
                 <span className="team-profile-form-label">Son 5 maç:</span>

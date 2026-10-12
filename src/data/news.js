@@ -1163,6 +1163,17 @@ export const NEWS_ITEMS = [
     competitionKey: "superlig",
     relatedTeamIds: ["s1"],
   },
+  {
+    id: "news-sl-59",
+    date: "2026-10-12",
+    title: "Göztepe'ye ilk galibiyet: André Henrique'nin hat-trick'iyle Eyüpspor 4-0 geçildi",
+    summary:
+      "7. haftanın kapanış maçında Eyüpspor, 9. dakikada Ahmed Abdullahi'nin VAR sonrası gördüğü direkt kırmızı kartla 10 kişi kaldı; verilen penaltıyı 11'de Juan gole çevirdi. İkinci yarıda André Henrique 54, 59 ve 75'te (penaltıdan) attığı gollerle hat-trick yaptı. Sezonun ilk galibiyetini alan Göztepe 6 puanla 15. sıraya yükseldi; son iki maçında 12 gol yiyen Eyüpspor 3 puanla son sırada.",
+    source: "Habertürk / Sabah / NTVSpor / ensonhaber",
+    url: "https://www.haberturk.com/spor/eyupspor-0-4-goztepe-mac-sonucu-ve-ozeti-trendyol-super-lig-3919213",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s16", "s7"],
+  },
 
   // ---- 2026-27 UCL lig fazı: dikkat çekici eşleşme önizlemeleri ----
   {

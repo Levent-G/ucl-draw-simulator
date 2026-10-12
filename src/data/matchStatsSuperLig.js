@@ -396,4 +396,18 @@ export const SUPER_LIG_MATCH_STATS = {
     asOf: "2026-10-11",
     source: "Takvim / Habertürk / Sabah / Fanatik",
   },
+  // Eyüpspor 0-4 Göztepe (12 Ekim 2026, Esenyurt Necmi Kadıoğlu Stadyumu,
+  // hakem Atilla Karaoğlan). Eyüpspor'da Ahmed Abdullahi 9'da VAR sonrası
+  // direkt kırmızı kart gördü; sarı kart sayıları doğrulanamadığından
+  // "cards" alanı eklenmedi.
+  sr7m1: {
+    scorers: [
+      { teamId: "s7", playerName: "Juan", minute: 11, penalty: true },
+      { teamId: "s7", playerName: "André Henrique", minute: 54 },
+      { teamId: "s7", playerName: "André Henrique", minute: 59 },
+      { teamId: "s7", playerName: "André Henrique", minute: 75, penalty: true },
+    ],
+    asOf: "2026-10-12",
+    source: "Habertürk / Hürriyet / NTVSpor / ensonhaber",
+  },
 };

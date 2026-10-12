@@ -67,38 +67,48 @@
 //    kaynaktan (7 Eylül 2026, 4. Hafta sonrası) alınmıştır.
 
 export const TEAM_DOMESTIC_FORM = {
+  // 2026-10-12 TAZELEMESİ: 28 kulübün position/played/w/d/l/pts değerleri ESPN
+  // (espn.com/soccer/standings) ve Sky Sports puan durumu tablolarından 12 Ekim
+  // 2026 itibarıyla güncellendi. Maç maç sıra doğrulanamadığı için "form" dizileri
+  // KORUNDU ve "formAsOf" alanı formun gerçek tarihini gösterir (UI bunu ayrıca
+  // belirtir). İstisna: tüm maçlarını kazanan Barcelona (8/8), Man City (6/6) ve
+  // Porto (8/8) -- son 5 maçı kesin "W". Satır sonu yorumları eski tarihli
+  // maç notlarıdır. Shakhtar, Slavia, Slovan, Sabah ve Norveç kulüpleri
+  // güncel/güvenilir tablo bulunamadığı için DEĞİŞTİRİLMEDİ (ESPN Norveç
+  // tablosunda Viking ve Bodø/Glimt satırları birebir aynı göründüğünden
+  // hatalı kabul edildi).
   // ---- La Liga (İspanya) -- ESPN + Wikipedia + Sky Sports, 4. hafta sonrası, 8 Eylül 2026'da tazelendi ----
-  t1: { league: "La Liga", country: "İspanya", position: 3, played: 4, w: 3, d: 0, l: 1, pts: 9, form: ["W", "W", "W", "L"], asOf: "2026-09-08" }, // Real Madrid (4. hafta Real Betis'e deplasmanda 0-1 kaybetti; pozisyon Sky Sports/Wikipedia ile 8 Eylül'de çapraz doğrulandı -- 3. sıra, 2 değil)
-  t7: { league: "La Liga", country: "İspanya", position: 1, played: 4, w: 4, d: 0, l: 0, pts: 12, form: ["W", "W", "W", "W"], asOf: "2026-09-08" }, // Barcelona (önceki satır 3. haftada donmuştu; 4. hafta -- 6 Eylül, Valencia'yı deplasmanda 5-0 yendi -- Wikipedia/Sky Sports ile 8 Eylül'de doğrulanıp güncellendi, 5/5 galibiyet değil 4/4)
-  t10: { league: "La Liga", country: "İspanya", position: 6, played: 4, w: 2, d: 1, l: 1, pts: 7, form: ["W", "W", "D", "L"], asOf: "2026-09-08" }, // Atletico Madrid (4. hafta Athletic Bilbao'ya deplasmanda 0-3 kaybetti -- ESPN; pozisyon Sky Sports ile 8 Eylül'de çapraz doğrulandı -- 6. sıra, 7 değil)
-  t14: { league: "La Liga", country: "İspanya", position: 17, played: 4, w: 0, d: 2, l: 2, pts: 2, form: ["D", "D", "L", "L"], asOf: "2026-09-08" }, // Villarreal (4. hafta evinde RC Deportivo'ya 2-3 kaybetti -- lagrada.org; pozisyon artık Sky Sports ile 8 Eylül'de doğrulandı -- 17. sıra, önceki tahmini 15. değil)
-  t19: { league: "La Liga", country: "İspanya", position: 4, played: 4, w: 3, d: 0, l: 1, pts: 9, form: ["W", "W", "L", "W"], asOf: "2026-09-08" }, // Real Betis (4. hafta Real Madrid'i evinde 1-0 yendi -- lagrada.org; pozisyon Sky Sports ile 8 Eylül'de çapraz doğrulandı -- 4. sıra, 3 değil)
+  t1: { league: "La Liga", country: "İspanya", position: 4, played: 8, w: 6, d: 0, l: 2, pts: 18, form: ["W", "W", "W", "L"], formAsOf: "2026-09-08", asOf: "2026-10-12" }, // Real Madrid (4. hafta Real Betis'e deplasmanda 0-1 kaybetti; pozisyon Sky Sports/Wikipedia ile 8 Eylül'de çapraz doğrulandı -- 3. sıra, 2 değil)
+  t7: { league: "La Liga", country: "İspanya", position: 1, played: 8, w: 8, d: 0, l: 0, pts: 24, form: ["W", "W", "W", "W", "W"], asOf: "2026-10-12" }, // Barcelona (önceki satır 3. haftada donmuştu; 4. hafta -- 6 Eylül, Valencia'yı deplasmanda 5-0 yendi -- Wikipedia/Sky Sports ile 8 Eylül'de doğrulanıp güncellendi, 5/5 galibiyet değil 4/4)
+  t10: { league: "La Liga", country: "İspanya", position: 2, played: 8, w: 6, d: 1, l: 1, pts: 19, form: ["W", "W", "D", "L"], formAsOf: "2026-09-08", asOf: "2026-10-12" }, // Atletico Madrid (4. hafta Athletic Bilbao'ya deplasmanda 0-3 kaybetti -- ESPN; pozisyon Sky Sports ile 8 Eylül'de çapraz doğrulandı -- 6. sıra, 7 değil)
+  t14: { league: "La Liga", country: "İspanya", position: 11, played: 8, w: 2, d: 2, l: 4, pts: 8, form: ["D", "D", "L", "L"], formAsOf: "2026-09-08", asOf: "2026-10-12" }, // Villarreal (4. hafta evinde RC Deportivo'ya 2-3 kaybetti -- lagrada.org; pozisyon artık Sky Sports ile 8 Eylül'de doğrulandı -- 17. sıra, önceki tahmini 15. değil)
+  t19: { league: "La Liga", country: "İspanya", position: 3, played: 8, w: 6, d: 1, l: 1, pts: 19, form: ["W", "W", "L", "W"], formAsOf: "2026-09-08", asOf: "2026-10-12" }, // Real Betis (4. hafta Real Madrid'i evinde 1-0 yendi -- lagrada.org; pozisyon Sky Sports ile 8 Eylül'de çapraz doğrulandı -- 4. sıra, 3 değil)
 
   // ---- Premier Lig (İngiltere) -- Sky Sports + Wikipedia + ESPN, 3. hafta sonrası, 8 Eylül 2026'da tazelendi (4. hafta 12 Eylül'de başlıyor) ----
-  t2: { league: "Premier Lig", country: "İngiltere", position: 1, played: 3, w: 3, d: 0, l: 0, pts: 9, form: ["W", "W", "W"], asOf: "2026-09-08" }, // Manchester City (3. haftada da kazanarak 3/3 yaptı)
-  t5: { league: "Premier Lig", country: "İngiltere", position: 6, played: 3, w: 1, d: 2, l: 0, pts: 5, form: ["D", "D", "W"], asOf: "2026-09-08" }, // Liverpool (3. hafta galibiyetle puanını 5'e çıkardı -- ESPN)
+  t2: { league: "Premier Lig", country: "İngiltere", position: 1, played: 6, w: 6, d: 0, l: 0, pts: 18, form: ["W", "W", "W", "W", "W"], asOf: "2026-10-12" }, // Manchester City (3. haftada da kazanarak 3/3 yaptı)
+  t5: { league: "Premier Lig", country: "İngiltere", position: 9, played: 6, w: 2, d: 3, l: 1, pts: 9, form: ["D", "D", "W"], formAsOf: "2026-09-08", asOf: "2026-10-12" }, // Liverpool (3. hafta galibiyetle puanını 5'e çıkardı -- ESPN)
   // Manchester United 3. haftayı (30 Ağustos, Ipswich Town deplasmanı) o sırada oynamamıştı; artık oynadığı doğrulandı: 5-2 kazandı, ardından 6 Eylül'de Everton'a evinde 2-2 berabere kaldı (ESPN maç kayıtları) -- played/pts/form 8 Eylül'de güncellendi.
-  t8: { league: "Premier Lig", country: "İngiltere", position: 11, played: 3, w: 1, d: 1, l: 1, pts: 4, form: ["L", "W", "D"], asOf: "2026-09-08" }, // Manchester United
+  t8: { league: "Premier Lig", country: "İngiltere", position: 13, played: 6, w: 1, d: 3, l: 2, pts: 6, form: ["L", "W", "D"], formAsOf: "2026-09-08", asOf: "2026-10-12" }, // Manchester United
   // Arsenal 3. haftayı (6 Eylül, Chelsea'yi evinde 2-1 yendiği) artık doğrulandı -- played/pts/form 8 Eylül'de güncellendi (Sky Sports).
-  t11: { league: "Premier Lig", country: "İngiltere", position: 2, played: 3, w: 3, d: 0, l: 0, pts: 9, form: ["W", "W", "W"], asOf: "2026-09-08" }, // Arsenal
-  t20: { league: "Premier Lig", country: "İngiltere", position: 17, played: 3, w: 0, d: 1, l: 2, pts: 1, form: ["L", "L", "D"], asOf: "2026-09-08" }, // Aston Villa (3. hafta Hull City ile deplasmanda 0-0 berabere kaldı)
+  t11: { league: "Premier Lig", country: "İngiltere", position: 2, played: 6, w: 5, d: 0, l: 1, pts: 15, form: ["W", "W", "W"], formAsOf: "2026-09-08", asOf: "2026-10-12" }, // Arsenal
+  t20: { league: "Premier Lig", country: "İngiltere", position: 15, played: 6, w: 1, d: 2, l: 3, pts: 5, form: ["L", "L", "D"], formAsOf: "2026-09-08", asOf: "2026-10-12" }, // Aston Villa (3. hafta Hull City ile deplasmanda 0-0 berabere kaldı)
 
   // ---- Bundesliga (Almanya) -- Sky Sports + resmi kulüp siteleri (rbleipzig.com), 2. hafta sonrası (4-5 Eylül'de oynandı), 8 Eylül 2026'da tazelendi ----
-  t3: { league: "Bundesliga", country: "Almanya", position: 6, played: 2, w: 1, d: 1, l: 0, pts: 4, form: ["W", "D"], asOf: "2026-09-08" }, // Bayern Münih (Stuttgart'ı 5-1 yendi, 2. hafta Schalke ile deplasmanda 0-0 berabere kaldı; pozisyon Sky Sports ile 8 Eylül'de çapraz doğrulandı -- 6. sıra, 4 değil)
-  t12: { league: "Bundesliga", country: "Almanya", position: 3, played: 2, w: 2, d: 0, l: 0, pts: 6, form: ["W", "W"], asOf: "2026-09-08" }, // Borussia Dortmund (2. hafta Hoffenheim'ı 3-2 yendi; pozisyon Sky Sports ile 8 Eylül'de çapraz doğrulandı -- 3. sıra, 2 değil)
-  t15: { league: "Bundesliga", country: "Almanya", position: 8, played: 2, w: 1, d: 0, l: 1, pts: 3, form: ["W", "L"], asOf: "2026-09-08" }, // RB Leipzig (2. hafta Werder Bremen'e deplasmanda KAYBETTİ -- rbleipzig.com resmi maç raporu skoru 1-3 olarak doğruladı, önceki "1-2" notu YANLIŞTI; pozisyon Sky Sports ile 8 Eylül'de çapraz doğrulandı -- 8. sıra, 7 değil)
-  t21: { league: "Bundesliga", country: "Almanya", position: 9, played: 2, w: 1, d: 0, l: 1, pts: 3, form: ["L", "W"], asOf: "2026-09-08" }, // VfB Stuttgart (Bayern'e 1-5 kaybetti, 2. hafta Köln'ü 4-1 yendi; pozisyon Sky Sports ile 8 Eylül'de çapraz doğrulandı -- 9. sıra, 8 değil)
+  t3: { league: "Bundesliga", country: "Almanya", position: 3, played: 5, w: 3, d: 2, l: 0, pts: 11, form: ["W", "D"], formAsOf: "2026-09-08", asOf: "2026-10-12" }, // Bayern Münih (Stuttgart'ı 5-1 yendi, 2. hafta Schalke ile deplasmanda 0-0 berabere kaldı; pozisyon Sky Sports ile 8 Eylül'de çapraz doğrulandı -- 6. sıra, 4 değil)
+  t12: { league: "Bundesliga", country: "Almanya", position: 2, played: 5, w: 4, d: 1, l: 0, pts: 13, form: ["W", "W"], formAsOf: "2026-09-08", asOf: "2026-10-12" }, // Borussia Dortmund (2. hafta Hoffenheim'ı 3-2 yendi; pozisyon Sky Sports ile 8 Eylül'de çapraz doğrulandı -- 3. sıra, 2 değil)
+  t15: { league: "Bundesliga", country: "Almanya", position: 5, played: 5, w: 3, d: 0, l: 2, pts: 9, form: ["W", "L"], formAsOf: "2026-09-08", asOf: "2026-10-12" }, // RB Leipzig (2. hafta Werder Bremen'e deplasmanda KAYBETTİ -- rbleipzig.com resmi maç raporu skoru 1-3 olarak doğruladı, önceki "1-2" notu YANLIŞTI; pozisyon Sky Sports ile 8 Eylül'de çapraz doğrulandı -- 8. sıra, 7 değil)
+  t21: { league: "Bundesliga", country: "Almanya", position: 11, played: 5, w: 2, d: 0, l: 3, pts: 6, form: ["L", "W"], formAsOf: "2026-09-08", asOf: "2026-10-12" }, // VfB Stuttgart (Bayern'e 1-5 kaybetti, 2. hafta Köln'ü 4-1 yendi; pozisyon Sky Sports ile 8 Eylül'de çapraz doğrulandı -- 9. sıra, 8 değil)
 
   // ---- Serie A (İtalya) -- Sky Sports + ESPN + Wikipedia, 3. hafta sonrası, 8 Eylül 2026'da tazelendi ----
-  t6: { league: "Serie A", country: "İtalya", position: 2, played: 3, w: 3, d: 0, l: 0, pts: 9, form: ["W", "W", "W"], asOf: "2026-09-08" }, // Inter (Monza 4-1, + galibiyet, 3. hafta Napoli'yi 3-2 yendi)
-  t9: { league: "Serie A", country: "İtalya", position: 12, played: 3, w: 1, d: 0, l: 2, pts: 3, form: ["L", "W", "L"], asOf: "2026-09-08" }, // Napoli (Atalanta'ya 1-2 kaybetti, sonra 3-2 kazandı, 3. hafta Inter'e 2-3 kaybetti; pozisyon Sky Sports ile 8 Eylül'de çapraz doğrulandı -- 12. sıra, 10 değil)
-  t13: { league: "Serie A", country: "İtalya", position: 1, played: 3, w: 3, d: 0, l: 0, pts: 9, form: ["W", "W", "W"], asOf: "2026-09-08" }, // Roma (Fiorentina'yı 4-0, Lecce deplasmanında 4-0, 3. hafta Atalanta'yı 2-1 yendi)
-  t34: { league: "Serie A", country: "İtalya", position: 4, played: 3, w: 2, d: 1, l: 0, pts: 7, form: ["W", "D", "W"], asOf: "2026-09-08" }, // Como (Cagliari'yi 2-1, Udinese ile 1-1, 3. hafta Genoa'yı deplasmanda yendi; pozisyon Sky Sports ile 8 Eylül'de çapraz doğrulandı -- 4. sıra, 3 değil)
+  t6: { league: "Serie A", country: "İtalya", position: 1, played: 6, w: 5, d: 1, l: 0, pts: 16, form: ["W", "W", "W"], formAsOf: "2026-09-08", asOf: "2026-10-12" }, // Inter (Monza 4-1, + galibiyet, 3. hafta Napoli'yi 3-2 yendi)
+  t9: { league: "Serie A", country: "İtalya", position: 8, played: 6, w: 3, d: 1, l: 2, pts: 10, form: ["L", "W", "L"], formAsOf: "2026-09-08", asOf: "2026-10-12" }, // Napoli (Atalanta'ya 1-2 kaybetti, sonra 3-2 kazandı, 3. hafta Inter'e 2-3 kaybetti; pozisyon Sky Sports ile 8 Eylül'de çapraz doğrulandı -- 12. sıra, 10 değil)
+  t13: { league: "Serie A", country: "İtalya", position: 3, played: 6, w: 4, d: 2, l: 0, pts: 14, form: ["W", "W", "W"], formAsOf: "2026-09-08", asOf: "2026-10-12" }, // Roma (Fiorentina'yı 4-0, Lecce deplasmanında 4-0, 3. hafta Atalanta'yı 2-1 yendi)
+  t34: { league: "Serie A", country: "İtalya", position: 7, played: 6, w: 3, d: 2, l: 1, pts: 11, form: ["W", "D", "W"], formAsOf: "2026-09-08", asOf: "2026-10-12" }, // Como (Cagliari'yi 2-1, Udinese ile 1-1, 3. hafta Genoa'yı deplasmanda yendi; pozisyon Sky Sports ile 8 Eylül'de çapraz doğrulandı -- 4. sıra, 3 değil)
 
   // ---- Ligue 1 (Fransa) -- Sky Sports + ESPN + Wikipedia, 3. hafta sonrası, 8 Eylül 2026'da tazelendi ----
-  t4: { league: "Ligue 1", country: "Fransa", position: 13, played: 3, w: 0, d: 2, l: 1, pts: 2, form: ["D", "D", "L"], asOf: "2026-09-08" }, // Paris Saint-Germain (Nice 0-0, Brest 4-4, 3. hafta AS Monaco'ya evinde 1-2 kaybetti -- vavel.com; pozisyon Sky Sports ile 8 Eylül'de tekrar doğrulandı)
-  t22: { league: "Ligue 1", country: "Fransa", position: 11, played: 3, w: 1, d: 0, l: 2, pts: 3, form: ["W", "L", "L"], asOf: "2026-09-08" }, // RC Lens (Auxerre'i 5-2 yendi, sonra bir mağlubiyet, 3. hafta Lorient'e evinde 0-1 kaybetti; pozisyon Sky Sports ile 8 Eylül'de çapraz doğrulandı -- 11. sıra, 10 değil)
-  t26: { league: "Ligue 1", country: "Fransa", position: 4, played: 3, w: 2, d: 1, l: 0, pts: 7, form: ["D", "W", "W"], asOf: "2026-09-08" }, // Lille (Brest ile 2-2, Lyon'u 4-2, 3. hafta Toulouse'u deplasmanda 1-0 yendi; pozisyon Sky Sports ile 8 Eylül'de çapraz doğrulandı -- 4. sıra, 3 değil)
+  t4: { league: "Ligue 1", country: "Fransa", position: 6, played: 6, w: 3, d: 2, l: 1, pts: 11, form: ["D", "D", "L"], formAsOf: "2026-09-08", asOf: "2026-10-12" }, // Paris Saint-Germain (Nice 0-0, Brest 4-4, 3. hafta AS Monaco'ya evinde 1-2 kaybetti -- vavel.com; pozisyon Sky Sports ile 8 Eylül'de tekrar doğrulandı)
+  t22: { league: "Ligue 1", country: "Fransa", position: 10, played: 6, w: 2, d: 1, l: 3, pts: 7, form: ["W", "L", "L"], formAsOf: "2026-09-08", asOf: "2026-10-12" }, // RC Lens (Auxerre'i 5-2 yendi, sonra bir mağlubiyet, 3. hafta Lorient'e evinde 0-1 kaybetti; pozisyon Sky Sports ile 8 Eylül'de çapraz doğrulandı -- 11. sıra, 10 değil)
+  t26: { league: "Ligue 1", country: "Fransa", position: 2, played: 6, w: 4, d: 1, l: 1, pts: 13, form: ["D", "W", "W"], formAsOf: "2026-09-08", asOf: "2026-10-12" }, // Lille (Brest ile 2-2, Lyon'u 4-2, 3. hafta Toulouse'u deplasmanda 1-0 yendi; pozisyon Sky Sports ile 8 Eylül'de çapraz doğrulandı -- 4. sıra, 3 değil)
 
   // ---- Süper Lig (Türkiye) -- src/data/liveStatus.js SUPER_LIG_LIVE_STANDINGS/RESULTS ile birebir aynı kaynak, 4. hafta sonrası, 7 Eylül 2026 (bu satır liveStatus.js her tazelendiğinde buradan da senkron edilmeli; aksi halde TeamProfilePage.jsx'te "Süper Lig Formu" ile "Son 5 maç" blokları farklı/çelişkili görünür) ----
   // 2026-10-12: liveStatus.js'teki 7. hafta (11 Ekim) sonrası tabloyla senkronlandı; form = son 5 maç.
@@ -110,24 +120,24 @@ export const TEAM_DOMESTIC_FORM = {
   // kalan 2 galibiyetin sırası kaynaklarda net değil ama toplam sayılar puan
   // durumuyla birebir tutarlı. 5. hafta Rio Ave'yi deplasmanda 4-0 yendiği (5 Eylül)
   // ayrıca doğrulandı.
-  t23: { league: "Liga Portugal", country: "Portekiz", position: 2, played: 5, w: 4, d: 1, l: 0, pts: 13, form: ["D", "W", "W", "W", "W"], asOf: "2026-09-05" }, // Sporting CP
-  t28: { league: "Liga Portugal", country: "Portekiz", position: 1, played: 5, w: 5, d: 0, l: 0, pts: 15, form: ["W", "W", "W", "W", "W"], asOf: "2026-09-05" }, // FC Porto (5. hafta Moreirense'yi evinde 2-1 yendi, 5/5 galibiyet)
+  t23: { league: "Liga Portugal", country: "Portekiz", position: 3, played: 8, w: 5, d: 3, l: 0, pts: 18, form: ["D", "W", "W", "W", "W"], formAsOf: "2026-09-05", asOf: "2026-10-12" }, // Sporting CP
+  t28: { league: "Liga Portugal", country: "Portekiz", position: 1, played: 8, w: 8, d: 0, l: 0, pts: 24, form: ["W", "W", "W", "W", "W"], asOf: "2026-10-12" }, // FC Porto (5. hafta Moreirense'yi evinde 2-1 yendi, 5/5 galibiyet)
 
   // ---- Eredivisie (Hollanda) -- ESPN, 5. hafta sonrası, 5 Eylül 2026 ----
   // Feyenoord: 4.hf (30 Ağu) ADO Den Haag ile 2-2 berabere kaldığı doğrulandı; kalan
   // 3 maçın 2G-1B olduğu toplam puan durumuyla tutarlı, tam sıra kesin değil.
   // 5. hafta (5 Eylül) NEC Nijmegen'i deplasmanda 3-1 yendiği ayrıca doğrulandı (nltimes.nl).
-  t16: { league: "Eredivisie", country: "Hollanda", position: 3, played: 5, w: 3, d: 2, l: 0, pts: 11, form: ["W", "W", "D", "D", "W"], asOf: "2026-09-05" }, // Feyenoord
+  t16: { league: "Eredivisie", country: "Hollanda", position: 1, played: 8, w: 6, d: 2, l: 0, pts: 20, form: ["W", "W", "D", "D", "W"], formAsOf: "2026-09-05", asOf: "2026-10-12" }, // Feyenoord
   // PSV: 1.hf (8 Ağu) Fortuna Sittard ile 2-2, 4.hf (30 Ağu) FC Utrecht'i 6-1 yendiği
   // doğrulandı; kalan 2 maçın galibiyet olduğu toplam puan durumuyla tutarlı.
   // 5. hafta (5 Eylül) Ajax'ı deplasmanda 3-1 yendiği ayrıca doğrulandı (ESPN/FOX Sports).
-  t24: { league: "Eredivisie", country: "Hollanda", position: 1, played: 5, w: 4, d: 1, l: 0, pts: 13, form: ["D", "W", "W", "W", "W"], asOf: "2026-09-05" }, // PSV Eindhoven
+  t24: { league: "Eredivisie", country: "Hollanda", position: 2, played: 8, w: 6, d: 1, l: 1, pts: 19, form: ["D", "W", "W", "W", "W"], formAsOf: "2026-09-05", asOf: "2026-10-12" }, // PSV Eindhoven
 
   // ---- Jupiler Pro League (Belçika) -- ESPN, 5. hafta sonrası, 5 Eylül 2026 ----
   // Club Brugge: sezon açılışı (7 Ağu) Kortrijk'i 3-0, sonra OH Leuven'i 3-0, KAA
   // Gent'e 1-2 kaybettiği, 23 Ağustos'ta Cercle Brugge'ü 1-0 yendiği doğrulandı --
   // 5. hafta (4 Eylül) Lommel'i deplasmanda 0-1 yendiği ayrıca doğrulandı (ESPN/Sports Mole).
-  t17: { league: "Jupiler Pro League", country: "Belçika", position: 3, played: 5, w: 4, d: 0, l: 1, pts: 12, form: ["W", "W", "L", "W", "W"], asOf: "2026-09-08" }, // Club Brugge (pozisyon ESPN/AiScore ile 8 Eylül'de çapraz doğrulandı -- 3. sıra, 2 değil; Lommel maçının 0-1 skoru da ESPN maç sayfasından ayrıca teyitli)
+  t17: { league: "Jupiler Pro League", country: "Belçika", position: 2, played: 8, w: 7, d: 0, l: 1, pts: 21, form: ["W", "W", "L", "W", "W"], formAsOf: "2026-09-08", asOf: "2026-10-12" }, // Club Brugge (pozisyon ESPN/AiScore ile 8 Eylül'de çapraz doğrulandı -- 3. sıra, 2 değil; Lommel maçının 0-1 skoru da ESPN maç sayfasından ayrıca teyitli)
 
   // ---- Ukrayna Premier Ligi -- Wikipedia "2026-27 Ukrainian Premier League", 5. hafta sonrası, 5 Eylül 2026 ----
   // Sonuç dizisi (5-1 Kudrivka, 2-1 Karpaty, 3-0 Epitsentr, 2-0 Obolon, 0-1 deplasmanda
@@ -166,8 +176,8 @@ export const TEAM_DOMESTIC_FORM = {
   // NOT: 5-6 Eylül 2026 için doğrulanabilir yeni bir maç/tablo değişikliği bulunamadığı
   // (ESPN'in en güncel tablosu da hâlâ aynı 5/5 galibiyet durumunu gösteriyor) için bu
   // satır GÜNCELLENMEDİ, olduğu gibi bırakıldı.
-  t33: { league: "Avusturya Bundesligası", country: "Avusturya", position: 1, played: 5, w: 5, d: 0, l: 0, pts: 15, form: ["W", "W", "W", "W", "W"], asOf: "2026-08-31" }, // LASK
+  t33: { league: "Avusturya Bundesligası", country: "Avusturya", position: 3, played: 8, w: 5, d: 1, l: 2, pts: 16, form: ["W", "W", "W", "W", "W"], formAsOf: "2026-08-31", asOf: "2026-10-12" }, // LASK
 
   // ---- Yunanistan Süper Ligi -- ESPN, 3. hafta sonrası, 8 Eylül 2026'da tazelendi ----
-  t27: { league: "Yunanistan Süper Ligi", country: "Yunanistan", position: 2, played: 3, w: 2, d: 1, l: 0, pts: 7, form: ["W", "D", "W"], asOf: "2026-09-08" }, // AEK Athens (3. hafta Aris Selanik'i evinde 5-0 yendi; pozisyon 8 Eylül'de çapraz doğrulandı -- Panetolikos 9 puanla lider, AEK 2. sırada, 1. değil)
+  t27: { league: "Yunanistan Süper Ligi", country: "Yunanistan", position: 2, played: 6, w: 4, d: 2, l: 0, pts: 14, form: ["W", "D", "W"], formAsOf: "2026-09-08", asOf: "2026-10-12" }, // AEK Athens (3. hafta Aris Selanik'i evinde 5-0 yendi; pozisyon 8 Eylül'de çapraz doğrulandı -- Panetolikos 9 puanla lider, AEK 2. sırada, 1. değil)
 };

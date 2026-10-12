@@ -12,7 +12,7 @@
 // tablosuyla birebir aynıydı). 7. Hafta 9 Ekim 20.00'de başladı; açılış
 // maçı Galatasaray 3-1 Kasımpaşa aynı gece 23:30'da eklendi. Kalan 8 maç
 // (10-12 Ekim) oynandıkça buraya eklenmeli.
-export const SUPER_LIG_LIVE_ASOF = "11 Ekim 2026, 21:50 (7. Hafta: 8/9 maç oynandı, Eyüpspor-Göztepe 12 Ekim'de)";
+export const SUPER_LIG_LIVE_ASOF = "12 Ekim 2026, 23:50 (7. Hafta TAMAMLANDI: 9/9 maç oynandı)";
 
 // Türkçe Vikipedi'nin "2026-27 Süper Lig" maddesinin ham wikitext'i (maç
 // sonuçları) + "Şablon:2026-27 Süper Lig puan durumu" (güncel puan durumu
@@ -134,10 +134,13 @@ export const SUPER_LIG_LIVE_STANDINGS = [
   { rank: 12, teamName: "Gaziantep FK", played: 7, w: 2, d: 2, l: 3, gf: 7, ga: 10, pts: 8 },
   { rank: 13, teamName: "Gençlerbirliği", played: 7, w: 2, d: 2, l: 3, gf: 7, ga: 15, pts: 8 },
   { rank: 14, teamName: "Erzurumspor FK", played: 7, w: 2, d: 2, l: 3, gf: 3, ga: 11, pts: 8 },
-  { rank: 15, teamName: "Konyaspor", played: 7, w: 1, d: 2, l: 4, gf: 4, ga: 8, pts: 5 },
-  { rank: 16, teamName: "Samsunspor", played: 7, w: 1, d: 1, l: 5, gf: 6, ga: 15, pts: 4 },
-  { rank: 17, teamName: "Göztepe", played: 6, w: 0, d: 3, l: 3, gf: 11, ga: 15, pts: 3 },
-  { rank: 18, teamName: "Eyüpspor", played: 6, w: 1, d: 0, l: 5, gf: 2, ga: 16, pts: 3 },
+  // 12 Ekim 2026: Eyüpspor 0-4 Göztepe ile 7. Hafta tamamlandı. Göztepe ilk
+  // galibiyetiyle 6 puana çıkıp 15. sıraya yükseldi, Eyüpspor 3 puanla son
+  // sırada (Habertürk / NTVSpor ile tutarlı).
+  { rank: 15, teamName: "Göztepe", played: 7, w: 1, d: 3, l: 3, gf: 15, ga: 15, pts: 6 },
+  { rank: 16, teamName: "Konyaspor", played: 7, w: 1, d: 2, l: 4, gf: 4, ga: 8, pts: 5 },
+  { rank: 17, teamName: "Samsunspor", played: 7, w: 1, d: 1, l: 5, gf: 6, ga: 15, pts: 4 },
+  { rank: 18, teamName: "Eyüpspor", played: 7, w: 1, d: 0, l: 6, gf: 2, ga: 20, pts: 3 },
 ];
 
 // 1., 2. ve 3. Hafta'nın TAMAMI (27 maç) — Türkçe Vikipedi'nin ham
@@ -250,6 +253,9 @@ export const SUPER_LIG_LIVE_RESULTS = [
   { label: "7. Hafta", date: "11 Eki", home: "Konyaspor", homeGoals: 0, away: "İstanbul Başakşehir", awayGoals: 0 },
   { label: "7. Hafta", date: "11 Eki", home: "Gaziantep FK", homeGoals: 0, away: "Çorum FK", awayGoals: 3 },
   { label: "7. Hafta", date: "11 Eki", home: "Beşiktaş", homeGoals: 2, away: "Kocaelispor", awayGoals: 1 },
+  // 12 Ekim 2026 23:50 tazelemesi -- 7. Hafta TAMAMLANDI (9/9). Eyüpspor
+  // 0-4 Göztepe: Habertürk, Hürriyet, Sabah, NTVSpor, Fanatik, ensonhaber.
+  { label: "7. Hafta", date: "12 Eki", home: "Eyüpspor", homeGoals: 0, away: "Göztepe", awayGoals: 4 },
 ];
 
 // Simüle edilmiş TAM fikstürü (roundRobinEngine'den gelen, gerçek dünyayla

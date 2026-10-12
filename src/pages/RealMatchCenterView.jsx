@@ -100,7 +100,7 @@ function TeamFormCard({ competitionKey, team }) {
             <span className="real-team-form-label">Son 5 maç</span>
             <FormBadges form={domestic.form} />
           </div>
-          {domestic.asOf && <span className="real-team-form-asof">Anlık görüntü: {domestic.asOf}</span>}
+          {domestic.asOf && <span className="real-team-form-asof">Anlık görüntü: {domestic.asOf}{domestic.formAsOf ? ` · Form verisi: ${domestic.formAsOf}` : ""}</span>}
         </>
       ) : (
         <p className="standings-empty">Bu takımın kendi ligindeki form verisi henüz eklenmedi.</p>
