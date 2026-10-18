@@ -410,4 +410,53 @@ export const SUPER_LIG_MATCH_STATS = {
     asOf: "2026-10-12",
     source: "Habertürk / Hürriyet / NTVSpor / ensonhaber",
   },
+  // ---- 8. Hafta (16-17 Ekim 2026) -- sadece golcüler. Gençlerbirliği-Galatasaray'da
+  // iki haber golü İrfan Can Eğribayat'ın kendi kalesine yazdı; Hürriyet ve
+  // kaynakların çoğu sekerek giren şutu Deniz Gül'e yazıyor, o esas alındı.
+  sr8m5: {
+    // Çorum FK 2-1 Çaykur Rizespor
+    scorers: [
+      { teamId: "s12", playerName: "Qazim Laçi", minute: 32 },
+      { teamId: "s13", playerName: "Cengiz Ünder", minute: 38 },
+      { teamId: "s13", playerName: "Youssoufa Moukoko", minute: 80 },
+    ],
+    asOf: "2026-10-17",
+    source: "Hürriyet / Ajansspor / Fanatik / Star",
+  },
+  sr8m8: {
+    // Erzurumspor FK 2-0 Eyüpspor
+    scorers: [
+      { teamId: "s14", playerName: "Miguel Cardoso", minute: 19 },
+      { teamId: "s14", playerName: "Eren Tozlu", minute: 47 },
+    ],
+    asOf: "2026-10-17",
+    source: "Habertürk / GZT / Takvim / Fanatik",
+  },
+  sr8m4: {
+    // Gençlerbirliği 0-1 Galatasaray
+    scorers: [
+      { teamId: "s1", playerName: "Deniz Gül", minute: 88 },
+    ],
+    asOf: "2026-10-17",
+    source: "Hürriyet / Habertürk / Star / gazetemerhaba",
+  },
+  sr8m3: {
+    // Amed SFK 1-0 Konyaspor
+    scorers: [
+      { teamId: "s11", playerName: "Mbaye Diagne", minute: 86 },
+    ],
+    asOf: "2026-10-17",
+    source: "Hürriyet / Habertürk / Sporx",
+  },
+  sr8m6: {
+    // Fenerbahçe 3-0 Alanyaspor (17 Ekim 2026) -- sadece golcüler. İrfan Can Kahveci'nin
+    // iki golü VAR ile iptal edildi, Greenwood 18'de penaltı kaçırdı (Fanatik).
+    scorers: [
+      { teamId: "s2", playerName: "Romelu Lukaku", minute: 40 },
+      { teamId: "s2", playerName: "Kerem Aktürkoğlu", minute: 71 },
+      { teamId: "s2", playerName: "Vedat Muriqi", minute: 87 },
+    ],
+    asOf: "2026-10-18",
+    source: "Fanatik / Karar / Takvim / Yeni Şafak",
+  },
 };

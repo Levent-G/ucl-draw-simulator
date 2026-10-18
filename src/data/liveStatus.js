@@ -12,7 +12,7 @@
 // tablosuyla birebir aynıydı). 7. Hafta 9 Ekim 20.00'de başladı; açılış
 // maçı Galatasaray 3-1 Kasımpaşa aynı gece 23:30'da eklendi. Kalan 8 maç
 // (10-12 Ekim) oynandıkça buraya eklenmeli.
-export const SUPER_LIG_LIVE_ASOF = "12 Ekim 2026, 23:50 (7. Hafta TAMAMLANDI: 9/9 maç oynandı)";
+export const SUPER_LIG_LIVE_ASOF = "18 Ekim 2026 (8. Hafta sürüyor: 5/9 maç oynandı)";
 
 // Türkçe Vikipedi'nin "2026-27 Süper Lig" maddesinin ham wikitext'i (maç
 // sonuçları) + "Şablon:2026-27 Süper Lig puan durumu" (güncel puan durumu
@@ -105,42 +105,27 @@ export const SUPER_LIG_LIVE_ASOF = "12 Ekim 2026, 23:50 (7. Hafta TAMAMLANDI: 9/
 // sütunları birbirine eşit=161, toplam puan=151 -- 54 maçlık bir sezonun bu
 // aşamasında matematiksel olarak beklenen değerler).
 export const SUPER_LIG_LIVE_STANDINGS = [
-  // 9 Ekim 2026: 7. Hafta açılış maçı Galatasaray 3-1 Kasımpaşa işlendi
-  // (Galatasaray 7 maçta 16 puanla maç fazlasıyla lider; Kasımpaşa'nın
-  // averajı +2'den 0'a düştüğü için +1 averajlı Çaykur Rizespor'un gerisine
-  // geçti). Hürriyet maç sonu "maç fazlasıyla liderliğe yükseldi (16 puan),
-  // Kasımpaşa 10 puanda kaldı" diye teyit ediyor.
-  // 10 Ekim 2026: 7. Hafta'nın 10 Ekim'de oynanan 4 maçı da işlendi
-  // (aşağıdaki SUPER_LIG_LIVE_RESULTS). Sıralama önce puan, sonra averaj,
-  // sonra atılan gol. Kaynak kontrolü: Alanyaspor 12 / Erzurumspor FK 8
-  // puan (Hürriyet), Trabzonspor 13 puan (Hürriyet/Fanatik) -- tutarlı.
-  // 11 Ekim 2026: Konyaspor 0-0 Başakşehir, Gaziantep FK 0-3 Çorum FK,
-  // Beşiktaş 2-1 Kocaelispor işlendi. Kaynak kontrolü: Habertürk "Konyaspor
-  // 5 puan 15. sırada, Başakşehir 8 puan 11. sırada"; Star "Çorum FK 10,
-  // Gaziantep FK 8 puan" -- tutarlı. Kocaelispor ile Alanyaspor puan (12),
-  // averaj (+2) ve atılan golde (8) eşit; aralarındaki sıra önceki tablodaki
-  // sırayı koruyor (TFF'nin ikili averaj kuralı burada uygulanmadı).
-  { rank: 1, teamName: "Galatasaray", played: 7, w: 5, d: 1, l: 1, gf: 16, ga: 11, pts: 16 },
-  { rank: 2, teamName: "Beşiktaş", played: 7, w: 5, d: 0, l: 2, gf: 16, ga: 8, pts: 15 },
-  { rank: 3, teamName: "Amed SFK", played: 7, w: 4, d: 2, l: 1, gf: 17, ga: 9, pts: 14 },
-  { rank: 4, teamName: "Fenerbahçe", played: 7, w: 4, d: 1, l: 2, gf: 19, ga: 6, pts: 13 },
+  // 18 Ekim 2026: 8. Hafta'nın ilk 5 maçı işlendi (kalan 4 maç 18-19 Ekim).
+  // Tablo SUPER_LIG_LIVE_RESULTS'tan yeniden hesaplandı: puan > averaj > atılan
+  // gol, eşitlikte önceki sıra korunur. Fenerbahçe 16 puan (Fanatik / Karar) -- tutarlı.
+  { rank: 1, teamName: "Galatasaray", played: 8, w: 6, d: 1, l: 1, gf: 17, ga: 11, pts: 19 },
+  { rank: 2, teamName: "Amed SFK", played: 8, w: 5, d: 2, l: 1, gf: 18, ga: 9, pts: 17 },
+  { rank: 3, teamName: "Fenerbahçe", played: 8, w: 5, d: 1, l: 2, gf: 22, ga: 6, pts: 16 },
+  { rank: 4, teamName: "Beşiktaş", played: 7, w: 5, d: 0, l: 2, gf: 16, ga: 8, pts: 15 },
   { rank: 5, teamName: "Trabzonspor", played: 7, w: 4, d: 1, l: 2, gf: 16, ga: 5, pts: 13 },
-  { rank: 6, teamName: "Kocaelispor", played: 7, w: 4, d: 0, l: 3, gf: 8, ga: 6, pts: 12 },
-  { rank: 7, teamName: "Alanyaspor", played: 7, w: 3, d: 3, l: 1, gf: 8, ga: 6, pts: 12 },
-  { rank: 8, teamName: "Çorum FK", played: 7, w: 3, d: 1, l: 3, gf: 16, ga: 12, pts: 10 },
-  { rank: 9, teamName: "Kasımpaşa", played: 7, w: 2, d: 4, l: 1, gf: 8, ga: 8, pts: 10 },
-  { rank: 10, teamName: "Çaykur Rizespor", played: 7, w: 3, d: 1, l: 3, gf: 7, ga: 9, pts: 10 },
-  { rank: 11, teamName: "İstanbul Başakşehir", played: 7, w: 2, d: 2, l: 3, gf: 10, ga: 11, pts: 8 },
-  { rank: 12, teamName: "Gaziantep FK", played: 7, w: 2, d: 2, l: 3, gf: 7, ga: 10, pts: 8 },
-  { rank: 13, teamName: "Gençlerbirliği", played: 7, w: 2, d: 2, l: 3, gf: 7, ga: 15, pts: 8 },
-  { rank: 14, teamName: "Erzurumspor FK", played: 7, w: 2, d: 2, l: 3, gf: 3, ga: 11, pts: 8 },
-  // 12 Ekim 2026: Eyüpspor 0-4 Göztepe ile 7. Hafta tamamlandı. Göztepe ilk
-  // galibiyetiyle 6 puana çıkıp 15. sıraya yükseldi, Eyüpspor 3 puanla son
-  // sırada (Habertürk / NTVSpor ile tutarlı).
+  { rank: 6, teamName: "Çorum FK", played: 8, w: 4, d: 1, l: 3, gf: 18, ga: 13, pts: 13 },
+  { rank: 7, teamName: "Kocaelispor", played: 7, w: 4, d: 0, l: 3, gf: 8, ga: 6, pts: 12 },
+  { rank: 8, teamName: "Alanyaspor", played: 8, w: 3, d: 3, l: 2, gf: 8, ga: 9, pts: 12 },
+  { rank: 9, teamName: "Erzurumspor FK", played: 8, w: 3, d: 2, l: 3, gf: 5, ga: 11, pts: 11 },
+  { rank: 10, teamName: "Kasımpaşa", played: 7, w: 2, d: 4, l: 1, gf: 8, ga: 8, pts: 10 },
+  { rank: 11, teamName: "Çaykur Rizespor", played: 8, w: 3, d: 1, l: 4, gf: 8, ga: 11, pts: 10 },
+  { rank: 12, teamName: "İstanbul Başakşehir", played: 7, w: 2, d: 2, l: 3, gf: 10, ga: 11, pts: 8 },
+  { rank: 13, teamName: "Gaziantep FK", played: 7, w: 2, d: 2, l: 3, gf: 7, ga: 10, pts: 8 },
+  { rank: 14, teamName: "Gençlerbirliği", played: 8, w: 2, d: 2, l: 4, gf: 7, ga: 16, pts: 8 },
   { rank: 15, teamName: "Göztepe", played: 7, w: 1, d: 3, l: 3, gf: 15, ga: 15, pts: 6 },
-  { rank: 16, teamName: "Konyaspor", played: 7, w: 1, d: 2, l: 4, gf: 4, ga: 8, pts: 5 },
+  { rank: 16, teamName: "Konyaspor", played: 8, w: 1, d: 2, l: 5, gf: 4, ga: 9, pts: 5 },
   { rank: 17, teamName: "Samsunspor", played: 7, w: 1, d: 1, l: 5, gf: 6, ga: 15, pts: 4 },
-  { rank: 18, teamName: "Eyüpspor", played: 7, w: 1, d: 0, l: 6, gf: 2, ga: 20, pts: 3 },
+  { rank: 18, teamName: "Eyüpspor", played: 8, w: 1, d: 0, l: 7, gf: 2, ga: 22, pts: 3 },
 ];
 
 // 1., 2. ve 3. Hafta'nın TAMAMI (27 maç) — Türkçe Vikipedi'nin ham
@@ -256,6 +241,18 @@ export const SUPER_LIG_LIVE_RESULTS = [
   // 12 Ekim 2026 23:50 tazelemesi -- 7. Hafta TAMAMLANDI (9/9). Eyüpspor
   // 0-4 Göztepe: Habertürk, Hürriyet, Sabah, NTVSpor, Fanatik, ensonhaber.
   { label: "7. Hafta", date: "12 Eki", home: "Eyüpspor", homeGoals: 0, away: "Göztepe", awayGoals: 4 },
+  // 8. Hafta (16-19 Ekim 2026) -- 17 Ekim tazelemesi. Her maç en az 2 bağımsız
+  // kaynakla: Çorum FK 2-1 Rizespor (Hürriyet, Ajansspor, Fanatik, Star),
+  // Erzurumspor FK 2-0 Eyüpspor (Habertürk, GZT, Takvim, Fanatik), Gençlerbirliği
+  // 0-1 Galatasaray (Hürriyet, Habertürk, Star), Amed SFK 1-0 Konyaspor
+  // (Hürriyet, Habertürk, Sporx). Fenerbahçe-Alanyaspor tazeleme anında oynanıyordu.
+  { label: "8. Hafta", date: "16 Eki", home: "Çorum FK", homeGoals: 2, away: "Çaykur Rizespor", awayGoals: 1 },
+  { label: "8. Hafta", date: "17 Eki", home: "Erzurumspor FK", homeGoals: 2, away: "Eyüpspor", awayGoals: 0 },
+  { label: "8. Hafta", date: "17 Eki", home: "Gençlerbirliği", homeGoals: 0, away: "Galatasaray", awayGoals: 1 },
+  { label: "8. Hafta", date: "17 Eki", home: "Amed SFK", homeGoals: 1, away: "Konyaspor", awayGoals: 0 },
+  // 18 Ekim tazelemesi: Fenerbahçe 3-0 Alanyaspor (17 Eki) -- Fanatik, Karar, Takvim,
+  // Yeni Şafak, Türkiye Gazetesi. Goller: Lukaku 40', Kerem Aktürkoğlu 71', Muriqi 87'.
+  { label: "8. Hafta", date: "17 Eki", home: "Fenerbahçe", homeGoals: 3, away: "Alanyaspor", awayGoals: 0 },
 ];
 
 // Simüle edilmiş TAM fikstürü (roundRobinEngine'den gelen, gerçek dünyayla

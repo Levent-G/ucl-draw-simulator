@@ -534,6 +534,94 @@ export const NEWS_ITEMS = [
     competitionKey: "ucl",
     relatedTeamIds: ["t7", "t35"],
   },
+  {
+    id: "news-ucl-47",
+    date: "2026-10-13",
+    title: "Galatasaray, Barcelona'ya 4-1 yenildi",
+    summary:
+      "Şampiyonlar Ligi 2. haftasında RAMS Park'ta Aleksey Batrakov'un 28. dakikadaki golüyle öne geçen Galatasaray, ilk yarı bitmeden João Cancelo'nun golüne engel olamadı. İkinci yarıda Fermín López (50'), Anthony Gordon (53') ve Karim Adeyemi (65') skoru 4-1'e taşıdı. Galatasaray lig fazında ikinci maçını da kaybetti.",
+    source: "ESPN / Fanatik / GZT",
+    url: "https://www.espn.com/soccer/match/_/gameId/401915435/barcelona-galatasaray",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t35", "t7"],
+  },
+  {
+    id: "news-ucl-48",
+    date: "2026-10-13",
+    title: "Club Brugge San Siro'da Inter'i 4-3 yendi",
+    summary:
+      "Nicolò Tresoldi'nin biri penaltıdan üç golü ve Romeo Vermant'ın 87. dakikadaki golüyle Club Brugge, Lautaro Martínez'in iki golüne rağmen Inter'i deplasmanda 4-3 mağlup etti. Inter'in üçüncü golünü uzatmada Ange-Yoan Bonny attı.",
+    source: "ESPN / thesportsencounter.com",
+    url: "https://thesportsencounter.com/2026/10/13/champions-league-october-13-2026-results-brugge-barcelona-arsenal/",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t6", "t17"],
+  },
+  {
+    id: "news-ucl-49",
+    date: "2026-10-13",
+    title: "Viking son dakikada Bayern'i durdurdu: 3-3",
+    summary:
+      "Gianni Stensness ve Peter Christiansen'in golleriyle 2-0 öne geçen Viking, Harry Kane'in (biri penaltı) iki golü ve Luis Díaz'ın golüyle geriye düştü; Herman Haugen 90. dakikada skoru 3-3'e getirdi.",
+    source: "ESPN / thesportsencounter.com",
+    url: "https://www.espn.com/soccer/scoreboard/_/league/uefa.champions/date/20261013",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t30", "t3"],
+  },
+  {
+    id: "news-ucl-50",
+    date: "2026-10-13",
+    title: "2. hafta ilk gün: Arsenal, Atlético ve Sporting kazandı",
+    summary:
+      "Arsenal, Timber, Eze ve Saka'nın golleriyle Lille'i 3-0 yendi. Atlético Madrid, Barrios ve Lookman'ın golleriyle Leny Yoro'nun kırmızı kart gördüğü Manchester United'ı 2-0 geçti. Sporting Lens deplasmanında 2-0, Villarreal Napoli karşısında 3-1, RB Leipzig PSV karşısında 1-0, Sabah da Slavia Prag karşısında 2-0 kazandı.",
+    source: "ESPN / UEFA.com / thesportsencounter.com",
+    url: "https://www.uefa.com/uefachampionsleague/news/02a8-2174c9e9019d-f909a77bd77a-1000--2026-27-champions-league-all-the-league-phase-fixtures-a/",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t11", "t26", "t10", "t8", "t22", "t23", "t14", "t9", "t15", "t24", "t31", "t29"],
+  },
+  {
+    id: "news-ucl-51",
+    date: "2026-10-14",
+    title: "Fenerbahçe, Villa Park'ta 6-0 yenildi",
+    summary:
+      "Şampiyonlar Ligi 2. haftasında Aston Villa, Manzambi (12'), Nicolas Jackson (31', 39'), Ross Barkley (68' penaltı, 72') ve Tammy Abraham'ın (90') golleriyle Fenerbahçe'yi 6-0 mağlup etti. Fenerbahçe lig fazında 1 puanda kaldı, Aston Villa 6 puana yükseldi.",
+    source: "ESPN / GZT / Fanatik / CNN Türk",
+    url: "https://www.gzt.com/spor/mac-sonucu-mac-ozeti-aston-villa-fenerbahce-maci-golleri-aston-villa-6-0-fenerbahce-uefa-sampiyonlar-ligi-4269662",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t20", "t25"],
+  },
+  {
+    id: "news-ucl-52",
+    date: "2026-10-14",
+    title: "PSG, Etihad'da Manchester City'yi 4-2 yendi",
+    summary:
+      "Doué, Dembélé ve Vitinha'nın golleriyle ilk yarıda 3-0 öne geçen Paris Saint-Germain, Haaland'ın iki golüne rağmen Akliouche'nin golüyle Manchester City'yi deplasmanda 4-2 mağlup etti.",
+    source: "ESPN / thesportsencounter.com",
+    url: "https://www.espn.com/soccer/report/_/gameId/401915407",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t2", "t4"],
+  },
+  {
+    id: "news-ucl-53",
+    date: "2026-10-14",
+    title: "Real Madrid, Roma'da 3-1 geriden gelip 4-3 kazandı",
+    summary:
+      "Roma, de Roon ve Malen'in iki golüyle 3-1 öne geçti. Real Madrid son bölümde Carlos Espí (83'), Endrick (85') ve Antonio Rüdiger'in (90') golleriyle maçı 4-3 kazandı.",
+    source: "ESPN / thesportsencounter.com",
+    url: "https://www.espn.com/soccer/report/_/gameId/401915414",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t13", "t1"],
+  },
+  {
+    id: "news-ucl-54",
+    date: "2026-10-14",
+    title: "2. hafta tamamlandı: Barcola'dan hat-trick, Bodø/Glimt'ten Dortmund sürprizi",
+    summary:
+      "Liverpool, Bradley Barcola'nın hat-trick'iyle LASK'ı deplasmanda 6-3 yendi. Bodø/Glimt, Sjøvold'ün golüyle Borussia Dortmund'u 1-0 mağlup etti. Real Betis Porto'yu 3-2, Feyenoord Como'yu 3-2, Shakhtar AEK'yı 3-1, Stuttgart da Slovan Bratislava'yı deplasmanda 3-0 yendi.",
+    source: "ESPN / thesportsencounter.com / UEFA.com",
+    url: "https://thesportsencounter.com/2026/10/14/champions-league-results-october-14-2026-psg-madrid-villa/",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t5", "t33", "t36", "t12", "t19", "t28", "t16", "t34", "t18", "t27", "t32", "t21"],
+  },
 
   // ---- Trendyol Süper Lig 2026-27 ----
   {
@@ -1173,6 +1261,39 @@ export const NEWS_ITEMS = [
     url: "https://www.haberturk.com/spor/eyupspor-0-4-goztepe-mac-sonucu-ve-ozeti-trendyol-super-lig-3919213",
     competitionKey: "superlig",
     relatedTeamIds: ["s16", "s7"],
+  },
+  {
+    id: "news-sl-60",
+    date: "2026-10-17",
+    title: "Galatasaray, Gençlerbirliği deplasmanında 88'de güldü",
+    summary:
+      "Galatasaray, Eryaman Stadı'nda oynanan maçta 88. dakikada Deniz Gül'ün sekerek ağlara giden şutuyla Gençlerbirliği'ni 1-0 yendi ve 19 puanla liderliğini sürdürdü. Bazı kaynaklar golü kendi kalesine gol olarak yazdı.",
+    source: "Hürriyet / Habertürk / Star",
+    url: "https://www.hurriyet.com.tr/sporarena/genclerbirligi-0-1-galatasaray-super-lig-maci-ozeti-43344988",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s18", "s1"],
+  },
+  {
+    id: "news-sl-61",
+    date: "2026-10-17",
+    title: "8. hafta: Amed, Çorum ve Erzurumspor kazandı",
+    summary:
+      "Çorum FK, Laçi'nin golüyle geriye düştüğü maçta Cengiz Ünder ve Moukoko'nun golleriyle Çaykur Rizespor'u 2-1 yendi. Erzurumspor FK, Cardoso ve Eren Tozlu'nun golleriyle Eyüpspor'u 2-0 geçti; Eyüpspor 7. yenilgisini aldı. Amed SFK, Mbaye Diagne'nin 86. dakikadaki golüyle Konyaspor'u 1-0 yenip 17 puana yükseldi.",
+    source: "Hürriyet / Habertürk / Fanatik",
+    url: "https://www.hurriyet.com.tr/sporarena/amedspor-1-0-konyaspor-super-lig-maci-ozeti-43345071",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s13", "s12", "s14", "s16", "s11", "s9"],
+  },
+  {
+    id: "news-sl-62",
+    date: "2026-10-17",
+    title: "Fenerbahçe, derbi öncesi Alanyaspor'u 3-0 geçti",
+    summary:
+      "Aston Villa'daki 6-0'lık yenilginin ardından Fenerbahçe, Kadıköy'de Lukaku (40'), Kerem Aktürkoğlu (71') ve Vedat Muriqi'nin (87') golleriyle Alanyaspor'u 3-0 yendi. Greenwood 18'de penaltı kaçırdı, İrfan Can Kahveci'nin iki golü VAR ile iptal edildi. Fenerbahçe puanını 16'ya çıkardı.",
+    source: "Fanatik / Karar / Takvim",
+    url: "https://www.fanatik.com.tr/fenerbahce/live-ozet-fenerbahce-derbi-oncesi-hata-yapmadi-3-puani-3-golle-aldi-fenerbahce-alanyaspor-mac-sonucu-3-0-2641269",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s2", "s10"],
   },
 
   // ---- 2026-27 UCL lig fazı: dikkat çekici eşleşme önizlemeleri ----

@@ -45,4 +45,30 @@ export const REAL_RESULTS_UCL_2026 = [
   { matchId: "r1m15", homeGoals: 5, awayGoals: 0, date: "2026-09-10" }, // Bayern Münih 5-0 Bodø/Glimt
   { matchId: "r1m16", homeGoals: 4, awayGoals: 0, date: "2026-09-10" }, // Manchester United 4-0 Sabah
   { matchId: "r1m17", homeGoals: 2, awayGoals: 3, date: "2026-09-10" }, // SK Slavia Prague 2-3 RC Lens
+
+  // 2. Hafta -- 13 Ekim 2026'da oynanan 9 maç (ESPN skor tablosu + UEFA.com
+  // fikstür/sonuç listesi + thesportsencounter.com maç özetleri ile çapraz
+  // doğrulandı). 14 Ekim maçları (r2m9..r2m17) henüz oynanmadı.
+  { matchId: "r2m0", homeGoals: 0, awayGoals: 2, date: "2026-10-13" }, // RC Lens 0-2 Sporting CP
+  { matchId: "r2m1", homeGoals: 2, awayGoals: 0, date: "2026-10-13" }, // Sabah 2-0 SK Slavia Prague
+  { matchId: "r2m2", homeGoals: 3, awayGoals: 0, date: "2026-10-13" }, // Arsenal 3-0 Lille
+  { matchId: "r2m3", homeGoals: 2, awayGoals: 0, date: "2026-10-13" }, // Atletico Madrid 2-0 Manchester United
+  { matchId: "r2m4", homeGoals: 3, awayGoals: 4, date: "2026-10-13" }, // Inter 3-4 Club Brugge
+  { matchId: "r2m5", homeGoals: 1, awayGoals: 4, date: "2026-10-13" }, // Galatasaray 1-4 Barcelona
+  { matchId: "r2m6", homeGoals: 1, awayGoals: 0, date: "2026-10-13" }, // RB Leipzig 1-0 PSV Eindhoven
+  { matchId: "r2m7", homeGoals: 3, awayGoals: 3, date: "2026-10-13" }, // Viking 3-3 Bayern Münih
+  { matchId: "r2m8", homeGoals: 3, awayGoals: 1, date: "2026-10-13" }, // Villarreal 3-1 Napoli
+
+  // 2. Hafta -- 14 Ekim 2026'da oynanan 9 maç (ESPN skor tablosu + UEFA.com +
+  // thesportsencounter.com; Aston Villa-Fenerbahçe ayrıca GZT/Fanatik/CNN Türk).
+  // 2. Hafta TAMAMLANDI (18/18).
+  { matchId: "r2m9", homeGoals: 3, awayGoals: 2, date: "2026-10-14" }, // Feyenoord 3-2 Como
+  { matchId: "r2m10", homeGoals: 3, awayGoals: 6, date: "2026-10-14" }, // LASK 3-6 Liverpool
+  { matchId: "r2m11", homeGoals: 3, awayGoals: 4, date: "2026-10-14" }, // Roma 3-4 Real Madrid
+  { matchId: "r2m12", homeGoals: 6, awayGoals: 0, date: "2026-10-14" }, // Aston Villa 6-0 Fenerbahçe
+  { matchId: "r2m13", homeGoals: 3, awayGoals: 1, date: "2026-10-14" }, // Shakhtar Donetsk 3-1 AEK Athens
+  { matchId: "r2m14", homeGoals: 1, awayGoals: 0, date: "2026-10-14" }, // Bodø/Glimt 1-0 Borussia Dortmund
+  { matchId: "r2m15", homeGoals: 2, awayGoals: 4, date: "2026-10-14" }, // Manchester City 2-4 Paris Saint-Germain
+  { matchId: "r2m16", homeGoals: 3, awayGoals: 2, date: "2026-10-14" }, // Real Betis 3-2 FC Porto
+  { matchId: "r2m17", homeGoals: 0, awayGoals: 3, date: "2026-10-14" }, // Slovan Bratislava 0-3 VfB Stuttgart
 ];

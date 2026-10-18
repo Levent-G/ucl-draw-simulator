@@ -179,10 +179,10 @@ export const TOP_SCORERS = [
     playerName: "Erling Haaland",
     teamId: "t2", // Manchester City
     competitionKey: "ucl",
-    goals: 2,
-    matchesPlayed: 1,
-    asOf: "2026-09-09",
-    source: "Sky Sports / ESPN",
+    goals: 4, // UCL 2. hafta 2
+    matchesPlayed: 2,
+    asOf: "2026-10-17",
+    source: "Sky Sports / ESPN / ESPN (scoreboard) / thesportsencounter.com",
   },
   {
     playerName: "Serhou Guirassy",
@@ -206,10 +206,10 @@ export const TOP_SCORERS = [
     playerName: "Kylian Mbappé",
     teamId: "t1", // Real Madrid
     competitionKey: "ucl",
-    goals: 1,
-    matchesPlayed: 1,
-    asOf: "2026-09-09",
-    source: "ESPN / Al Jazeera",
+    goals: 2, // UCL 2. hafta 1
+    matchesPlayed: 2,
+    asOf: "2026-10-17",
+    source: "ESPN / Al Jazeera / ESPN (scoreboard) / thesportsencounter.com",
   },
   {
     playerName: "Federico Valverde",
@@ -269,10 +269,10 @@ export const TOP_SCORERS = [
     playerName: "Nicolas Jackson",
     teamId: "t20", // Aston Villa
     competitionKey: "ucl",
-    goals: 1,
-    matchesPlayed: 1,
-    asOf: "2026-09-09",
-    source: "Sky Sports",
+    goals: 3, // UCL 2. hafta 2
+    matchesPlayed: 2,
+    asOf: "2026-10-17",
+    source: "Sky Sports / ESPN (scoreboard) / thesportsencounter.com",
   },
   {
     playerName: "Hugo Vetlesen",
@@ -287,19 +287,19 @@ export const TOP_SCORERS = [
     playerName: "Nicolò Tresoldi",
     teamId: "t17", // Club Brugge
     competitionKey: "ucl",
-    goals: 1, // penaltıdan
-    matchesPlayed: 1,
-    asOf: "2026-09-09",
-    source: "Sky Sports",
+    goals: 4, // penaltıdan + 2. hafta 3 gol
+    matchesPlayed: 2,
+    asOf: "2026-10-14",
+    source: "Sky Sports / ESPN (scoreboard) / thesportsencounter.com",
   },
   {
     playerName: "Santiago Mouriño",
     teamId: "t14", // Villarreal
     competitionKey: "ucl",
-    goals: 1,
-    matchesPlayed: 1,
-    asOf: "2026-09-09",
-    source: "ESPN / Yahoo Sports",
+    goals: 2, // 2. hafta 1 gol
+    matchesPlayed: 2,
+    asOf: "2026-10-14",
+    source: "ESPN / Yahoo Sports / ESPN (scoreboard) / thesportsencounter.com",
   },
   {
     playerName: "Razvan Marin",
@@ -325,10 +325,10 @@ export const TOP_SCORERS = [
     playerName: "Karim Adeyemi",
     teamId: "t7", // Barcelona
     competitionKey: "ucl",
-    goals: 1, // 22'
-    matchesPlayed: 1,
-    asOf: "2026-09-10",
-    source: "ESPN / VAVEL",
+    goals: 2, // 22' + 2. hafta 1 gol
+    matchesPlayed: 2,
+    asOf: "2026-10-14",
+    source: "ESPN / VAVEL / ESPN (scoreboard) / thesportsencounter.com",
   },
   {
     playerName: "Lamine Yamal",
@@ -361,10 +361,10 @@ export const TOP_SCORERS = [
     playerName: "Ermedin Demirović",
     teamId: "t21", // VfB Stuttgart
     competitionKey: "ucl",
-    goals: 3, // ilk yarıda 12 dakika içinde hat-trick: 20', 26', 32'
-    matchesPlayed: 1,
-    asOf: "2026-09-10",
-    source: "ESPN / Bundesliga.com / Yahoo Sports",
+    goals: 4, // ilk yarıda 12 dakika içinde hat-trick: 20', 26', 32' + UCL 2. hafta 1
+    matchesPlayed: 2,
+    asOf: "2026-10-17",
+    source: "ESPN / Bundesliga.com / Yahoo Sports / ESPN (scoreboard) / thesportsencounter.com",
   },
   {
     playerName: "Zlatko Tripić",
@@ -406,10 +406,10 @@ export const TOP_SCORERS = [
     playerName: "Ousmane Dembélé",
     teamId: "t4", // Paris Saint-Germain
     competitionKey: "ucl",
-    goals: 2, // 16'-17' ve 23'
-    matchesPlayed: 1,
-    asOf: "2026-09-10",
-    source: "ESPN / VAVEL / Yahoo Sports",
+    goals: 3, // 16'-17' ve 23' + UCL 2. hafta 1
+    matchesPlayed: 2,
+    asOf: "2026-10-17",
+    source: "ESPN / VAVEL / Yahoo Sports / ESPN (scoreboard) / thesportsencounter.com",
   },
   {
     // Bkz. dosya başındaki not: kadro dosyasında (players.js, t4) Ferran
@@ -454,10 +454,10 @@ export const TOP_SCORERS = [
     playerName: "Luis Suárez",
     teamId: "t23", // Sporting CP
     competitionKey: "ucl",
-    goals: 1, // ~55'-57', penaltıdan
-    matchesPlayed: 1,
-    asOf: "2026-09-10",
-    source: "ESPN / WebSearch (whoscored.com / allfootball.com)",
+    goals: 2, // ~55'-57', penaltıdan + 2. hafta 1 gol
+    matchesPlayed: 2,
+    asOf: "2026-10-14",
+    source: "ESPN / WebSearch (whoscored.com / allfootball.com) / ESPN (scoreboard) / thesportsencounter.com",
   },
   {
     playerName: "Rodrigo Zalazar",
@@ -501,10 +501,10 @@ export const TOP_SCORERS = [
     playerName: "Gleiker Mendoza",
     teamId: "t18", // Shakhtar Donetsk
     competitionKey: "ucl",
-    goals: 1, // 45+1'
-    matchesPlayed: 1,
-    asOf: "2026-09-16",
-    source: "ESPN / Shakhtar.com (resmi)",
+    goals: 2, // 45+1' + UCL 2. hafta 1
+    matchesPlayed: 2,
+    asOf: "2026-10-17",
+    source: "ESPN / Shakhtar.com (resmi) / ESPN (scoreboard) / thesportsencounter.com",
   },
   {
     playerName: "Sergiño Dest",
@@ -531,20 +531,20 @@ export const TOP_SCORERS = [
     playerName: "Anastasios Douvikas",
     teamId: "t34", // Como
     competitionKey: "ucl",
-    goals: 1, // ~38'-40'
-    matchesPlayed: 1,
-    asOf: "2026-09-16",
-    source: "ESPN / VAVEL",
+    goals: 2, // ~38'-40' + UCL 2. hafta 1
+    matchesPlayed: 2,
+    asOf: "2026-10-17",
+    source: "ESPN / VAVEL / ESPN (scoreboard) / thesportsencounter.com",
   },
   {
     // players.js'te Como (t34) kadrosunda YOK, bkz. üstteki not.
     playerName: "Assane Diao",
     teamId: "t34", // Como
     competitionKey: "ucl",
-    goals: 1, // ~54'-55'
-    matchesPlayed: 1,
-    asOf: "2026-09-16",
-    source: "ESPN / VAVEL",
+    goals: 2, // ~54'-55' + UCL 2. hafta 1
+    matchesPlayed: 2,
+    asOf: "2026-10-17",
+    source: "ESPN / VAVEL / ESPN (scoreboard) / thesportsencounter.com",
   },
   {
     // players.js'te Como (t34) kadrosunda YOK, bkz. üstteki not.
@@ -582,10 +582,10 @@ export const TOP_SCORERS = [
     playerName: "Harry Kane",
     teamId: "t3", // Bayern Münih
     competitionKey: "ucl",
-    goals: 1, // 61'
-    matchesPlayed: 1,
-    asOf: "2026-09-16",
-    source: "ESPN / VAVEL",
+    goals: 3, // 61' + 2. hafta 2 gol
+    matchesPlayed: 2,
+    asOf: "2026-10-14",
+    source: "ESPN / VAVEL / ESPN (scoreboard) / thesportsencounter.com",
   },
   {
     playerName: "Alphonso Davies",
@@ -688,6 +688,427 @@ export const TOP_SCORERS = [
     matchesPlayed: 1,
     asOf: "2026-09-16",
     source: "ESPN / VAVEL / GiveMeSport",
+  },
+
+  // ---- UEFA Şampiyonlar Ligi 2026-27 -- 2. Hafta, 13 Ekim 2026 (9 maç), yeni golcüler.
+  // matchesPlayed bilinçli olarak YOK: 1. haftada oynayıp oynamadıkları doğrulanmadı.
+  {
+    playerName: "Issa Doumbia",
+    teamId: "t23",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Kaheem Parris",
+    teamId: "t31",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Joy-Lance Mickels",
+    teamId: "t31",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Jurriën Timber",
+    teamId: "t11",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Eberechi Eze",
+    teamId: "t11",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Bukayo Saka",
+    teamId: "t11",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Pablo Barrios",
+    teamId: "t10",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Ademola Lookman",
+    teamId: "t10",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Lautaro Martínez",
+    teamId: "t6",
+    competitionKey: "ucl",
+    goals: 2,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Romeo Vermant",
+    teamId: "t17",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Ange-Yoan Bonny",
+    teamId: "t6",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Aleksey Batrakov",
+    teamId: "t35",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "João Cancelo",
+    teamId: "t7",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Fermín López",
+    teamId: "t7",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Anthony Gordon",
+    teamId: "t7",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Brajan Gruda",
+    teamId: "t15",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Gianni Stensness",
+    teamId: "t30",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Peter Christiansen",
+    teamId: "t30",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Luis Díaz",
+    teamId: "t3",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Herman Haugen",
+    teamId: "t30",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Amir Rrahmani",
+    teamId: "t9",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Georges Mikautadze",
+    teamId: "t14",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Tani Oluwaseyi",
+    teamId: "t14",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+
+  // ---- UEFA Şampiyonlar Ligi 2026-27 -- 2. Hafta, 14 Ekim 2026, yeni golcüler (matchesPlayed doğrulanmadığı için yok) ----
+  {
+    playerName: "Gjivai Zechiël",
+    teamId: "t16",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Anis Hadj Moussa",
+    teamId: "t16",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Ronald Araújo",
+    teamId: "t5",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Bradley Barcola",
+    teamId: "t5",
+    competitionKey: "ucl",
+    goals: 3,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Jeremie Frimpong",
+    teamId: "t5",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Robert Ljubičić",
+    teamId: "t33",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Lewis Koumas",
+    teamId: "t5",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Florian Flecker",
+    teamId: "t33",
+    competitionKey: "ucl",
+    goals: 2,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Marten de Roon",
+    teamId: "t13",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Donyell Malen",
+    teamId: "t13",
+    competitionKey: "ucl",
+    goals: 2,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Carlos Espí",
+    teamId: "t1",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Endrick",
+    teamId: "t1",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Antonio Rüdiger",
+    teamId: "t1",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Johan Manzambi",
+    teamId: "t20",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Ross Barkley",
+    teamId: "t20",
+    competitionKey: "ucl",
+    goals: 2,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Tammy Abraham",
+    teamId: "t20",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Lovro Majer",
+    teamId: "t27",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Pedrinho",
+    teamId: "t18",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Vinícius Tobias",
+    teamId: "t18",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Fredrik Sjøvold",
+    teamId: "t36",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Désiré Doué",
+    teamId: "t4",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Vitinha",
+    teamId: "t4",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Maghnes Akliouche",
+    teamId: "t4",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Abde Ezzalzouli",
+    teamId: "t19",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Gabri Veiga",
+    teamId: "t28",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Samu Aghehowa",
+    teamId: "t28",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Cucho Hernández",
+    teamId: "t19",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Isco",
+    teamId: "t19",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  {
+    playerName: "Deniz Undav",
+    teamId: "t21",
+    competitionKey: "ucl",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
   },
 
   // ---- Trendyol Süper Lig 2026-27 -- 1-4. Haftaların TAMAMI ----
@@ -869,10 +1290,10 @@ export const TOP_SCORERS = [
     playerName: "Cengiz Ünder",
     teamId: "s13", // Çorum FK
     competitionKey: "superlig",
-    goals: 3, // 5. hafta Samsunspor deplasmanında 2 (10', 15'), 7. hafta Gaziantep FK deplasmanında 1 (37')
-    matchesPlayed: 7,
-    asOf: "2026-10-11",
-    source: "Fanatik / Habertürk / Sporkolik.net / Star / Takvim (7. hafta)",
+    goals: 4, // 5. hafta Samsunspor deplasmanında 2 (10', 15'), 7. hafta Gaziantep FK deplasmanında 1 (37') + 8. hafta 1
+    matchesPlayed: 8,
+    asOf: "2026-10-17",
+    source: "Fanatik / Habertürk / Sporkolik.net / Star / Takvim (7. hafta) / Hürriyet / Ajansspor / Fanatik / Star",
   },
   {
     // superLigPlayers.js'te Çorum FK (s13) kadrosunda YOK, bkz. üstteki not.
@@ -976,10 +1397,9 @@ export const TOP_SCORERS = [
     playerName: "Mbaye Diagne",
     teamId: "s11", // Amed SFK
     competitionKey: "superlig",
-    goals: 1, // 5. hafta İstanbul Başakşehir'e, 84'
-    matchesPlayed: 5,
-    asOf: "2026-09-19",
-    source: "Habertürk / Fanatik / beIN Sports",
+    goals: 2, // 5. hafta İstanbul Başakşehir'e, 84' + 8. hafta 1
+    asOf: "2026-10-17",
+    source: "Habertürk / Fanatik / beIN Sports / Hürriyet / Habertürk / Sporx",
   },
   {
     playerName: "Abdülkerim Bardakcı",
@@ -1185,10 +1605,9 @@ export const TOP_SCORERS = [
     playerName: "Vedat Muriqi",
     teamId: "s2", // Fenerbahçe
     competitionKey: "superlig",
-    goals: 6, // 2. hafta Konyaspor'a 1 (7'), 3. hafta Samsunspor deplasmanında 1 (3'), 6. hafta Eyüpspor'a karşı 8-0'lık galibiyette 4 gol (7', 21', 47', 55') -- kariyerinde ilk Süper Lig hat-trick'inden fazlası
-    matchesPlayed: 6,
-    asOf: "2026-09-20",
-    source: "Habertürk / Hürriyet / ajansspor.com / fanatik.com.tr / milliyet.com.tr / sporx.com / gzt26.com",
+    goals: 7, // 2. hafta Konyaspor'a 1 (7'), 3. hafta Samsunspor deplasmanında 1 (3'), 6. hafta Eyüpspor'a karşı 8-0'lık galibiyette 4 gol (7', 21', 47', 55') -- kariyerinde ilk Süper Lig hat-trick'inden fazlası + 8. hafta Alanyaspor'a 1 (87')
+    asOf: "2026-10-18",
+    source: "Habertürk / Hürriyet / ajansspor.com / fanatik.com.tr / milliyet.com.tr / sporx.com / gzt26.com / Fanatik / Karar / Takvim / Yeni Şafak",
   },
   {
     playerName: "Mason Greenwood",
@@ -1228,10 +1647,9 @@ export const TOP_SCORERS = [
     playerName: "Miguel Cardoso",
     teamId: "s14", // Erzurumspor FK
     competitionKey: "superlig",
-    goals: 1, // 6. hafta Samsunspor'a karşı, 45' (maçın tek golü)
-    matchesPlayed: 6,
-    asOf: "2026-09-20",
-    source: "Fanatik / Habertürk / ASpor / AA",
+    goals: 2, // 6. hafta Samsunspor'a karşı, 45' (maçın tek golü) + 8. hafta 1
+    asOf: "2026-10-17",
+    source: "Fanatik / Habertürk / ASpor / AA / Habertürk / GZT / Takvim / Fanatik",
   },
   {
     playerName: "Dia Saba",
@@ -1302,5 +1720,54 @@ export const TOP_SCORERS = [
     matchesPlayed: 6,
     asOf: "2026-09-20",
     source: "NTVSpor / takvim.com.tr",
+  },
+  // ---- Trendyol Süper Lig 2026-27 -- 8. Hafta (16-17 Ekim), yeni golcüler (matchesPlayed doğrulanmadığı için yok) ----
+  {
+    playerName: "Qazim Laçi",
+    teamId: "s12",
+    competitionKey: "superlig",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "Hürriyet / Ajansspor / Fanatik / Star",
+  },
+  {
+    playerName: "Youssoufa Moukoko",
+    teamId: "s13",
+    competitionKey: "superlig",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "Hürriyet / Ajansspor / Fanatik / Star",
+  },
+  {
+    playerName: "Eren Tozlu",
+    teamId: "s14",
+    competitionKey: "superlig",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "Habertürk / GZT / Takvim / Fanatik",
+  },
+  {
+    playerName: "Deniz Gül",
+    teamId: "s1",
+    competitionKey: "superlig",
+    goals: 1,
+    asOf: "2026-10-17",
+    source: "Hürriyet / Habertürk / Star / gazetemerhaba",
+  },
+  {
+    playerName: "Romelu Lukaku",
+    teamId: "s2", // Fenerbahçe
+    competitionKey: "superlig",
+    goals: 1, // 8. hafta Alanyaspor'a
+    asOf: "2026-10-18",
+    source: "Fanatik / Karar / Takvim / Yeni Şafak",
+  },
+  {
+    playerName: "Kerem Aktürkoğlu",
+    teamId: "s2", // Fenerbahçe
+    competitionKey: "superlig",
+    goals: 1, // 8. hafta Alanyaspor'a
+    asOf: "2026-10-18",
+    source: "Fanatik / Karar / Takvim / Yeni Şafak",
   },
 ];

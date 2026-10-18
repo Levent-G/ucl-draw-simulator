@@ -523,6 +523,15 @@ export const CURRENT_INJURIES = [
     type: "suspension",
   },
   {
+    teamId: "t8",
+    playerName: "Leny Yoro",
+    reason: "Kırmızı kart cezası -- 13 Ekim'de Atlético Madrid deplasmanında (2-0 yenilgi) ikinci yarıda VAR incelemesi sonrası kırmızı kart gördü; UEFA kuralı gereği bir sonraki Şampiyonlar Ligi maçında oynayamaz",
+    expectedReturn: "UCL 3. hafta maçından sonra (UEFA'nın ek ceza verip vermeyeceği henüz netleşmedi)",
+    asOf: "2026-10-14",
+    source: "ESPN / thesportsencounter.com",
+    type: "suspension",
+  },
+  {
     teamId: "s18",
     playerName: "Dilhan Demir",
     reason: "Ön çapraz bağ yırtığı",

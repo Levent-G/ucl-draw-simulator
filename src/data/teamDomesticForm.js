@@ -112,8 +112,8 @@ export const TEAM_DOMESTIC_FORM = {
 
   // ---- Süper Lig (Türkiye) -- src/data/liveStatus.js SUPER_LIG_LIVE_STANDINGS/RESULTS ile birebir aynı kaynak, 4. hafta sonrası, 7 Eylül 2026 (bu satır liveStatus.js her tazelendiğinde buradan da senkron edilmeli; aksi halde TeamProfilePage.jsx'te "Süper Lig Formu" ile "Son 5 maç" blokları farklı/çelişkili görünür) ----
   // 2026-10-12: liveStatus.js'teki 7. hafta (11 Ekim) sonrası tabloyla senkronlandı; form = son 5 maç.
-  t25: { league: "Süper Lig", country: "Türkiye", position: 4, played: 7, w: 4, d: 1, l: 2, pts: 13, form: ["W", "L", "D", "W", "W"], asOf: "2026-10-11" }, // Fenerbahçe (3. hf Samsunspor'u 2-0 yendi, 4. hf Beşiktaş'a 1-2, 5. hf Gaziantep FK ile 0-0, 6. hf Eyüpspor'u 8-0, 7. hf Çaykur Rizespor'u 3-0)
-  t35: { league: "Süper Lig", country: "Türkiye", position: 1, played: 7, w: 5, d: 1, l: 1, pts: 16, form: ["W", "W", "W", "L", "W"], asOf: "2026-10-11" }, // Galatasaray (3. hf Göztepe'yi 3-2, 4. hf Başakşehir'i 3-2, 5. hf Kocaelispor'u 1-0, 6. hf Trabzonspor'a 0-4, 7. hf Kasımpaşa'yı 3-1)
+  t25: { league: "Süper Lig", country: "Türkiye", position: 3, played: 8, w: 5, d: 1, l: 2, pts: 16, form: ["L", "D", "W", "W", "W"], asOf: "2026-10-18" }, // Fenerbahçe (4. hf Beşiktaş'a 1-2, 5. hf Gaziantep FK ile 0-0, 6. hf Eyüpspor'u 8-0, 7. hf Çaykur Rizespor'u 3-0, 8. hf Alanyaspor'u 3-0)
+  t35: { league: "Süper Lig", country: "Türkiye", position: 1, played: 8, w: 6, d: 1, l: 1, pts: 19, form: ["W", "W", "L", "W", "W"], asOf: "2026-10-17" }, // Galatasaray (4. hf Başakşehir 3-2, 5. hf Kocaelispor 1-0, 6. hf Trabzonspor'a 0-4, 7. hf Kasımpaşa 3-1, 8. hf Gençlerbirliği deplasmanı 1-0)
 
   // ---- Liga Portugal (Portekiz) -- ESPN, 5. hafta sonrası, 5 Eylül 2026 ----
   // Sporting: 1.hf Estrela Amadora ile 2-2, 2.hf Vitória SC'yi 3-2 yendi (doğrulandı);

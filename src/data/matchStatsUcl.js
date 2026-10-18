@@ -552,4 +552,214 @@ export const UCL_MATCH_STATS = {
     asOf: "2026-09-21",
     source: "ESPN / fotmob.com / VAVEL / GiveMeSport",
   },
+  // ---- 2. Hafta, 13 Ekim 2026 (9 maç) -- Viking-Bayern: ESPN'de Bayern için
+  // listelenen fazladan "Olise 73'" satırı skorla (3) çeliştiği ve ikinci kaynakta
+  // olmadığı için kullanılmadı. Man Utd'den Leny Yoro'nun 2. yarıda VAR sonrası
+  // kırmızı kart gördüğü iki kaynakta geçiyor ama dakika net değil, kart alanı eklenmedi.
+  r2m0: {
+    // RC Lens 0-2 Sporting CP -- sadece golcüler (takım istatistikleri henüz doğrulanmadı, kasıtlı olarak eklenmedi)
+    scorers: [
+      { teamId: "t23", playerName: "Luis Suárez", minute: 22 },
+      { teamId: "t23", playerName: "Issa Doumbia", minute: 74 },
+    ],
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  r2m1: {
+    // Sabah 2-0 SK Slavia Prague -- sadece golcüler (takım istatistikleri henüz doğrulanmadı, kasıtlı olarak eklenmedi)
+    scorers: [
+      { teamId: "t31", playerName: "Kaheem Parris", minute: 49 },
+      { teamId: "t31", playerName: "Joy-Lance Mickels", minute: 88 },
+    ],
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  r2m2: {
+    // Arsenal 3-0 Lille -- sadece golcüler (takım istatistikleri henüz doğrulanmadı, kasıtlı olarak eklenmedi)
+    scorers: [
+      { teamId: "t11", playerName: "Jurriën Timber", minute: 64 },
+      { teamId: "t11", playerName: "Eberechi Eze", minute: 67 },
+      { teamId: "t11", playerName: "Bukayo Saka", minute: 71 },
+    ],
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  r2m3: {
+    // Atletico Madrid 2-0 Manchester United -- sadece golcüler (takım istatistikleri henüz doğrulanmadı, kasıtlı olarak eklenmedi)
+    scorers: [
+      { teamId: "t10", playerName: "Pablo Barrios", minute: 1 },
+      { teamId: "t10", playerName: "Ademola Lookman", minute: 79 },
+    ],
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  r2m4: {
+    // Inter 3-4 Club Brugge -- sadece golcüler (takım istatistikleri henüz doğrulanmadı, kasıtlı olarak eklenmedi)
+    scorers: [
+      { teamId: "t17", playerName: "Nicolò Tresoldi", minute: 30, penalty: true },
+      { teamId: "t6", playerName: "Lautaro Martínez", minute: 44 },
+      { teamId: "t17", playerName: "Nicolò Tresoldi", minute: 63 },
+      { teamId: "t17", playerName: "Nicolò Tresoldi", minute: 74 },
+      { teamId: "t6", playerName: "Lautaro Martínez", minute: 81 },
+      { teamId: "t17", playerName: "Romeo Vermant", minute: 87 },
+      { teamId: "t6", playerName: "Ange-Yoan Bonny", minute: 93 },
+    ],
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  r2m5: {
+    // Galatasaray 1-4 Barcelona -- sadece golcüler (takım istatistikleri henüz doğrulanmadı, kasıtlı olarak eklenmedi)
+    scorers: [
+      { teamId: "t35", playerName: "Aleksey Batrakov", minute: 28 },
+      { teamId: "t7", playerName: "João Cancelo", minute: 43 },
+      { teamId: "t7", playerName: "Fermín López", minute: 50 },
+      { teamId: "t7", playerName: "Anthony Gordon", minute: 53 },
+      { teamId: "t7", playerName: "Karim Adeyemi", minute: 65 },
+    ],
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  r2m6: {
+    // RB Leipzig 1-0 PSV Eindhoven -- sadece golcüler (takım istatistikleri henüz doğrulanmadı, kasıtlı olarak eklenmedi)
+    scorers: [
+      { teamId: "t15", playerName: "Brajan Gruda", minute: 75 },
+    ],
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  r2m7: {
+    // Viking 3-3 Bayern Münih -- sadece golcüler (takım istatistikleri henüz doğrulanmadı, kasıtlı olarak eklenmedi)
+    scorers: [
+      { teamId: "t30", playerName: "Gianni Stensness", minute: 2 },
+      { teamId: "t30", playerName: "Peter Christiansen", minute: 38 },
+      { teamId: "t3", playerName: "Harry Kane", minute: 54, penalty: true },
+      { teamId: "t3", playerName: "Harry Kane", minute: 60 },
+      { teamId: "t3", playerName: "Luis Díaz", minute: 71 },
+      { teamId: "t30", playerName: "Herman Haugen", minute: 90 },
+    ],
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  r2m8: {
+    // Villarreal 3-1 Napoli -- sadece golcüler (takım istatistikleri henüz doğrulanmadı, kasıtlı olarak eklenmedi)
+    scorers: [
+      { teamId: "t9", playerName: "Amir Rrahmani", minute: 8 },
+      { teamId: "t14", playerName: "Georges Mikautadze", minute: 23 },
+      { teamId: "t14", playerName: "Santiago Mouriño", minute: 26 },
+      { teamId: "t14", playerName: "Tani Oluwaseyi", minute: 86 },
+    ],
+    asOf: "2026-10-14",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  // ---- 2. Hafta, 14 Ekim 2026 (9 maç) -- sadece golcüler. Kendi kalesine goller
+  // (Robert Sánchez, Sandro Cruz) faydalanan takımın teamId'siyle ownGoal:true.
+  r2m9: {
+    // Feyenoord 3-2 Como
+    scorers: [
+      { teamId: "t34", playerName: "Assane Diao", minute: 18 },
+      { teamId: "t16", playerName: "Gjivai Zechiël", minute: 20 },
+      { teamId: "t16", playerName: "Anis Hadj Moussa", minute: 52 },
+      { teamId: "t16", playerName: "Robert Sánchez", minute: 81, ownGoal: true },
+      { teamId: "t34", playerName: "Anastasios Douvikas", minute: 93 },
+    ],
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  r2m10: {
+    // LASK 3-6 Liverpool
+    scorers: [
+      { teamId: "t5", playerName: "Ronald Araújo", minute: 22 },
+      { teamId: "t5", playerName: "Bradley Barcola", minute: 24 },
+      { teamId: "t5", playerName: "Bradley Barcola", minute: 37 },
+      { teamId: "t5", playerName: "Jeremie Frimpong", minute: 51 },
+      { teamId: "t33", playerName: "Robert Ljubičić", minute: 63 },
+      { teamId: "t5", playerName: "Bradley Barcola", minute: 66 },
+      { teamId: "t5", playerName: "Lewis Koumas", minute: 72 },
+      { teamId: "t33", playerName: "Florian Flecker", minute: 74 },
+      { teamId: "t33", playerName: "Florian Flecker", minute: 77 },
+    ],
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  r2m11: {
+    // Roma 3-4 Real Madrid
+    scorers: [
+      { teamId: "t13", playerName: "Marten de Roon", minute: 20 },
+      { teamId: "t1", playerName: "Kylian Mbappé", minute: 25 },
+      { teamId: "t13", playerName: "Donyell Malen", minute: 51 },
+      { teamId: "t13", playerName: "Donyell Malen", minute: 57 },
+      { teamId: "t1", playerName: "Carlos Espí", minute: 83 },
+      { teamId: "t1", playerName: "Endrick", minute: 85 },
+      { teamId: "t1", playerName: "Antonio Rüdiger", minute: 90 },
+    ],
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  r2m12: {
+    // Aston Villa 6-0 Fenerbahçe
+    scorers: [
+      { teamId: "t20", playerName: "Johan Manzambi", minute: 12 },
+      { teamId: "t20", playerName: "Nicolas Jackson", minute: 31 },
+      { teamId: "t20", playerName: "Nicolas Jackson", minute: 39 },
+      { teamId: "t20", playerName: "Ross Barkley", minute: 68, penalty: true },
+      { teamId: "t20", playerName: "Ross Barkley", minute: 72 },
+      { teamId: "t20", playerName: "Tammy Abraham", minute: 90 },
+    ],
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  r2m13: {
+    // Shakhtar Donetsk 3-1 AEK Athens
+    scorers: [
+      { teamId: "t27", playerName: "Lovro Majer", minute: 28 },
+      { teamId: "t18", playerName: "Pedrinho", minute: 34, penalty: true },
+      { teamId: "t18", playerName: "Vinícius Tobias", minute: 80 },
+      { teamId: "t18", playerName: "Gleiker Mendoza", minute: 86 },
+    ],
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  r2m14: {
+    // Bodø/Glimt 1-0 Borussia Dortmund
+    scorers: [
+      { teamId: "t36", playerName: "Fredrik Sjøvold", minute: 52 },
+    ],
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  r2m15: {
+    // Manchester City 2-4 Paris Saint-Germain
+    scorers: [
+      { teamId: "t4", playerName: "Désiré Doué", minute: 13 },
+      { teamId: "t4", playerName: "Ousmane Dembélé", minute: 15 },
+      { teamId: "t4", playerName: "Vitinha", minute: 32 },
+      { teamId: "t2", playerName: "Erling Haaland", minute: 53 },
+      { teamId: "t4", playerName: "Maghnes Akliouche", minute: 62 },
+      { teamId: "t2", playerName: "Erling Haaland", minute: 75 },
+    ],
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  r2m16: {
+    // Real Betis 3-2 FC Porto
+    scorers: [
+      { teamId: "t19", playerName: "Abde Ezzalzouli", minute: 47 },
+      { teamId: "t28", playerName: "Gabri Veiga", minute: 54 },
+      { teamId: "t28", playerName: "Samu Aghehowa", minute: 61 },
+      { teamId: "t19", playerName: "Cucho Hernández", minute: 74 },
+      { teamId: "t19", playerName: "Isco", minute: 84, penalty: true },
+    ],
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
+  r2m17: {
+    // Slovan Bratislava 0-3 VfB Stuttgart
+    scorers: [
+      { teamId: "t21", playerName: "Deniz Undav", minute: 29 },
+      { teamId: "t21", playerName: "Sandro Cruz", minute: 64, ownGoal: true },
+      { teamId: "t21", playerName: "Ermedin Demirović", minute: 90 },
+    ],
+    asOf: "2026-10-17",
+    source: "ESPN (scoreboard) / thesportsencounter.com",
+  },
 };
