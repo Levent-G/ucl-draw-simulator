@@ -459,4 +459,45 @@ export const SUPER_LIG_MATCH_STATS = {
     asOf: "2026-10-18",
     source: "Fanatik / Karar / Takvim / Yeni Şafak",
   },
+  sr8m1: {
+    // Kasımpaşa 4-1 Samsunspor (18 Ekim 2026) -- sadece golcüler. Coulibaly'nin 58'deki golü VAR sonrası ofsayttan iptal edildi.
+    scorers: [
+      { teamId: "s8", playerName: "Claudio Winck", minute: 27 },
+      { teamId: "s8", playerName: "Adem Arous", minute: 31 },
+      { teamId: "s6", playerName: "Tanguy Coulibaly", minute: 45 },
+      { teamId: "s8", playerName: "Adem Arous", minute: 64 },
+      { teamId: "s8", playerName: "Adrian Benedyczak", minute: 78 },
+    ],
+    asOf: "2026-10-19",
+    source: "Hürriyet / Timeturk / Sabah / Sporx",
+  },
+  sr8m7: {
+    // Kocaelispor 1-2 Göztepe (18 Ekim 2026) -- sadece golcüler. 24'teki gol Juan'ın kafa vuruşunun Show'a çarpmasıyla geldi; Hürriyet ve kaynakların çoğu kendi kalesine gol olarak yazıyor.
+    scorers: [
+      { teamId: "s7", playerName: "Show", minute: 24, ownGoal: true },
+      { teamId: "s7", playerName: "Novatus Miroshi", minute: 77 },
+      { teamId: "s17", playerName: "Berkan Kutlu", minute: 82, penalty: true },
+    ],
+    asOf: "2026-10-19",
+    source: "Hürriyet / Ajansspor / DHA / Akşam",
+  },
+  sr8m2: {
+    // İstanbul Başakşehir 2-1 Gaziantep FK (18 Ekim 2026) -- sadece golcüler. Başakşehir'in 29'daki golü VAR sonrası elle oynama gerekçesiyle iptal edildi.
+    scorers: [
+      { teamId: "s5", playerName: "Eldor Shomurodov", minute: 8 },
+      { teamId: "s15", playerName: "Serdar Dursun", minute: 66 },
+      { teamId: "s5", playerName: "Umut Güneş", minute: 82 },
+    ],
+    asOf: "2026-10-19",
+    source: "Fanatik / Sabah / Takvim / Timeturk",
+  },
+  sr8m0: {
+    // Trabzonspor 2-0 Beşiktaş (19 Ekim 2026) -- sadece golcüler. Ozan Tufan, Muçi'nin şutunda Nübel'in çeldiği topu ağlara gönderdi; Salah'ın golünde asist Franculino'dan.
+    scorers: [
+      { teamId: "s4", playerName: "Ozan Tufan", minute: 21 },
+      { teamId: "s4", playerName: "Mohamed Salah", minute: 71 },
+    ],
+    asOf: "2026-10-19",
+    source: "Star / Cumhuriyet / Sporkolik / Karsmanset",
+  },
 };

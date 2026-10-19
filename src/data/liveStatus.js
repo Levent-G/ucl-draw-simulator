@@ -12,7 +12,7 @@
 // tablosuyla birebir aynıydı). 7. Hafta 9 Ekim 20.00'de başladı; açılış
 // maçı Galatasaray 3-1 Kasımpaşa aynı gece 23:30'da eklendi. Kalan 8 maç
 // (10-12 Ekim) oynandıkça buraya eklenmeli.
-export const SUPER_LIG_LIVE_ASOF = "18 Ekim 2026 (8. Hafta sürüyor: 5/9 maç oynandı)";
+export const SUPER_LIG_LIVE_ASOF = "19 Ekim 2026, 22:00 (8. Hafta TAMAMLANDI: 9/9 maç oynandı)";
 
 // Türkçe Vikipedi'nin "2026-27 Süper Lig" maddesinin ham wikitext'i (maç
 // sonuçları) + "Şablon:2026-27 Süper Lig puan durumu" (güncel puan durumu
@@ -105,26 +105,26 @@ export const SUPER_LIG_LIVE_ASOF = "18 Ekim 2026 (8. Hafta sürüyor: 5/9 maç o
 // sütunları birbirine eşit=161, toplam puan=151 -- 54 maçlık bir sezonun bu
 // aşamasında matematiksel olarak beklenen değerler).
 export const SUPER_LIG_LIVE_STANDINGS = [
-  // 18 Ekim 2026: 8. Hafta'nın ilk 5 maçı işlendi (kalan 4 maç 18-19 Ekim).
-  // Tablo SUPER_LIG_LIVE_RESULTS'tan yeniden hesaplandı: puan > averaj > atılan
-  // gol, eşitlikte önceki sıra korunur. Fenerbahçe 16 puan (Fanatik / Karar) -- tutarlı.
+  // 19 Ekim 2026: 8. Hafta TAMAMLANDI (9/9) -- son maç Trabzonspor 2-0 Beşiktaş.
+  // Tablo SUPER_LIG_LIVE_RESULTS'tan yeniden hesaplandı: puan > averaj > atılan gol,
+  // eşitlikte önceki sıra korunur. Trabzonspor 16, Beşiktaş 15 puan -- tutarlı.
   { rank: 1, teamName: "Galatasaray", played: 8, w: 6, d: 1, l: 1, gf: 17, ga: 11, pts: 19 },
   { rank: 2, teamName: "Amed SFK", played: 8, w: 5, d: 2, l: 1, gf: 18, ga: 9, pts: 17 },
   { rank: 3, teamName: "Fenerbahçe", played: 8, w: 5, d: 1, l: 2, gf: 22, ga: 6, pts: 16 },
-  { rank: 4, teamName: "Beşiktaş", played: 7, w: 5, d: 0, l: 2, gf: 16, ga: 8, pts: 15 },
-  { rank: 5, teamName: "Trabzonspor", played: 7, w: 4, d: 1, l: 2, gf: 16, ga: 5, pts: 13 },
+  { rank: 4, teamName: "Trabzonspor", played: 8, w: 5, d: 1, l: 2, gf: 18, ga: 5, pts: 16 },
+  { rank: 5, teamName: "Beşiktaş", played: 8, w: 5, d: 0, l: 3, gf: 16, ga: 10, pts: 15 },
   { rank: 6, teamName: "Çorum FK", played: 8, w: 4, d: 1, l: 3, gf: 18, ga: 13, pts: 13 },
-  { rank: 7, teamName: "Kocaelispor", played: 7, w: 4, d: 0, l: 3, gf: 8, ga: 6, pts: 12 },
-  { rank: 8, teamName: "Alanyaspor", played: 8, w: 3, d: 3, l: 2, gf: 8, ga: 9, pts: 12 },
-  { rank: 9, teamName: "Erzurumspor FK", played: 8, w: 3, d: 2, l: 3, gf: 5, ga: 11, pts: 11 },
-  { rank: 10, teamName: "Kasımpaşa", played: 7, w: 2, d: 4, l: 1, gf: 8, ga: 8, pts: 10 },
-  { rank: 11, teamName: "Çaykur Rizespor", played: 8, w: 3, d: 1, l: 4, gf: 8, ga: 11, pts: 10 },
-  { rank: 12, teamName: "İstanbul Başakşehir", played: 7, w: 2, d: 2, l: 3, gf: 10, ga: 11, pts: 8 },
-  { rank: 13, teamName: "Gaziantep FK", played: 7, w: 2, d: 2, l: 3, gf: 7, ga: 10, pts: 8 },
-  { rank: 14, teamName: "Gençlerbirliği", played: 8, w: 2, d: 2, l: 4, gf: 7, ga: 16, pts: 8 },
-  { rank: 15, teamName: "Göztepe", played: 7, w: 1, d: 3, l: 3, gf: 15, ga: 15, pts: 6 },
+  { rank: 7, teamName: "Kasımpaşa", played: 8, w: 3, d: 4, l: 1, gf: 12, ga: 9, pts: 13 },
+  { rank: 8, teamName: "Kocaelispor", played: 8, w: 4, d: 0, l: 4, gf: 9, ga: 8, pts: 12 },
+  { rank: 9, teamName: "Alanyaspor", played: 8, w: 3, d: 3, l: 2, gf: 8, ga: 9, pts: 12 },
+  { rank: 10, teamName: "İstanbul Başakşehir", played: 8, w: 3, d: 2, l: 3, gf: 12, ga: 12, pts: 11 },
+  { rank: 11, teamName: "Erzurumspor FK", played: 8, w: 3, d: 2, l: 3, gf: 5, ga: 11, pts: 11 },
+  { rank: 12, teamName: "Çaykur Rizespor", played: 8, w: 3, d: 1, l: 4, gf: 8, ga: 11, pts: 10 },
+  { rank: 13, teamName: "Göztepe", played: 8, w: 2, d: 3, l: 3, gf: 17, ga: 16, pts: 9 },
+  { rank: 14, teamName: "Gaziantep FK", played: 8, w: 2, d: 2, l: 4, gf: 8, ga: 12, pts: 8 },
+  { rank: 15, teamName: "Gençlerbirliği", played: 8, w: 2, d: 2, l: 4, gf: 7, ga: 16, pts: 8 },
   { rank: 16, teamName: "Konyaspor", played: 8, w: 1, d: 2, l: 5, gf: 4, ga: 9, pts: 5 },
-  { rank: 17, teamName: "Samsunspor", played: 7, w: 1, d: 1, l: 5, gf: 6, ga: 15, pts: 4 },
+  { rank: 17, teamName: "Samsunspor", played: 8, w: 1, d: 1, l: 6, gf: 7, ga: 19, pts: 4 },
   { rank: 18, teamName: "Eyüpspor", played: 8, w: 1, d: 0, l: 7, gf: 2, ga: 22, pts: 3 },
 ];
 
@@ -253,6 +253,16 @@ export const SUPER_LIG_LIVE_RESULTS = [
   // 18 Ekim tazelemesi: Fenerbahçe 3-0 Alanyaspor (17 Eki) -- Fanatik, Karar, Takvim,
   // Yeni Şafak, Türkiye Gazetesi. Goller: Lukaku 40', Kerem Aktürkoğlu 71', Muriqi 87'.
   { label: "8. Hafta", date: "17 Eki", home: "Fenerbahçe", homeGoals: 3, away: "Alanyaspor", awayGoals: 0 },
+  // 19 Ekim tazelemesi -- 18 Ekim'de oynanan 3 maç, her biri en az 3 kaynakla:
+  // Kasımpaşa 4-1 Samsunspor (Hürriyet, Sabah, Sporx, Timeturk), Kocaelispor 1-2
+  // Göztepe (Hürriyet, Ajansspor, DHA, Akşam), Başakşehir 2-1 Gaziantep FK (Fanatik,
+  // Sabah, Takvim, Sporx). Trabzonspor-Beşiktaş 19 Ekim 20:00'de oynanacak.
+  { label: "8. Hafta", date: "18 Eki", home: "Kasımpaşa", homeGoals: 4, away: "Samsunspor", awayGoals: 1 },
+  { label: "8. Hafta", date: "18 Eki", home: "Kocaelispor", homeGoals: 1, away: "Göztepe", awayGoals: 2 },
+  { label: "8. Hafta", date: "18 Eki", home: "İstanbul Başakşehir", homeGoals: 2, away: "Gaziantep FK", awayGoals: 1 },
+  // 19 Ekim gece tazelemesi -- 8. Hafta TAMAMLANDI (9/9). Trabzonspor 2-0 Beşiktaş:
+  // Star, Cumhuriyet, Sporkolik, Karsmanset, Sporx.
+  { label: "8. Hafta", date: "19 Eki", home: "Trabzonspor", homeGoals: 2, away: "Beşiktaş", awayGoals: 0 },
 ];
 
 // Simüle edilmiş TAM fikstürü (roundRobinEngine'den gelen, gerçek dünyayla

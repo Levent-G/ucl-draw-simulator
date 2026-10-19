@@ -1295,6 +1295,28 @@ export const NEWS_ITEMS = [
     competitionKey: "superlig",
     relatedTeamIds: ["s2", "s10"],
   },
+  {
+    id: "news-sl-63",
+    date: "2026-10-18",
+    title: "8. hafta pazar: Kasımpaşa'dan 4 gol, Göztepe ve Başakşehir'e 3 puan",
+    summary:
+      "Kasımpaşa, Adem Arous'un iki golüyle Samsunspor'u 4-1 yendi ve 13 puana yükseldi. Göztepe, Show'un kendi kalesine attığı gol ve Miroshi'nin golüyle Kocaelispor'u deplasmanda 2-1 mağlup etti; Kocaelispor sezonun ilk iç saha yenilgisini aldı. Başakşehir, Shomurodov ve Umut Güneş'in golleriyle Gaziantep FK'yı 2-1 geçti.",
+    source: "Hürriyet / Sabah / Fanatik / Ajansspor",
+    url: "https://www.hurriyet.com.tr/sporarena/kocaelispor-1-2-goztepe-super-lig-maci-ozeti-43346101",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s8", "s6", "s17", "s7", "s5", "s15"],
+  },
+  {
+    id: "news-sl-64",
+    date: "2026-10-19",
+    title: "Trabzonspor, derbide Beşiktaş'ı 2-0 yendi",
+    summary:
+      "8. haftanın kapanış maçında Trabzonspor, 21. dakikada Ozan Tufan'ın Muçi'nin şutunda dönen topu ağlara göndermesiyle öne geçti. 71. dakikada Franculino'nun ortasında Mohamed Salah farkı ikiye çıkardı. Kalede Onana önemli kurtarışlar yaptı. Trabzonspor 16 puana yükseldi, Beşiktaş sezonun üçüncü yenilgisini aldı ve 15 puanda kaldı.",
+    source: "Star / Cumhuriyet / Sporkolik / Politikam",
+    url: "https://www.star.com.tr/spor/mac-sonucu-trabzonspor-2-0-besiktas-haber-2047637/",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s4", "s3"],
+  },
 
   // ---- 2026-27 UCL lig fazı: dikkat çekici eşleşme önizlemeleri ----
   {

@@ -1134,10 +1134,9 @@ export const TOP_SCORERS = [
     playerName: "Eldor Shomurodov",
     teamId: "s5", // İstanbul Başakşehir (superLigPlayers.js'te "Eldar Şahmuradov" adıyla kayıtlı, bkz. üstteki not)
     competitionKey: "superlig",
-    goals: 6, // 1-4. haftalarda 4 (Kocaelispor, Trabzonspor, Kasımpaşa, Galatasaray maçlarında birer), 6. hafta Gençlerbirliği'ne 2 (33', 65')
-    matchesPlayed: 6,
-    asOf: "2026-09-19",
-    source: "gazetebirlik.com / karsmanset.com / sporx.com / Hürriyet / AA",
+    goals: 7, // 1-4. haftalarda 4 (Kocaelispor, Trabzonspor, Kasımpaşa, Galatasaray maçlarında birer), 6. hafta Gençlerbirliği'ne 2 (33', 65') + 8. hafta 1
+    asOf: "2026-10-19",
+    source: "gazetebirlik.com / karsmanset.com / sporx.com / Hürriyet / AA / Fanatik / Sabah / Takvim / Timeturk",
   },
   {
     playerName: "Gift Orban",
@@ -1184,10 +1183,9 @@ export const TOP_SCORERS = [
     playerName: "Mohamed Salah",
     teamId: "s4", // Trabzonspor
     competitionKey: "superlig",
-    goals: 7, // 2. hafta Başakşehir'e 2 (8', 48'), 3. hafta Amed SFK deplasmanında 1 (11'), 4. hafta Gençlerbirliği'ne (penaltı) 1, 5. hafta Konyaspor deplasmanında sessiz kaldı, 6. hafta Galatasaray derbisinde hat-trick (4', 44', 80')
-    matchesPlayed: 6,
-    asOf: "2026-09-20",
-    source: "Al Jazeera / The National / beIN Sports / AA / Hürriyet / Sözcü / Fanatik / Star / Cumhuriyet / Habertürk / Sabah / fotmob.com / tff.org",
+    goals: 8, // 2. hafta Başakşehir'e 2 (8', 48'), 3. hafta Amed SFK deplasmanında 1 (11'), 4. hafta Gençlerbirliği'ne (penaltı) 1, 5. hafta Konyaspor deplasmanında sessiz kaldı, 6. hafta Galatasaray derbisinde hat-trick (4', 44', 80') + 8. hafta 1
+    asOf: "2026-10-19",
+    source: "Al Jazeera / The National / beIN Sports / AA / Hürriyet / Sözcü / Fanatik / Star / Cumhuriyet / Habertürk / Sabah / fotmob.com / tff.org / Star / Cumhuriyet / Sporkolik / Karsmanset",
   },
   {
     playerName: "Milan Škriniar",
@@ -1377,10 +1375,9 @@ export const TOP_SCORERS = [
     playerName: "Adrian Benedyczak",
     teamId: "s8", // Kasımpaşa
     competitionKey: "superlig",
-    goals: 4, // 1. hafta Trabzonspor'a 1 (56', penaltı), 2. hafta Çorum FK deplasmanında 1 (6'), 4. hafta Amed SFK'ya 1, 5. hafta Gençlerbirliği'ne 1 (79')
-    matchesPlayed: 6,
-    asOf: "2026-09-20",
-    source: "Habertürk / Hürriyet / gzt.com / Fanatik / Takvim / ASpor / flashscore.com.tr",
+    goals: 5, // 1. hafta Trabzonspor'a 1 (56', penaltı), 2. hafta Çorum FK deplasmanında 1 (6'), 4. hafta Amed SFK'ya 1, 5. hafta Gençlerbirliği'ne 1 (79') + 8. hafta 1
+    asOf: "2026-10-19",
+    source: "Habertürk / Hürriyet / gzt.com / Fanatik / Takvim / ASpor / flashscore.com.tr / Hürriyet / Timeturk / Sabah / Sporx",
   },
   {
     playerName: "Güven Yalçın",
@@ -1536,10 +1533,9 @@ export const TOP_SCORERS = [
     playerName: "Berkan Kutlu",
     teamId: "s17", // Kocaelispor
     competitionKey: "superlig",
-    goals: 1, // 6. hafta Gaziantep FK'ya, 56'
-    matchesPlayed: 6,
-    asOf: "2026-09-19",
-    source: "Habertürk / Fanatik / Sporx",
+    goals: 2, // 6. hafta Gaziantep FK'ya, 56' + 8. hafta 1
+    asOf: "2026-10-19",
+    source: "Habertürk / Fanatik / Sporx / Hürriyet / Ajansspor / DHA / Akşam",
   },
   {
     playerName: "Dan Agyei",
@@ -1769,5 +1765,61 @@ export const TOP_SCORERS = [
     goals: 1, // 8. hafta Alanyaspor'a
     asOf: "2026-10-18",
     source: "Fanatik / Karar / Takvim / Yeni Şafak",
+  },
+  {
+    playerName: "Claudio Winck",
+    teamId: "s8",
+    competitionKey: "superlig",
+    goals: 1, // 8. hafta
+    asOf: "2026-10-19",
+    source: "Hürriyet / Timeturk / Sabah / Sporx",
+  },
+  {
+    playerName: "Adem Arous",
+    teamId: "s8",
+    competitionKey: "superlig",
+    goals: 2, // 8. hafta
+    asOf: "2026-10-19",
+    source: "Hürriyet / Timeturk / Sabah / Sporx",
+  },
+  {
+    playerName: "Tanguy Coulibaly",
+    teamId: "s6",
+    competitionKey: "superlig",
+    goals: 1, // 8. hafta
+    asOf: "2026-10-19",
+    source: "Hürriyet / Timeturk / Sabah / Sporx",
+  },
+  {
+    playerName: "Novatus Miroshi",
+    teamId: "s7",
+    competitionKey: "superlig",
+    goals: 1, // 8. hafta
+    asOf: "2026-10-19",
+    source: "Hürriyet / Ajansspor / DHA / Akşam",
+  },
+  {
+    playerName: "Serdar Dursun",
+    teamId: "s15",
+    competitionKey: "superlig",
+    goals: 1, // 8. hafta
+    asOf: "2026-10-19",
+    source: "Fanatik / Sabah / Takvim / Timeturk",
+  },
+  {
+    playerName: "Umut Güneş",
+    teamId: "s5",
+    competitionKey: "superlig",
+    goals: 1, // 8. hafta
+    asOf: "2026-10-19",
+    source: "Fanatik / Sabah / Takvim / Timeturk",
+  },
+  {
+    playerName: "Ozan Tufan",
+    teamId: "s4",
+    competitionKey: "superlig",
+    goals: 1, // 8. hafta
+    asOf: "2026-10-19",
+    source: "Star / Cumhuriyet / Sporkolik / Karsmanset",
   },
 ];
