@@ -523,6 +523,15 @@ export const CURRENT_INJURIES = [
     type: "suspension",
   },
   {
+    teamId: "t10",
+    playerName: "Morten Hjulmand",
+    reason: "Kırmızı kart cezası -- 20 Ekim'de Stuttgart deplasmanında (1-1) 64. dakikada kırmızı kart gördü; UEFA kuralı gereği bir sonraki Şampiyonlar Ligi maçında oynayamaz",
+    expectedReturn: "UCL 4. hafta maçından sonra (UEFA'nın ek ceza verip vermeyeceği henüz netleşmedi)",
+    asOf: "2026-10-21",
+    source: "Sporkolik / Bundesliga.com / Sporx",
+    type: "suspension",
+  },
+  {
     teamId: "t8",
     playerName: "Leny Yoro",
     reason: "Kırmızı kart cezası -- 13 Ekim'de Atlético Madrid deplasmanında (2-0 yenilgi) ikinci yarıda VAR incelemesi sonrası kırmızı kart gördü; UEFA kuralı gereği bir sonraki Şampiyonlar Ligi maçında oynayamaz",

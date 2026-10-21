@@ -762,4 +762,108 @@ export const UCL_MATCH_STATS = {
     asOf: "2026-10-17",
     source: "ESPN (scoreboard) / thesportsencounter.com",
   },
+  // ---- 3. Hafta, 20 Ekim 2026 (9 maç) -- sadece golcüler.
+  r3m0: {
+    // Fenerbahçe 2-2 SK Slavia Prague -- Pavel Kačor'un golü bazı kaynaklarda 89'.
+    scorers: [
+      { teamId: "t25", playerName: "Oğuz Aydın", minute: 4 },
+      { teamId: "t25", playerName: "Mason Greenwood", minute: 11 },
+      { teamId: "t29", playerName: "Lukáš Provod", minute: 15 },
+      { teamId: "t29", playerName: "Pavel Kačor", minute: 90 },
+    ],
+    asOf: "2026-10-21",
+    source: "ESPN / UEFA.com / AA / Sofascore / Al Jazeera",
+  },
+  r3m1: {
+    // Sabah 1-2 Borussia Dortmund
+    scorers: [
+      { teamId: "t12", playerName: "Serhou Guirassy", minute: 10 },
+      { teamId: "t31", playerName: "McCarthy", minute: 39 },
+      { teamId: "t12", playerName: "Serhou Guirassy", minute: 53 },
+    ],
+    asOf: "2026-10-21",
+    source: "ESPN / UEFA.com / AA / Sofascore / Al Jazeera",
+  },
+  r3m2: {
+    // Roma 4-0 Slovan Bratislava
+    scorers: [
+      { teamId: "t13", playerName: "Mario Hermoso", minute: 21 },
+      { teamId: "t13", playerName: "Nahuel Molina", minute: 39 },
+      { teamId: "t13", playerName: "Niccolò Pisilli", minute: 52 },
+      { teamId: "t13", playerName: "Donyell Malen", minute: 58, penalty: true },
+    ],
+    asOf: "2026-10-21",
+    source: "ESPN / UEFA.com / AA / Sofascore / Al Jazeera",
+  },
+  r3m3: {
+    // FC Porto 0-1 PSV Eindhoven
+    scorers: [
+      { teamId: "t24", playerName: "Guus Til", minute: 57 },
+    ],
+    asOf: "2026-10-21",
+    source: "ESPN / UEFA.com / AA / Sofascore / Al Jazeera",
+  },
+  r3m4: {
+    // Liverpool 4-3 Villarreal -- Araújo'nun golü 45+2'.
+    scorers: [
+      { teamId: "t14", playerName: "Georges Mikautadze", minute: 4 },
+      { teamId: "t14", playerName: "Sergi Cardona", minute: 29 },
+      { teamId: "t5", playerName: "Alexis Mac Allister", minute: 36 },
+      { teamId: "t5", playerName: "Ronald Araújo", minute: 47 },
+      { teamId: "t5", playerName: "Alexis Mac Allister", minute: 65 },
+      { teamId: "t5", playerName: "Florian Wirtz", minute: 68 },
+      { teamId: "t14", playerName: "Tani Oluwaseyi", minute: 87 },
+    ],
+    asOf: "2026-10-21",
+    source: "ESPN / UEFA.com / AA / Sofascore / Al Jazeera",
+  },
+  r3m5: {
+    // Manchester City 5-1 AEK Athens
+    scorers: [
+      { teamId: "t2", playerName: "Elliot Anderson", minute: 12 },
+      { teamId: "t2", playerName: "Phil Foden", minute: 34 },
+      { teamId: "t27", playerName: "Stavros Pilios", minute: 52 },
+      { teamId: "t2", playerName: "Rayan Cherki", minute: 57 },
+      { teamId: "t2", playerName: "Phil Foden", minute: 65 },
+      { teamId: "t2", playerName: "Phil Foden", minute: 76 },
+    ],
+    asOf: "2026-10-21",
+    source: "ESPN / UEFA.com / AA / Sofascore / Al Jazeera",
+  },
+  r3m6: {
+    // Paris Saint-Germain 4-2 Barcelona
+    scorers: [
+      { teamId: "t4", playerName: "Désiré Doué", minute: 38 },
+      { teamId: "t7", playerName: "Xavi Espart", minute: 55 },
+      { teamId: "t4", playerName: "Lucas Hernández", minute: 72 },
+      { teamId: "t7", playerName: "Lamine Yamal", minute: 79 },
+      { teamId: "t4", playerName: "Vitinha", minute: 81 },
+      { teamId: "t4", playerName: "Fabián Ruiz", minute: 86 },
+    ],
+    asOf: "2026-10-21",
+    source: "ESPN / UEFA.com / AA / Sofascore / Al Jazeera",
+  },
+  r3m7: {
+    // Napoli 4-3 Bodø/Glimt -- Bjørtuft'un kendi kalesine golü Napoli lehine; Fet'in golü 90+4'.
+    scorers: [
+      { teamId: "t9", playerName: "Matteo Politano", minute: 1 },
+      { teamId: "t36", playerName: "Jens Petter Hauge", minute: 27 },
+      { teamId: "t9", playerName: "Scott McTominay", minute: 41 },
+      { teamId: "t36", playerName: "Andreas Helmersen", minute: 62 },
+      { teamId: "t9", playerName: "Scott McTominay", minute: 75 },
+      { teamId: "t9", playerName: "Odin Bjørtuft", minute: 88, ownGoal: true },
+      { teamId: "t36", playerName: "Sondre Brunstad Fet", minute: 94 },
+    ],
+    asOf: "2026-10-21",
+    source: "ESPN / UEFA.com / AA / Sofascore / Al Jazeera",
+  },
+  r3m8: {
+    // VfB Stuttgart 1-1 Atletico Madrid -- ESPN Hjulmand'ı golcü gibi listeledi; 64'te kırmızı kart gördü (Sporkolik, Bundesliga.com).
+    scorers: [
+      { teamId: "t21", playerName: "Jamie Leweling", minute: 36 },
+      { teamId: "t10", playerName: "Julián Álvarez", minute: 47 },
+    ],
+    asOf: "2026-10-21",
+    source: "ESPN / UEFA.com / AA / Sofascore / Al Jazeera",
+  },
 };

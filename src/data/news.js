@@ -622,6 +622,39 @@ export const NEWS_ITEMS = [
     competitionKey: "ucl",
     relatedTeamIds: ["t5", "t33", "t36", "t12", "t19", "t28", "t16", "t34", "t18", "t27", "t32", "t21"],
   },
+  {
+    id: "news-ucl-55",
+    date: "2026-10-20",
+    title: "Fenerbahçe, 2-0 öne geçtiği maçta Slavia Prag'la 2-2 berabere kaldı",
+    summary:
+      "Kadıköy'de Oğuz Aydın (4') ve Mason Greenwood'un (11') golleriyle hızlı başlayan Fenerbahçe, 15'te Guendouzi'nin hatalı pasını değerlendiren Provod'a gol yedi. 90. dakikada Pavel Kačor eşitliği getirdi. Fenerbahçe lig fazında 3 maçta 2 puana yükseldi.",
+    source: "Ajansspor / NTV / Habertürk / ESPN",
+    url: "https://ajansspor.com/haber/fenerbahce-slavia-prag-2-2-mac-sonucu-mac-ozeti-yazili-737007",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t25", "t29"],
+  },
+  {
+    id: "news-ucl-56",
+    date: "2026-10-20",
+    title: "PSG, Barcelona'nın yenilmezlik serisini 4-2 ile bitirdi",
+    summary:
+      "Parc des Princes'te Doué'nin golüyle öne geçen PSG, Xavi Espart ve Lamine Yamal'ın golleriyle iki kez eşitliğe yakalandı. Lucas Hernández, Vitinha ve Fabián Ruiz'in golleriyle maçı 4-2 kazanan PSG lig fazında 3'te 3 yaptı; Barcelona sezonun ilk yenilgisini aldı.",
+    source: "ESPN / Al Jazeera / Sports Mole",
+    url: "https://www.aljazeera.com/sports/2026/10/20/psg-sink-barcelona-4-2-for-third-champions-league-win-in-a-row",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t4", "t7"],
+  },
+  {
+    id: "news-ucl-57",
+    date: "2026-10-20",
+    title: "3. hafta ilk gün: Foden'dan hat-trick, Liverpool geriden geldi",
+    summary:
+      "Phil Foden'ın ilk Şampiyonlar Ligi hat-trick'iyle Manchester City AEK'yı 5-1 yendi. Liverpool, 2-0 geriye düştüğü maçta Mac Allister'in iki golü, Araújo ve Wirtz'in golleriyle Villarreal'i 4-3 geçti. Napoli Bodø/Glimt'i 4-3, Roma Slovan Bratislava'yı 4-0, PSV Porto'yu deplasmanda 1-0, Dortmund Sabah'ı 2-1 yendi. Stuttgart ile Atlético 1-1 berabere kaldı; Atlético'da Hjulmand kırmızı kart gördü.",
+    source: "AA / Sofascore / UEFA.com / Sporkolik",
+    url: "https://www.aa.com.tr/en/sports/liverpool-stage-stunning-comeback-against-villarreal-as-foden-hat-trick-powers-man-city-past-aek/4095213",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t2", "t27", "t5", "t14", "t9", "t36", "t13", "t32", "t28", "t24", "t31", "t12", "t21", "t10"],
+  },
 
   // ---- Trendyol Süper Lig 2026-27 ----
   {

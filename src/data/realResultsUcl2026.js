@@ -71,4 +71,17 @@ export const REAL_RESULTS_UCL_2026 = [
   { matchId: "r2m15", homeGoals: 2, awayGoals: 4, date: "2026-10-14" }, // Manchester City 2-4 Paris Saint-Germain
   { matchId: "r2m16", homeGoals: 3, awayGoals: 2, date: "2026-10-14" }, // Real Betis 3-2 FC Porto
   { matchId: "r2m17", homeGoals: 0, awayGoals: 3, date: "2026-10-14" }, // Slovan Bratislava 0-3 VfB Stuttgart
+
+  // 3. Hafta -- 20 Ekim 2026'da oynanan 9 maç (ESPN skor tablosu + UEFA.com; golcüler
+  // AA, Sofascore, Al Jazeera, Ajansspor ile çapraz doğrulandı). 21 Ekim maçları
+  // (r3m9..r3m17) bu tazeleme anında başlamamıştı.
+  { matchId: "r3m0", homeGoals: 2, awayGoals: 2, date: "2026-10-20" }, // Fenerbahçe 2-2 SK Slavia Prague
+  { matchId: "r3m1", homeGoals: 1, awayGoals: 2, date: "2026-10-20" }, // Sabah 1-2 Borussia Dortmund
+  { matchId: "r3m2", homeGoals: 4, awayGoals: 0, date: "2026-10-20" }, // Roma 4-0 Slovan Bratislava
+  { matchId: "r3m3", homeGoals: 0, awayGoals: 1, date: "2026-10-20" }, // FC Porto 0-1 PSV Eindhoven
+  { matchId: "r3m4", homeGoals: 4, awayGoals: 3, date: "2026-10-20" }, // Liverpool 4-3 Villarreal
+  { matchId: "r3m5", homeGoals: 5, awayGoals: 1, date: "2026-10-20" }, // Manchester City 5-1 AEK Athens
+  { matchId: "r3m6", homeGoals: 4, awayGoals: 2, date: "2026-10-20" }, // Paris Saint-Germain 4-2 Barcelona
+  { matchId: "r3m7", homeGoals: 4, awayGoals: 3, date: "2026-10-20" }, // Napoli 4-3 Bodø/Glimt
+  { matchId: "r3m8", homeGoals: 1, awayGoals: 1, date: "2026-10-20" }, // VfB Stuttgart 1-1 Atletico Madrid
 ];
