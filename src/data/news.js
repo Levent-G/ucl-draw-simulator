@@ -655,6 +655,39 @@ export const NEWS_ITEMS = [
     competitionKey: "ucl",
     relatedTeamIds: ["t2", "t27", "t5", "t14", "t9", "t36", "t13", "t32", "t28", "t24", "t31", "t12", "t21", "t10"],
   },
+  {
+    id: "news-ucl-58",
+    date: "2026-10-21",
+    title: "Galatasaray, Lille deplasmanında 4-2 kazandı",
+    summary:
+      "Yunus Akgün'ün 2. dakikadaki golüyle öne geçen Galatasaray, Diaoune'nin iki golüyle 2-1 geriye düştü. Batrakov 44'te eşitliği getirdi. İkinci yarıda 52'de Lille kalecisi Berke Özer'in kendi kalesine attığı gol ve Osimhen'in 61. dakikadaki golüyle Galatasaray maçı 4-2 kazandı ve lig fazındaki ilk puanlarını aldı.",
+    source: "Ajansspor / Hürriyet / ESPN / Milliyet",
+    url: "https://ajansspor.com/haber/lille-galatasaray-2-4-mac-sonucu-mac-ozeti-yazili-737062",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t26", "t35"],
+  },
+  {
+    id: "news-ucl-59",
+    date: "2026-10-21",
+    title: "Como, Manchester United'ı 4-1 yendi",
+    summary:
+      "Nico Paz'ın iki golü, Douvikas ve Jacobo Ramón'un golleriyle Como, Manchester United'ı evinde 4-1 mağlup etti. United'ın tek golü uzatmada Zirkzee'den geldi.",
+    source: "VAVEL / TNT Sports / 101 Great Goals / ESPN",
+    url: "https://www.vavel.com/en-us/soccer/2026/10/21/1276244-como-vs-manchester-united-live-score-uefa-champions-league.html",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t34", "t8"],
+  },
+  {
+    id: "news-ucl-60",
+    date: "2026-10-21",
+    title: "3. hafta tamamlandı: Rice Arsenal'i Münih'te kurtardı, Real Madrid Leipzig'i 4-1 yendi",
+    summary:
+      "Bayern ile Arsenal 2-2 berabere kaldı; Arsenal'in golleri Eze ve 82'de Declan Rice'tan geldi. Real Madrid, Bernardo Silva, Arda Güler, Mbappé ve Diomande'nin golleriyle Leipzig'i 4-1 yendi. Aston Villa Viking'i 3-1 geçerek 3'te 3 yaptı. Club Brugge Lens'i 3-0, Inter Shakhtar'ı 1-0, Real Betis Feyenoord'u 1-0 yendi; LASK Lizbon'da Sporting'i 3-2 mağlup etti. Inter'de Bastoni kırmızı kart gördü.",
+    source: "NBC Sports / SoccerMag / Sky Sports / ESPN",
+    url: "https://www.soccermag.com/tournaments/uefa-champions-league/champions-league-wrap-rice-rescues-arsenal-madrid-thrash-leipzig/",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t3", "t11", "t1", "t15", "t20", "t30", "t17", "t22", "t6", "t18", "t19", "t16", "t23", "t33"],
+  },
 
   // ---- Trendyol Süper Lig 2026-27 ----
   {
@@ -1349,6 +1382,39 @@ export const NEWS_ITEMS = [
     url: "https://www.star.com.tr/spor/mac-sonucu-trabzonspor-2-0-besiktas-haber-2047637/",
     competitionKey: "superlig",
     relatedTeamIds: ["s4", "s3"],
+  },
+  {
+    id: "news-sl-65",
+    date: "2026-10-26",
+    title: "Derbi Galatasaray'ın: Osimhen'in iki golüyle Fenerbahçe 2-1 yenildi",
+    summary:
+      "RAMS Park'taki derbide Victor Osimhen 29. ve 44. dakikalarda attığı gollerle Galatasaray'ı 2-0 öne geçirdi. Fenerbahçe'nin tek golü 62'de İrfan Can Kahveci'den geldi. Galatasaray 22 puanla liderliğini sürdürdü, Fenerbahçe 16 puanla 5. sıraya geriledi.",
+    source: "Hürriyet / Habertürk / Ajansspor / Akşam",
+    url: "https://www.hurriyet.com.tr/sporarena/live-galatasaray-2-1-fenerbahce-super-lig-mac-ozeti-43354900",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s1", "s2"],
+  },
+  {
+    id: "news-sl-66",
+    date: "2026-10-26",
+    title: "Trabzonspor, Rize'de 2-0 geriden gelip 4-3 kazandı",
+    summary:
+      "Borrelli'nin iki golüyle ilk yarıyı 2-0 önde kapatan Çaykur Rizespor'a karşı Trabzonspor; Melih Kabasakal, Aral Şimşir ve Franculino'nun iki golüyle maçı 4-3 kazandı ve galibiyet serisini 4 maça çıkardı. Beşiktaş da Oh ve Olaitan'ın golleriyle Başakşehir'i 2-0 yendi.",
+    source: "Hürriyet / beIN Sports / Daily Sabah",
+    url: "https://www.hurriyet.com.tr/sporarena/caykur-rizespor-3-4-trabzonspor-super-lig-maci-ozeti-43354977",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s12", "s4", "s3", "s5"],
+  },
+  {
+    id: "news-sl-67",
+    date: "2026-10-25",
+    title: "9. hafta: Amed ikinci sırada, Kasımpaşa ve Erzurumspor kazandı",
+    summary:
+      "Amed SFK, iki kırmızı kartın çıktığı maçta Orban (penaltı) ve Dia Saba'nın golleriyle Samsunspor'u 2-1 yenip 20 puana yükseldi. Kasımpaşa Benedyczak'ın golüyle Eyüpspor'u 1-0, Erzurumspor Gaziantep FK'yı 3-1, Kocaelispor Alanyaspor'u 2-1 yendi. Konyaspor Awaziem'in iki golüyle Gençlerbirliği'ni, Göztepe de Antunes ve Juan'ın golleriyle Çorum FK'yı 2-0 geçti.",
+    source: "beIN Sports / Ajansspor / Sporx / Sporkolik",
+    url: "https://t24.com.tr/spor/trendyol-super-ligde-9-haftanin-ardindan-gorunum-puan-durumu-ve-10-hafta-programi,1355474",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s6", "s11", "s16", "s8", "s15", "s14", "s10", "s17", "s9", "s18", "s7", "s13"],
   },
 
   // ---- 2026-27 UCL lig fazı: dikkat çekici eşleşme önizlemeleri ----

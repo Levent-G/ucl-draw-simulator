@@ -12,7 +12,7 @@
 // tablosuyla birebir aynıydı). 7. Hafta 9 Ekim 20.00'de başladı; açılış
 // maçı Galatasaray 3-1 Kasımpaşa aynı gece 23:30'da eklendi. Kalan 8 maç
 // (10-12 Ekim) oynandıkça buraya eklenmeli.
-export const SUPER_LIG_LIVE_ASOF = "19 Ekim 2026, 22:00 (8. Hafta TAMAMLANDI: 9/9 maç oynandı)";
+export const SUPER_LIG_LIVE_ASOF = "27 Ekim 2026 (9. Hafta TAMAMLANDI: 9/9 maç oynandı)";
 
 // Türkçe Vikipedi'nin "2026-27 Süper Lig" maddesinin ham wikitext'i (maç
 // sonuçları) + "Şablon:2026-27 Süper Lig puan durumu" (güncel puan durumu
@@ -105,27 +105,27 @@ export const SUPER_LIG_LIVE_ASOF = "19 Ekim 2026, 22:00 (8. Hafta TAMAMLANDI: 9/
 // sütunları birbirine eşit=161, toplam puan=151 -- 54 maçlık bir sezonun bu
 // aşamasında matematiksel olarak beklenen değerler).
 export const SUPER_LIG_LIVE_STANDINGS = [
-  // 19 Ekim 2026: 8. Hafta TAMAMLANDI (9/9) -- son maç Trabzonspor 2-0 Beşiktaş.
-  // Tablo SUPER_LIG_LIVE_RESULTS'tan yeniden hesaplandı: puan > averaj > atılan gol,
-  // eşitlikte önceki sıra korunur. Trabzonspor 16, Beşiktaş 15 puan -- tutarlı.
-  { rank: 1, teamName: "Galatasaray", played: 8, w: 6, d: 1, l: 1, gf: 17, ga: 11, pts: 19 },
-  { rank: 2, teamName: "Amed SFK", played: 8, w: 5, d: 2, l: 1, gf: 18, ga: 9, pts: 17 },
-  { rank: 3, teamName: "Fenerbahçe", played: 8, w: 5, d: 1, l: 2, gf: 22, ga: 6, pts: 16 },
-  { rank: 4, teamName: "Trabzonspor", played: 8, w: 5, d: 1, l: 2, gf: 18, ga: 5, pts: 16 },
-  { rank: 5, teamName: "Beşiktaş", played: 8, w: 5, d: 0, l: 3, gf: 16, ga: 10, pts: 15 },
-  { rank: 6, teamName: "Çorum FK", played: 8, w: 4, d: 1, l: 3, gf: 18, ga: 13, pts: 13 },
-  { rank: 7, teamName: "Kasımpaşa", played: 8, w: 3, d: 4, l: 1, gf: 12, ga: 9, pts: 13 },
-  { rank: 8, teamName: "Kocaelispor", played: 8, w: 4, d: 0, l: 4, gf: 9, ga: 8, pts: 12 },
-  { rank: 9, teamName: "Alanyaspor", played: 8, w: 3, d: 3, l: 2, gf: 8, ga: 9, pts: 12 },
-  { rank: 10, teamName: "İstanbul Başakşehir", played: 8, w: 3, d: 2, l: 3, gf: 12, ga: 12, pts: 11 },
-  { rank: 11, teamName: "Erzurumspor FK", played: 8, w: 3, d: 2, l: 3, gf: 5, ga: 11, pts: 11 },
-  { rank: 12, teamName: "Çaykur Rizespor", played: 8, w: 3, d: 1, l: 4, gf: 8, ga: 11, pts: 10 },
-  { rank: 13, teamName: "Göztepe", played: 8, w: 2, d: 3, l: 3, gf: 17, ga: 16, pts: 9 },
-  { rank: 14, teamName: "Gaziantep FK", played: 8, w: 2, d: 2, l: 4, gf: 8, ga: 12, pts: 8 },
-  { rank: 15, teamName: "Gençlerbirliği", played: 8, w: 2, d: 2, l: 4, gf: 7, ga: 16, pts: 8 },
-  { rank: 16, teamName: "Konyaspor", played: 8, w: 1, d: 2, l: 5, gf: 4, ga: 9, pts: 5 },
-  { rank: 17, teamName: "Samsunspor", played: 8, w: 1, d: 1, l: 6, gf: 7, ga: 19, pts: 4 },
-  { rank: 18, teamName: "Eyüpspor", played: 8, w: 1, d: 0, l: 7, gf: 2, ga: 22, pts: 3 },
+  // 27 Ekim 2026: 9. Hafta TAMAMLANDI (9/9). Tablo SUPER_LIG_LIVE_RESULTS'tan yeniden
+  // hesaplandı (puan > averaj > atılan gol, eşitlikte önceki sıra). 18 takımın puanı t24 /
+  // Fotomaç 9. hafta puan durumuyla birebir aynı.
+  { rank: 1, teamName: "Galatasaray", played: 9, w: 7, d: 1, l: 1, gf: 19, ga: 12, pts: 22 },
+  { rank: 2, teamName: "Amed SFK", played: 9, w: 6, d: 2, l: 1, gf: 20, ga: 10, pts: 20 },
+  { rank: 3, teamName: "Trabzonspor", played: 9, w: 6, d: 1, l: 2, gf: 22, ga: 8, pts: 19 },
+  { rank: 4, teamName: "Beşiktaş", played: 9, w: 6, d: 0, l: 3, gf: 18, ga: 10, pts: 18 },
+  { rank: 5, teamName: "Fenerbahçe", played: 9, w: 5, d: 1, l: 3, gf: 23, ga: 8, pts: 16 },
+  { rank: 6, teamName: "Kasımpaşa", played: 9, w: 4, d: 4, l: 1, gf: 13, ga: 9, pts: 16 },
+  { rank: 7, teamName: "Kocaelispor", played: 9, w: 5, d: 0, l: 4, gf: 11, ga: 9, pts: 15 },
+  { rank: 8, teamName: "Erzurumspor FK", played: 9, w: 4, d: 2, l: 3, gf: 8, ga: 12, pts: 14 },
+  { rank: 9, teamName: "Çorum FK", played: 9, w: 4, d: 1, l: 4, gf: 18, ga: 15, pts: 13 },
+  { rank: 10, teamName: "Göztepe", played: 9, w: 3, d: 3, l: 3, gf: 19, ga: 16, pts: 12 },
+  { rank: 11, teamName: "Alanyaspor", played: 9, w: 3, d: 3, l: 3, gf: 9, ga: 11, pts: 12 },
+  { rank: 12, teamName: "İstanbul Başakşehir", played: 9, w: 3, d: 2, l: 4, gf: 12, ga: 14, pts: 11 },
+  { rank: 13, teamName: "Çaykur Rizespor", played: 9, w: 3, d: 1, l: 5, gf: 11, ga: 15, pts: 10 },
+  { rank: 14, teamName: "Konyaspor", played: 9, w: 2, d: 2, l: 5, gf: 6, ga: 9, pts: 8 },
+  { rank: 15, teamName: "Gaziantep FK", played: 9, w: 2, d: 2, l: 5, gf: 9, ga: 15, pts: 8 },
+  { rank: 16, teamName: "Gençlerbirliği", played: 9, w: 2, d: 2, l: 5, gf: 7, ga: 18, pts: 8 },
+  { rank: 17, teamName: "Samsunspor", played: 9, w: 1, d: 1, l: 7, gf: 8, ga: 21, pts: 4 },
+  { rank: 18, teamName: "Eyüpspor", played: 9, w: 1, d: 0, l: 8, gf: 2, ga: 23, pts: 3 },
 ];
 
 // 1., 2. ve 3. Hafta'nın TAMAMI (27 maç) — Türkçe Vikipedi'nin ham
@@ -263,6 +263,18 @@ export const SUPER_LIG_LIVE_RESULTS = [
   // 19 Ekim gece tazelemesi -- 8. Hafta TAMAMLANDI (9/9). Trabzonspor 2-0 Beşiktaş:
   // Star, Cumhuriyet, Sporkolik, Karsmanset, Sporx.
   { label: "8. Hafta", date: "19 Eki", home: "Trabzonspor", homeGoals: 2, away: "Beşiktaş", awayGoals: 0 },
+  // 9. Hafta (23-26 Ekim 2026) -- 27 Ekim tazelemesi, 9/9 maç. Kaynaklar: beIN Sports,
+  // Hürriyet, Habertürk, Ajansspor, Sporx, Sporkolik, Daily Sabah; puan durumu t24 / Fotomaç
+  // 9. hafta tablosuyla birebir tutarlı.
+  { label: "9. Hafta", date: "23 Eki", home: "Alanyaspor", homeGoals: 1, away: "Kocaelispor", awayGoals: 2 },
+  { label: "9. Hafta", date: "24 Eki", home: "Eyüpspor", homeGoals: 0, away: "Kasımpaşa", awayGoals: 1 },
+  { label: "9. Hafta", date: "24 Eki", home: "Gaziantep FK", homeGoals: 1, away: "Erzurumspor FK", awayGoals: 3 },
+  { label: "9. Hafta", date: "24 Eki", home: "Samsunspor", homeGoals: 1, away: "Amed SFK", awayGoals: 2 },
+  { label: "9. Hafta", date: "25 Eki", home: "Konyaspor", homeGoals: 2, away: "Gençlerbirliği", awayGoals: 0 },
+  { label: "9. Hafta", date: "25 Eki", home: "Göztepe", homeGoals: 2, away: "Çorum FK", awayGoals: 0 },
+  { label: "9. Hafta", date: "26 Eki", home: "Beşiktaş", homeGoals: 2, away: "İstanbul Başakşehir", awayGoals: 0 },
+  { label: "9. Hafta", date: "26 Eki", home: "Çaykur Rizespor", homeGoals: 3, away: "Trabzonspor", awayGoals: 4 },
+  { label: "9. Hafta", date: "26 Eki", home: "Galatasaray", homeGoals: 2, away: "Fenerbahçe", awayGoals: 1 },
 ];
 
 // Simüle edilmiş TAM fikstürü (roundRobinEngine'den gelen, gerçek dünyayla

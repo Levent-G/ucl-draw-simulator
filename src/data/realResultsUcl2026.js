@@ -84,4 +84,17 @@ export const REAL_RESULTS_UCL_2026 = [
   { matchId: "r3m6", homeGoals: 4, awayGoals: 2, date: "2026-10-20" }, // Paris Saint-Germain 4-2 Barcelona
   { matchId: "r3m7", homeGoals: 4, awayGoals: 3, date: "2026-10-20" }, // Napoli 4-3 Bodø/Glimt
   { matchId: "r3m8", homeGoals: 1, awayGoals: 1, date: "2026-10-20" }, // VfB Stuttgart 1-1 Atletico Madrid
+
+  // 3. Hafta -- 21 Ekim 2026, 18:45 maçları (ESPN + Ajansspor/Hürriyet/VAVEL/TNT).
+  // 21:00 maçları (r3m11..r3m17) bu tazeleme anında sürüyordu.
+  { matchId: "r3m9", homeGoals: 4, awayGoals: 1, date: "2026-10-21" }, // Como 4-1 Manchester United
+  { matchId: "r3m10", homeGoals: 2, awayGoals: 4, date: "2026-10-21" }, // Lille 2-4 Galatasaray
+  // 21 Ekim 21:00 maçları -- 3. Hafta TAMAMLANDI (18/18). ESPN + NBC Sports + Sky Sports/Yahoo.
+  { matchId: "r3m11", homeGoals: 3, awayGoals: 1, date: "2026-10-21" }, // Aston Villa 3-1 Viking
+  { matchId: "r3m12", homeGoals: 3, awayGoals: 0, date: "2026-10-21" }, // Club Brugge 3-0 RC Lens
+  { matchId: "r3m13", homeGoals: 2, awayGoals: 2, date: "2026-10-21" }, // Bayern Münih 2-2 Arsenal
+  { matchId: "r3m14", homeGoals: 1, awayGoals: 0, date: "2026-10-21" }, // Inter 1-0 Shakhtar Donetsk
+  { matchId: "r3m15", homeGoals: 4, awayGoals: 1, date: "2026-10-21" }, // Real Madrid 4-1 RB Leipzig
+  { matchId: "r3m16", homeGoals: 1, awayGoals: 0, date: "2026-10-21" }, // Real Betis 1-0 Feyenoord
+  { matchId: "r3m17", homeGoals: 2, awayGoals: 3, date: "2026-10-21" }, // Sporting CP 2-3 LASK
 ];

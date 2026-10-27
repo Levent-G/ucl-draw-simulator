@@ -500,4 +500,95 @@ export const SUPER_LIG_MATCH_STATS = {
     asOf: "2026-10-19",
     source: "Star / Cumhuriyet / Sporkolik / Karsmanset",
   },
+  // ---- 9. Hafta (23-26 Ekim 2026) -- sadece golcüler.
+  sr9m2: {
+    // Alanyaspor 1-2 Kocaelispor (23 Eki) -- Alanyaspor'un golü beIN'in gol listesinde Duarte; maç anlatımında Ruan geçiyor.
+    scorers: [
+      { teamId: "s17", playerName: "Berkan Kutlu", minute: 27 },
+      { teamId: "s17", playerName: "Baku", minute: 42 },
+      { teamId: "s10", playerName: "Duarte", minute: 52 },
+    ],
+    asOf: "2026-10-27",
+    source: "beIN Sports / Ensonhaber",
+  },
+  sr9m1: {
+    // Eyüpspor 0-1 Kasımpaşa (24 Eki)
+    scorers: [
+      { teamId: "s8", playerName: "Adrian Benedyczak", minute: 37 },
+    ],
+    asOf: "2026-10-27",
+    source: "beIN Sports / Ensonhaber",
+  },
+  sr9m0: {
+    // Gaziantep FK 1-3 Erzurumspor FK (24 Eki) -- Giorbelidze'nin golü 90+4'; bazı kaynaklarda Çalhanoğlu 69', Gerxhaliu 64'.
+    scorers: [
+      { teamId: "s14", playerName: "Miguel Cardoso", minute: 52 },
+      { teamId: "s14", playerName: "Amar Gerxhaliu", minute: 63 },
+      { teamId: "s15", playerName: "Kerim Çalhanoğlu", minute: 70 },
+      { teamId: "s14", playerName: "Guram Giorbelidze", minute: 94 },
+    ],
+    asOf: "2026-10-27",
+    source: "Ajansspor / beIN Sports",
+  },
+  sr9m6: {
+    // Samsunspor 1-2 Amed SFK (24 Eki) -- Kırmızı kartlar: Afonso Sousa (Samsunspor, 37'), Mbaye Diagne (Amed SFK, 60').
+    scorers: [
+      { teamId: "s6", playerName: "Logi Tomasson", minute: 21 },
+      { teamId: "s11", playerName: "Gift Orban", minute: 73, penalty: true },
+      { teamId: "s11", playerName: "Dia Saba", minute: 83 },
+    ],
+    asOf: "2026-10-27",
+    source: "beIN Sports / Ensonhaber",
+  },
+  sr9m3: {
+    // Konyaspor 2-0 Gençlerbirliği (25 Eki)
+    scorers: [
+      { teamId: "s9", playerName: "Chidozie Awaziem", minute: 43 },
+      { teamId: "s9", playerName: "Chidozie Awaziem", minute: 56 },
+    ],
+    asOf: "2026-10-27",
+    source: "Sporkolik / Sporx",
+  },
+  sr9m8: {
+    // Göztepe 2-0 Çorum FK (25 Eki)
+    scorers: [
+      { teamId: "s7", playerName: "Alexis Antunes", minute: 3 },
+      { teamId: "s7", playerName: "Juan", minute: 38 },
+    ],
+    asOf: "2026-10-27",
+    source: "Habertürk / Sporx",
+  },
+  sr9m5: {
+    // Beşiktaş 2-0 İstanbul Başakşehir (26 Eki)
+    scorers: [
+      { teamId: "s3", playerName: "Hyeon-Gyu Oh", minute: 76 },
+      { teamId: "s3", playerName: "Junior Olaitan", minute: 89 },
+    ],
+    asOf: "2026-10-27",
+    source: "beIN Sports / Daily Sabah",
+  },
+  sr9m7: {
+    // Çaykur Rizespor 3-4 Trabzonspor (26 Eki) -- Hürriyet anlatımında Franculino 58' ve 85', Laçi 70'.
+    scorers: [
+      { teamId: "s12", playerName: "Gennaro Borrelli", minute: 12 },
+      { teamId: "s12", playerName: "Gennaro Borrelli", minute: 32 },
+      { teamId: "s4", playerName: "Melih Kabasakal", minute: 49 },
+      { teamId: "s4", playerName: "Aral Şimşir", minute: 51 },
+      { teamId: "s4", playerName: "Franculino Dju", minute: 57 },
+      { teamId: "s12", playerName: "Qazim Laçi", minute: 69 },
+      { teamId: "s4", playerName: "Franculino Dju", minute: 83 },
+    ],
+    asOf: "2026-10-27",
+    source: "Hürriyet / beIN Sports / Star",
+  },
+  sr9m4: {
+    // Galatasaray 2-1 Fenerbahçe (26 Eki)
+    scorers: [
+      { teamId: "s1", playerName: "Victor Osimhen", minute: 29 },
+      { teamId: "s1", playerName: "Victor Osimhen", minute: 44 },
+      { teamId: "s2", playerName: "İrfan Can Kahveci", minute: 62 },
+    ],
+    asOf: "2026-10-27",
+    source: "Hürriyet / Habertürk / Ajansspor / Akşam",
+  },
 };

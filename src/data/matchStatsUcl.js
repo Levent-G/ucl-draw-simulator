@@ -866,4 +866,103 @@ export const UCL_MATCH_STATS = {
     asOf: "2026-10-21",
     source: "ESPN / UEFA.com / AA / Sofascore / Al Jazeera",
   },
+  // ---- 3. Hafta, 21 Ekim 2026 (18:45 maçları) -- sadece golcüler.
+  r3m9: {
+    // Como 4-1 Manchester United
+    scorers: [
+      { teamId: "t34", playerName: "Nico Paz", minute: 2 },
+      { teamId: "t34", playerName: "Anastasios Douvikas", minute: 49 },
+      { teamId: "t34", playerName: "Nico Paz", minute: 57 },
+      { teamId: "t34", playerName: "Jacobo Ramón", minute: 76 },
+      { teamId: "t8", playerName: "Joshua Zirkzee", minute: 91 },
+    ],
+    asOf: "2026-10-21",
+    source: "ESPN / Ajansspor / Hürriyet / VAVEL / TNT Sports",
+  },
+  r3m10: {
+    // Lille 2-4 Galatasaray -- 52'deki gol ESPN, UEFA ve Hürriyet özetinde Berke Özer'in kendi kalesine golü; Hürriyet canlı anlatımı Torreira'nın kafası diyor. Yunus Akgün'ün golü bazı kaynaklarda 1'.
+    scorers: [
+      { teamId: "t35", playerName: "Yunus Akgün", minute: 2 },
+      { teamId: "t26", playerName: "Soriba Diaoune", minute: 7 },
+      { teamId: "t26", playerName: "Soriba Diaoune", minute: 39 },
+      { teamId: "t35", playerName: "Aleksey Batrakov", minute: 44 },
+      { teamId: "t35", playerName: "Berke Özer", minute: 52, ownGoal: true },
+      { teamId: "t35", playerName: "Victor Osimhen", minute: 61 },
+    ],
+    asOf: "2026-10-21",
+    source: "ESPN / Ajansspor / Hürriyet / VAVEL / TNT Sports",
+  },
+  // ---- 3. Hafta, 21 Ekim 2026 (21:00 maçları) -- sadece golcüler.
+  r3m11: {
+    // Aston Villa 3-1 Viking -- Heggheim (Viking) Alysson'un ortasında topu kendi kalesine çeldi (Sky Sports / Newsbeep).
+    scorers: [
+      { teamId: "t20", playerName: "Ross Barkley", minute: 23 },
+      { teamId: "t20", playerName: "Emiliano Buendía", minute: 37, penalty: true },
+      { teamId: "t20", playerName: "Henrik Heggheim", minute: 62, ownGoal: true },
+      { teamId: "t30", playerName: "Peter Christiansen", minute: 84 },
+    ],
+    asOf: "2026-10-27",
+    source: "ESPN / NBC Sports / Sky Sports / Yahoo Sports / SoccerMag",
+  },
+  r3m12: {
+    // Club Brugge 3-0 RC Lens -- Vanaken'in golü 45+3'.
+    scorers: [
+      { teamId: "t17", playerName: "Hans Vanaken", minute: 48 },
+      { teamId: "t17", playerName: "Joaquin Seys", minute: 50 },
+      { teamId: "t17", playerName: "Carlos Forbs", minute: 72 },
+    ],
+    asOf: "2026-10-27",
+    source: "ESPN / NBC Sports / Sky Sports / Yahoo Sports / SoccerMag",
+  },
+  r3m13: {
+    // Bayern Münih 2-2 Arsenal
+    scorers: [
+      { teamId: "t11", playerName: "Eberechi Eze", minute: 25 },
+      { teamId: "t3", playerName: "Alphonso Davies", minute: 35 },
+      { teamId: "t3", playerName: "Harry Kane", minute: 61, penalty: true },
+      { teamId: "t11", playerName: "Declan Rice", minute: 82 },
+    ],
+    asOf: "2026-10-27",
+    source: "ESPN / NBC Sports / Sky Sports / Yahoo Sports / SoccerMag",
+  },
+  r3m14: {
+    // Inter 1-0 Shakhtar Donetsk -- Inter'den Alessandro Bastoni ikinci yarıda kırmızı kart gördü.
+    scorers: [
+      { teamId: "t6", playerName: "Carlos Augusto", minute: 77 },
+    ],
+    asOf: "2026-10-27",
+    source: "ESPN / NBC Sports / Sky Sports / Yahoo Sports / SoccerMag",
+  },
+  r3m15: {
+    // Real Madrid 4-1 RB Leipzig
+    scorers: [
+      { teamId: "t1", playerName: "Bernardo Silva", minute: 43 },
+      { teamId: "t1", playerName: "Arda Güler", minute: 52 },
+      { teamId: "t1", playerName: "Kylian Mbappé", minute: 83 },
+      { teamId: "t15", playerName: "Tidiam Gomis", minute: 85 },
+      { teamId: "t1", playerName: "Yan Diomande", minute: 87 },
+    ],
+    asOf: "2026-10-27",
+    source: "ESPN / NBC Sports / Sky Sports / Yahoo Sports / SoccerMag",
+  },
+  r3m16: {
+    // Real Betis 1-0 Feyenoord
+    scorers: [
+      { teamId: "t19", playerName: "Isco", minute: 59, penalty: true },
+    ],
+    asOf: "2026-10-27",
+    source: "ESPN / NBC Sports / Sky Sports / Yahoo Sports / SoccerMag",
+  },
+  r3m17: {
+    // Sporting CP 2-3 LASK
+    scorers: [
+      { teamId: "t23", playerName: "Luis Suárez", minute: 5, penalty: true },
+      { teamId: "t33", playerName: "Christoph Lang", minute: 15 },
+      { teamId: "t33", playerName: "Saša Kalajdžić", minute: 63 },
+      { teamId: "t33", playerName: "Krystof Danek", minute: 68 },
+      { teamId: "t23", playerName: "Luis Suárez", minute: 89 },
+    ],
+    asOf: "2026-10-27",
+    source: "ESPN / NBC Sports / Sky Sports / Yahoo Sports / SoccerMag",
+  },
 };
