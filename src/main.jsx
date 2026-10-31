@@ -16,6 +16,7 @@ import AppShell from './AppShell.jsx'
 import RouteLoading from './components/RouteLoading.jsx'
 import './index.css'
 import './styles/pages.css'
+import './styles/football-hub.css'
 
 // Rota bileşenleri lazy-load edilir -- her sayfa (özellikle recharts/
 // html2canvas kullanan İstatistikler, Canlı Skorlar, Arşiv, Rüya Takım gibi

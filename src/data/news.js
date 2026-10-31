@@ -1384,6 +1384,39 @@ export const NEWS_ITEMS = [
     relatedTeamIds: ["s4", "s3"],
   },
   {
+    id: "news-sl-68",
+    date: "2026-10-30",
+    title: "Galatasaray Konya'da farka koştu: 0-4",
+    summary:
+      "10. haftanın açılış maçında Galatasaray, Osimhen (12'), Yunus Akgün (28', ceza sahası dışından), Batrakov (49', Süper Lig'deki ilk golü) ve VAR sonrası verilen penaltıda Rafael Leao'nun (55') golleriyle Konyaspor'u 4-0 yendi. Sarı-kırmızılılar 25 puanla liderliğini sürdürdü, Konyaspor 8 puanda kaldı.",
+    source: "beIN Sports / Ajansspor / Habertürk / Milliyet",
+    url: "https://beinsports.com.tr/haber/tumosan-konyaspor-galatasaray-4",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s9", "s1"],
+  },
+  {
+    id: "news-sl-70",
+    date: "2026-10-31",
+    title: "Çorum FK, Erzurum'un serisini bitirdi: 1-3",
+    summary:
+      "Çorum FK, Kazım Karabekir'de Çağlar Söyüncü'nün 20. dakikadaki golüyle öne geçti. Jesus Ramirez 71. dakikada farkı ikiye çıkardı, Ibrahim Diabate 74'te Erzurumspor adına skoru 1-2 yaptı. Ramirez, Orhan Ovacıklı'nın elle oynaması sonucu verilen penaltıyı 79'da gole çevirdi. Çorum FK 16 puana yükseldi, Erzurumspor'un 4 maçlık yenilmezlik serisi sona erdi.",
+    source: "Hürriyet / Sporx / Yeni Şafak / Milliyet",
+    url: "https://www.hurriyet.com.tr/sporarena/canli-anlatim-erzurumspor-corum-fk-maci-43361372",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s14", "s13"],
+  },
+  {
+    id: "news-sl-69",
+    date: "2026-10-29",
+    title: "PFDK derbinin faturasını kesti: Brown'a 3, Abdülkerim'e 2 maç",
+    summary:
+      "Profesyonel Futbol Disiplin Kurulu, derbinin bitiş düdüğünde kavga ederek kırmızı kart gören Fenerbahçeli Archie Brown'a 3, Galatasaraylı Abdülkerim Bardakcı'ya 2 maç men cezası verdi. Galatasaray'a 2 milyon 120 bin TL, Fenerbahçe'ye 1 milyon 277 bin TL para cezası kesildi. Brown, Göztepe maçında forma giyemeyecek.",
+    source: "AA / İHA / Hürriyet / Sözcü",
+    url: "https://www.aa.com.tr/tr/spor/pfdkden-archie-browna-3-abdulkerim-bardakciya-2-mac-ceza/4105598",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s1", "s2"],
+  },
+  {
     id: "news-sl-65",
     date: "2026-10-26",
     title: "Derbi Galatasaray'ın: Osimhen'in iki golüyle Fenerbahçe 2-1 yenildi",

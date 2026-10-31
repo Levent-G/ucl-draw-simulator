@@ -12,7 +12,7 @@
 // tablosuyla birebir aynıydı). 7. Hafta 9 Ekim 20.00'de başladı; açılış
 // maçı Galatasaray 3-1 Kasımpaşa aynı gece 23:30'da eklendi. Kalan 8 maç
 // (10-12 Ekim) oynandıkça buraya eklenmeli.
-export const SUPER_LIG_LIVE_ASOF = "27 Ekim 2026 (9. Hafta TAMAMLANDI: 9/9 maç oynandı)";
+export const SUPER_LIG_LIVE_ASOF = "31 Ekim 2026 (10. Hafta: 2/9 maç oynandı)";
 
 // Türkçe Vikipedi'nin "2026-27 Süper Lig" maddesinin ham wikitext'i (maç
 // sonuçları) + "Şablon:2026-27 Süper Lig puan durumu" (güncel puan durumu
@@ -105,24 +105,24 @@ export const SUPER_LIG_LIVE_ASOF = "27 Ekim 2026 (9. Hafta TAMAMLANDI: 9/9 maç 
 // sütunları birbirine eşit=161, toplam puan=151 -- 54 maçlık bir sezonun bu
 // aşamasında matematiksel olarak beklenen değerler).
 export const SUPER_LIG_LIVE_STANDINGS = [
-  // 27 Ekim 2026: 9. Hafta TAMAMLANDI (9/9). Tablo SUPER_LIG_LIVE_RESULTS'tan yeniden
-  // hesaplandı (puan > averaj > atılan gol, eşitlikte önceki sıra). 18 takımın puanı t24 /
-  // Fotomaç 9. hafta puan durumuyla birebir aynı.
-  { rank: 1, teamName: "Galatasaray", played: 9, w: 7, d: 1, l: 1, gf: 19, ga: 12, pts: 22 },
+  // 31 Ekim 2026: 10. Hafta 2/9 (Konyaspor 0-4 Galatasaray, Erzurumspor FK 1-3 Çorum FK). Tablo SUPER_LIG_LIVE_RESULTS'tan
+  // yeniden hesaplandı (puan > averaj > atılan gol, eşitlikte önceki sıra). 9. hafta sonu
+  // tablosu t24 / Fotomaç ile birebir aynıydı; GS 25 puan beIN/Ajansspor ile tutarlı.
+  { rank: 1, teamName: "Galatasaray", played: 10, w: 8, d: 1, l: 1, gf: 23, ga: 12, pts: 25 },
   { rank: 2, teamName: "Amed SFK", played: 9, w: 6, d: 2, l: 1, gf: 20, ga: 10, pts: 20 },
   { rank: 3, teamName: "Trabzonspor", played: 9, w: 6, d: 1, l: 2, gf: 22, ga: 8, pts: 19 },
   { rank: 4, teamName: "Beşiktaş", played: 9, w: 6, d: 0, l: 3, gf: 18, ga: 10, pts: 18 },
   { rank: 5, teamName: "Fenerbahçe", played: 9, w: 5, d: 1, l: 3, gf: 23, ga: 8, pts: 16 },
-  { rank: 6, teamName: "Kasımpaşa", played: 9, w: 4, d: 4, l: 1, gf: 13, ga: 9, pts: 16 },
-  { rank: 7, teamName: "Kocaelispor", played: 9, w: 5, d: 0, l: 4, gf: 11, ga: 9, pts: 15 },
-  { rank: 8, teamName: "Erzurumspor FK", played: 9, w: 4, d: 2, l: 3, gf: 8, ga: 12, pts: 14 },
-  { rank: 9, teamName: "Çorum FK", played: 9, w: 4, d: 1, l: 4, gf: 18, ga: 15, pts: 13 },
+  { rank: 6, teamName: "Çorum FK", played: 10, w: 5, d: 1, l: 4, gf: 21, ga: 16, pts: 16 },
+  { rank: 7, teamName: "Kasımpaşa", played: 9, w: 4, d: 4, l: 1, gf: 13, ga: 9, pts: 16 },
+  { rank: 8, teamName: "Kocaelispor", played: 9, w: 5, d: 0, l: 4, gf: 11, ga: 9, pts: 15 },
+  { rank: 9, teamName: "Erzurumspor FK", played: 10, w: 4, d: 2, l: 4, gf: 9, ga: 15, pts: 14 },
   { rank: 10, teamName: "Göztepe", played: 9, w: 3, d: 3, l: 3, gf: 19, ga: 16, pts: 12 },
   { rank: 11, teamName: "Alanyaspor", played: 9, w: 3, d: 3, l: 3, gf: 9, ga: 11, pts: 12 },
   { rank: 12, teamName: "İstanbul Başakşehir", played: 9, w: 3, d: 2, l: 4, gf: 12, ga: 14, pts: 11 },
   { rank: 13, teamName: "Çaykur Rizespor", played: 9, w: 3, d: 1, l: 5, gf: 11, ga: 15, pts: 10 },
-  { rank: 14, teamName: "Konyaspor", played: 9, w: 2, d: 2, l: 5, gf: 6, ga: 9, pts: 8 },
-  { rank: 15, teamName: "Gaziantep FK", played: 9, w: 2, d: 2, l: 5, gf: 9, ga: 15, pts: 8 },
+  { rank: 14, teamName: "Gaziantep FK", played: 9, w: 2, d: 2, l: 5, gf: 9, ga: 15, pts: 8 },
+  { rank: 15, teamName: "Konyaspor", played: 10, w: 2, d: 2, l: 6, gf: 6, ga: 13, pts: 8 },
   { rank: 16, teamName: "Gençlerbirliği", played: 9, w: 2, d: 2, l: 5, gf: 7, ga: 18, pts: 8 },
   { rank: 17, teamName: "Samsunspor", played: 9, w: 1, d: 1, l: 7, gf: 8, ga: 21, pts: 4 },
   { rank: 18, teamName: "Eyüpspor", played: 9, w: 1, d: 0, l: 8, gf: 2, ga: 23, pts: 3 },
@@ -275,6 +275,12 @@ export const SUPER_LIG_LIVE_RESULTS = [
   { label: "9. Hafta", date: "26 Eki", home: "Beşiktaş", homeGoals: 2, away: "İstanbul Başakşehir", awayGoals: 0 },
   { label: "9. Hafta", date: "26 Eki", home: "Çaykur Rizespor", homeGoals: 3, away: "Trabzonspor", awayGoals: 4 },
   { label: "9. Hafta", date: "26 Eki", home: "Galatasaray", homeGoals: 2, away: "Fenerbahçe", awayGoals: 1 },
+  // 10. Hafta (30 Ekim - 2 Kasım 2026) -- 31 Ekim tazelemesi. Konyaspor 0-4 Galatasaray:
+  // beIN Sports, Ajansspor, Habertürk, Milliyet, Yirmidört. Erzurumspor FK 1-3 Çorum FK
+  // (31 Eki 13:30): Hürriyet, Sporx, Yeni Şafak, Milliyet, ensondakika. Kocaelispor-Rizespor
+  // tazeleme anında oynanıyordu.
+  { label: "10. Hafta", date: "30 Eki", home: "Konyaspor", homeGoals: 0, away: "Galatasaray", awayGoals: 4 },
+  { label: "10. Hafta", date: "31 Eki", home: "Erzurumspor FK", homeGoals: 1, away: "Çorum FK", awayGoals: 3 },
 ];
 
 // Simüle edilmiş TAM fikstürü (roundRobinEngine'den gelen, gerçek dünyayla

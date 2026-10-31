@@ -591,4 +591,27 @@ export const SUPER_LIG_MATCH_STATS = {
     asOf: "2026-10-27",
     source: "Hürriyet / Habertürk / Ajansspor / Akşam",
   },
+  // ---- 10. Hafta (30 Ekim - 2 Kasım 2026) -- sadece golcüler.
+  sr10m1: {
+    // Konyaspor 0-4 Galatasaray (30 Eki) -- Leao'nun golü VAR sonrası penaltı. Sarı kartlar: Sara 31', Deniz Türüç 45+5', Jevtovic 89'.
+    scorers: [
+      { teamId: "s1", playerName: "Victor Osimhen", minute: 12 },
+      { teamId: "s1", playerName: "Yunus Akgün", minute: 28 },
+      { teamId: "s1", playerName: "Aleksey Batrakov", minute: 49 },
+      { teamId: "s1", playerName: "Rafael Leao", minute: 55, penalty: true },
+    ],
+    asOf: "2026-10-31",
+    source: "beIN Sports / Ajansspor",
+  },
+  sr10m8: {
+    // Erzurumspor FK 1-3 Çorum FK (31 Eki) -- Ramirez'in ikinci golü 77'de Orhan Ovacıklı'nın elle oynamasıyla verilen penaltıdan. Sporkolik ilk golü 68' yazıyor.
+    scorers: [
+      { teamId: "s13", playerName: "Çağlar Söyüncü", minute: 20 },
+      { teamId: "s13", playerName: "Jesus Ramirez", minute: 71 },
+      { teamId: "s14", playerName: "Ibrahim Diabate", minute: 74 },
+      { teamId: "s13", playerName: "Jesus Ramirez", minute: 79, penalty: true },
+    ],
+    asOf: "2026-10-31",
+    source: "Hürriyet / ensondakika / Sporx",
+  },
 };

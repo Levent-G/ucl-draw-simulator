@@ -1443,9 +1443,9 @@ export const TOP_SCORERS = [
     playerName: "Victor Osimhen",
     teamId: "s1", // Galatasaray
     competitionKey: "superlig",
-    goals: 8, // 1. hafta Çorum FK'ya 2 (53' ve 90'), 2. hafta Erzurumspor FK'ya 2, 3. hafta Göztepe'ye 1 (penaltı), 4. hafta Başakşehir'e 1 -- 5. ve 6. hafta sakatlık nedeniyle forma giymedi (bkz. Hürriyet/Fotomaç/Fanatik/gzt.com), bu yüzden 6 gollük toplam DEĞİŞMEDİ + 9. hafta 2
-    asOf: "2026-10-27",
-    source: "Hürriyet / Habertürk / galatasaray.org / takvim.com.tr / ajansspor.com / Fotomaç / gzt.com / fotmob.com / Hürriyet / Habertürk / Ajansspor / Akşam",
+    goals: 9, // 1. hafta Çorum FK'ya 2 (53' ve 90'), 2. hafta Erzurumspor FK'ya 2, 3. hafta Göztepe'ye 1 (penaltı), 4. hafta Başakşehir'e 1 -- 5. ve 6. hafta sakatlık nedeniyle forma giymedi (bkz. Hürriyet/Fotomaç/Fanatik/gzt.com), bu yüzden 6 gollük toplam DEĞİŞMEDİ + 9. hafta 2 + 10. hafta Konyaspor'a 1 (12')
+    asOf: "2026-10-31",
+    source: "Hürriyet / Habertürk / galatasaray.org / takvim.com.tr / ajansspor.com / Fotomaç / gzt.com / fotmob.com / Hürriyet / Habertürk / Ajansspor / Akşam / beIN Sports",
   },
   {
     playerName: "Dušan Vlahović",
@@ -1602,10 +1602,9 @@ export const TOP_SCORERS = [
     playerName: "Jesus Ramirez",
     teamId: "s13", // Çorum FK
     competitionKey: "superlig",
-    goals: 4, // 1. hafta Galatasaray'a karşı 1 (61'), 5. hafta Samsunspor deplasmanında 2 (1', 71'), 6. hafta Alanyaspor'a 1 (76')
-    matchesPlayed: 6,
-    asOf: "2026-09-20",
-    source: "Hürriyet / ajansspor.com / Fanatik / Habertürk / Sporkolik.net",
+    goals: 6, // 1. hafta Galatasaray'a karşı 1 (61'), 5. hafta Samsunspor deplasmanında 2 (1', 71'), 6. hafta Alanyaspor'a 1 (76'), 10. hafta Erzurumspor deplasmanında 2 (71', 79' penaltı)
+    asOf: "2026-10-31",
+    source: "Hürriyet / ajansspor.com / Fanatik / Habertürk / Sporkolik.net / ensondakika",
   },
   {
     // superLigPlayers.js'te Çorum FK (s13) kadrosunda YOK, bkz. üstteki not.
@@ -2248,5 +2247,49 @@ export const TOP_SCORERS = [
     goals: 1, // 9. hafta
     asOf: "2026-10-27",
     source: "Hürriyet / beIN Sports / Star",
+  },
+  // ---- Trendyol Süper Lig 2026-27 -- 10. Hafta, 30 Ekim 2026: Konyaspor 0-4 Galatasaray ----
+  // Golcüler beIN Sports geniş özet + Ajansspor ile birebir aynı. Batrakov'un Süper Lig'deki
+  // ilk golü (Ajansspor); Yunus ve Leao bu dosyada daha önce lig golüyle yer almıyordu.
+  {
+    playerName: "Yunus Akgün",
+    teamId: "s1",
+    competitionKey: "superlig",
+    goals: 1, // 10. hafta 28' (ceza sahası dışından)
+    asOf: "2026-10-31",
+    source: "beIN Sports / Ajansspor",
+  },
+  {
+    playerName: "Aleksey Batrakov",
+    teamId: "s1",
+    competitionKey: "superlig",
+    goals: 1, // 10. hafta 49'
+    asOf: "2026-10-31",
+    source: "beIN Sports / Ajansspor",
+  },
+  {
+    playerName: "Rafael Leao",
+    teamId: "s1",
+    competitionKey: "superlig",
+    goals: 1, // 10. hafta 55' (penaltı, VAR sonrası)
+    asOf: "2026-10-31",
+    source: "beIN Sports / Ajansspor",
+  },
+  // ---- 10. Hafta, 31 Ekim 2026: Erzurumspor FK 1-3 Çorum FK (Hürriyet / ensondakika) ----
+  {
+    playerName: "Çağlar Söyüncü",
+    teamId: "s13",
+    competitionKey: "superlig",
+    goals: 1, // 10. hafta 20'
+    asOf: "2026-10-31",
+    source: "Hürriyet / ensondakika / Sporx",
+  },
+  {
+    playerName: "Ibrahim Diabate",
+    teamId: "s14",
+    competitionKey: "superlig",
+    goals: 1, // 10. hafta 74'
+    asOf: "2026-10-31",
+    source: "Hürriyet / ensondakika",
   },
 ];

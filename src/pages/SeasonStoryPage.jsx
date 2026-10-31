@@ -1,32 +1,30 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getCompetition } from "../data/competitions.js";
-import CompetitionStepper from "../components/CompetitionStepper.jsx";
 import Crest from "../components/Crest.jsx";
 import TeamFilterSelect from "../components/stats/TeamFilterSelect.jsx";
+import NewsHubHeader from "../components/newsHub/NewsHubHeader.jsx";
 import { useFavoriteTeam } from "../state/FavoriteTeamContext.jsx";
 import { useAchievements } from "../state/AchievementsContext.jsx";
 import { formatMatchDate } from "../utils/matchDate.js";
 import { getSeasonStory } from "../utils/realStandingsSelectors.js";
 
 const CATEGORIES = [
-  { key: "tarihi-an", icon: "🏛️", label: "Tarihi An" },
-  { key: "rekor", icon: "📈", label: "Rekor" },
-  { key: "surpriz", icon: "😲", label: "Sürpriz" },
-  { key: "skandal", icon: "🔥", label: "Skandal/Tartışma" },
-  { key: "sakatlik", icon: "🩹", label: "Sakatlık" },
-  { key: "teknik-direktor", icon: "🔁", label: "Teknik Direktör" },
-  { key: "basari", icon: "🏆", label: "Başarı" },
-  { key: "basarisizlik", icon: "💔", label: "Başarısızlık" },
+  { key: "tarihi-an", label: "Tarihi An" },
+  { key: "rekor", label: "Rekor" },
+  { key: "surpriz", label: "Sürpriz" },
+  { key: "skandal", label: "Skandal / Tartışma" },
+  { key: "sakatlik", label: "Sakatlık" },
+  { key: "teknik-direktor", label: "Teknik Direktör" },
+  { key: "basari", label: "Başarı" },
+  { key: "basarisizlik", label: "Başarısızlık" },
 ];
 const CATEGORY_BY_KEY = Object.fromEntries(CATEGORIES.map((c) => [c.key, c]));
+const longDate = (iso) => formatMatchDate(iso, { day: "numeric", month: "long", year: "numeric" });
 
-// Sezonun GERÇEK, kaynaklı öne çıkan anlarının kronolojik "hikaye" görünümü
-// -- bkz. src/data/seasonStory.js'in başındaki metodoloji notu. Sezon
-// devam ettikçe hafta hafta büyür; sezon sonunda bu SAYFA (ve altındaki
-// veri) doğrudan "sezonun hikayesi" özetinin kendisi olur -- ayrı bir
-// "recap" sayfası yazmaya gerek kalmadan, çünkü zaten kronolojik ve
-// kaynaklı bir arşiv olarak tutuluyor.
+// Sezonun gerçek, kaynaklı öne çıkan anlarının kronolojik zaman çizelgesi
+// (bkz. src/data/seasonStory.js). Haberler ile aynı başlığı ve sekme
+// geçişini paylaşır -- Stitch "Football Hub" tasarımı (2026-10-28).
 export default function SeasonStoryPage() {
   const { competitionKey } = useParams();
   const competition = getCompetition(competitionKey);
@@ -45,28 +43,23 @@ export default function SeasonStoryPage() {
     [competitionKey, categoryFilter, activeTeamFilter]
   );
   const teamById = useMemo(() => Object.fromEntries(competition.teams.map((t) => [t.id, t])), [competition]);
+  const allStory = useMemo(() => getSeasonStory(competitionKey), [competitionKey]);
+  const lastEntry = allStory[allStory.length - 1];
 
   return (
-    <div className="page-shell">
-      <CompetitionStepper competitionKey={competitionKey} />
-      <header className="page-header">
-        <div>
-          <div className="page-eyebrow">{competition.shortName} · Sezon Hikayesi</div>
-          <h1>Sezonun Hikayesi</h1>
-          <p>
-            Bu sezonun gerçekten öne çıkan anlarının kronolojik, kaynaklı arşivi -- tarihi ilkler, rekorlar,
-            sürprizler, tartışmalar, önemli sakatlıklar, teknik direktör krizleri, dikkat çekici başarı/başarısızlıklar.
-            Genel gündem için <Link to={`/${competitionKey}/haberler`}>Haberler</Link> sayfasına bakabilirsin -- burası
-            sadece sezonun "hikaye değeri" olan anlarını biriktirir ve sezon sonunda doğrudan sezonun özetine dönüşür.
-          </p>
-        </div>
-      </header>
+    <div className="sa-page">
+      <NewsHubHeader
+        competitionKey={competitionKey}
+        active="story"
+        lastDate={lastEntry && longDate(lastEntry.date)}
+        itemCount={story.length}
+      />
 
-      <div className="season-story-filters">
-        <div className="season-story-category-chips">
+      <section className="sa-card sa-filter-card">
+        <div className="sa-filter-chips">
           <button
             type="button"
-            className={`season-story-chip ${categoryFilter === null ? "active" : ""}`}
+            className={`sa-filter-chip ${categoryFilter === null ? "active" : ""}`}
             onClick={() => setCategoryFilter(null)}
           >
             Tümü
@@ -75,73 +68,77 @@ export default function SeasonStoryPage() {
             <button
               key={c.key}
               type="button"
-              className={`season-story-chip ${categoryFilter === c.key ? "active" : ""}`}
+              className={`sa-filter-chip ${categoryFilter === c.key ? "active" : ""}`}
               onClick={() => setCategoryFilter(categoryFilter === c.key ? null : c.key)}
             >
-              {c.icon} {c.label}
+              {c.label}
             </button>
           ))}
         </div>
-        <TeamFilterSelect
-          teams={competition.teams}
-          value={activeTeamFilter || ""}
-          onChange={(id) => setTeamFilter(id || "")}
-          placeholder={favoriteTeamId && teamFilter === null ? "⭐ Tuttuğun takım" : "Takıma göre filtrele…"}
-        />
-        {activeTeamFilter && (
-          <button className="btn-ghost" onClick={() => setTeamFilter("")}>
-            Filtreyi Temizle ✕
-          </button>
-        )}
-      </div>
+        <div className="sa-filter-row">
+          <div className="sa-filter-team">
+            <TeamFilterSelect
+              teams={competition.teams}
+              value={activeTeamFilter || ""}
+              onChange={(id) => setTeamFilter(id || "")}
+              placeholder={favoriteTeamId && teamFilter === null ? "⭐ Tuttuğun takım" : "Takıma göre filtrele…"}
+            />
+          </div>
+          {activeTeamFilter && (
+            <button type="button" className="sa-btn-ghost" onClick={() => setTeamFilter("")}>
+              Filtreyi temizle ✕
+            </button>
+          )}
+          <span className="sa-muted sa-small sa-filter-note">
+            Genel gündem için <Link to={`/${competitionKey}/haberler`}>Haberler</Link> sekmesine bak.
+          </span>
+        </div>
+      </section>
 
       {story.length === 0 ? (
-        <p className="standings-empty">
+        <section className="sa-card sa-empty">
           {categoryFilter || activeTeamFilter
             ? "Bu filtreye uyan bir hikaye anı henüz eklenmedi."
-            : "Sezonun hikayesi henüz yazılmaya başlanmadı -- ilk anlar yakında eklenecek."}
-        </p>
+            : "Sezonun hikayesi henüz yazılmaya başlanmadı."}
+        </section>
       ) : (
-        <div className="season-story-timeline">
+        <ol className="sa-timeline">
           {story.map((s) => {
             const cat = CATEGORY_BY_KEY[s.category];
+            const teams = (s.relatedTeamIds || []).map((id) => teamById[id]).filter(Boolean);
             return (
-              <article key={s.id} className={`season-story-entry season-story-cat-${s.category}`}>
-                <div className="season-story-entry-marker">
-                  <span className="season-story-entry-icon">{cat?.icon || "📌"}</span>
-                  <span className="season-story-entry-line" />
-                </div>
-                <div className="season-story-entry-body">
-                  <div className="season-story-entry-head">
-                    <span className="season-story-entry-date">
-                      {formatMatchDate(s.date, { day: "numeric", month: "long", year: "numeric" })}
+              <li key={s.id} className={`sa-timeline-item cat-${s.category}`}>
+                <div className="sa-timeline-marker" aria-hidden="true" />
+                <article className="sa-card sa-timeline-card">
+                  <div className="sa-news-card-top">
+                    {cat && <span className="sa-tag-soft">{cat.label}</span>}
+                    <span className="sa-mono sa-muted sa-small">
+                      {longDate(s.date)}
                       {s.week ? ` · ${s.week}. Hafta` : ""}
                     </span>
-                    {cat && <span className="season-story-entry-tag">{cat.label}</span>}
                   </div>
-                  <h3 className="season-story-entry-title">{s.title}</h3>
-                  <p className="season-story-entry-summary">{s.summary}</p>
-                  <div className="season-story-entry-foot">
-                    {s.relatedTeamIds?.length > 0 && (
-                      <div className="season-story-entry-teams">
-                        {s.relatedTeamIds
-                          .map((id) => teamById[id])
-                          .filter(Boolean)
-                          .map((t) => (
-                            <Link key={t.id} to={`/${competitionKey}/takim/${t.id}`} className="news-card-team-chip">
-                              <Crest team={t} size={16} />
-                              {t.short}
-                            </Link>
-                          ))}
+                  <h3 className="sa-news-card-title">{s.title}</h3>
+                  <p className="sa-news-card-summary is-full">{s.summary}</p>
+                  <div className="sa-news-card-foot">
+                    {teams.length > 0 ? (
+                      <div className="sa-team-chips">
+                        {teams.map((t) => (
+                          <Link key={t.id} to={`/${competitionKey}/takim/${t.id}`} className="sa-team-chip">
+                            <Crest team={t} size={14} />
+                            {t.short}
+                          </Link>
+                        ))}
                       </div>
+                    ) : (
+                      <span />
                     )}
-                    <span className="season-story-entry-source">{s.source}</span>
+                    <span className="sa-muted sa-small">{s.source}</span>
                   </div>
-                </div>
-              </article>
+                </article>
+              </li>
             );
           })}
-        </div>
+        </ol>
       )}
     </div>
   );

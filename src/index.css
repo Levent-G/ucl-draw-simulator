@@ -27,17 +27,32 @@
      .broadcast-hero bilinçli olarak koyu bir "yayın" panosu kalıyor (bkz.
      pages.css'teki scoped token override) -- bu yüzden marka renklerinin
      ORİJİNAL canlı tonları hâlâ ORADA kullanılıyor, silinmedi. */
-  --bg-void: #eef1f7;
-  --bg-deep: #e3e9f3;
+  /* 2026-10-28: Stitch "Süper Analiz Football Hub" tasarım sistemi
+     (public/stitch_super_analiz_football_hub/DESIGN.md) -- "Clean Light
+     Precision": yüzeyin büyük kısmı beyaz / çok açık nötr, kenarlıklar ince,
+     gölgeler neredeyse yok. */
+  --bg-void: #f7f9fc;
+  --bg-deep: #f1f4f8;
   --bg-panel: #ffffff;
-  --bg-panel-alt: #f6f8fc;
+  --bg-panel-alt: #f7f9fc;
   --bg-card: #ffffff;
-  --line: rgba(11, 19, 43, 0.1);
-  --line-strong: rgba(11, 19, 43, 0.18);
+  --line: #e5eaf1;
+  --line-soft: #e9edf3;
+  --line-strong: #d5dfeb;
 
   --text-primary: #0b132b;
-  --text-dim: #4b5876;
-  --text-faint: #7c88a3;
+  --text-body: #172033;
+  --text-dim: #667085;
+  --text-faint: #8490a5;
+
+  --shadow-1: 0 1px 3px rgba(11, 19, 43, 0.03), 0 1px 2px rgba(11, 19, 43, 0.02);
+  --shadow-2: 0 4px 12px rgba(11, 19, 43, 0.05);
+  --shadow-3: 0 8px 24px rgba(11, 19, 43, 0.06);
+  --pitch-green: #00874a;
+  --pitch-green-hover: #00a859;
+  --data-cyan: #00b4d8;
+  --loss: #ff007f;
+  --draw: #f59e0b;
 
   /* Camgöbeği ölçeği -- marka rengi #00B4D8'in text-safe (koyulaştırılmış)
      karşılığından başlayıp yeşile geçiş yapar. */
@@ -76,7 +91,7 @@
   --font-body: "Inter", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
-  --radius-lg: 18px;
+  --radius-lg: 16px;
   --radius-md: 12px;
   --radius-sm: 8px;
 }
@@ -96,14 +111,7 @@ body {
   overflow-x: hidden;
   font-family: var(--font-body);
   color: var(--text-primary);
-  background: linear-gradient(
-    150deg,
-    #eef1f7 0%,
-    #e7ecf5 35%,
-    #dfe7f4 65%,
-    #d5e2f2 100%
-  );
-  background-attachment: fixed;
+  background: var(--bg-void);
   min-height: 100vh;
 }
 
@@ -130,6 +138,9 @@ body::before {
       transparent 61%
     );
   opacity: 0.8;
+  /* Yeni tasarım sistemi dekoratif ışık şeritlerini istemiyor ("Micro-Contrast
+     & Restraint"); kural silinmedi, sadece gizlendi. */
+  display: none;
 }
 
 h1,
