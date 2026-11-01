@@ -614,4 +614,67 @@ export const SUPER_LIG_MATCH_STATS = {
     asOf: "2026-10-31",
     source: "Hürriyet / ensondakika / Sporx",
   },
+  sr10m3: {
+    // Kocaelispor 0-0 Çaykur Rizespor (31 Eki) -- golsüz. Skor TFF fikstür sayfası ile birebir.
+    scorers: [],
+    asOf: "2026-11-01",
+    source: "TFF / Hürriyet / Fanatik / Sporx",
+  },
+  sr10m2: {
+    // Fenerbahçe 1-2 Göztepe (31 Eki, Chobani Stadı) -- Dirk Kuyt'un geçici teknik direktör olarak ilk maçı. Guendouzi'nin golünde pas Lukaku'dan. Karadeniz Gazete Henrique'nin golünü 79' yazıyor.
+    scorers: [
+      { teamId: "s2", playerName: "Mattéo Guendouzi", minute: 45 }, // 45+1'
+      { teamId: "s7", playerName: "Sinclair Armstrong", minute: 76 },
+      { teamId: "s7", playerName: "André Henrique", minute: 78 },
+    ],
+    asOf: "2026-11-01",
+    source: "TFF / Ajansspor / Star / Sporx / Sözcü",
+  },
+  sr10m6: {
+    // Amed SFK 5-1 Eyüpspor (1 Kas) -- Ballet hat-trick (üçüncüsü Yira Sor'a yapılan faul sonrası penaltı), 90+1'de VAR sonrası direkt kırmızı. Ajansspor Krasniqi'nin golünü 12' yazıyor.
+    scorers: [
+      { teamId: "s11", playerName: "Ermal Krasniqi", minute: 13 },
+      { teamId: "s11", playerName: "Gift Orban", minute: 35 },
+      { teamId: "s11", playerName: "Samuel Ballet", minute: 42 },
+      { teamId: "s11", playerName: "Samuel Ballet", minute: 51 },
+      { teamId: "s16", playerName: "Ahmed Abdullahi", minute: 73 },
+      { teamId: "s11", playerName: "Samuel Ballet", minute: 83, penalty: true },
+    ],
+    asOf: "2026-11-01",
+    source: "TFF / Ajansspor / Hürriyet / beIN Sports",
+  },
+  sr10m0: {
+    // Trabzonspor 2-0 Gaziantep FK (1 Kas) -- Savić'in golü Salah'ın kornerinde Muçi'nin kafa pasıyla. GZT golleri ikinci yarıya yazıyor; Star ve Cumhuriyet 45+2' diyor (ilk yarı 1-0).
+    scorers: [
+      { teamId: "s4", playerName: "Stefan Savić", minute: 45 }, // 45+2'
+      { teamId: "s4", playerName: "Ernest Muçi", minute: 61 },
+    ],
+    asOf: "2026-11-01",
+    source: "TFF / Star / Cumhuriyet / GZT",
+  },
+  sr10m5: {
+    // İstanbul Başakşehir 5-2 Samsunspor (1 Kas) -- bazı kaynaklar Skov Olsen'in golünü 26', Tavşan'ınkini 83', Fayzullaev'inkini 90' yazıyor.
+    scorers: [
+      { teamId: "s5", playerName: "Eldor Shomurodov", minute: 10 },
+      { teamId: "s6", playerName: "Tanguy Coulibaly", minute: 22 },
+      { teamId: "s5", playerName: "Andreas Skov Olsen", minute: 25 },
+      { teamId: "s5", playerName: "Emin Bayram", minute: 41 },
+      { teamId: "s5", playerName: "Ousseynou Ba", minute: 75 },
+      { teamId: "s6", playerName: "Elayis Tavşan", minute: 84 },
+      { teamId: "s5", playerName: "Abbosbek Fayzullaev", minute: 90 }, // 90+1'
+    ],
+    asOf: "2026-11-01",
+    source: "TFF / Ajansspor / Star / Takvim",
+  },
+  sr10m4: {
+    // Kasımpaşa 2-2 Beşiktaş (1 Kas) -- Winck kafayla; Rafferty 83'te Hajradinović'in yerine girdi, Kerem Demirbay'ın ortasında kafayla eşitledi.
+    scorers: [
+      { teamId: "s3", playerName: "Leandro Trossard", minute: 28 },
+      { teamId: "s3", playerName: "Dušan Vlahović", minute: 47 },
+      { teamId: "s8", playerName: "Claudio Winck", minute: 60 },
+      { teamId: "s8", playerName: "Marcus Rafferty", minute: 87 },
+    ],
+    asOf: "2026-11-01",
+    source: "TFF / Ajansspor / Star / Cumhuriyet / haberler.com",
+  },
 };

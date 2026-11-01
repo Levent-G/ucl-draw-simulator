@@ -1451,26 +1451,25 @@ export const TOP_SCORERS = [
     playerName: "Dušan Vlahović",
     teamId: "s3", // Beşiktaş
     competitionKey: "superlig",
-    goals: 6, // 3. hafta Çorum FK'ya hat-trick, 4. hafta derbide 1, 6. hafta Amed SFK deplasmanında 1 (55'), 7. hafta Kocaelispor'a 1 (31', penaltıdan)
-    matchesPlayed: 7,
-    asOf: "2026-10-11",
-    source: "beIN Sports / fotomac.com.tr / takvim.com.tr / sofascore.com / gzt.com / Habertürk",
+    goals: 7, // 3. hafta Çorum FK'ya hat-trick, 4. hafta derbide 1, 6. hafta Amed SFK deplasmanında 1 (55'), 7. hafta Kocaelispor'a 1 (31', penaltıdan) + 10. hafta Kasımpaşa deplasmanında 1 (47')
+    asOf: "2026-11-01",
+    source: "beIN Sports / fotomac.com.tr / takvim.com.tr / sofascore.com / gzt.com / Habertürk / Ajansspor / Star / Cumhuriyet",
   },
   {
     playerName: "Eldor Shomurodov",
     teamId: "s5", // İstanbul Başakşehir (superLigPlayers.js'te "Eldar Şahmuradov" adıyla kayıtlı, bkz. üstteki not)
     competitionKey: "superlig",
-    goals: 7, // 1-4. haftalarda 4 (Kocaelispor, Trabzonspor, Kasımpaşa, Galatasaray maçlarında birer), 6. hafta Gençlerbirliği'ne 2 (33', 65') + 8. hafta 1
-    asOf: "2026-10-19",
-    source: "gazetebirlik.com / karsmanset.com / sporx.com / Hürriyet / AA / Fanatik / Sabah / Takvim / Timeturk",
+    goals: 8, // 1-4. haftalarda 4 (Kocaelispor, Trabzonspor, Kasımpaşa, Galatasaray maçlarında birer), 6. hafta Gençlerbirliği'ne 2 (33', 65') + 8. hafta 1 + 10. hafta Samsunspor'a 1 (10')
+    asOf: "2026-11-01",
+    source: "gazetebirlik.com / karsmanset.com / sporx.com / Hürriyet / AA / Fanatik / Sabah / Takvim / Timeturk / Ajansspor / Star",
   },
   {
     playerName: "Gift Orban",
     teamId: "s11", // Amed SFK
     competitionKey: "superlig",
-    goals: 8, // 1-4. haftalarda 3, 5. hafta İstanbul Başakşehir'e hat-trick (52', 56', 75'), 6. hafta Beşiktaş'a 1 (13') + 9. hafta 1
-    asOf: "2026-10-27",
-    source: "ESPN / sofascore.com / diyarbakir.net / Fanatik / Habertürk / gzt.com / beIN Sports / Ensonhaber",
+    goals: 9, // 1-4. haftalarda 3, 5. hafta İstanbul Başakşehir'e hat-trick (52', 56', 75'), 6. hafta Beşiktaş'a 1 (13') + 9. hafta 1 + 10. hafta Eyüpspor'a 1 (35')
+    asOf: "2026-11-01",
+    source: "ESPN / sofascore.com / diyarbakir.net / Fanatik / Habertürk / gzt.com / beIN Sports / Ensonhaber / Ajansspor / Hürriyet",
   },
   {
     playerName: "Juan",
@@ -1524,10 +1523,9 @@ export const TOP_SCORERS = [
     playerName: "Ernest Muçi",
     teamId: "s4", // Trabzonspor
     competitionKey: "superlig",
-    goals: 2, // 4. hafta Gençlerbirliği'ne -- 5. ve 6. hafta golsüz geçti (bkz. Salah/Saviolo notları); 7. hafta Samsunspor deplasmanında 1 (Hürriyet 28', başka kaynaklar 27'; Mustafa Eskihellaç asistiyle)
-    matchesPlayed: 7,
-    asOf: "2026-10-10",
-    source: "Hürriyet / Fanatik / Star / Takvim (7. hafta)",
+    goals: 3, // 4. hafta Gençlerbirliği'ne -- 5. ve 6. hafta golsüz geçti (bkz. Salah/Saviolo notları); 7. hafta Samsunspor deplasmanında 1 (Hürriyet 28', başka kaynaklar 27'; Mustafa Eskihellaç asistiyle) + 10. hafta Gaziantep FK'ya 1 (61')
+    asOf: "2026-11-01",
+    source: "Hürriyet / Fanatik / Star / Takvim (7. hafta) / Star / Cumhuriyet / GZT (10. hafta)",
   },
 
   // ---- Trendyol Süper Lig 2026-27 -- 5. Hafta, 11-14 Eylül 2026'da oynanan 9 maçın TAMAMI ----
@@ -1544,10 +1542,9 @@ export const TOP_SCORERS = [
     playerName: "Leandro Trossard",
     teamId: "s3", // Beşiktaş
     competitionKey: "superlig",
-    goals: 1, // 5. hafta Erzurumspor FK'ya, 27'
-    matchesPlayed: 5,
-    asOf: "2026-09-19",
-    source: "Hürriyet / Fanatik / ASpor",
+    goals: 2, // 5. hafta Erzurumspor FK'ya, 27' + 10. hafta Kasımpaşa deplasmanında 1 (28')
+    asOf: "2026-11-01",
+    source: "Hürriyet / Fanatik / ASpor / Ajansspor / Star / Cumhuriyet",
   },
   {
     // superLigPlayers.js'te Beşiktaş (s3) kadrosunda YOK -- kadro dosyası
@@ -1784,9 +1781,9 @@ export const TOP_SCORERS = [
     playerName: "Samuel Ballet",
     teamId: "s11", // Amed SFK
     competitionKey: "superlig",
-    goals: 1, // 7. hafta Gençlerbirliği deplasmanında 68' (ceza sahası dışından)
-    asOf: "2026-10-10",
-    source: "Habertürk / Takvim / A Haber",
+    goals: 4, // 7. hafta Gençlerbirliği deplasmanında 68' (ceza sahası dışından) + 10. hafta Eyüpspor'a hat-trick (42', 51', 83' penaltı)
+    asOf: "2026-11-01",
+    source: "Habertürk / Takvim / A Haber / Ajansspor / Hürriyet / beIN Sports",
   },
   {
     playerName: "Chibuike Nwaiwu",
@@ -1844,9 +1841,9 @@ export const TOP_SCORERS = [
     playerName: "André Henrique",
     teamId: "s7", // Göztepe
     competitionKey: "superlig",
-    goals: 3, // 7. hafta Eyüpspor deplasmanında hat-trick: 54', 59', 75' (penaltı) -- bu sezonki ilk lig golleri
-    asOf: "2026-10-12",
-    source: "Habertürk / Hürriyet / NTVSpor",
+    goals: 4, // 7. hafta Eyüpspor deplasmanında hat-trick: 54', 59', 75' (penaltı) -- bu sezonki ilk lig golleri + 10. hafta Fenerbahçe deplasmanında 1 (78', galibiyet golü)
+    asOf: "2026-11-01",
+    source: "Habertürk / Hürriyet / NTVSpor / Ajansspor / Star / Sporx",
   },
 
   // ---- Trendyol Süper Lig 2026-27 -- 6. Hafta, 18-19 Eylül 2026'da oynanan 5/9 maç ----
@@ -1899,10 +1896,9 @@ export const TOP_SCORERS = [
     playerName: "Andreas Skov Olsen",
     teamId: "s5", // İstanbul Başakşehir
     competitionKey: "superlig",
-    goals: 1, // 6. hafta Gençlerbirliği'ne, 9'
-    matchesPlayed: 6,
-    asOf: "2026-09-19",
-    source: "AA / Hürriyet / Fotomaç",
+    goals: 2, // 6. hafta Gençlerbirliği'ne, 9' + 10. hafta Samsunspor'a 1 (25'; bazı kaynaklar 26')
+    asOf: "2026-11-01",
+    source: "AA / Hürriyet / Fotomaç / Ajansspor / Star",
   },
   {
     playerName: "Davie Selke",
@@ -1945,10 +1941,9 @@ export const TOP_SCORERS = [
     playerName: "Mattéo Guendouzi",
     teamId: "s2", // Fenerbahçe
     competitionKey: "superlig",
-    goals: 1, // 6. hafta Eyüpspor'a, 38'
-    matchesPlayed: 6,
-    asOf: "2026-09-20",
-    source: "Habertürk / Hürriyet",
+    goals: 2, // 6. hafta Eyüpspor'a, 38' + 10. hafta Göztepe'ye 1 (45+1', Lukaku'nun pasıyla)
+    asOf: "2026-11-01",
+    source: "Habertürk / Hürriyet / Ajansspor / Star / Sporx",
   },
   {
     // superLigPlayers.js'teki s2 (Fenerbahçe) kadrosunda YOK -- kadro
@@ -2091,9 +2086,9 @@ export const TOP_SCORERS = [
     playerName: "Claudio Winck",
     teamId: "s8",
     competitionKey: "superlig",
-    goals: 1, // 8. hafta
-    asOf: "2026-10-19",
-    source: "Hürriyet / Timeturk / Sabah / Sporx",
+    goals: 2, // 8. hafta + 10. hafta Beşiktaş'a 1 (60', kafa)
+    asOf: "2026-11-01",
+    source: "Hürriyet / Timeturk / Sabah / Sporx / Ajansspor / Star",
   },
   {
     playerName: "Adem Arous",
@@ -2107,9 +2102,9 @@ export const TOP_SCORERS = [
     playerName: "Tanguy Coulibaly",
     teamId: "s6",
     competitionKey: "superlig",
-    goals: 1, // 8. hafta
-    asOf: "2026-10-19",
-    source: "Hürriyet / Timeturk / Sabah / Sporx",
+    goals: 2, // 8. hafta + 10. hafta Başakşehir deplasmanında 1 (22')
+    asOf: "2026-11-01",
+    source: "Hürriyet / Timeturk / Sabah / Sporx / Ajansspor / Star",
   },
   {
     playerName: "Novatus Miroshi",
@@ -2291,5 +2286,82 @@ export const TOP_SCORERS = [
     goals: 1, // 10. hafta 74'
     asOf: "2026-10-31",
     source: "Hürriyet / ensondakika",
+  },
+  // ---- 10. Hafta, 31 Ekim - 1 Kasım 2026: Fenerbahçe 1-2 Göztepe, Amed SFK 5-1 Eyüpspor,
+  // Trabzonspor 2-0 Gaziantep FK, Başakşehir 5-2 Samsunspor, Kasımpaşa 2-2 Beşiktaş ----
+  // Bu dosyada daha önce lig golüyle yer almayan oyuncular. Mevcut oyuncuların (Guendouzi,
+  // André Henrique, Orban, Ballet, Muçi, Shomurodov, Skov Olsen, Coulibaly, Trossard,
+  // Vlahović, Winck) sayıları kendi kayıtlarında artırıldı.
+  {
+    playerName: "Sinclair Armstrong",
+    teamId: "s7",
+    competitionKey: "superlig",
+    goals: 1, // 10. hafta Fenerbahçe deplasmanında 76'
+    asOf: "2026-11-01",
+    source: "Ajansspor / Star / Sporx",
+  },
+  {
+    playerName: "Ermal Krasniqi",
+    teamId: "s11",
+    competitionKey: "superlig",
+    goals: 1, // 10. hafta Eyüpspor'a 13' (Ajansspor 12')
+    asOf: "2026-11-01",
+    source: "Hürriyet / beIN Sports / Ajansspor",
+  },
+  {
+    playerName: "Ahmed Abdullahi",
+    teamId: "s16",
+    competitionKey: "superlig",
+    goals: 1, // 10. hafta Amed SFK deplasmanında 73'
+    asOf: "2026-11-01",
+    source: "Ajansspor / beIN Sports / Hürriyet",
+  },
+  {
+    playerName: "Stefan Savić",
+    teamId: "s4",
+    competitionKey: "superlig",
+    goals: 1, // 10. hafta Gaziantep FK'ya 45+2'
+    asOf: "2026-11-01",
+    source: "Star / Cumhuriyet / GZT",
+  },
+  {
+    playerName: "Emin Bayram",
+    teamId: "s5",
+    competitionKey: "superlig",
+    goals: 1, // 10. hafta Samsunspor'a 41'
+    asOf: "2026-11-01",
+    source: "Ajansspor / Star / Takvim",
+  },
+  {
+    playerName: "Ousseynou Ba",
+    teamId: "s5",
+    competitionKey: "superlig",
+    goals: 1, // 10. hafta Samsunspor'a 75'
+    asOf: "2026-11-01",
+    source: "Ajansspor / Star / Takvim",
+  },
+  {
+    playerName: "Abbosbek Fayzullaev",
+    teamId: "s5",
+    competitionKey: "superlig",
+    goals: 1, // 10. hafta Samsunspor'a 90+1' (bazı kaynaklar 90')
+    asOf: "2026-11-01",
+    source: "Ajansspor / Star / Takvim",
+  },
+  {
+    playerName: "Elayis Tavşan",
+    teamId: "s6",
+    competitionKey: "superlig",
+    goals: 1, // 10. hafta Başakşehir deplasmanında 84' (bazı kaynaklar 83')
+    asOf: "2026-11-01",
+    source: "Ajansspor / Star / Takvim",
+  },
+  {
+    playerName: "Marcus Rafferty",
+    teamId: "s8",
+    competitionKey: "superlig",
+    goals: 1, // 10. hafta Beşiktaş'a 87' (83'te oyuna girdi, Kerem Demirbay'ın ortasında kafa)
+    asOf: "2026-11-01",
+    source: "Ajansspor / haberler.com / Sporkolik / Canlıgaste",
   },
 ];
