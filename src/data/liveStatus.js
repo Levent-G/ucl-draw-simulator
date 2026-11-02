@@ -12,7 +12,7 @@
 // tablosuyla birebir aynıydı). 7. Hafta 9 Ekim 20.00'de başladı; açılış
 // maçı Galatasaray 3-1 Kasımpaşa aynı gece 23:30'da eklendi. Kalan 8 maç
 // (10-12 Ekim) oynandıkça buraya eklenmeli.
-export const SUPER_LIG_LIVE_ASOF = "1 Kasım 2026 (10. Hafta: 8/9 maç oynandı)";
+export const SUPER_LIG_LIVE_ASOF = "2 Kasım 2026 (10. Hafta: 8/9 maç oynandı)";
 
 // Türkçe Vikipedi'nin "2026-27 Süper Lig" maddesinin ham wikitext'i (maç
 // sonuçları) + "Şablon:2026-27 Süper Lig puan durumu" (güncel puan durumu
@@ -288,6 +288,8 @@ export const SUPER_LIG_LIVE_RESULTS = [
   // beIN), Trabzonspor 2-0 Gaziantep FK (Star, GZT, Cumhuriyet, Akşam), Başakşehir 5-2
   // Samsunspor (Ajansspor, Star, Takvim), Kasımpaşa 2-2 Beşiktaş (Ajansspor, Star, Cumhuriyet).
   // Gençlerbirliği-Alanyaspor 2 Kasım 20:00'de oynanacak.
+  // 2 Kasım 10:00 kontrolü: 8 skorun tamamı TFF fikstür sayfasıyla (hafta=10) yeniden birebir
+  // doğrulandı; Gençlerbirliği-Alanyaspor henüz oynanmadığı için eklenmedi.
   { label: "10. Hafta", date: "31 Eki", home: "Kocaelispor", homeGoals: 0, away: "Çaykur Rizespor", awayGoals: 0 },
   { label: "10. Hafta", date: "31 Eki", home: "Fenerbahçe", homeGoals: 1, away: "Göztepe", awayGoals: 2 },
   { label: "10. Hafta", date: "1 Kas", home: "Amed SFK", homeGoals: 5, away: "Eyüpspor", awayGoals: 1 },

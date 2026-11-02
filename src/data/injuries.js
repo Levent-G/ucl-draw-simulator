@@ -335,10 +335,10 @@ export const CURRENT_INJURIES = [
   {
     teamId: "t26",
     playerName: "Ethan Mbappé",
-    reason: "Kırmızı kart cezası (8 Eylül, Real Betis deplasmanı, 56. dk VAR incelemesiyle doğrudan kırmızı -- rakip oyuncunun yüzüne kol savurma) -- UEFA disiplin süreci sürüyor, en az 3 maç ceza bekleniyor",
-    expectedReturn: "13-14 Ekim (UCL lig fazı 2. haftası maçını kesin kaçıracak; UEFA'nın kesin ceza kararına göre daha da uzayabilir)",
-    asOf: "2026-09-20",
-    source: "Yahoo Sports / Goal.com / L'Équipe (via shango.media) / Get French Football News",
+    reason: "Kırmızı kart cezası (8 Eylül, Real Betis maçı, 56. dk VAR incelemesiyle doğrudan kırmızı -- rakip oyuncunun yüzüne dirsek) -- UEFA 3 maç ceza verdi: Arsenal, Galatasaray ve Bodø/Glimt maçlarını kaçırıyor (son maçı 3 Kasım Bodø/Glimt deplasmanı)",
+    expectedReturn: "25 Kasım (Bayern Münih maçı)",
+    asOf: "2026-11-02",
+    source: "Fanatik (UEFA açıklaması) / Ghanaian Times / maxifoot.fr / Goal.com",
     type: "suspension",
   },
   {
@@ -357,15 +357,6 @@ export const CURRENT_INJURIES = [
     asOf: "2026-09-16",
     source: "Complete Sports / allAfrica.com",
   },
-  {
-    teamId: "t28",
-    playerName: "Jan Bednarek",
-    reason: "Kırmızı kart cezası (2025-26 sezonu UEFA Avrupa Ligi çeyrek finali Nottingham Forest maçından kalan 2 maçlık ceza, kulübün bu sezon terfi ettiği Şampiyonlar Ligi'ne taşındı) -- lig fazının ilk 2 maçını (Manchester City, Real Betis) kaçırdı",
-    expectedReturn: "20 Ekim (PSV Eindhoven maçında dönecek)",
-    asOf: "2026-09-20",
-    source: "Sports Mole / A Bola / O Jogo / RotoWire",
-    type: "suspension",
-  },
 
   // ---- Trendyol Süper Lig ----
   {
@@ -383,22 +374,6 @@ export const CURRENT_INJURIES = [
     expectedReturn: null,
     asOf: "2026-10-30",
     source: "gzt.com / haber61.net / 61saat.com / Ajansspor (10. hafta listesi)",
-  },
-  {
-    teamId: "s6",
-    playerName: "Tanguy Coulibaly",
-    reason: "Darbeye bağlı sakatlık, sezon başında ameliyat oldu",
-    expectedReturn: null,
-    asOf: "2026-09-16",
-    source: "samsunhaber.com / samsungazetesi.com",
-  },
-  {
-    teamId: "s6",
-    playerName: "Elayis Tavşan",
-    reason: "Ayak kırığı",
-    expectedReturn: null,
-    asOf: "2026-09-16",
-    source: "samsunhaber.com / dengegazetesi.com.tr",
   },
   {
     teamId: "s6",
@@ -423,14 +398,6 @@ export const CURRENT_INJURIES = [
     expectedReturn: null,
     asOf: "2026-10-30",
     source: "haberekspres.com.tr / gazeteyenigun.com.tr / Ajansspor (10. hafta listesi)",
-  },
-  {
-    teamId: "s8",
-    playerName: "Haris Hajradinovic",
-    reason: "Baldır/bacak sakatlığı (320 gün sonra Ağustos'ta sahalara dönmüştü, yeni bir sakatlıkla yeniden sahalardan uzak kaldı)",
-    expectedReturn: null,
-    asOf: "2026-09-16",
-    source: "Sabah / Cumhuriyet / sporx.com",
   },
   {
     teamId: "s12",
@@ -472,24 +439,6 @@ export const CURRENT_INJURIES = [
     expectedReturn: "UCL 4. hafta maçından sonra (UEFA'nın ek ceza verip vermeyeceği henüz netleşmedi)",
     asOf: "2026-10-27",
     source: "ESPN / SoccerMag",
-    type: "suspension",
-  },
-  {
-    teamId: "s6",
-    playerName: "Afonso Sousa",
-    reason: "Kırmızı kart cezası -- 24 Ekim'de Amed SFK maçında 37. dakikada kırmızı kart gördü; bir sonraki Süper Lig maçında oynayamaz",
-    expectedReturn: "PFDK kararına göre (en az 1 maç) -- 10. hafta Başakşehir maçında cezalı",
-    asOf: "2026-10-30",
-    source: "beIN Sports / Ajansspor (10. hafta listesi) / Aksiyon",
-    type: "suspension",
-  },
-  {
-    teamId: "s11",
-    playerName: "Mbaye Diagne",
-    reason: "Kırmızı kart cezası -- 24 Ekim'de Samsunspor deplasmanında 60. dakikada kırmızı kart gördü; bir sonraki Süper Lig maçında oynayamaz",
-    expectedReturn: "PFDK kararına göre (en az 1 maç) -- 10. hafta Eyüpspor maçında cezalı",
-    asOf: "2026-10-30",
-    source: "beIN Sports / Ajansspor (10. hafta listesi)",
     type: "suspension",
   },
   {
@@ -565,9 +514,22 @@ export const CURRENT_INJURIES = [
   { teamId: "s8", playerName: "Godfried Frimpong", reason: "Sakatlık (türü açıklanmadı)", expectedReturn: null, asOf: "2026-10-30", source: "Ajansspor (10. hafta listesi)" },
   { teamId: "s8", playerName: "Fousseni Diabaté", reason: "Sakatlık (türü açıklanmadı)", expectedReturn: null, asOf: "2026-10-30", source: "Ajansspor (10. hafta listesi)" },
   { teamId: "s9", playerName: "Adil Demirbağ", reason: "Sakatlık (türü açıklanmadı)", expectedReturn: null, asOf: "2026-10-30", source: "Ajansspor (10. hafta listesi)" },
-  { teamId: "s11", playerName: "Lumbardh Dellova", reason: "Cezalı (10. hafta)", expectedReturn: "Eyüpspor maçından sonra", asOf: "2026-10-30", source: "Ajansspor (10. hafta listesi)", type: "suspension" },
   { teamId: "s12", playerName: "Ahmed Kutucu", reason: "Sakatlık -- Kocaelispor maçında forma giyemeyecek", expectedReturn: null, asOf: "2026-10-30", source: "Ajansspor (10. hafta listesi) / analiz53" },
-  { teamId: "s15", playerName: "Myenty Abena", reason: "Cezalı (10. hafta)", expectedReturn: "Trabzonspor maçından sonra", asOf: "2026-10-30", source: "Ajansspor (10. hafta listesi)", type: "suspension" },
   { teamId: "s18", playerName: "Dimitrios Goutas", reason: "Sakatlık (türü açıklanmadı)", expectedReturn: null, asOf: "2026-10-30", source: "Ajansspor (10. hafta listesi)" },
   { teamId: "s18", playerName: "Ousmane Diabaté", reason: "Cezalı (10. hafta)", expectedReturn: "Alanyaspor maçından sonra", asOf: "2026-10-30", source: "Ajansspor (10. hafta listesi)", type: "suspension" },
+  // ---- 2026-11-02 tazelemesi (Süper Lig 10. hafta sonrası) ----
+  // ÇIKARILANLAR: Tanguy Coulibaly ve Elayis Tavşan (s6 -- 1 Kasım Başakşehir maçında ikisi de
+  // gol attı, Fanatik), Haris Hajradinovic (s8 -- 1 Kasım Beşiktaş maçında Winck'in golüne asist
+  // yaptı, Hürriyet), 10. hafta cezalarını çeken Afonso Sousa (ikinci sarıdan kırmızı), Mbaye
+  // Diagne, Lumbardh Dellova, Myenty Abena; Jan Bednarek (t28 -- cezası 20 Ekim'de bitti).
+  // GÜNCELLENEN: Ethan Mbappé (t26 -- UEFA'nın 3 maçlık cezası netleşti).
+  {
+    teamId: "s11",
+    playerName: "Samuel Ballet",
+    reason: "Kırmızı kart cezası -- 1 Kasım Eyüpspor maçında (5-1) hat-trick yaptıktan sonra maçın son dakikalarında VAR incelemesiyle El Yamiq'e yaptığı faul nedeniyle direkt kırmızı kart gördü",
+    expectedReturn: "PFDK kararına göre (en az 1 maç) -- 11. hafta Galatasaray maçında cezalı",
+    asOf: "2026-11-02",
+    source: "sondakika.com / Ajansspor / Van Ekspres",
+    type: "suspension",
+  },
 ];

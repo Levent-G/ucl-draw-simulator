@@ -97,4 +97,6 @@ export const REAL_RESULTS_UCL_2026 = [
   { matchId: "r3m15", homeGoals: 4, awayGoals: 1, date: "2026-10-21" }, // Real Madrid 4-1 RB Leipzig
   { matchId: "r3m16", homeGoals: 1, awayGoals: 0, date: "2026-10-21" }, // Real Betis 1-0 Feyenoord
   { matchId: "r3m17", homeGoals: 2, awayGoals: 3, date: "2026-10-21" }, // Sporting CP 2-3 LASK
+  // 2 Kasım 2026 kontrolü: 1-3. Hafta'nın 54 sonucu Wikipedia "2026-27 UEFA Champions League
+  // league phase" sayfasıyla yeniden birebir doğrulandı. 4. Hafta 3-4 Kasım'da oynanacak.
 ];

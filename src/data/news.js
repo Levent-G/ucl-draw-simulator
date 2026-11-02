@@ -1449,6 +1449,62 @@ export const NEWS_ITEMS = [
     competitionKey: "superlig",
     relatedTeamIds: ["s6", "s11", "s16", "s8", "s15", "s14", "s10", "s17", "s9", "s18", "s7", "s13"],
   },
+  // ---- 2026-11-02 tazelemesi (Süper Lig 10. hafta) ----
+  {
+    id: "news-sl-71",
+    date: "2026-10-27",
+    title: "Fenerbahçe'de İsmail Kartal dönemi bitti, takım geçici olarak Dirk Kuyt'a emanet",
+    summary:
+      "Galatasaray derbisindeki 2-1'lik yenilginin ardından İsmail Kartal istifasını sundu, kulüp istifayı kabul etti. Fenerbahçe yaptığı açıklamada, sezon başından beri Kartal'ın yardımcısı olan Dirk Kuyt'un yeni bir teknik direktörle anlaşma sağlanana kadar A takımın teknik sorumluluğunu üstlendiğini duyurdu.",
+    source: "Fanatik / Habertürk / Goal.com / Asharq Al-Awsat Türkçe",
+    url: "https://www.fanatik.com.tr/fenerbahce/galeri-fenerbahcede-milli-araya-kadar-takimi-dirk-kuyt-calistiracak-yonetim-kararini-verdi-2642558",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s2"],
+  },
+  {
+    id: "news-sl-72",
+    date: "2026-10-31",
+    title: "Kuyt'un ilk maçında Göztepe Kadıköy'den 2-1 galip döndü",
+    summary:
+      "Fenerbahçe, Guendouzi'nin 45+1'deki golüyle devreyi önde kapattı; Göztepe 76'da Sinclair Armstrong ve 78'de André Henrique'nin golleriyle maçı çevirdi. Galibiyet serisini 4 maça, yenilmezlik serisini 6 maça çıkaran Göztepe 15 puana yükseldi; Fenerbahçe 16 puanda kaldı. Aynı gün Kocaelispor ile Çaykur Rizespor golsüz berabere kaldı.",
+    source: "Fanatik / TFF / Ajansspor / Star",
+    url: "https://www.fanatik.com.tr/goztepe/goztepenin-galibiyet-serisi-4-maca-cikti-stoilov-kazandiktan-sonra-plan-tuttu-demek-cok-kolay-2642970",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s2", "s7", "s17", "s12"],
+  },
+  {
+    id: "news-sl-73",
+    date: "2026-11-01",
+    title: "Amed SFK, Eyüpspor'u 5-1 yenip ikinci sıraya yükseldi; Ballet'den hat-trick ve kırmızı kart",
+    summary:
+      "Diyarbakır'da Krasniqi (13') ve Orban (35') Amed'i öne geçirdi; Samuel Ballet 42, 51 ve 83'te (penaltı) attığı gollerle hat-trick yaptı. Eyüpspor'un tek golü 73'te Abdullahi'den geldi. Ballet, maçın son dakikalarında El Yamiq'e yaptığı faul sonrası VAR incelemesiyle direkt kırmızı kart gördü. Amed SFK 23 puanla lider Galatasaray'ın 2 puan gerisinde ikinci sıraya yükseldi.",
+    source: "Ajansspor / Hürriyet / beIN Sports / sondakika.com",
+    url: "https://ajansspor.com/haber/amedspor-eyupspor-5-1-mac-sonucu-mac-ozeti-yazili-737729",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s11", "s16"],
+  },
+  {
+    id: "news-sl-74",
+    date: "2026-11-01",
+    title: "Trabzonspor'dan üst üste 5. galibiyet, Başakşehir'den Samsunspor'a 5 gol",
+    summary:
+      "Trabzonspor, Salah'ın kornerinde Savić'in 45+2'deki golü ve Muçi'nin 61'deki uzak mesafe şutuyla Gaziantep FK'yı 2-0 yendi; ligde üst üste 5. galibiyetini alıp 22 puana yükseldi. Gaziantep FK üst üste 5. yenilgisini aldı. Başakşehir ise Shomurodov, Skov Olsen, Emin Bayram, Ousseynou Ba ve Fayzullaev'in golleriyle Samsunspor'u 5-2 mağlup etti; Samsunspor ligde üst üste 8. kez kaybetti.",
+    source: "Fanatik / TFF / Star / Takvim",
+    url: "https://www.fanatik.com.tr/trabzonspor/live-trabzonspor-durdurulamiyor-thomas-reis-ile-beste-bes-yaptilar-gaziantep-fk-serbest-dususte-mac-ozeti-2642985",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s4", "s15", "s5", "s6"],
+  },
+  {
+    id: "news-sl-75",
+    date: "2026-11-01",
+    title: "Beşiktaş, Kasımpaşa'da 2-0 öndeyken 2-2'ye razı oldu",
+    summary:
+      "Beşiktaş, Trossard (28') ve Vlahović'in (47') golleriyle 2-0 öne geçti. Kasımpaşa 60'ta Claudio Winck'in kafa golüyle farkı bire indirdi, 87'de Marcus Rafferty Kerem Demirbay'ın ortasında kafayla skoru eşitledi. Beşiktaş 19 puanla liderin 6 puan gerisinde kaldı, Kasımpaşa 17 puana yükseldi. Kasımpaşa teknik direktörü Emre Belözoğlu maç sonrası, adının geçtiği Fenerbahçe teknik direktörlüğü için 'O göreve talip olunmaz, layık görülünür' dedi.",
+    source: "Hürriyet / Fanatik / Ajansspor / Star",
+    url: "https://www.hurriyet.com.tr/sporarena/kasimpasa-2-2-besiktas-super-lig-maci-ozeti-43362290",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s8", "s3"],
+  },
 
   // ---- 2026-27 UCL lig fazı: dikkat çekici eşleşme önizlemeleri ----
   {
