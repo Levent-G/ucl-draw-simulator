@@ -688,6 +688,50 @@ export const NEWS_ITEMS = [
     competitionKey: "ucl",
     relatedTeamIds: ["t3", "t11", "t1", "t15", "t20", "t30", "t17", "t22", "t6", "t18", "t19", "t16", "t23", "t33"],
   },
+  {
+    id: "news-ucl-61",
+    date: "2026-11-03",
+    title: "Batrakov'un iki golü Galatasaray'a Stuttgart galibiyetini getirdi",
+    summary:
+      "Galatasaray, 4. haftada RAMS Park'ta VfB Stuttgart'ı 2-0 yendi. İki gol de Aleksey Batrakov'dan, 12. ve 15. dakikalarda geldi. Victor Osimhen bu maçta sol dizinden sakatlandı; kulüp daha sonra oyuncunun artroskopik diz ameliyatı geçireceğini açıkladı.",
+    source: "Flashscore / After90 Sports / ESPN / Hürriyet",
+    url: "https://www.flashscore.com/news/soccer-champions-league-live-updates-and-scores-2026-11-03/Spqr1qCD/",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t35", "t21"],
+  },
+  {
+    id: "news-ucl-62",
+    date: "2026-11-04",
+    title: "Fenerbahçe, Liverpool'u 3-2 yendi",
+    summary:
+      "Geçici teknik direktör Dirk Kuyt yönetimindeki Fenerbahçe, İstanbul'da iki kez geriye düştüğü maçta Liverpool'u 3-2 mağlup etti. Liverpool'un golleri Trey Nyoni (25') ve Isak'tan (69'), Fenerbahçe'nin golleri Greenwood (29'), Archie Brown (73') ve Muriqi'den (79') geldi. Bu, Liverpool'un bu sezon turnuvadaki ilk yenilgisi oldu.",
+    source: "KSAT (AP) / 112.ua / thesportsencounter.com / ESPN",
+    url: "https://www.ksat.com/news/2026/11/04/champions-league-real-madrid-and-liverpool-defending-perfect-records/",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t25", "t5"],
+  },
+  {
+    id: "news-ucl-63",
+    date: "2026-11-04",
+    title: "Como, Lens deplasmanında 9-1 kazanarak rekor kırdı",
+    summary:
+      "Como, Stade Bollaert-Delelis'te Lens'i 9-1 yendi. Douvikas hat-trick yaptı; Nico Paz, Da Cunha, Kempf, Liberali, Baturina ve Papaccioli de gol attı. Bu skor, modern Şampiyonlar Ligi'nin en farklı galibiyet rekoruna ortak oldu; Como, turnuva tarihinde deplasmanda 9 gol atan ilk takım oldu. Lens için bu, bir Fransız kulübünün Şampiyonlar Ligi'ndeki en ağır yenilgisi.",
+    source: "theScore / Irish Examiner / ESPN / Flashscore",
+    url: "https://www.thescore.com/seri/news/3645258/como-equal-ucl-record-with-historic-9-1-win-over-lens",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t34", "t22"],
+  },
+  {
+    id: "news-ucl-64",
+    date: "2026-11-04",
+    title: "4. hafta tamamlandı: PSG Villarreal'i 6-0 yendi, Valverde Real Madrid'i son dakikada kurtardı",
+    summary:
+      "Salı akşamı PSG, Villarreal'i deplasmanda 6-0 yendi. Manchester United, Roma karşısında 0-2'den Cunha'nın 83. ve 86. dakikalardaki golleriyle 3-2 kazandı. Barcelona Aston Villa'yı 3-0, Bayern Atletico'yu 2-0, Inter Feyenoord'u 3-0 yendi. Çarşamba günü Real Madrid, Mbappé'nin 78. ve Valverde'nin 90+2. dakikadaki golleriyle AEK'yı 3-2 geçti. Haaland'ın 78. dakikadaki golüyle City Leipzig'i 3-2 yendi. Porto Napoli'yi 4-1, Dortmund Betis'i 2-1, Club Brugge PSV'yi 2-1, Arsenal Slavia Prag'ı 2-1, Viking Sabah'ı 4-1 mağlup etti.",
+    source: "Yahoo Sports / After90 Sports / KSAT (AP) / ESPN",
+    url: "https://sports.yahoo.com/soccer/live/champions-league-scores-live-updates-scores-highlights-leipzig-vs-manchester-city-real-madrid-arsenal-190000043.html",
+    competitionKey: "ucl",
+    relatedTeamIds: ["t4", "t14", "t8", "t13", "t7", "t20", "t3", "t10", "t6", "t16", "t1", "t27", "t2", "t15", "t28", "t9", "t12", "t19", "t17", "t24", "t11", "t29", "t30", "t31"],
+  },
 
   // ---- Trendyol Süper Lig 2026-27 ----
   {
@@ -1504,6 +1548,61 @@ export const NEWS_ITEMS = [
     url: "https://www.hurriyet.com.tr/sporarena/kasimpasa-2-2-besiktas-super-lig-maci-ozeti-43362290",
     competitionKey: "superlig",
     relatedTeamIds: ["s8", "s3"],
+  },
+  {
+    id: "news-sl-76",
+    date: "2026-11-02",
+    title: "Gençlerbirliği, Alanyaspor'u 5-0 yenerek 7 maçlık galibiyet hasretine son verdi",
+    summary:
+      "10. haftanın kapanış maçında Gençlerbirliği, Ankara'da Alanyaspor'u 5-0 mağlup etti. Goller Oğulcan Ülgün, Franco Tongya, Tiago Gouveia (2) ve Pedro Mendes'ten geldi. Gençlerbirliği puanını 11'e çıkardı, Alanyaspor 12 puanda kaldı.",
+    source: "DHA / Evrensel / Yeniçağ / İstiklal",
+    url: "https://www.dha.com.tr/spor/genclerbirligi-corendon-alanyaspor-5-0-2974031",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s18", "s10"],
+  },
+  {
+    id: "news-sl-77",
+    date: "2026-11-06",
+    title: "Galatasaray: Osimhen sol dizinden ameliyat oldu",
+    summary:
+      "Galatasaray, Stuttgart maçında sakatlanan Victor Osimhen'in MR tetkiklerinde sol dizinde serbest fragman tespit edildiğini ve oyuncunun Maslak Acıbadem Hastanesi'nde artroskopik ameliyat geçirdiğini açıkladı. Osimhen Amed SFK maçının kadrosunda yer almadı. Kesin dönüş süresi açıklanmadı; basında 2-3 ile 3-4 hafta arasında değişen tahminler var.",
+    source: "Hürriyet / Sözcü / Sporx / GZT",
+    url: "https://www.hurriyet.com.tr/sporarena/galatasaraydan-osimhen-icin-sakatlik-aciklamasi-operasyon-gecirecek-43368793",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s1", "t35"],
+  },
+  {
+    id: "news-sl-78",
+    date: "2026-11-06",
+    title: "Schreuder'li Kasımpaşa, Gaziantep'ten 2-0 galibiyetle döndü",
+    summary:
+      "11. haftanın açılış maçında Kasımpaşa, Gaziantep FK'yı deplasmanda 2-0 yendi. Goller 3. dakikada Hajradinović'ten ve 21. dakikada penaltıdan Benedyczak'tan geldi. Emre Belözoğlu'nun ayrılmasının ardından göreve gelen Alfred Schreuder ilk maçında kazandı; Kasımpaşa 20 puanla 4. sıraya yükseldi. Gaziantep FK üst üste 6. lig maçını kaybetti.",
+    source: "Ajansspor / Hürriyet / Akşam / İHA / 10haber",
+    url: "https://ajansspor.com/haber/gaziantep-fk-kasimpasa-0-2-mac-sonucu-yazili-ozet-738119",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s15", "s8"],
+  },
+  {
+    id: "news-sl-79",
+    date: "2026-11-07",
+    title: "Zirvede 7 gollü maç: Galatasaray, Amed SFK'yı 4-3 yendi",
+    summary:
+      "RAMS Park'taki zirve maçında Galatasaray, Leão (7'), Lafont'un kendi kalesine golü (45'), Batrakov (59') ve Barış Alper Yılmaz (80') ile 4 gol buldu. Amed'in golleri Dia Saba (62'), Orban (65') ve uzatmada Yira Sor'dan geldi. Leão golünden sonra sakatlanarak oyundan çıktı. Galatasaray 28 puanla milli araya lider girdi; Amed 23 puanda kaldı.",
+    source: "Ajansspor / Hürriyet / Fanatik / Star / NTV Spor",
+    url: "https://ajansspor.com/haber/galatasaray-amed-sportif-faaliyetler-4-3-mac-sonucu-yazili-ozet-738185",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s1", "s11"],
+  },
+  {
+    id: "news-sl-80",
+    date: "2026-11-07",
+    title: "Samsunspor 8 maçlık yenilgi serisini bitirdi; Kocaelispor ve Başakşehir deplasmanda kazandı",
+    summary:
+      "Samsunspor, 39. dakikada Coulibaly'nin pasında Antoine Sekongo'nun golüyle Konyaspor'u 1-0 yendi; Nenad Bjelica takımın başındaki ilk galibiyetini aldı. Kocaelispor, Agyei (5') ve Berkan Kutlu'nun (28') golleriyle Eyüpspor'u 2-0 mağlup edip 19 puanla 6. sıraya çıktı. Başakşehir ise Göztepe deplasmanında 1-1 biten ilk yarının ardından Visca'nın 83. dakikadaki golüyle 2-1 kazandı; Göztepe 6 maç sonra ilk kez yenildi.",
+    source: "Hürriyet / Fanatik / Ajansspor / AA / A Spor / Son Mühür",
+    url: "https://www.fanatik.com.tr/samsunspor/samsunspor-nefes-aldi-8-maclik-maglubiyet-serisi-bitti-mac-sonucu-samsunspor-konyaspor-1-0-super-lig-2643690",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s6", "s9", "s16", "s17", "s7", "s5"],
   },
 
   // ---- 2026-27 UCL lig fazı: dikkat çekici eşleşme önizlemeleri ----

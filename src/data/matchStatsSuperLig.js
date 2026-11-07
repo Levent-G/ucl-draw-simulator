@@ -677,4 +677,66 @@ export const SUPER_LIG_MATCH_STATS = {
     asOf: "2026-11-01",
     source: "TFF / Ajansspor / Star / Cumhuriyet / haberler.com",
   },
+  sr10m7: {
+    // Gençlerbirliği 5-0 Alanyaspor (2 Kas) -- 7 maç sonra gelen galibiyet. Ülgün'ün golü bazı kaynaklarda 1', DHA anlatımında 2'.
+    scorers: [
+      { teamId: "s18", playerName: "Oğulcan Ülgün", minute: 2 },
+      { teamId: "s18", playerName: "Franco Tongya", minute: 59 },
+      { teamId: "s18", playerName: "Tiago Gouveia", minute: 66 },
+      { teamId: "s18", playerName: "Pedro Mendes", minute: 68 },
+      { teamId: "s18", playerName: "Tiago Gouveia", minute: 78 },
+    ],
+    asOf: "2026-11-07",
+    source: "DHA / Evrensel / Yeniçağ / İstiklal",
+  },
+  sr11m0: {
+    // Gaziantep FK 0-2 Kasımpaşa (6 Kas) -- Alfred Schreuder'in Kasımpaşa'daki ilk maçı. Kıyas Haber penaltı golünü 19' yazıyor.
+    scorers: [
+      { teamId: "s8", playerName: "Haris Hajradinović", minute: 3 },
+      { teamId: "s8", playerName: "Adrian Benedyczak", minute: 21, penalty: true },
+    ],
+    asOf: "2026-11-07",
+    source: "Ajansspor / Hürriyet / Akşam / İHA",
+  },
+  sr11m1: {
+    // Eyüpspor 0-2 Kocaelispor (7 Kas) -- iki gol de ilk yarıda; Berkan Kutlu ceza sahası dışından.
+    scorers: [
+      { teamId: "s17", playerName: "Dan Agyei", minute: 5 },
+      { teamId: "s17", playerName: "Berkan Kutlu", minute: 28 },
+    ],
+    asOf: "2026-11-07",
+    source: "Ajansspor / Hürriyet / AA / Sporkolik",
+  },
+  sr11m8: {
+    // Samsunspor 1-0 Konyaspor (7 Kas) -- Samsunspor'un 8 maçlık mağlubiyet serisi bitti; Nenad Bjelica'nın ilk galibiyeti. Golde asist Tanguy Coulibaly. Enis Destan'ın kırmızı kartı VAR sonrası sarıya çevrildi.
+    scorers: [
+      { teamId: "s6", playerName: "Antoine Sekongo", minute: 39 },
+    ],
+    asOf: "2026-11-07",
+    source: "Hürriyet / Fanatik / Milliyet / Star / Takvim",
+  },
+  sr11m4: {
+    // Göztepe 1-2 İstanbul Başakşehir (7 Kas) -- ilk yarı 1-1; Visca'nın golünde asist Onur Bulut. Son Mühür Visca'nın golünü 82' yazıyor.
+    scorers: [
+      { teamId: "s7", playerName: "Juan", minute: 18 },
+      { teamId: "s5", playerName: "Davie Selke", minute: 22 },
+      { teamId: "s5", playerName: "Edin Visca", minute: 83 },
+    ],
+    asOf: "2026-11-07",
+    source: "A Spor / Son Mühür / Mersin Haber / Yeni Birlik",
+  },
+  sr11m6: {
+    // Galatasaray 4-3 Amed SFK (7 Kas, RAMS Park) -- Leão golünden sonra sakatlandı. Lafont'un kendi kalesine golü bazı kaynaklarda 44'; Dia Saba 62'/63', Orban 65'/66', Yira Sor 90+2'/90+3'.
+    scorers: [
+      { teamId: "s1", playerName: "Rafael Leao", minute: 7 },
+      { teamId: "s1", playerName: "Alban Lafont", minute: 45, ownGoal: true },
+      { teamId: "s1", playerName: "Aleksey Batrakov", minute: 59 },
+      { teamId: "s11", playerName: "Dia Saba", minute: 62 },
+      { teamId: "s11", playerName: "Gift Orban", minute: 65 },
+      { teamId: "s1", playerName: "Barış Alper Yılmaz", minute: 80 },
+      { teamId: "s11", playerName: "Yira Sor", minute: 90 }, // 90+2'/90+3'
+    ],
+    asOf: "2026-11-07",
+    source: "Ajansspor / Hürriyet / Fanatik / Star / NTV Spor",
+  },
 };

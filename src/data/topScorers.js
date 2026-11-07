@@ -179,7 +179,7 @@ export const TOP_SCORERS = [
     playerName: "Erling Haaland",
     teamId: "t2", // Manchester City
     competitionKey: "ucl",
-    goals: 4, // UCL 2. hafta 2
+    goals: 5, // UCL 2. hafta 2 + UCL 4. hafta RB Leipzig'e 78' (galibiyet golü)
     matchesPlayed: 2,
     asOf: "2026-10-17",
     source: "Sky Sports / ESPN / ESPN (scoreboard) / thesportsencounter.com",
@@ -205,7 +205,7 @@ export const TOP_SCORERS = [
     playerName: "Kylian Mbappé",
     teamId: "t1", // Real Madrid
     competitionKey: "ucl",
-    goals: 3, // UCL 2. hafta 1 + UCL 3. hafta 1
+    goals: 4, // UCL 2. hafta 1 + UCL 3. hafta 1 + UCL 4. hafta AEK'ya 78'
     matchesPlayed: 3,
     asOf: "2026-10-27",
     source: "ESPN / Al Jazeera / ESPN (scoreboard) / thesportsencounter.com / ESPN / NBC Sports / Sky Sports / Yahoo Sports / SoccerMag",
@@ -214,7 +214,7 @@ export const TOP_SCORERS = [
     playerName: "Federico Valverde",
     teamId: "t1", // Real Madrid
     competitionKey: "ucl",
-    goals: 1,
+    goals: 2, // + UCL 4. hafta AEK'ya 90+2' (galibiyet golü)
     matchesPlayed: 1,
     asOf: "2026-09-09",
     source: "ESPN / Al Jazeera",
@@ -284,7 +284,7 @@ export const TOP_SCORERS = [
     playerName: "Nicolò Tresoldi",
     teamId: "t17", // Club Brugge
     competitionKey: "ucl",
-    goals: 4, // penaltıdan + 2. hafta 3 gol
+    goals: 5, // penaltıdan + 2. hafta 3 gol + 4. hafta PSV'ye 25'
     matchesPlayed: 2,
     asOf: "2026-10-14",
     source: "Sky Sports / ESPN (scoreboard) / thesportsencounter.com",
@@ -313,7 +313,7 @@ export const TOP_SCORERS = [
     playerName: "Raphinha",
     teamId: "t7", // Barcelona
     competitionKey: "ucl",
-    goals: 2, // 3' ve 57'
+    goals: 4, // 3' ve 57' + UCL 4. hafta Aston Villa'ya 52', 64'
     matchesPlayed: 1,
     asOf: "2026-09-10",
     source: "ESPN / VAVEL",
@@ -331,7 +331,7 @@ export const TOP_SCORERS = [
     playerName: "Lamine Yamal",
     teamId: "t7", // Barcelona
     competitionKey: "ucl",
-    goals: 2, // 77', frikikten + UCL 3. hafta 1
+    goals: 3, // 77', frikikten + UCL 3. hafta 1 + UCL 4. hafta Aston Villa'ya 7'
     asOf: "2026-10-21",
     source: "ESPN / VAVEL / ESPN / UEFA.com / AA / Sofascore / Al Jazeera",
   },
@@ -366,7 +366,7 @@ export const TOP_SCORERS = [
     playerName: "Zlatko Tripić",
     teamId: "t30", // Viking
     competitionKey: "ucl",
-    goals: 1, // 22'
+    goals: 2, // 22' + UCL 4. hafta Sabah'a 69'
     matchesPlayed: 1,
     asOf: "2026-09-10",
     source: "ESPN / Bundesliga.com / Yahoo Sports",
@@ -422,7 +422,7 @@ export const TOP_SCORERS = [
     playerName: "Fabián Ruiz",
     teamId: "t4", // Paris Saint-Germain
     competitionKey: "ucl",
-    goals: 2, // 87'-88' + UCL 3. hafta 1
+    goals: 4, // 87'-88' + UCL 3. hafta 1 + UCL 4. hafta Villarreal'e 17', 50'
     asOf: "2026-10-21",
     source: "ESPN / VAVEL / Yahoo Sports / ESPN / UEFA.com / AA / Sofascore / Al Jazeera",
   },
@@ -486,7 +486,7 @@ export const TOP_SCORERS = [
     playerName: "Archie Brown",
     teamId: "t25", // Fenerbahçe
     competitionKey: "ucl",
-    goals: 1, // 48', Fenerbahçe adına UCL'de gol atan ilk İngiliz oyuncu
+    goals: 2, // 48', Fenerbahçe adına UCL'de gol atan ilk İngiliz oyuncu + UCL 4. hafta Liverpool'a 73'
     matchesPlayed: 1,
     asOf: "2026-09-16",
     source: "ESPN / FOX Sports",
@@ -513,7 +513,7 @@ export const TOP_SCORERS = [
     playerName: "Martin Baturina",
     teamId: "t34", // Como
     competitionKey: "ucl",
-    goals: 1, // 15'
+    goals: 2, // 15' + UCL 4. hafta Lens'e 69'
     matchesPlayed: 1,
     asOf: "2026-09-16",
     source: "ESPN / VAVEL",
@@ -525,7 +525,7 @@ export const TOP_SCORERS = [
     playerName: "Anastasios Douvikas",
     teamId: "t34", // Como
     competitionKey: "ucl",
-    goals: 3, // ~38'-40' + UCL 2. hafta 1 + UCL 3. hafta 1
+    goals: 6, // ~38'-40' + UCL 2. hafta 1 + UCL 3. hafta 1 + UCL 4. hafta Lens'e hat-trick (7', 32', 57')
     matchesPlayed: 3,
     asOf: "2026-10-21",
     source: "ESPN / VAVEL / ESPN (scoreboard) / thesportsencounter.com / ESPN / Ajansspor / Hürriyet / VAVEL / TNT Sports",
@@ -605,7 +605,7 @@ export const TOP_SCORERS = [
     playerName: "Matheus Cunha",
     teamId: "t8", // Manchester United
     competitionKey: "ucl",
-    goals: 1, // ~27'-28'
+    goals: 3, // ~27'-28' + UCL 4. hafta Roma'ya 83', 86'
     matchesPlayed: 1,
     asOf: "2026-09-16",
     source: "ESPN / VAVEL",
@@ -614,7 +614,7 @@ export const TOP_SCORERS = [
     playerName: "Bruno Fernandes",
     teamId: "t8", // Manchester United
     competitionKey: "ucl",
-    goals: 1, // 42'
+    goals: 2, // 42' + UCL 4. hafta Roma'ya 58' (penaltı)
     matchesPlayed: 1,
     asOf: "2026-09-16",
     source: "ESPN / Yahoo Sports",
@@ -677,7 +677,7 @@ export const TOP_SCORERS = [
     playerName: "Ruben Aguilar",
     teamId: "t22", // RC Lens
     competitionKey: "ucl",
-    goals: 1, // 90+3'
+    goals: 2, // 90+3' + UCL 4. hafta Como'ya 65'
     matchesPlayed: 1,
     asOf: "2026-09-16",
     source: "ESPN / VAVEL / GiveMeSport",
@@ -689,7 +689,7 @@ export const TOP_SCORERS = [
     playerName: "Issa Doumbia",
     teamId: "t23",
     competitionKey: "ucl",
-    goals: 1,
+    goals: 2, // + UCL 4. hafta Shakhtar'a 59'
     asOf: "2026-10-14",
     source: "ESPN (scoreboard) / thesportsencounter.com",
   },
@@ -777,7 +777,7 @@ export const TOP_SCORERS = [
     playerName: "Aleksey Batrakov",
     teamId: "t35",
     competitionKey: "ucl",
-    goals: 2, // UCL 3. hafta 1
+    goals: 4, // UCL 3. hafta 1 + UCL 4. hafta Stuttgart'a 12', 15'
     asOf: "2026-10-21",
     source: "ESPN (scoreboard) / thesportsencounter.com / ESPN / Ajansspor / Hürriyet / VAVEL / TNT Sports",
   },
@@ -915,7 +915,7 @@ export const TOP_SCORERS = [
     playerName: "Robert Ljubičić",
     teamId: "t33",
     competitionKey: "ucl",
-    goals: 1,
+    goals: 2, // + UCL 4. hafta Slovan Bratislava'ya 44'
     asOf: "2026-10-17",
     source: "ESPN (scoreboard) / thesportsencounter.com",
   },
@@ -947,7 +947,7 @@ export const TOP_SCORERS = [
     playerName: "Donyell Malen",
     teamId: "t13",
     competitionKey: "ucl",
-    goals: 3, // UCL 3. hafta 1
+    goals: 4, // UCL 3. hafta 1 + UCL 4. hafta Man United'a 17' (penaltı)
     asOf: "2026-10-21",
     source: "ESPN (scoreboard) / thesportsencounter.com / ESPN / UEFA.com / AA / Sofascore / Al Jazeera",
   },
@@ -1035,7 +1035,7 @@ export const TOP_SCORERS = [
     playerName: "Désiré Doué",
     teamId: "t4",
     competitionKey: "ucl",
-    goals: 2, // UCL 3. hafta 1
+    goals: 3, // UCL 3. hafta 1 + UCL 4. hafta Villarreal'e 12'
     asOf: "2026-10-21",
     source: "ESPN (scoreboard) / thesportsencounter.com / ESPN / UEFA.com / AA / Sofascore / Al Jazeera",
   },
@@ -1067,7 +1067,7 @@ export const TOP_SCORERS = [
     playerName: "Gabri Veiga",
     teamId: "t28",
     competitionKey: "ucl",
-    goals: 1,
+    goals: 2, // + UCL 4. hafta Napoli'ye 71'
     asOf: "2026-10-17",
     source: "ESPN (scoreboard) / thesportsencounter.com",
   },
@@ -1075,7 +1075,7 @@ export const TOP_SCORERS = [
     playerName: "Samu Aghehowa",
     teamId: "t28",
     competitionKey: "ucl",
-    goals: 1,
+    goals: 2, // + UCL 4. hafta Napoli'ye 90' (penaltı)
     asOf: "2026-10-17",
     source: "ESPN (scoreboard) / thesportsencounter.com",
   },
@@ -1117,7 +1117,7 @@ export const TOP_SCORERS = [
     playerName: "Mason Greenwood",
     teamId: "t25",
     competitionKey: "ucl",
-    goals: 1,
+    goals: 2, // + UCL 4. hafta Liverpool'a 29'
     asOf: "2026-10-21",
     source: "ESPN / UEFA.com / AA / Sofascore / Al Jazeera",
   },
@@ -1213,7 +1213,7 @@ export const TOP_SCORERS = [
     playerName: "Stavros Pilios",
     teamId: "t27",
     competitionKey: "ucl",
-    goals: 1,
+    goals: 2, // + UCL 4. hafta Real Madrid'e 75'
     asOf: "2026-10-21",
     source: "ESPN / UEFA.com / AA / Sofascore / Al Jazeera",
   },
@@ -1261,7 +1261,7 @@ export const TOP_SCORERS = [
     playerName: "Scott McTominay",
     teamId: "t9",
     competitionKey: "ucl",
-    goals: 2,
+    goals: 3, // + UCL 4. hafta Porto'ya 43'
     asOf: "2026-10-21",
     source: "ESPN / UEFA.com / AA / Sofascore / Al Jazeera",
   },
@@ -1303,7 +1303,7 @@ export const TOP_SCORERS = [
     playerName: "Nico Paz",
     teamId: "t34",
     competitionKey: "ucl",
-    goals: 2,
+    goals: 3, // + UCL 4. hafta Lens'e 40'
     asOf: "2026-10-21",
     source: "ESPN / Ajansspor / Hürriyet / VAVEL / TNT Sports",
   },
@@ -1369,7 +1369,7 @@ export const TOP_SCORERS = [
     playerName: "Carlos Forbs",
     teamId: "t17",
     competitionKey: "ucl",
-    goals: 1, // UCL 3. hafta
+    goals: 2, // UCL 3. hafta + UCL 4. hafta PSV'ye 65'
     asOf: "2026-10-27",
     source: "ESPN / NBC Sports / Sky Sports / Yahoo Sports / SoccerMag",
   },
@@ -1467,16 +1467,16 @@ export const TOP_SCORERS = [
     playerName: "Gift Orban",
     teamId: "s11", // Amed SFK
     competitionKey: "superlig",
-    goals: 9, // 1-4. haftalarda 3, 5. hafta İstanbul Başakşehir'e hat-trick (52', 56', 75'), 6. hafta Beşiktaş'a 1 (13') + 9. hafta 1 + 10. hafta Eyüpspor'a 1 (35')
-    asOf: "2026-11-01",
+    goals: 10, // 1-4. haftalarda 3, 5. hafta İstanbul Başakşehir'e hat-trick (52', 56', 75'), 6. hafta Beşiktaş'a 1 (13') + 9. hafta 1 + 10. hafta Eyüpspor'a 1 (35') + 11. hafta Galatasaray'a 1 (65')
+    asOf: "2026-11-07",
     source: "ESPN / sofascore.com / diyarbakir.net / Fanatik / Habertürk / gzt.com / beIN Sports / Ensonhaber / Ajansspor / Hürriyet",
   },
   {
     playerName: "Juan",
     teamId: "s7", // Göztepe
     competitionKey: "superlig",
-    goals: 6, // 3. hafta Galatasaray'a 1, 4. hafta Gaziantep FK'ya 2, 5. hafta Alanyaspor'a 1 (73', penaltıdan) -- 6. hafta Çaykur Rizespor'a karşı (2-2) golsüz kaldı (o maçın golleri Kurtulan ve Bekiroğlu'na yazıldı, aşağıya bkz.); 7. hafta Eyüpspor deplasmanında 1 (11', penaltıdan) + 9. hafta 1
-    asOf: "2026-10-27",
+    goals: 7, // 3. hafta Galatasaray'a 1, 4. hafta Gaziantep FK'ya 2, 5. hafta Alanyaspor'a 1 (73', penaltıdan) -- 6. hafta Çaykur Rizespor'a karşı (2-2) golsüz kaldı (o maçın golleri Kurtulan ve Bekiroğlu'na yazıldı, aşağıya bkz.); 7. hafta Eyüpspor deplasmanında 1 (11', penaltıdan) + 9. hafta 1 + 11. hafta Başakşehir'e 1 (18')
+    asOf: "2026-11-07",
     source: "beIN Sports / Hürriyet / fotmob.com / Habertürk (7. hafta) / Habertürk / Sporx",
   },
   {
@@ -1695,8 +1695,8 @@ export const TOP_SCORERS = [
     playerName: "Adrian Benedyczak",
     teamId: "s8", // Kasımpaşa
     competitionKey: "superlig",
-    goals: 6, // 1. hafta Trabzonspor'a 1 (56', penaltı), 2. hafta Çorum FK deplasmanında 1 (6'), 4. hafta Amed SFK'ya 1, 5. hafta Gençlerbirliği'ne 1 (79') + 8. hafta 1 + 9. hafta 1
-    asOf: "2026-10-27",
+    goals: 7, // 1. hafta Trabzonspor'a 1 (56', penaltı), 2. hafta Çorum FK deplasmanında 1 (6'), 4. hafta Amed SFK'ya 1, 5. hafta Gençlerbirliği'ne 1 (79') + 8. hafta 1 + 9. hafta 1 + 11. hafta Gaziantep FK'ya 1 (21', penaltı)
+    asOf: "2026-11-07",
     source: "Habertürk / Hürriyet / gzt.com / Fanatik / Takvim / ASpor / flashscore.com.tr / Hürriyet / Timeturk / Sabah / Sporx / beIN Sports / Ensonhaber",
   },
   {
@@ -1734,8 +1734,8 @@ export const TOP_SCORERS = [
     playerName: "Barış Alper Yılmaz",
     teamId: "s1", // Galatasaray
     competitionKey: "superlig",
-    goals: 1, // 7. hafta Kasımpaşa'ya 90' (Jakobs asistiyle)
-    asOf: "2026-10-09",
+    goals: 2, // 7. hafta Kasımpaşa'ya 90' (Jakobs asistiyle) + 11. hafta Amed SFK'ya 80'
+    asOf: "2026-11-07",
     source: "Hürriyet / Takvim / ESPN / haberler.com",
   },
   {
@@ -1853,18 +1853,18 @@ export const TOP_SCORERS = [
     playerName: "Berkan Kutlu",
     teamId: "s17", // Kocaelispor
     competitionKey: "superlig",
-    goals: 3, // 6. hafta Gaziantep FK'ya, 56' + 8. hafta 1 + 9. hafta 1
-    asOf: "2026-10-27",
+    goals: 4, // 6. hafta Gaziantep FK'ya, 56' + 8. hafta 1 + 9. hafta 1 + 11. hafta Eyüpspor'a 28'
+    asOf: "2026-11-07",
     source: "Habertürk / Fanatik / Sporx / Hürriyet / Ajansspor / DHA / Akşam / beIN Sports / Ensonhaber",
   },
   {
     playerName: "Dan Agyei",
     teamId: "s17", // Kocaelispor
     competitionKey: "superlig",
-    goals: 1, // 6. hafta Gaziantep FK'ya, 76'
+    goals: 2, // 6. hafta Gaziantep FK'ya, 76' + 11. hafta Eyüpspor'a 5'
     matchesPlayed: 6,
-    asOf: "2026-09-19",
-    source: "Habertürk / Fanatik / Sporx",
+    asOf: "2026-11-07",
+    source: "Habertürk / Fanatik / Sporx / Ajansspor / Hürriyet / AA",
   },
   {
     // superLigPlayers.js'te Trabzonspor (s4) kadrosunda YOK -- kadro dosyası
@@ -1904,10 +1904,10 @@ export const TOP_SCORERS = [
     playerName: "Davie Selke",
     teamId: "s5", // İstanbul Başakşehir
     competitionKey: "superlig",
-    goals: 1, // 6. hafta Gençlerbirliği'ne, 53' (penaltı)
+    goals: 2, // 6. hafta Gençlerbirliği'ne, 53' (penaltı) + 11. hafta Göztepe'ye 22'
     matchesPlayed: 6,
-    asOf: "2026-09-19",
-    source: "AA / Hürriyet / Fotomaç",
+    asOf: "2026-11-07",
+    source: "AA / Hürriyet / Fotomaç / A Spor / Son Mühür",
   },
 
   // ---- Trendyol Süper Lig 2026-27 -- 6. Hafta, 20 Eylül 2026'da oynanan KALAN 4 maç (6. Hafta TAMAMLANDI) ----
@@ -1968,8 +1968,8 @@ export const TOP_SCORERS = [
     playerName: "Dia Saba",
     teamId: "s11", // Amed SFK
     competitionKey: "superlig",
-    goals: 3, // 6. hafta Beşiktaş'a, 22'; 7. hafta Gençlerbirliği deplasmanında 25' (penaltıdan) + 9. hafta 1
-    asOf: "2026-10-27",
+    goals: 4, // 6. hafta Beşiktaş'a, 22'; 7. hafta Gençlerbirliği deplasmanında 25' (penaltıdan) + 9. hafta 1 + 11. hafta Galatasaray'a 62'
+    asOf: "2026-11-07",
     source: "gzt.com / Habertürk / Fanatik / Cumhuriyet / Takvim (7. hafta) / beIN Sports / Ensonhaber",
   },
   {
@@ -2258,17 +2258,17 @@ export const TOP_SCORERS = [
     playerName: "Aleksey Batrakov",
     teamId: "s1",
     competitionKey: "superlig",
-    goals: 1, // 10. hafta 49'
-    asOf: "2026-10-31",
-    source: "beIN Sports / Ajansspor",
+    goals: 2, // 10. hafta 49' + 11. hafta Amed SFK'ya 59'
+    asOf: "2026-11-07",
+    source: "beIN Sports / Ajansspor / Hürriyet",
   },
   {
     playerName: "Rafael Leao",
     teamId: "s1",
     competitionKey: "superlig",
-    goals: 1, // 10. hafta 55' (penaltı, VAR sonrası)
-    asOf: "2026-10-31",
-    source: "beIN Sports / Ajansspor",
+    goals: 2, // 10. hafta 55' (penaltı, VAR sonrası) + 11. hafta Amed SFK'ya 7'
+    asOf: "2026-11-07",
+    source: "beIN Sports / Ajansspor / Hürriyet",
   },
   // ---- 10. Hafta, 31 Ekim 2026: Erzurumspor FK 1-3 Çorum FK (Hürriyet / ensondakika) ----
   {
@@ -2364,4 +2364,55 @@ export const TOP_SCORERS = [
     asOf: "2026-11-01",
     source: "Ajansspor / haberler.com / Sporkolik / Canlıgaste",
   },
+  // ---- UCL Lig Fazı 4. Hafta (3-4 Kasım 2026) -- bu dosyada daha önce UCL golüyle yer almayan
+  // oyuncular. Golcüler ESPN skor tablosu (3 ve 4 Kasım) + Flashscore / Yahoo Sports /
+  // footballwebpages.co.uk / thesportsencounter.com ile çapraz doğrulandı. Tam adlar
+  // players.js kadrolarından; kadroda olmayan ve tam adı doğrulanamayan iki oyuncu (PSG'den
+  // D. Boly, Como'dan M. Papaccioli) ESPN'deki baş harfli biçimiyle yazıldı. Leipzig-City
+  // maçında Lukeba'nın kendi kalesine golü kurala göre hiçbir oyuncuya yazılmadı.
+  { playerName: "Lennart Karl", teamId: "t3", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / Flashscore" }, // Atletico'ya 54'
+  { playerName: "Konrad Laimer", teamId: "t3", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / Flashscore" }, // Atletico'ya 74'
+  { playerName: "Yann Aurel Bisseck", teamId: "t6", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / footballwebpages.co.uk" }, // Feyenoord'a 8'
+  { playerName: "Pio Esposito", teamId: "t6", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / footballwebpages.co.uk" }, // Feyenoord'a 34'
+  { playerName: "Piotr Zieliński", teamId: "t6", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / footballwebpages.co.uk" }, // Feyenoord'a 54'
+  { playerName: "Kasper Jørgensen", teamId: "t33", competitionKey: "ucl", goals: 2, asOf: "2026-11-07", source: "ESPN / footballwebpages.co.uk" }, // Slovan Bratislava'ya 19', 37'
+  { playerName: "Samuel Adeniran", teamId: "t33", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / footballwebpages.co.uk" }, // Slovan Bratislava'ya 48'
+  { playerName: "Matías Soulé", teamId: "t13", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / footballwebpages.co.uk / Yahoo Sports" }, // Man United'a 11'
+  { playerName: "João Neves", teamId: "t4", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / After90 Sports" }, // Villarreal'e 9'
+  { playerName: "Senny Mayulu", teamId: "t4", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / After90 Sports" }, // Villarreal'e 13'
+  { playerName: "D. Boly", teamId: "t4", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN" }, // Villarreal'e 78'
+  { playerName: "Aboubakary Koita", teamId: "t27", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / KSAT (AP)" }, // Real Madrid'e 12'
+  { playerName: "Jude Bellingham", teamId: "t1", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / KSAT (AP)" }, // AEK'ya 32'
+  { playerName: "Trey Nyoni", teamId: "t5", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / thesportsencounter.com" }, // Fenerbahçe'ye 25'
+  { playerName: "Alexander Isak", teamId: "t5", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / thesportsencounter.com" }, // Fenerbahçe'ye 69'
+  { playerName: "Fábio Silva", teamId: "t12", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN" }, // Real Betis'e 49'
+  { playerName: "Konstantinos Karetsas", teamId: "t12", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN" }, // Real Betis'e 72'
+  { playerName: "Aitor Ruibal", teamId: "t19", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN" }, // Dortmund'a 67'
+  { playerName: "Jan Bednarek", teamId: "t28", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN" }, // Napoli'ye 11'
+  { playerName: "Jakub Kiwior", teamId: "t28", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN" }, // Napoli'ye 80'
+  { playerName: "Kodai Sano", teamId: "t24", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN" }, // Club Brugge'e 54'
+  { playerName: "Ridle Baku", teamId: "t15", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / Yahoo Sports" }, // Man City'ye 49'
+  { playerName: "Antonio Nusa", teamId: "t15", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / Yahoo Sports" }, // Man City'ye 61'
+  { playerName: "Enzo Fernández", teamId: "t2", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / Yahoo Sports" }, // RB Leipzig'e 58'
+  { playerName: "Lucas Da Cunha", teamId: "t34", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / theScore" }, // Lens'e 47'
+  { playerName: "Marc-Oliver Kempf", teamId: "t34", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / theScore" }, // Lens'e 53'
+  { playerName: "Mattia Liberali", teamId: "t34", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / theScore" }, // Lens'e 62'
+  { playerName: "M. Papaccioli", teamId: "t34", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN" }, // Lens'e 90+1'
+  { playerName: "Noni Madueke", teamId: "t11", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / graphiconline.com" }, // Slavia Prag'a 9'
+  { playerName: "Viktor Gyökeres", teamId: "t11", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / graphiconline.com" }, // Slavia Prag'a 38'
+  { playerName: "Wiktor Nowak", teamId: "t29", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN" }, // Arsenal'e 90'
+  { playerName: "Erik Botheim", teamId: "t30", competitionKey: "ucl", goals: 2, asOf: "2026-11-07", source: "ESPN" }, // Sabah'a 27', 90+4'
+  { playerName: "Henrik Falchener", teamId: "t30", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN" }, // Sabah'a 81'
+  { playerName: "Orphe Mbina", teamId: "t31", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN" }, // Viking'e 11'
+  { playerName: "Vedat Muriqi", teamId: "t25", competitionKey: "ucl", goals: 1, asOf: "2026-11-07", source: "ESPN / KSAT (AP) / thesportsencounter.com" }, // Liverpool'a 79' (galibiyet golü)
+  // ---- Süper Lig 10. Hafta (2 Kas) + 11. Hafta (6-7 Kas) -- bu dosyada daha önce lig golüyle
+  // yer almayan oyuncular (bu sezonki önceki golleri varsa burada sayılmamış olabilir).
+  { playerName: "Oğulcan Ülgün", teamId: "s18", competitionKey: "superlig", goals: 1, asOf: "2026-11-07", source: "DHA / Evrensel / Yeniçağ" }, // 10. hafta Alanyaspor'a 2' (bazı kaynaklar 1')
+  { playerName: "Franco Tongya", teamId: "s18", competitionKey: "superlig", goals: 1, asOf: "2026-11-07", source: "DHA / Evrensel / Yeniçağ" }, // 10. hafta Alanyaspor'a 59'
+  { playerName: "Tiago Gouveia", teamId: "s18", competitionKey: "superlig", goals: 2, asOf: "2026-11-07", source: "DHA / Evrensel / Yeniçağ" }, // 10. hafta Alanyaspor'a 66', 78'
+  { playerName: "Pedro Mendes", teamId: "s18", competitionKey: "superlig", goals: 1, asOf: "2026-11-07", source: "DHA / Evrensel / Yeniçağ" }, // 10. hafta Alanyaspor'a 68'
+  { playerName: "Haris Hajradinović", teamId: "s8", competitionKey: "superlig", goals: 1, asOf: "2026-11-07", source: "Ajansspor / Hürriyet / Akşam" }, // 11. hafta Gaziantep FK'ya 3'
+  { playerName: "Antoine Sekongo", teamId: "s6", competitionKey: "superlig", goals: 1, asOf: "2026-11-07", source: "Hürriyet / Fanatik / Takvim" }, // 11. hafta Konyaspor'a 39'
+  { playerName: "Edin Visca", teamId: "s5", competitionKey: "superlig", goals: 1, asOf: "2026-11-07", source: "A Spor / Son Mühür" }, // 11. hafta Göztepe'ye 83' (Son Mühür 82')
+  { playerName: "Yira Sor", teamId: "s11", competitionKey: "superlig", goals: 1, asOf: "2026-11-07", source: "Ajansspor / Hürriyet / Fanatik" }, // 11. hafta Galatasaray'a 90+2'/90+3'
 ];

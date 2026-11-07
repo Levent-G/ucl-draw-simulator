@@ -99,4 +99,29 @@ export const REAL_RESULTS_UCL_2026 = [
   { matchId: "r3m17", homeGoals: 2, awayGoals: 3, date: "2026-10-21" }, // Sporting CP 2-3 LASK
   // 2 Kasım 2026 kontrolü: 1-3. Hafta'nın 54 sonucu Wikipedia "2026-27 UEFA Champions League
   // league phase" sayfasıyla yeniden birebir doğrulandı. 4. Hafta 3-4 Kasım'da oynanacak.
+
+  // 4. Hafta -- 3 Kasım 2026'da oynanan 9 maç (Flashscore, Yahoo Sports, After90 Sports,
+  // footballwebpages.co.uk, cameroun24.net ile çapraz doğrulandı).
+  { matchId: "r4m0", homeGoals: 0, awayGoals: 1, date: "2026-11-03" }, // Shakhtar Donetsk 0-1 Sporting CP
+  { matchId: "r4m1", homeGoals: 2, awayGoals: 0, date: "2026-11-03" }, // Galatasaray 2-0 VfB Stuttgart
+  { matchId: "r4m2", homeGoals: 0, awayGoals: 2, date: "2026-11-03" }, // Atletico Madrid 0-2 Bayern Münih
+  { matchId: "r4m3", homeGoals: 3, awayGoals: 0, date: "2026-11-03" }, // Barcelona 3-0 Aston Villa
+  { matchId: "r4m4", homeGoals: 0, awayGoals: 3, date: "2026-11-03" }, // Feyenoord 0-3 Inter
+  { matchId: "r4m5", homeGoals: 0, awayGoals: 0, date: "2026-11-03" }, // Bodø/Glimt 0-0 Lille
+  { matchId: "r4m6", homeGoals: 4, awayGoals: 0, date: "2026-11-03" }, // LASK 4-0 Slovan Bratislava
+  { matchId: "r4m7", homeGoals: 3, awayGoals: 2, date: "2026-11-03" }, // Manchester United 3-2 Roma
+  { matchId: "r4m8", homeGoals: 0, awayGoals: 6, date: "2026-11-03" }, // Villarreal 0-6 Paris Saint-Germain
+
+  // 4. Hafta -- 4 Kasım 2026'da oynanan 9 maç (KSAT/AP, Yahoo Sports, 112.ua,
+  // thesportsencounter.com, telecomasia.net, theScore, Irish Examiner, Flashscore).
+  // 4. Hafta TAMAMLANDI (18/18).
+  { matchId: "r4m9", homeGoals: 2, awayGoals: 3, date: "2026-11-04" }, // AEK Athens 2-3 Real Madrid
+  { matchId: "r4m10", homeGoals: 3, awayGoals: 2, date: "2026-11-04" }, // Fenerbahçe 3-2 Liverpool
+  { matchId: "r4m11", homeGoals: 2, awayGoals: 1, date: "2026-11-04" }, // Borussia Dortmund 2-1 Real Betis
+  { matchId: "r4m12", homeGoals: 4, awayGoals: 1, date: "2026-11-04" }, // FC Porto 4-1 Napoli
+  { matchId: "r4m13", homeGoals: 1, awayGoals: 2, date: "2026-11-04" }, // PSV Eindhoven 1-2 Club Brugge
+  { matchId: "r4m14", homeGoals: 2, awayGoals: 3, date: "2026-11-04" }, // RB Leipzig 2-3 Manchester City
+  { matchId: "r4m15", homeGoals: 1, awayGoals: 9, date: "2026-11-04" }, // RC Lens 1-9 Como
+  { matchId: "r4m16", homeGoals: 1, awayGoals: 2, date: "2026-11-04" }, // SK Slavia Prague 1-2 Arsenal
+  { matchId: "r4m17", homeGoals: 4, awayGoals: 1, date: "2026-11-04" }, // Viking 4-1 Sabah
 ];

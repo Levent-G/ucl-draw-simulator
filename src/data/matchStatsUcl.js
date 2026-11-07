@@ -965,4 +965,205 @@ export const UCL_MATCH_STATS = {
     asOf: "2026-10-27",
     source: "ESPN / NBC Sports / Sky Sports / Yahoo Sports / SoccerMag",
   },
+  // ==== 4. HAFTA (3-4 Kasım 2026) -- 7 Kasım tazelemesi. Golcüler ESPN skor tablosundan
+  // (espn.com/soccer/scoreboard, 20261103 ve 20261104) alındı ve Flashscore, Yahoo Sports,
+  // footballwebpages.co.uk, After90 Sports, KSAT (AP), thesportsencounter.com, theScore,
+  // graphiconline.com ile çapraz doğrulandı. ESPN'in dört maçta (r4m7, r4m9, r4m12, r4m17)
+  // skorla uyuşmayan fazladan birer satır gösterdiği görüldü; skorla çelişen bu satırlar
+  // gol olarak EKLENMEDİ. Kartlar için güvenilir takım toplamı bulunamadığından alan atlandı.
+  r4m0: {
+    // Shakhtar Donetsk 0-1 Sporting CP
+    scorers: [
+      { teamId: "t23", playerName: "Issa Doumbia", minute: 59 },
+    ],
+    asOf: "2026-11-07",
+    source: "ESPN / footballwebpages.co.uk / Flashscore",
+  },
+  r4m1: {
+    // Galatasaray 2-0 VfB Stuttgart -- Batrakov ilk 15 dakikada iki gol attı.
+    scorers: [
+      { teamId: "t35", playerName: "Aleksey Batrakov", minute: 12 },
+      { teamId: "t35", playerName: "Aleksey Batrakov", minute: 15 },
+    ],
+    asOf: "2026-11-07",
+    source: "ESPN / Flashscore / After90 Sports",
+  },
+  r4m2: {
+    // Atletico Madrid 0-2 Bayern Münih
+    scorers: [
+      { teamId: "t3", playerName: "Lennart Karl", minute: 54 },
+      { teamId: "t3", playerName: "Konrad Laimer", minute: 74 },
+    ],
+    asOf: "2026-11-07",
+    source: "ESPN / Flashscore",
+  },
+  r4m3: {
+    // Barcelona 3-0 Aston Villa
+    scorers: [
+      { teamId: "t7", playerName: "Lamine Yamal", minute: 7 },
+      { teamId: "t7", playerName: "Raphinha", minute: 52 },
+      { teamId: "t7", playerName: "Raphinha", minute: 64 },
+    ],
+    asOf: "2026-11-07",
+    source: "ESPN / Flashscore / Yahoo Sports",
+  },
+  r4m4: {
+    // Feyenoord 0-3 Inter
+    scorers: [
+      { teamId: "t6", playerName: "Yann Aurel Bisseck", minute: 8 },
+      { teamId: "t6", playerName: "Pio Esposito", minute: 34 },
+      { teamId: "t6", playerName: "Piotr Zieliński", minute: 54 },
+    ],
+    asOf: "2026-11-07",
+    source: "ESPN / footballwebpages.co.uk",
+  },
+  r4m5: {
+    // Bodø/Glimt 0-0 Lille
+    scorers: [],
+    asOf: "2026-11-07",
+    source: "ESPN / footballwebpages.co.uk",
+  },
+  r4m6: {
+    // LASK 4-0 Slovan Bratislava
+    scorers: [
+      { teamId: "t33", playerName: "Kasper Jørgensen", minute: 19 },
+      { teamId: "t33", playerName: "Kasper Jørgensen", minute: 37 },
+      { teamId: "t33", playerName: "Robert Ljubičić", minute: 44 },
+      { teamId: "t33", playerName: "Samuel Adeniran", minute: 48 },
+    ],
+    asOf: "2026-11-07",
+    source: "ESPN / footballwebpages.co.uk",
+  },
+  r4m7: {
+    // Manchester United 3-2 Roma -- United ilk yarıyı 0-2 geride kapattı, Cunha 83' ve 86'da çevirdi.
+    scorers: [
+      { teamId: "t13", playerName: "Matías Soulé", minute: 11 },
+      { teamId: "t13", playerName: "Donyell Malen", minute: 17, penalty: true },
+      { teamId: "t8", playerName: "Bruno Fernandes", minute: 58, penalty: true },
+      { teamId: "t8", playerName: "Matheus Cunha", minute: 83 },
+      { teamId: "t8", playerName: "Matheus Cunha", minute: 86 },
+    ],
+    asOf: "2026-11-07",
+    source: "ESPN / footballwebpages.co.uk / Yahoo Sports",
+  },
+  r4m8: {
+    // Villarreal 0-6 Paris Saint-Germain
+    scorers: [
+      { teamId: "t4", playerName: "João Neves", minute: 9 },
+      { teamId: "t4", playerName: "Désiré Doué", minute: 12 },
+      { teamId: "t4", playerName: "Senny Mayulu", minute: 13 },
+      { teamId: "t4", playerName: "Fabián Ruiz", minute: 17 },
+      { teamId: "t4", playerName: "Fabián Ruiz", minute: 50 },
+      { teamId: "t4", playerName: "D. Boly", minute: 78 },
+    ],
+    asOf: "2026-11-07",
+    source: "ESPN / After90 Sports / Yahoo Sports",
+  },
+  r4m9: {
+    // AEK Athens 2-3 Real Madrid -- Valverde 90+2'de kazandırdı.
+    scorers: [
+      { teamId: "t27", playerName: "Aboubakary Koita", minute: 12 },
+      { teamId: "t1", playerName: "Jude Bellingham", minute: 32 },
+      { teamId: "t27", playerName: "Stavros Pilios", minute: 75 },
+      { teamId: "t1", playerName: "Kylian Mbappé", minute: 78 },
+      { teamId: "t1", playerName: "Federico Valverde", minute: 90 }, // 90+2'
+    ],
+    asOf: "2026-11-07",
+    source: "ESPN / KSAT (AP) / Yahoo Sports",
+  },
+  r4m10: {
+    // Fenerbahçe 3-2 Liverpool -- Dirk Kuyt yönetimindeki Fenerbahçe iki kez geriye düşüp kazandı; Liverpool'un turnuvadaki ilk yenilgisi.
+    scorers: [
+      { teamId: "t5", playerName: "Trey Nyoni", minute: 25 },
+      { teamId: "t25", playerName: "Mason Greenwood", minute: 29 },
+      { teamId: "t5", playerName: "Alexander Isak", minute: 69 },
+      { teamId: "t25", playerName: "Archie Brown", minute: 73 },
+      { teamId: "t25", playerName: "Vedat Muriqi", minute: 79 },
+    ],
+    asOf: "2026-11-07",
+    source: "ESPN / KSAT (AP) / thesportsencounter.com",
+  },
+  r4m11: {
+    // Borussia Dortmund 2-1 Real Betis
+    scorers: [
+      { teamId: "t12", playerName: "Fábio Silva", minute: 49 },
+      { teamId: "t19", playerName: "Aitor Ruibal", minute: 67 },
+      { teamId: "t12", playerName: "Konstantinos Karetsas", minute: 72 },
+    ],
+    asOf: "2026-11-07",
+    source: "ESPN",
+  },
+  r4m12: {
+    // FC Porto 4-1 Napoli
+    scorers: [
+      { teamId: "t28", playerName: "Jan Bednarek", minute: 11 },
+      { teamId: "t9", playerName: "Scott McTominay", minute: 43 },
+      { teamId: "t28", playerName: "Gabri Veiga", minute: 71 },
+      { teamId: "t28", playerName: "Jakub Kiwior", minute: 80 },
+      { teamId: "t28", playerName: "Samu Aghehowa", minute: 90, penalty: true },
+    ],
+    asOf: "2026-11-07",
+    source: "ESPN / footballwebpages.co.uk",
+  },
+  r4m13: {
+    // PSV Eindhoven 1-2 Club Brugge -- Brugge'ün art arda 3. UCL galibiyeti.
+    scorers: [
+      { teamId: "t17", playerName: "Nicolò Tresoldi", minute: 25 },
+      { teamId: "t24", playerName: "Kodai Sano", minute: 54 },
+      { teamId: "t17", playerName: "Carlos Forbs", minute: 65 },
+    ],
+    asOf: "2026-11-07",
+    source: "ESPN / Flashscore",
+  },
+  r4m14: {
+    // RB Leipzig 2-3 Manchester City -- City iki kez öne geçip skoru kaptırdı, Haaland 78'de kazandırdı.
+    scorers: [
+      { teamId: "t2", playerName: "Castello Lukeba", minute: 37, ownGoal: true },
+      { teamId: "t15", playerName: "Ridle Baku", minute: 49 },
+      { teamId: "t2", playerName: "Enzo Fernández", minute: 58 },
+      { teamId: "t15", playerName: "Antonio Nusa", minute: 61 },
+      { teamId: "t2", playerName: "Erling Haaland", minute: 78 },
+    ],
+    asOf: "2026-11-07",
+    source: "ESPN / Yahoo Sports / KSAT (AP)",
+  },
+  r4m15: {
+    // RC Lens 1-9 Como -- modern UCL'de en farklı galibiyet rekoruna ortak oldu; turnuva tarihinde deplasmanda 9 gol atan ilk takım.
+    scorers: [
+      { teamId: "t34", playerName: "Anastasios Douvikas", minute: 7 },
+      { teamId: "t34", playerName: "Anastasios Douvikas", minute: 32 },
+      { teamId: "t34", playerName: "Nico Paz", minute: 40 },
+      { teamId: "t34", playerName: "Lucas Da Cunha", minute: 47 },
+      { teamId: "t34", playerName: "Marc-Oliver Kempf", minute: 53 },
+      { teamId: "t34", playerName: "Anastasios Douvikas", minute: 57 },
+      { teamId: "t34", playerName: "Mattia Liberali", minute: 62 },
+      { teamId: "t22", playerName: "Ruben Aguilar", minute: 65 },
+      { teamId: "t34", playerName: "Martin Baturina", minute: 69 },
+      { teamId: "t34", playerName: "M. Papaccioli", minute: 90 }, // 90+1'
+    ],
+    asOf: "2026-11-07",
+    source: "ESPN / theScore / Irish Examiner / Flashscore",
+  },
+  r4m16: {
+    // SK Slavia Prague 1-2 Arsenal -- Arsenal'in art arda 4. UCL galibiyeti.
+    scorers: [
+      { teamId: "t11", playerName: "Noni Madueke", minute: 9 },
+      { teamId: "t11", playerName: "Viktor Gyökeres", minute: 38 },
+      { teamId: "t29", playerName: "Wiktor Nowak", minute: 90 },
+    ],
+    asOf: "2026-11-07",
+    source: "ESPN / graphiconline.com",
+  },
+  r4m17: {
+    // Viking 4-1 Sabah
+    scorers: [
+      { teamId: "t31", playerName: "Orphe Mbina", minute: 11 },
+      { teamId: "t30", playerName: "Erik Botheim", minute: 27 },
+      { teamId: "t30", playerName: "Zlatko Tripić", minute: 69 },
+      { teamId: "t30", playerName: "Henrik Falchener", minute: 81 },
+      { teamId: "t30", playerName: "Erik Botheim", minute: 90 }, // 90+4'
+    ],
+    asOf: "2026-11-07",
+    source: "ESPN",
+  },
 };

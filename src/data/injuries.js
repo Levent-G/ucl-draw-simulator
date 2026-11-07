@@ -475,15 +475,6 @@ export const CURRENT_INJURIES = [
   // Thiemoko Diarra (9 Ekim'de asist yaptı), Mouandilmadji ve Rıdvan Yılmaz (güncel listelerde
   // yoklar), Leny Yoro (UCL 3. hafta cezasını çekti).
   {
-    teamId: "s1",
-    playerName: "Abdülkerim Bardakcı",
-    reason: "PFDK'dan 2 maç men cezası -- 26 Ekim derbisinin bitiş düdüğünde Archie Brown ile kavga ettiği için direkt kırmızı kart gördü; ilk maçını 30 Ekim Konyaspor deplasmanında çekti",
-    expectedReturn: "7 Kasım Amed SFK maçından sonra (Tahkim Kurulu indirim yapmazsa)",
-    asOf: "2026-10-31",
-    source: "AA / İHA / Hürriyet / Sözcü / Ajansspor",
-    type: "suspension",
-  },
-  {
     teamId: "s2",
     playerName: "Archie Brown",
     reason: "PFDK'dan 3 maç men cezası -- 26 Ekim derbisinin bitiş düdüğünde Abdülkerim Bardakcı ile kavga ettiği için direkt kırmızı kart gördü (UEFA maçlarına engel değil)",
@@ -531,5 +522,26 @@ export const CURRENT_INJURIES = [
     asOf: "2026-11-02",
     source: "sondakika.com / Ajansspor / Van Ekspres",
     type: "suspension",
+  },
+  // ---- 2026-11-07 tazelemesi (UCL 4. hafta + Süper Lig 11. hafta) ----
+  // ÇIKARILANLAR: Abdülkerim Bardakcı (s1 -- 2 maçlık PFDK cezasını Konyaspor ve 7 Kasım Amed
+  // SFK maçlarında çekti; Ajansspor 11. hafta listesi Amed maçı için hâlâ cezalı gösteriyordu).
+  // Rafael Leão'nun 7 Kasım Amed maçındaki sakatlığı kulüpçe henüz açıklanmadığı ve oyuncu
+  // kadro dosyalarında bulunmadığı için EKLENMEDİ.
+  {
+    teamId: "s1",
+    playerName: "Victor Osimhen",
+    reason: "Sol diz sakatlığı -- 3 Kasım Stuttgart maçında sakatlandı; MR'da sol dizde serbest fragman tespit edildi, Maslak Acıbadem'de artroskopik ameliyat geçirdi (kulüp açıklaması)",
+    expectedReturn: "Kesin süre açıklanmadı -- basında 2-3 ile 3-4 hafta arası tahminler var",
+    asOf: "2026-11-07",
+    source: "Hürriyet / Sözcü / Sporx / GZT / Dünya",
+  },
+  {
+    teamId: "t35",
+    playerName: "Victor Osimhen",
+    reason: "Sol diz sakatlığı -- 3 Kasım Stuttgart maçında sakatlandı; artroskopik diz ameliyatı geçirdi (kulüp açıklaması)",
+    expectedReturn: "Kesin süre açıklanmadı -- basında 2-3 ile 3-4 hafta arası tahminler var (GZT: Aston Villa ve AEK maçlarını kaçırabilir)",
+    asOf: "2026-11-07",
+    source: "Hürriyet / Sözcü / Sporx / GZT / Dünya",
   },
 ];
