@@ -507,7 +507,6 @@ export const CURRENT_INJURIES = [
   { teamId: "s9", playerName: "Adil Demirbağ", reason: "Sakatlık (türü açıklanmadı)", expectedReturn: null, asOf: "2026-10-30", source: "Ajansspor (10. hafta listesi)" },
   { teamId: "s12", playerName: "Ahmed Kutucu", reason: "Sakatlık -- Kocaelispor maçında forma giyemeyecek", expectedReturn: null, asOf: "2026-10-30", source: "Ajansspor (10. hafta listesi) / analiz53" },
   { teamId: "s18", playerName: "Dimitrios Goutas", reason: "Sakatlık (türü açıklanmadı)", expectedReturn: null, asOf: "2026-10-30", source: "Ajansspor (10. hafta listesi)" },
-  { teamId: "s18", playerName: "Ousmane Diabaté", reason: "Cezalı (10. hafta)", expectedReturn: "Alanyaspor maçından sonra", asOf: "2026-10-30", source: "Ajansspor (10. hafta listesi)", type: "suspension" },
   // ---- 2026-11-02 tazelemesi (Süper Lig 10. hafta sonrası) ----
   // ÇIKARILANLAR: Tanguy Coulibaly ve Elayis Tavşan (s6 -- 1 Kasım Başakşehir maçında ikisi de
   // gol attı, Fanatik), Haris Hajradinovic (s8 -- 1 Kasım Beşiktaş maçında Winck'in golüne asist
@@ -543,5 +542,33 @@ export const CURRENT_INJURIES = [
     expectedReturn: "Kesin süre açıklanmadı -- basında 2-3 ile 3-4 hafta arası tahminler var (GZT: Aston Villa ve AEK maçlarını kaçırabilir)",
     asOf: "2026-11-07",
     source: "Hürriyet / Sözcü / Sporx / GZT / Dünya",
+  },
+  // ---- 2026-11-08 tazelemesi (Süper Lig 11. hafta tamamlandı) ----
+  // ÇIKARILANLAR: Ousmane Diabaté (s18 -- 10. hafta cezasını 2 Kasım Alanyaspor maçında çekti).
+  // Archie Brown'ın 3 maçlık cezasının son maçı 12. haftada; kayıt korundu.
+  {
+    teamId: "s1",
+    playerName: "Rafael Leão",
+    reason: "Sağ arka adale sakatlığı -- 7 Kasım Amed SFK maçında gol attıktan sonra sakatlanıp oyundan çıktı; MR'da sağ üst arka adale grubunda ileri derecede zorlanma ve kanama tespit edildi (kulüp açıklaması)",
+    expectedReturn: "Kulüp kesin süre açıklamadı -- basında yaklaşık 4 hafta tahmini var",
+    asOf: "2026-11-08",
+    source: "Hürriyet / Fotomaç / Milliyet / Sporx / t24",
+  },
+  {
+    teamId: "t35",
+    playerName: "Rafael Leão",
+    reason: "Sağ arka adale sakatlığı -- 7 Kasım Amed SFK lig maçında sakatlandı; MR'da ileri derecede zorlanma ve kanama tespit edildi (kulüp açıklaması)",
+    expectedReturn: "Kulüp kesin süre açıklamadı -- basında yaklaşık 4 hafta tahmini var (Aston Villa maçını kaçırması bekleniyor)",
+    asOf: "2026-11-08",
+    source: "Hürriyet / Fotomaç / Milliyet / Sporx / t24",
+  },
+  {
+    teamId: "s18",
+    playerName: "Metehan Baltacı",
+    reason: "Kırmızı kart cezası -- 8 Kasım Beşiktaş maçında (0-3) 22. dakikada Vlahović'i formasından çektiği için ikinci sarı karttan kırmızı kart gördü",
+    expectedReturn: "12. hafta maçında cezalı (ikinci sarıdan kırmızı kartta otomatik 1 maç men)",
+    asOf: "2026-11-08",
+    source: "Habertürk / Star / Milliyet / CNN Türk",
+    type: "suspension",
   },
 ];

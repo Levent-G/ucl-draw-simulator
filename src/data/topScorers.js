@@ -1451,9 +1451,9 @@ export const TOP_SCORERS = [
     playerName: "Dušan Vlahović",
     teamId: "s3", // Beşiktaş
     competitionKey: "superlig",
-    goals: 7, // 3. hafta Çorum FK'ya hat-trick, 4. hafta derbide 1, 6. hafta Amed SFK deplasmanında 1 (55'), 7. hafta Kocaelispor'a 1 (31', penaltıdan) + 10. hafta Kasımpaşa deplasmanında 1 (47')
-    asOf: "2026-11-01",
-    source: "beIN Sports / fotomac.com.tr / takvim.com.tr / sofascore.com / gzt.com / Habertürk / Ajansspor / Star / Cumhuriyet",
+    goals: 9, // 3. hafta Çorum FK'ya hat-trick, 4. hafta derbide 1, 6. hafta Amed SFK deplasmanında 1 (55'), 7. hafta Kocaelispor'a 1 (31', penaltıdan) + 10. hafta Kasımpaşa deplasmanında 1 (47') + 11. hafta Gençlerbirliği'ne 2 (20', 45')
+    asOf: "2026-11-08",
+    source: "beIN Sports / fotomac.com.tr / takvim.com.tr / sofascore.com / gzt.com / Habertürk / Ajansspor / Star / Cumhuriyet / Milliyet",
   },
   {
     playerName: "Eldor Shomurodov",
@@ -1506,9 +1506,9 @@ export const TOP_SCORERS = [
     playerName: "Mohamed Salah",
     teamId: "s4", // Trabzonspor
     competitionKey: "superlig",
-    goals: 8, // 2. hafta Başakşehir'e 2 (8', 48'), 3. hafta Amed SFK deplasmanında 1 (11'), 4. hafta Gençlerbirliği'ne (penaltı) 1, 5. hafta Konyaspor deplasmanında sessiz kaldı, 6. hafta Galatasaray derbisinde hat-trick (4', 44', 80') + 8. hafta 1
-    asOf: "2026-10-19",
-    source: "Al Jazeera / The National / beIN Sports / AA / Hürriyet / Sözcü / Fanatik / Star / Cumhuriyet / Habertürk / Sabah / fotmob.com / tff.org / Star / Cumhuriyet / Sporkolik / Karsmanset",
+    goals: 9, // 2. hafta Başakşehir'e 2 (8', 48'), 3. hafta Amed SFK deplasmanında 1 (11'), 4. hafta Gençlerbirliği'ne (penaltı) 1, 5. hafta Konyaspor deplasmanında sessiz kaldı, 6. hafta Galatasaray derbisinde hat-trick (4', 44', 80') + 8. hafta 1 + 11. hafta Alanyaspor deplasmanında 1 (34', Muçi asistiyle)
+    asOf: "2026-11-08",
+    source: "Al Jazeera / The National / beIN Sports / AA / Hürriyet / Sözcü / Fanatik / Star / Cumhuriyet / Habertürk / Sabah / fotmob.com / tff.org / Star / Cumhuriyet / Sporkolik / Karsmanset / Ajansspor",
   },
   {
     playerName: "Milan Škriniar",
@@ -1564,10 +1564,9 @@ export const TOP_SCORERS = [
     playerName: "Ali Sowe",
     teamId: "s12", // Çaykur Rizespor
     competitionKey: "superlig",
-    goals: 1, // 5. hafta Eyüpspor deplasmanında, 21'
-    matchesPlayed: 5,
-    asOf: "2026-09-19",
-    source: "Habertürk / beIN Sports / Sporx",
+    goals: 3, // 5. hafta Eyüpspor deplasmanında, 21' + 11. hafta Erzurumspor FK'ya 2 (31', 66')
+    asOf: "2026-11-08",
+    source: "Habertürk / beIN Sports / Sporx / Hürriyet / A Spor / Takvim",
   },
   {
     // superLigPlayers.js'te Çaykur Rizespor (s12) kadrosunda YOK, ama gol
@@ -1813,9 +1812,9 @@ export const TOP_SCORERS = [
     playerName: "Oğuz Aydın",
     teamId: "s2", // Fenerbahçe
     competitionKey: "superlig",
-    goals: 1, // 7. hafta Çaykur Rizespor deplasmanında 87' (Lukaku asistiyle; 80'de oyuna girdi)
-    asOf: "2026-10-10",
-    source: "Takvim / Fotomaç / FOX Sports",
+    goals: 2, // 7. hafta Çaykur Rizespor deplasmanında 87' (Lukaku asistiyle; 80'de oyuna girdi) + 11. hafta Çorum FK deplasmanında 1 (74', bazı kaynaklar 75')
+    asOf: "2026-11-08",
+    source: "Takvim / Fotomaç / FOX Sports / Hürriyet / CNN Türk / Yeni Şafak",
   },
   // ---- Trendyol Süper Lig 2026-27 -- 7. Hafta, 11 Ekim 2026 ----
   {
@@ -1928,10 +1927,9 @@ export const TOP_SCORERS = [
     playerName: "Mason Greenwood",
     teamId: "s2", // Fenerbahçe
     competitionKey: "superlig",
-    goals: 2, // 6. hafta Eyüpspor'a, 4'/5' (penaltı) ve 80'
-    matchesPlayed: 6,
-    asOf: "2026-09-20",
-    source: "Habertürk / Hürriyet / ajansspor.com / fanatik.com.tr",
+    goals: 4, // 6. hafta Eyüpspor'a, 4'/5' (penaltı) ve 80' + 11. hafta Çorum FK deplasmanında 2 (12', 63')
+    asOf: "2026-11-08",
+    source: "Habertürk / Hürriyet / ajansspor.com / fanatik.com.tr / CNN Türk / Yeni Şafak",
   },
   {
     // Habertürk "Matteo Guendouzi", Hürriyet ise yanlışlıkla "Aurélien
@@ -1952,9 +1950,9 @@ export const TOP_SCORERS = [
     playerName: "İrfan Can Kahveci",
     teamId: "s2", // Fenerbahçe
     competitionKey: "superlig",
-    goals: 3, // 6. hafta Eyüpspor'a, 45+1'; 7. hafta Çaykur Rizespor deplasmanında 83' (Oğuz Aydın asistiyle) + 9. hafta 1
-    asOf: "2026-10-27",
-    source: "Habertürk / Hürriyet / Takvim / Fotomaç (7. hafta) / Hürriyet / Habertürk / Ajansspor / Akşam",
+    goals: 5, // 6. hafta Eyüpspor'a, 45+1'; 7. hafta Çaykur Rizespor deplasmanında 83' (Oğuz Aydın asistiyle) + 9. hafta 1 + 11. hafta Çorum FK deplasmanında 2 (21' [bazı kaynaklar 20'], 56')
+    asOf: "2026-11-08",
+    source: "Habertürk / Hürriyet / Takvim / Fotomaç (7. hafta) / Hürriyet / Habertürk / Ajansspor / Akşam / CNN Türk / Yeni Şafak",
   },
   {
     playerName: "Miguel Cardoso",
@@ -2283,9 +2281,9 @@ export const TOP_SCORERS = [
     playerName: "Ibrahim Diabate",
     teamId: "s14",
     competitionKey: "superlig",
-    goals: 1, // 10. hafta 74'
-    asOf: "2026-10-31",
-    source: "Hürriyet / ensondakika",
+    goals: 2, // 10. hafta 74' + 11. hafta Çaykur Rizespor deplasmanında 37'
+    asOf: "2026-11-08",
+    source: "Hürriyet / ensondakika / A Spor / Takvim",
   },
   // ---- 10. Hafta, 31 Ekim - 1 Kasım 2026: Fenerbahçe 1-2 Göztepe, Amed SFK 5-1 Eyüpspor,
   // Trabzonspor 2-0 Gaziantep FK, Başakşehir 5-2 Samsunspor, Kasımpaşa 2-2 Beşiktaş ----
@@ -2415,4 +2413,9 @@ export const TOP_SCORERS = [
   { playerName: "Antoine Sekongo", teamId: "s6", competitionKey: "superlig", goals: 1, asOf: "2026-11-07", source: "Hürriyet / Fanatik / Takvim" }, // 11. hafta Konyaspor'a 39'
   { playerName: "Edin Visca", teamId: "s5", competitionKey: "superlig", goals: 1, asOf: "2026-11-07", source: "A Spor / Son Mühür" }, // 11. hafta Göztepe'ye 83' (Son Mühür 82')
   { playerName: "Yira Sor", teamId: "s11", competitionKey: "superlig", goals: 1, asOf: "2026-11-07", source: "Ajansspor / Hürriyet / Fanatik" }, // 11. hafta Galatasaray'a 90+2'/90+3'
+  // ---- Süper Lig 11. Hafta (8 Kas) -- bu dosyada daha önce lig golüyle yer almayan oyuncular
+  // (bu sezonki önceki golleri varsa burada sayılmamış olabilir). Mevcut oyuncuların (Vlahović,
+  // Salah, Greenwood, İrfan Can Kahveci, Oğuz Aydın, Ali Sowe, Diabate) sayıları kendi kayıtlarında artırıldı.
+  { playerName: "Wagner Pina", teamId: "s4", competitionKey: "superlig", goals: 1, asOf: "2026-11-08", source: "Ajansspor / Hürriyet / Habertürk" }, // 11. hafta Alanyaspor'a 17'
+  { playerName: "Ernest Poku", teamId: "s3", competitionKey: "superlig", goals: 1, asOf: "2026-11-08", source: "Habertürk / Star / Milliyet" }, // 11. hafta Gençlerbirliği'ne 85' (bazı kaynaklar 87')
 ];

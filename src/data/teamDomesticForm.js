@@ -120,7 +120,8 @@ export const TEAM_DOMESTIC_FORM = {
   // ---- Süper Lig (Türkiye) -- src/data/liveStatus.js SUPER_LIG_LIVE_STANDINGS/RESULTS ile birebir aynı kaynak, 4. hafta sonrası, 7 Eylül 2026 (bu satır liveStatus.js her tazelendiğinde buradan da senkron edilmeli; aksi halde TeamProfilePage.jsx'te "Süper Lig Formu" ile "Son 5 maç" blokları farklı/çelişkili görünür) ----
   // 2026-10-12: liveStatus.js'teki 7. hafta (11 Ekim) sonrası tabloyla senkronlandı; form = son 5 maç.
   // 2026-11-07: liveStatus.js'teki 11. hafta (5/9) sonrası tabloyla senkronlandı. Fenerbahçe 11. hafta maçını (Çorum FK) 8 Kasım'da oynayacak; sırası 6.'dan 8.'ye düştü.
-  t25: { league: "Süper Lig", country: "Türkiye", position: 8, played: 10, w: 5, d: 1, l: 4, pts: 16, form: ["W", "W", "W", "L", "L"], asOf: "2026-11-07" }, // Fenerbahçe (6. hf Eyüpspor 8-0, 7. hf Rizespor 3-0, 8. hf Alanyaspor 3-0, 9. hf Galatasaray'a 1-2, 10. hf Göztepe'ye 1-2)
+  // 2026-11-08: 11. hafta tamamlandı (9/9); Fenerbahçe Çorum FK'yı deplasmanda 5-0 yendi, 8.'likten 6.'lığa yükseldi.
+  t25: { league: "Süper Lig", country: "Türkiye", position: 6, played: 11, w: 6, d: 1, l: 4, pts: 19, form: ["W", "W", "L", "L", "W"], asOf: "2026-11-08" }, // Fenerbahçe (7. hf Rizespor 3-0, 8. hf Alanyaspor 3-0, 9. hf Galatasaray'a 1-2, 10. hf Göztepe'ye 1-2, 11. hf Çorum FK 5-0)
   t35: { league: "Süper Lig", country: "Türkiye", position: 1, played: 11, w: 9, d: 1, l: 1, pts: 28, form: ["W", "W", "W", "W", "W"], asOf: "2026-11-07" }, // Galatasaray (7. hf Kasımpaşa 3-1, 8. hf Gençlerbirliği 1-0, 9. hf Fenerbahçe 2-1, 10. hf Konyaspor 4-0, 11. hf Amed SFK 4-3)
 
   // ---- Liga Portugal (Portekiz) -- ESPN, 5. hafta sonrası, 5 Eylül 2026 ----

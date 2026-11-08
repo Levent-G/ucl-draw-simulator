@@ -739,4 +739,45 @@ export const SUPER_LIG_MATCH_STATS = {
     asOf: "2026-11-07",
     source: "Ajansspor / Hürriyet / Fanatik / Star / NTV Spor",
   },
+  sr11m3: {
+    // Çaykur Rizespor 2-1 Erzurumspor FK (8 Kas, Çaykur Didi Stadı) -- ilk yarı 1-1; Rizespor'un sezonun ilk iç saha galibiyeti, 5 maçlık galibiyetsizlik serisi bitti.
+    scorers: [
+      { teamId: "s12", playerName: "Ali Sowe", minute: 31 },
+      { teamId: "s14", playerName: "Ibrahim Diabate", minute: 37 },
+      { teamId: "s12", playerName: "Ali Sowe", minute: 66 },
+    ],
+    asOf: "2026-11-08",
+    source: "Hürriyet / A Spor / Takvim / Yeni Şafak / Anka",
+  },
+  sr11m5: {
+    // Çorum FK 0-5 Fenerbahçe (8 Kas, Çorum Şehir Stadyumu) -- Emre Belözoğlu'nun Fenerbahçe'deki ilk maçı; ilk yarı 0-2. Kahveci'nin ilk golü bazı kaynaklarda 20', Oğuz Aydın'ınki 75'. Sarı kartlar: Mohammed Diomande (Çorum FK), Nelson Semedo (Fenerbahçe).
+    scorers: [
+      { teamId: "s2", playerName: "Mason Greenwood", minute: 12 },
+      { teamId: "s2", playerName: "İrfan Can Kahveci", minute: 21 },
+      { teamId: "s2", playerName: "İrfan Can Kahveci", minute: 56 },
+      { teamId: "s2", playerName: "Mason Greenwood", minute: 63 },
+      { teamId: "s2", playerName: "Oğuz Aydın", minute: 74 },
+    ],
+    asOf: "2026-11-08",
+    source: "Hürriyet / CNN Türk / Fanatik / DHA / Yeni Şafak / beIN Sports",
+  },
+  sr11m2: {
+    // Alanyaspor 0-2 Trabzonspor (8 Kas) -- Trabzonspor'un üst üste 6. lig galibiyeti. Salah'ın golünde asist Muçi. Sarı kartlar: Aliti (Alanyaspor, 82'), Nwaiwu (Trabzonspor, 90+4').
+    scorers: [
+      { teamId: "s4", playerName: "Wagner Pina", minute: 17 },
+      { teamId: "s4", playerName: "Mohamed Salah", minute: 34 },
+    ],
+    asOf: "2026-11-08",
+    source: "Ajansspor / Hürriyet / Habertürk / Star / Akşam",
+  },
+  sr11m7: {
+    // Beşiktaş 3-0 Gençlerbirliği (8 Kas, Tüpraş Stadyumu) -- Metehan Baltacı (Gençlerbirliği) 22'de ikinci sarıdan kırmızı kart gördü. Trossard 3 asist. Poku'nun golü bazı kaynaklarda 87'.
+    scorers: [
+      { teamId: "s3", playerName: "Dušan Vlahović", minute: 20 },
+      { teamId: "s3", playerName: "Dušan Vlahović", minute: 45 },
+      { teamId: "s3", playerName: "Ernest Poku", minute: 85 },
+    ],
+    asOf: "2026-11-08",
+    source: "Habertürk / Star / Milliyet / CNN Türk / NTV Spor",
+  },
 };

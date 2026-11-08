@@ -1604,6 +1604,50 @@ export const NEWS_ITEMS = [
     competitionKey: "superlig",
     relatedTeamIds: ["s6", "s9", "s16", "s17", "s7", "s5"],
   },
+  {
+    id: "news-sl-81",
+    date: "2026-11-08",
+    title: "Emre Belözoğlu'lu Fenerbahçe, Çorum'da 5-0 kazandı",
+    summary:
+      "Emre Belözoğlu'nun Fenerbahçe'nin başındaki ilk maçında sarı-lacivertliler Çorum FK'yı deplasmanda 5-0 yendi. Mason Greenwood (12', 63') ve İrfan Can Kahveci (21', 56') ikişer, Oğuz Aydın (74') bir gol attı. İlk yarı 0-2 biten maçla Fenerbahçe ligde iki maçlık yenilgi serisini bitirip 19 puana yükseldi; Çorum FK 16 puanda kaldı.",
+    source: "Hürriyet / CNN Türk / Fanatik / DHA / Yeni Şafak",
+    url: "https://www.hurriyet.com.tr/sporarena/corum-fk-0-5-fenerbahce-super-lig-maci-ozeti-43370366",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s13", "s2"],
+  },
+  {
+    id: "news-sl-82",
+    date: "2026-11-08",
+    title: "Trabzonspor'dan üst üste 6. galibiyet: Alanya'da 2-0",
+    summary:
+      "Trabzonspor, Wagner Pina'nın 17. dakikadaki golü ve Muçi'nin pasında Salah'ın 34. dakikadaki golüyle Alanyaspor'u deplasmanda 2-0 yendi. Thomas Reis yönetiminde ligde üst üste 6. galibiyetini alan Trabzonspor 25 puanla ikinci sıraya yükseldi ve lider Galatasaray'ın 3 puan gerisinde milli araya girdi. Alanyaspor 12 puanda kaldı.",
+    source: "Ajansspor / Hürriyet / Habertürk / Star / NTV",
+    url: "https://ajansspor.com/haber/corendon-alanyaspor-trabzonspor-0-2-mac-sonucu-yazili-ozet-738260",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s10", "s4"],
+  },
+  {
+    id: "news-sl-83",
+    date: "2026-11-08",
+    title: "Vlahović'ten iki gol, Trossard'dan üç asist: Beşiktaş 3-0 Gençlerbirliği",
+    summary:
+      "11. haftanın kapanış maçında Beşiktaş, Tüpraş Stadyumu'nda Gençlerbirliği'ni 3-0 yendi. Dušan Vlahović 20. ve 45. dakikalarda, Ernest Poku 85. dakikada gol attı; üç golün asistini Leandro Trossard yaptı. Gençlerbirliği'nde Metehan Baltacı 22. dakikada ikinci sarı karttan kırmızı kart gördü. Beşiktaş 22 puanla 4. sıraya yükseldi, Gençlerbirliği 11 puanda kaldı.",
+    source: "Habertürk / Star / Milliyet / Cumhuriyet / NTV Spor",
+    url: "https://www.star.com.tr/spor/mac-sonucu-besiktas-3-0-genclerbirligi-haber-2052095/",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s3", "s18"],
+  },
+  {
+    id: "news-sl-84",
+    date: "2026-11-08",
+    title: "Ali Sowe'nin iki golüyle Rizespor evinde ilk kez kazandı",
+    summary:
+      "Çaykur Rizespor, Ali Sowe'nin 31. ve 66. dakikalardaki golleriyle Erzurumspor FK'yı 2-1 yendi; Erzurumspor'un golünü 37. dakikada Ibrahim Diabate attı. Rizespor bu sezon Süper Lig'de sahasındaki ilk galibiyetini alarak 5 maçlık galibiyet hasretine son verdi. İki takım da 14 puanda.",
+    source: "Hürriyet / A Spor / Takvim / Yeni Şafak / Anka",
+    url: "https://www.aspor.com.tr/rizespor/2026/11/08/caykur-rizespor-evinde-erzurumspor-fkyi-maglup-etti-iste-macin-ozeti",
+    competitionKey: "superlig",
+    relatedTeamIds: ["s12", "s14"],
+  },
 
   // ---- 2026-27 UCL lig fazı: dikkat çekici eşleşme önizlemeleri ----
   {

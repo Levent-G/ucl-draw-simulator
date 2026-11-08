@@ -12,7 +12,7 @@
 // tablosuyla birebir aynıydı). 7. Hafta 9 Ekim 20.00'de başladı; açılış
 // maçı Galatasaray 3-1 Kasımpaşa aynı gece 23:30'da eklendi. Kalan 8 maç
 // (10-12 Ekim) oynandıkça buraya eklenmeli.
-export const SUPER_LIG_LIVE_ASOF = "7 Kasım 2026 (11. Hafta: 5/9 maç oynandı)";
+export const SUPER_LIG_LIVE_ASOF = "8 Kasım 2026 (11. Hafta tamamlandı)";
 
 // Türkçe Vikipedi'nin "2026-27 Süper Lig" maddesinin ham wikitext'i (maç
 // sonuçları) + "Şablon:2026-27 Süper Lig puan durumu" (güncel puan durumu
@@ -105,25 +105,25 @@ export const SUPER_LIG_LIVE_ASOF = "7 Kasım 2026 (11. Hafta: 5/9 maç oynandı)
 // sütunları birbirine eşit=161, toplam puan=151 -- 54 maçlık bir sezonun bu
 // aşamasında matematiksel olarak beklenen değerler).
 export const SUPER_LIG_LIVE_STANDINGS = [
-  // 7 Kasım 2026: 10. Hafta 9/9 + 11. Hafta 5/9. Tablo SUPER_LIG_LIVE_RESULTS'tan yeniden
-  // hesaplandı (puan > averaj > atılan gol, eşitlikte önceki sıra; toplam G = toplam M = 79,
-  // oynanan maç toplamı 190 = 95 maç x 2). Maç haberlerindeki puanlarla tutarlı: Galatasaray 28
-  // (lider), Amed 23, Kasımpaşa 20 (4.), Kocaelispor 19 (6.), Başakşehir 17, Gençlerbirliği 11,
-  // Alanyaspor 12, Samsunspor 7, Konyaspor 8, Gaziantep 8 (16.), Eyüpspor 3.
+  // 8 Kasım 2026: 11. Hafta TAMAMLANDI (9/9). Tablo SUPER_LIG_LIVE_RESULTS'tan yeniden
+  // hesaplandı (puan > averaj > atılan gol, eşitlikte önceki sıra; toplam G = toplam M = 83,
+  // oynanan maç toplamı 198 = 99 maç x 2). Maç haberlerindeki puanlarla tutarlı: Trabzonspor 25
+  // (2., liderin 3 puan gerisi), Beşiktaş 22 (4.), Fenerbahçe 19, Çorum FK 16, Rizespor 14,
+  // Erzurumspor FK 14, Alanyaspor 12 (13.), Gençlerbirliği 11.
   { rank: 1, teamName: "Galatasaray", played: 11, w: 9, d: 1, l: 1, gf: 27, ga: 15, pts: 28 },
-  { rank: 2, teamName: "Amed SFK", played: 11, w: 7, d: 2, l: 2, gf: 28, ga: 15, pts: 23 },
-  { rank: 3, teamName: "Trabzonspor", played: 10, w: 7, d: 1, l: 2, gf: 24, ga: 8, pts: 22 },
-  { rank: 4, teamName: "Kasımpaşa", played: 11, w: 5, d: 5, l: 1, gf: 17, ga: 11, pts: 20 },
-  { rank: 5, teamName: "Beşiktaş", played: 10, w: 6, d: 1, l: 3, gf: 20, ga: 12, pts: 19 },
-  { rank: 6, teamName: "Kocaelispor", played: 11, w: 6, d: 1, l: 4, gf: 13, ga: 9, pts: 19 },
-  { rank: 7, teamName: "İstanbul Başakşehir", played: 11, w: 5, d: 2, l: 4, gf: 19, ga: 17, pts: 17 },
-  { rank: 8, teamName: "Fenerbahçe", played: 10, w: 5, d: 1, l: 4, gf: 24, ga: 10, pts: 16 },
-  { rank: 9, teamName: "Çorum FK", played: 10, w: 5, d: 1, l: 4, gf: 21, ga: 16, pts: 16 },
+  { rank: 2, teamName: "Trabzonspor", played: 11, w: 8, d: 1, l: 2, gf: 26, ga: 8, pts: 25 },
+  { rank: 3, teamName: "Amed SFK", played: 11, w: 7, d: 2, l: 2, gf: 28, ga: 15, pts: 23 },
+  { rank: 4, teamName: "Beşiktaş", played: 11, w: 7, d: 1, l: 3, gf: 23, ga: 12, pts: 22 },
+  { rank: 5, teamName: "Kasımpaşa", played: 11, w: 5, d: 5, l: 1, gf: 17, ga: 11, pts: 20 },
+  { rank: 6, teamName: "Fenerbahçe", played: 11, w: 6, d: 1, l: 4, gf: 29, ga: 10, pts: 19 },
+  { rank: 7, teamName: "Kocaelispor", played: 11, w: 6, d: 1, l: 4, gf: 13, ga: 9, pts: 19 },
+  { rank: 8, teamName: "İstanbul Başakşehir", played: 11, w: 5, d: 2, l: 4, gf: 19, ga: 17, pts: 17 },
+  { rank: 9, teamName: "Çorum FK", played: 11, w: 5, d: 1, l: 5, gf: 21, ga: 21, pts: 16 },
   { rank: 10, teamName: "Göztepe", played: 11, w: 4, d: 3, l: 4, gf: 22, ga: 19, pts: 15 },
-  { rank: 11, teamName: "Erzurumspor FK", played: 10, w: 4, d: 2, l: 4, gf: 9, ga: 15, pts: 14 },
-  { rank: 12, teamName: "Alanyaspor", played: 10, w: 3, d: 3, l: 4, gf: 9, ga: 16, pts: 12 },
-  { rank: 13, teamName: "Çaykur Rizespor", played: 10, w: 3, d: 2, l: 5, gf: 11, ga: 15, pts: 11 },
-  { rank: 14, teamName: "Gençlerbirliği", played: 10, w: 3, d: 2, l: 5, gf: 12, ga: 18, pts: 11 },
+  { rank: 11, teamName: "Çaykur Rizespor", played: 11, w: 4, d: 2, l: 5, gf: 13, ga: 16, pts: 14 },
+  { rank: 12, teamName: "Erzurumspor FK", played: 11, w: 4, d: 2, l: 5, gf: 10, ga: 17, pts: 14 },
+  { rank: 13, teamName: "Alanyaspor", played: 11, w: 3, d: 3, l: 5, gf: 9, ga: 18, pts: 12 },
+  { rank: 14, teamName: "Gençlerbirliği", played: 11, w: 3, d: 2, l: 6, gf: 12, ga: 21, pts: 11 },
   { rank: 15, teamName: "Konyaspor", played: 11, w: 2, d: 2, l: 7, gf: 6, ga: 14, pts: 8 },
   { rank: 16, teamName: "Gaziantep FK", played: 11, w: 2, d: 2, l: 7, gf: 9, ga: 19, pts: 8 },
   { rank: 17, teamName: "Samsunspor", played: 11, w: 2, d: 1, l: 8, gf: 11, ga: 26, pts: 7 },
@@ -312,6 +312,15 @@ export const SUPER_LIG_LIVE_RESULTS = [
   { label: "11. Hafta", date: "7 Kas", home: "Samsunspor", homeGoals: 1, away: "Konyaspor", awayGoals: 0 },
   { label: "11. Hafta", date: "7 Kas", home: "Göztepe", homeGoals: 1, away: "İstanbul Başakşehir", awayGoals: 2 },
   { label: "11. Hafta", date: "7 Kas", home: "Galatasaray", homeGoals: 4, away: "Amed SFK", awayGoals: 3 },
+  // 8 Kasım gece tazelemesi -- 11. Hafta TAMAMLANDI (9/9). Her skor en az 3 kaynakla:
+  // Çaykur Rizespor 2-1 Erzurumspor FK (Hürriyet, A Spor, Takvim, Yeni Şafak, haberler.com),
+  // Çorum FK 0-5 Fenerbahçe (Hürriyet, CNN Türk, Fanatik, DHA, Yeni Şafak, NTV),
+  // Alanyaspor 0-2 Trabzonspor (Ajansspor, Hürriyet, Habertürk, Star, Akşam, NTV),
+  // Beşiktaş 3-0 Gençlerbirliği (Habertürk, Star, Milliyet, Cumhuriyet, CNN Türk, NTV Spor).
+  { label: "11. Hafta", date: "8 Kas", home: "Çaykur Rizespor", homeGoals: 2, away: "Erzurumspor FK", awayGoals: 1 },
+  { label: "11. Hafta", date: "8 Kas", home: "Çorum FK", homeGoals: 0, away: "Fenerbahçe", awayGoals: 5 },
+  { label: "11. Hafta", date: "8 Kas", home: "Alanyaspor", homeGoals: 0, away: "Trabzonspor", awayGoals: 2 },
+  { label: "11. Hafta", date: "8 Kas", home: "Beşiktaş", homeGoals: 3, away: "Gençlerbirliği", awayGoals: 0 },
 ];
 
 // Simüle edilmiş TAM fikstürü (roundRobinEngine'den gelen, gerçek dünyayla
